@@ -1,6 +1,6 @@
 <!-- /.content-wrapper -->
 <footer class="main-footer">
-    <strong>Copyright &copy; 2023-2024 <a href="https://adminlte.io">rickek.hack98.com</a></strong>
+    <strong>Copyright &copy; 2025 <a href="https://adminlte.io">PT Sanwamas Metal Industry</a></strong>
     All rights reserved.
     <div class="float-right d-none d-sm-inline-block">
     <b>Version</b> 3.2.0

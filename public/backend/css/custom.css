@@ -1,0 +1,13 @@
+.itemSubMenu .nav-item {
+    width: 80%; /* Adjust width as needed */
+}
+
+.itemSubMenu .nav-link {
+    text-align: left; /* Keeps text aligned left within centered container */
+    display: flex;
+    flex-direction: column;
+}
+
+.itemSubMenu .nav-link p {
+    margin-left: 35px;
+}

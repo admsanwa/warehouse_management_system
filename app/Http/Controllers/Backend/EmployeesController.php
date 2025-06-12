@@ -1,24 +1,29 @@
 <?php
 
 namespace App\Http\Controllers\Backend;
+
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\JobsModel;
 use App\Models\User;
 use Monolog\Handler\RedisHandler;
 
-class EmployeesController extends Controller{
-    public function index(Request $request) {
+class EmployeesController extends Controller
+{
+    public function index(Request $request)
+    {
         $data['getRecord'] = User::getRecord($request);
         return view('backend.employees.list', $data);
     }
 
-    public function add(Request $request) {
+    public function add(Request $request)
+    {
         $data['getJobs'] = JobsModel::getRecord($request);
         return view('backend.employees.add', $data);
     }
 
-    public function add_post(Request $request){
+    public function add_post(Request $request)
+    {
         // dd($request->all());
         $user = request()->validate([
             'name'           => 'required',
@@ -42,26 +47,29 @@ class EmployeesController extends Controller{
         $user->commission_pct       = trim($request->commission_pct);
         $user->manager_id           = trim($request->manager_id);
         $user->department_id        = trim($request->department_id);
-        $user->is_role              = 0;
+        $user->role              = $user->role == 1 ? 1 : 0;
         $user->save();
 
         return redirect('admin/employees')->with('success', 'Employees Succesfully Register');
     }
 
-    public function view($id) {
+    public function view($id)
+    {
         $data['getRecord'] = User::find($id);
         return view('backend.employees.view', $data);
     }
 
-    public function edit($id){
+    public function edit($id)
+    {
         $data['getRecord'] = User::find($id);
         $data['getJobs'] = JobsModel::get();
         return view('backend.employees.edit', $data);
     }
 
-    public function update($id, Request $request) {
+    public function update($id, Request $request)
+    {
         $user = $request->validate([
-            'email' => 'required|unique:users,email,'.$id,
+            'email' => 'required|unique:users,email,' . $id,
         ]);
 
         $user                       = User::find($id);
@@ -76,7 +84,7 @@ class EmployeesController extends Controller{
             $user->commission_pct       = trim($request->commission_pct);
             $user->manager_id           = trim($request->manager_id);
             $user->department_id        = trim($request->department_id);
-            $user->is_role              = $user->is_role == 1 ? 1 : 0;
+            $user->role              = $user->role == 1 ? 1 : 0;
             $user->save();
 
             return redirect('admin/employees')->with('success', 'Employees succesfully update');
@@ -85,11 +93,10 @@ class EmployeesController extends Controller{
         }
     }
 
-    public function delete($id) {
+    public function delete($id)
+    {
         $recordDelete = User::find($id);
         $recordDelete->delete();
         return redirect()->back()->with('error', 'Employees succesfully delete');
     }
 }
-
-?>

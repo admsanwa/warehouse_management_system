@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role'
     ];
 
     /**
@@ -44,7 +45,8 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    static public function getRecord() {
+    static public function getRecord()
+    {
         $return = self::select('users.*');
 
         // search box start
@@ -63,10 +65,10 @@ class User extends Authenticatable
 
         $return = $return->orderBy('id', 'desc')->paginate(5);
         return $return;
-
     }
 
-    public function get_job_single() {
+    public function get_job_single()
+    {
         return $this->belongsTo(JobsModel::class, 'job_id');
     }
 }

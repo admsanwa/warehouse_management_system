@@ -7,7 +7,11 @@ use App\Http\Controllers\Backend\JobsHistoryController;
 use App\Http\Controllers\Backend\JobsController;
 use App\Http\Controllers\Backend\DashboardController;
 use App\Http\Controllers\Backend\EmployeesController;
-use App\Http\Controllers\Backend\JobGradesController;
+use App\Http\Controllers\Backend\ItemsController;
+use App\Http\Controllers\Backend\ProductionController;
+use App\Http\Controllers\Backend\PurchasingController;
+use App\Http\Controllers\Backend\StockController;
+use App\Http\Controllers\Backend\TransactionController;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 /*
@@ -21,6 +25,7 @@ use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 |
 */
 
+// Auth
 Route::get('/', [AuthController::class, 'index']);
 Route::get('forgot-password', [AuthController::class, 'forgot_password']);
 Route::get('register', [AuthController::class, 'register']);
@@ -40,27 +45,44 @@ Route::group(['middleware' => 'admin'], function () {
 
     // JobsController
     Route::get('admin/jobs', [JobsController::class, 'index']);
-    Route::get('admin/jobs/add', [JobsController::class, 'add']);
-    Route::post('admin/jobs/add', [JobsController::class, 'add_post']);
-    Route::get('admin/jobs/view/{id}', [JobsController::class, 'view']);
-    Route::get('admin/jobs/edit/{id}', [JobsController::class, 'edit']);
-    Route::post('admin/jobs/edit/{id}', [JobsController::class, 'update']);
-    Route::get('admin/jobs/delete/{id}', [JobsController::class, 'delete']);
     Route::get('admin/jobs_export', [JobsController::class, 'jobs_export']);
 
-    // JobsHistoryController
-    Route::get('admin/job_history', [JobsHistoryController::class, 'index']);
-    Route::get('admin/job_history/add', [JobsHistoryController::class, 'add']);
-    Route::post('admin/job_history/add', [JobsHistoryController::class, 'add_post']);
-    Route::get('admin/job_history/edit/{id}', [JobsHistoryController::class, 'edit']);
-    Route::post('admin/job_history/edit/{id}', [JobsHistoryController::class, 'update']);
-    Route::get('admin/job_history/delete/{id}', [JobsHistoryController::class, 'delete']);
+    // ItemsController
+    Route::get('admin/items/barcode', [ItemsController::class, 'index']);
+    Route::get('admin/items/print', [ItemsController::class, 'print']);
+    Route::post('admin/items/add', [ItemsController::class, 'post']);
+    Route::get('admin/items/delete/{id}', [ItemsController::class, 'delete']);
+    Route::get('admin/items/deleteall', [ItemsController::class, 'deleteall']);
+    Route::get('admin/items/additem', [ItemsController::class, 'add']);
+    Route::post('admin/items/additem', [ItemsController::class, 'post_item']);
+    Route::get('admin/items/list', [ItemsController::class, 'list']);
+    Route::get('admin/items/trash/{id}', [ItemsController::class, 'trash']);
+    Route::get('admin/items/edit/{id}', [ItemsController::class, 'edit']);
+    Route::get('admin/items/upload', [ItemsController::class, 'upload']);
 
-    Route::get('admin/job_history_export', [JobsHistoryController::class, 'job_history_export']);
+    // Purchasing
+    Route::get('admin/purchasing', [PurchasingController::class, 'index']);
+    Route::get('admin/purchasing/view/{id}', [PurchasingController::class, 'view']);
+    Route::get('admin/purchasing/upload', [PurchasingController::class, 'upload_form']);
+    Route::post('admin/purchasing/upload', [PurchasingController::class, 'upload']);
 
-    // JobGradeController
-    Route::get('admin/job_grades', [JobGradesController::class, 'index']);
-    Route::get('admin/job_grades/add', [JobGradesController::class, 'add']);
+    // production
+    Route::get('admin/production', [ProductionController::class, 'index']);
+    Route::get('admin/production/view/{id}', [ProductionController::class, 'view']);
+    Route::get('admin/production/upload', [ProductionController::class, 'upload_form']);
+    Route::post('admin/production/upload', [ProductionController::class, 'upload']);
+
+    // stock
+    Route::get('admin/stock', [StockController::class, 'index']);
+
+    // transaction
+    Route::get('admin/transaction/stockin', [TransactionController::class, 'stock_in']);
+    Route::post('admin/transaction/stockup', [TransactionController::class, 'stock_up']);
+    Route::get('admin/transaction/stockdel/{id}', [TransactionController::class, 'stock_del']);
+    Route::get('admin/transaction/stockdet/{grpo}', [TransactionController::class, 'stock_det']);
+    Route::get('admin/transaction/stockout', [TransactionController::class, 'stock_out']);
+    Route::post('/stockin-add', [TransactionController::class, 'scan_and_store']);
+    Route::get('/scanned-barcodes/{grpo}', [TransactionController::class, 'getScannedBarcodes']);
 });
 
 Route::get('logout', [AuthController::class, 'logout']);

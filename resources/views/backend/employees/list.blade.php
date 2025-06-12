@@ -2,21 +2,21 @@
 
 @section('content')
 <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
+<div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <div class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1>Employees</h1>
-          </div><!-- /.col -->
-          <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-                <a href="{{ url('admin/employees/add')}}" class="btn btn-primary">Add Employees</a>
-            </ol>
-          </div><!-- /.col -->
-        </div><!-- /.row -->
-      </div><!-- /.container-fluid -->
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Employees</h1>
+                </div><!-- /.col -->
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <a href="{{ url('admin/employees/add')}}" class="btn btn-primary">Add Employees</a>
+                    </ol>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
     </div>
     <!-- /.content-header -->
 
@@ -80,7 +80,7 @@
                                         <td>{{ $value->name}}</td>
                                         <td>{{ $value->last_name}}</td>
                                         <td>{{ $value->email}}</td>
-                                        <td>{{ !empty($value->is_role) ? 'HR' : 'Employees'}}</td>
+                                        <td>{{ !empty($value->role) ? 'HR' : 'Employees'}}</td>
                                         <td>
                                             <a href="{{ url('admin/employees/view/' . $value->id) }}" class="btn btn-info">View</a>
                                             <a href="{{ url('admin/employees/edit/' . $value->id) }}" class="btn btn-primary">Edit</a>
@@ -88,9 +88,9 @@
                                         </td>
                                     </tr>
                                     @empty
-                                        <tr>
-                                            <td colspan="100%">No Record Found</td>
-                                        </tr>
+                                    <tr>
+                                        <td colspan="100%">No Record Found</td>
+                                    </tr>
                                     @endforelse
                                 </tbody>
                             </table>
@@ -104,5 +104,5 @@
             </div>
         </div>
     </section>
-  </div>
+</div>
 @endsection

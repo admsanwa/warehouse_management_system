@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\User;
@@ -10,31 +11,37 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use function Laravel\Prompts\password;
 
-class AuthController extends Controller{
+class AuthController extends Controller
+{
 
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         return view('login');
     }
 
-    public function forgot_password(Request $request) {
+    public function forgot_password(Request $request)
+    {
         return view('forgot_password');
     }
 
-    public function register(Request $request){
+    public function register(Request $request)
+    {
         return view('register');
     }
 
-    public function register_post(Request $request){
+    public function register_post(Request $request)
+    {
         // dd($request->all());
         $user = request()->validate([
-            'name'              => 'required',
+            'username'              => 'required',
             'email'             => 'required|unique:users',
             'password'          => 'required|min:6|',
             'confirm_password'  => 'required_with:password|same:password|min:6|'
         ]);
 
         $user                   = new User;
-        $user->name             = trim($request->name);
+        $user->username             = trim($request->username);
+        $user->fullname         = trim($request->fullname);
         $user->email            = trim($request->email);
         $user->password         = Hash::make($request->password);
         $user->remember_token   = Str::random(50);
@@ -43,7 +50,8 @@ class AuthController extends Controller{
         return redirect('/')->with('success', 'Register Succesfully');
     }
 
-    public function check_email(Request $request) {
+    public function check_email(Request $request)
+    {
         $email = $request->input('email');
         $isExists = User::where('email', $email)->first();
         if ($isExists) {
@@ -53,22 +61,26 @@ class AuthController extends Controller{
         }
     }
 
-    public function login_post(Request $request){
+    public function login_post(Request $request)
+    {
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password], true)) {
-            if (Auth::user()->is_role == '1') {
+            // dd(Auth::user()->toArray());
+            // dd(Auth::user()->role);
+
+            if (Auth::user()->role == "1") {
+                $request->session()->regenerate();
                 return redirect()->intended('admin/dashboard');
             } else {
-                return redirect('/')->with('error', 'No HR availables.. please check');
+                return redirect('/')->with('error', 'No Admin availables.. please check');
             }
         } else {
             return redirect()->back()->with('error', 'Please enter correct credentials');
         }
     }
 
-    public function logout(Request $request){
+    public function logout(Request $request)
+    {
         Auth::logout();
         return redirect('/');
     }
 }
-
-?>
