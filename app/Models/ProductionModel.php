@@ -32,4 +32,14 @@ class ProductionModel extends Model
         $return = $return->orderBy('id', 'desc')->paginate(5);
         return $return;
     }
+
+    public function quality()
+    {
+        return $this->belongsTo(QualityModel::class, "io_no", "io");
+    }
+
+    public function stocks()
+    {
+        return $this->belongsTo(StockModel::class, "doc_num", "prod_order");
+    }
 }

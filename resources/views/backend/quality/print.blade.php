@@ -1,8 +1,7 @@
-@extends('backend.layouts.app')
-
-@section('content')
+@extends("backend.layouts.app")
+@section("content")
 <style>
-     .barcode-wrapper {
+    .barcode-wrapper {
         width: 270px; /* fixed width for consistency */
         margin: 15px;
         padding: 10px;
@@ -14,9 +13,9 @@
     }
 
     .barcode-text {
-    margin-left: 20px;
-    text-align: left;
-}
+        margin-left: 20px;
+        text-align: left;
+    }
 
     .item-code {
         font-weight: bold;
@@ -45,34 +44,30 @@
     }
 
     @media print {
-    button {
-        display: none !important;
+        button {
+            display: none !important;
+        }
     }
-}
 </style>
 
 <div class="text-center mt-3">
     <button onclick="history.back()" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Back</button>
-    <button id="print" onclick="printBarcodes()" class="btn btn-primary"><i class="fa fa-print"></i> Print Barcodes</button>
+    <button onclick="printBarcodes()" class="btn btn-primary"><i class="fa fa-print"></i> Print Barcodes</button>
 </div>
 
 <div class="mt-2">
-    <div class="container"> 
+    <div class="container">
         <div class="row justify-content-start">
-            @foreach($addedBarcodes as $barcode)
-                @for ($i = 0; $i < $barcode->qty; $i++)
+            @foreach ($addedBarcodes as $barcodes)
+                @for ($i = 0; $i < $barcodes->qty; $i++)
                     <div class="barcode-wrapper d-flex align-items-center mb-4">
-            
                         <div class="barcode-image">
-                            <img 
-                                src="data:image/png;base64,{{ DNS2D::getBarcodePNG($barcode->code, 'QRCODE', 5, 5) }}" 
-                                alt="barcode"
-                                style="height: 100px; width: 100px;"
-                            />
+                            <img src="data:image/png;base64, {{ DNS2D::getBarcodePNG($barcodes->prod_no . ' ' . $barcodes->prod_desc, "QRCODE", 5, 5) }}" alt="barcodes" 
+                            style="height: 100%; width:100%;">
                         </div>
                         <div class="barcode-text me-4 text-end">
-                            <div class="item-code">{{ $barcode->code }}</div>
-                            <div class="item-name">{{ $barcode->name }}</div>
+                            <div class="item-code">{{ $barcodes->prod_no }}</div>
+                            <div class="item-name">{{ $barcodes->prod_desc }}</div>
                         </div>
                     </div>
                 @endfor
@@ -81,12 +76,9 @@
     </div>
 </div>
 
-
 <script>
     function printBarcodes() {
         window.print();
     }
 </script>
 @endsection
-
-

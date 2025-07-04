@@ -4,6 +4,12 @@
     </div>
 @endif
 
+@if (session('warning'))
+    <div class="alert alert-warning">
+        {{ session('warning') }}
+    </div>
+@endif
+
 @if(!empty(session('error')))
     <div class="alert alert-danger" role="alert">
         {{ session('error')}}

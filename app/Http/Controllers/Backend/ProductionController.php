@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProductionModel;
+use App\Models\StockModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -13,14 +14,28 @@ class ProductionController extends Controller
 {
     public function index(Request $request)
     {
-        $getRecord = ProductionModel::getRecord($request);
-        return view('backend.production.list', compact('getRecord'));
+        $getRecord = ProductionModel::with("stocks")->get()->unique("doc_num")->values();
+
+        $productionSummary = [];
+        foreach ($getRecord as $record) {
+            $po = $record->doc_num;
+
+            $productionQty = ProductionModel::where("doc_num", $po)->sum("qty");
+            $stockOutQty = StockModel::where("prod_order", $po)->sum("qty");
+
+            $productionSummary[$po] = [
+                "remain" => $productionQty - $stockOutQty
+            ];
+        }
+        return view('backend.production.list', compact('getRecord', 'productionSummary'));
     }
 
-    public function view($id)
+    public function view(Request $request, $id)
     {
-        $data['getRecord'] = ProductionModel::find($id);
-        return view('backend.production.view', $data);
+        $getRecord = ProductionModel::find($id);
+        $getDocnum = ProductionModel::where("id", $id)->value("doc_num");
+        $getData = ProductionModel::getRecord($request)->where("doc_num", $getDocnum);
+        return view('backend.production.view', compact("getRecord", "getData"));
     }
 
     public function upload_form()
@@ -79,5 +94,11 @@ class ProductionController extends Controller
         }
 
         return back()->with('success', "Productions Imported Succesfully");
+    }
+
+    public function view_prod($prod)
+    {
+        $prod = ProductionModel::where("prod_no", $prod)->value("id");
+        return redirect("admin/production/view/" . $prod);
     }
 }

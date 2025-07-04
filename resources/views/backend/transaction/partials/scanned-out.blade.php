@@ -1,7 +1,7 @@
-<form id="stockupForm" action="{{ url("admin/transaction/stockup")}}" method="post">
+<form id="stockupForm" action="{{ url("admin/transaction/stockoutup")}}" method="post">
     @csrf
-    <input type="hidden" name="nopo" id="no_po_hidden">
-    <input type="hidden" name="grpo" id="grpo_hidden">
+    <input type="hidden" name="prod_order" id="prod_order_hidden">
+    <input type="hidden" name="io" id="io_hidden">
     <div class="table-responsive">
         <table class="table table-striped table-borderd table-sm">
             @if (isset($scannedBarcodes) && $scannedBarcodes->count())
@@ -17,14 +17,15 @@
                 <tbody>
                     @foreach ($scannedBarcodes as $index => $stocks)
                         <tr>
-                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $loop->iteration }}
+                                <input type="hidden" name="stocks[{{ $index }}][id]" value="{{ $stocks->id }}">
+                            </td>
                             <td>
                                 {{ $stocks->item->code }}
                                 <input type="hidden" name="stocks[{{ $index }}][item_code]" value="{{ $stocks->item->code }}">
                             </td>                            
                             <td>{{ $stocks->item->name }}</td>
                             <td>
-                                <input type="hidden" name="stocks[{{ $index }}][id]" value="{{ $stocks->id }}">
                                 <input type="number" name="stocks[{{ $index }}][qty]" class="form-control" value="0">
                             </td>
                             <td>

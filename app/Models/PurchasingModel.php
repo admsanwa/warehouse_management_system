@@ -35,4 +35,9 @@ class PurchasingModel extends Model
         $return = $return->orderBy('id', 'desc')->paginate(5);
         return $return;
     }
+
+    public function stocks()
+    {
+        return $this->belongsTo(StockModel::class, "no_po", "no_po");
+    }
 }

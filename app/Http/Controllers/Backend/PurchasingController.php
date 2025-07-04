@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\PurchasingModel;
+use App\Models\StockModel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
@@ -13,17 +14,29 @@ class PurchasingController extends Controller
 {
     public function index(Request $request)
     {
-        $getRecord = PurchasingModel::getRecord($request)->unique("no_po");
+        $getRecord = PurchasingModel::with("stocks")->get()->unique("no_po")->values();
         $getPagination = PurchasingModel::getRecord($request);
 
-        return view("backend.purchasing.list", compact('getRecord', 'getPagination'));
+        $purchasingSummary = [];
+        foreach ($getRecord as $record) {
+            $po = $record->no_po;
+            $purchaseQty = PurchasingModel::where("no_po", $po)->sum("qty");
+            $stockInQty = StockModel::where("no_po", $po)->sum("qty");
+
+            $purchasingSummary[$po] = [
+                'remain' => $purchaseQty - $stockInQty
+            ];
+        }
+
+        return view("backend.purchasing.list", compact('getRecord', 'getPagination', 'purchasingSummary'));
     }
 
     public function view(Request $request, $id)
     {
         $getRecord  = PurchasingModel::find($id);
-        $getData    = PurchasingModel::getRecord($request);
-        return view("backend.purchasing.view", compact('getRecord', 'getData'));
+        $getPO      = PurchasingModel::where("id", $id)->value("no_po");
+        $getData    = PurchasingModel::where("no_po", $getPO)->get();
+        return view("backend.purchasing.view", compact('getRecord', 'getData', 'getPO'));
     }
 
     public function upload_form()

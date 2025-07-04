@@ -10,6 +10,8 @@ use App\Http\Controllers\Backend\EmployeesController;
 use App\Http\Controllers\Backend\ItemsController;
 use App\Http\Controllers\Backend\ProductionController;
 use App\Http\Controllers\Backend\PurchasingController;
+use App\Http\Controllers\Backend\QualityController;
+use App\Http\Controllers\Backend\ReportsController;
 use App\Http\Controllers\Backend\StockController;
 use App\Http\Controllers\Backend\TransactionController;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
@@ -56,8 +58,6 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('admin/items/additem', [ItemsController::class, 'add']);
     Route::post('admin/items/additem', [ItemsController::class, 'post_item']);
     Route::get('admin/items/list', [ItemsController::class, 'list']);
-    Route::get('admin/items/trash/{id}', [ItemsController::class, 'trash']);
-    Route::get('admin/items/edit/{id}', [ItemsController::class, 'edit']);
     Route::get('admin/items/upload', [ItemsController::class, 'upload']);
 
     // Purchasing
@@ -71,18 +71,50 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('admin/production/view/{id}', [ProductionController::class, 'view']);
     Route::get('admin/production/upload', [ProductionController::class, 'upload_form']);
     Route::post('admin/production/upload', [ProductionController::class, 'upload']);
+    Route::get('admin/production/{prod_no}', [ProductionController::class, 'view_prod']);
+
+    // qc
+    Route::get("admin/quality/list", [QualityController::class, "index"]);
+    Route::post("admin/quality/{prod_no}", [QualityController::class, "result"]);
+    Route::get("admin/quality/barcode", [QualityController::class, "barcode"]);
+    Route::get("admin/quality/add", [QualityController::class, "add_print"]);
+    Route::get("admin/quality/delete/{id}", [QualityController::class, "delete"]);
+    Route::get("admin/quality/deleteall", [QualityController::class, "deleteall"]);
+    Route::get("admin/quality/print", [QualityController::class, "print"]);
 
     // stock
     Route::get('admin/stock', [StockController::class, 'index']);
 
     // transaction
+    // stockin
     Route::get('admin/transaction/stockin', [TransactionController::class, 'stock_in']);
+    Route::get('admin/transaction/stockin/{po}', [TransactionController::class, 'stockin_po']);
     Route::post('admin/transaction/stockup', [TransactionController::class, 'stock_up']);
-    Route::get('admin/transaction/stockdel/{id}', [TransactionController::class, 'stock_del']);
+    Route::get('admin/transaction/stockdel/{grpo}', [TransactionController::class, 'stock_del']);
+    Route::post("admin/transaction/stockindelone/{id}", [TransactionController::class, 'stockin_delone']);
     Route::get('admin/transaction/stockdet/{grpo}', [TransactionController::class, 'stock_det']);
-    Route::get('admin/transaction/stockout', [TransactionController::class, 'stock_out']);
     Route::post('/stockin-add', [TransactionController::class, 'scan_and_store']);
     Route::get('/scanned-barcodes/{grpo}', [TransactionController::class, 'getScannedBarcodes']);
+    // stockout    
+    Route::get('admin/transaction/stockout', [TransactionController::class, 'stock_out']);
+    Route::get("admin/transaction/stockout/{prod_order}", [TransactionController::class, 'stockout_po']);
+    Route::post("/stockout-issued", [TransactionController::class, "scan_and_issued"]);
+    Route::get("/scanned-barcodes-out/{isp}", [TransactionController::class, "getScanOut"]);
+    Route::post("admin/transaction/stockoutup", [TransactionController::class, "stockout_up"]);
+    Route::get("admin/transaction/stockoutdet/{isp}", [TransactionController::class, "stockout_det"]);
+    Route::get("admin/transaction/stockoutdel/{isp}", [TransactionController::class, "stockout_del"]);
+    Route::post("admin/transaction/stockoutdelone/{id}", [TransactionController::class, "stockout_delone"]);
+    // receipt from prod
+    Route::get("admin/transaction/rfp", [TransactionController::class, "receipt_from_prod"]);
+    Route::post("/rfp-add", [TransactionController::class, "scan_and_receipt"]);
+    Route::get("/scanned-barcodes-rfp/{number}", [TransactionController::class, "getScannedRfp"]);
+    Route::post("admin/transaction/rfpup", [TransactionController::class, "rfp_update"]);
+    Route::post("admin/transaction/rfpdelone/{id}", [TransactionController::class, "rfp_delone"]);
+    Route::get("admin/transaction/rfpdetail/{number}", [TransactionController::class, "rfp_detail"]);
+    Route::get("admin/transaction/rfpdelete/{number}", [TransactionController::class, "rfp_delete"]);
+
+    // Reports
+    Route::get("admin/reports/finishgoods", [ReportsController::class, "finish_goods"]);
 });
 
 Route::get('logout', [AuthController::class, 'logout']);

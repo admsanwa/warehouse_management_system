@@ -24,10 +24,11 @@ class ItemsController extends Controller
 
     public function print(Request $request)
     {
-        $addedBarcodes = BarcodeModel::getRecord($request);
+        $user = Auth::user()->username;
+        $addedBarcodes = BarcodeModel::where("username", $user)->get();
 
         if (empty($addedBarcodes)) {
-            return redirect()->back()->with('error', 'No barcodes to print.');
+            return redirect()->back()->with('error', 'Tidak ada barcodes yang dipilih untuk print');
         }
 
         return view('backend.items.print', compact('addedBarcodes'));
@@ -56,13 +57,16 @@ class ItemsController extends Controller
     {
         $recordDelete = BarcodeModel::find($id);
         $recordDelete->delete();
+        // dd($recordDelete);
 
         return redirect()->back()->with('error', 'Barcodes successfully delete');
     }
 
     public function deleteall()
     {
-        BarcodeModel::query()->delete();
+        $user = Auth::user()->username;
+        $recordDelete = BarcodeModel::where("username", $user);
+        $recordDelete->delete();
 
         return redirect()->back()->with('error', 'All Barcodes succesfully delete');
     }
@@ -98,20 +102,6 @@ class ItemsController extends Controller
     {
         $getRecord = ItemsModel::getRecord($request);
         return view("backend.items.list", compact('getRecord'));
-    }
-
-    public function trash($id)
-    {
-        $recordDelete = ItemsModel::find($id);
-        $recordDelete->delete();
-
-        return redirect()->back()->with('error', "Items succesfully delete");
-    }
-
-    public function edit(Request $request, $id)
-    {
-        $getRecord = ItemsModel::getRecord($request);
-        return view('backend.items.edit', compact('getRecord'));
     }
 
     public function upload(Request $request)

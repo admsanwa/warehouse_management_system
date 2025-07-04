@@ -8,8 +8,8 @@
                         <h1>Purchasing List Details</h1>
                     </div>
                     <div class="col col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <a href="{{ url('admin/purchasing') }}" class="btn btn-primary">Purchasing List</a>
+                        <ol class="breadcrumb justify-content-end">
+                            <a href="{{ url('admin/purchasing') }}" class="btn btn-primary btn-sm">Purchasing List</a>
                         </ol>
                     </div>
                 </div>
@@ -28,19 +28,19 @@
                                 <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">Nomor PO :</label>
                                     <div class="col-sm-4">{{ $getRecord->no_po }}</div>
-                                        <label for="" class="col-sm-2 col-form-lable">Buyer :</label>
+                                    <label for="" class="col-sm-2 col-form-lable">Buyer :</label>
                                     <div class="col-sm-4">{{ $getRecord->buyer }}</div>
                                 </div>
                                 <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">Vendor :</label>
                                     <div class="col-sm-4">{{ $getRecord->vendor }}</div>
-                                        <label for="" class="col-sm-2 col-form-lable">Delivery Date :</label>
+                                    <label for="" class="col-sm-2 col-form-lable">Delivery Date :</label>
                                     <div class="col-sm-4">{{ $getRecord->delivery_date }}</div>
                                 </div>
                                 <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">Contact Person :</label>
                                     <div class="col-sm-4">{{ $getRecord->contact_person }}</div>
-                                        <label for="" class="col-sm-2 col-form-lable">Status :</label>
+                                    <label for="" class="col-sm-2 col-form-lable">Status :</label>
                                     <div class="col-sm-4">{{ $getRecord->status == "Open" ? 'Open' : 'Closed' }}</div>
                                 </div>
                             </div>
@@ -73,7 +73,7 @@
                                         @else
                                             <tbody>
                                                 <tr>
-                                                    <td colspan="100%">No Record Found</td>
+                                                    <td colspan="100%">Tidak ada data yang ditemukan</td>
                                                 </tr>
                                             </tbody>
                                         @endif
@@ -82,7 +82,7 @@
                             </div>
                             <div class="card-footer">
                                 <a href="{{ url('admin/purchasing') }}" class="btn btn-default">Back</a>
-                                <a href="{{ url("admin/transaction/stockin/" . $pos->no_po)}}" class="btn btn-success">Scan Barcode</a>
+                                <a href="{{ url("admin/transaction/stockin/" . $getPO)}}" class="btn btn-success">Scan Barcode</a>
                             </div>
                         </div>
                     </div>

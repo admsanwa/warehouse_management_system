@@ -5,12 +5,12 @@
         <div class="content-header">
             <div class="container-fluid">
                 <div class="row mb-2">
-                    <div class="col-sm-6">
+                    <div class="col col-sm-6">
                         <h1>Purchasing</h1>
                     </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                        <a href="{{ url('admin/purchasing/upload')}}" class="btn btn-primary"><i class="fa fa-upload"> Upload Data</i></a>
+                    <div class="col col-sm-6">
+                        <ol class="breadcrumb justify-content-end">
+                        <a href="{{ url('admin/purchasing/upload')}}" class="btn btn-primary btn-sm"><i class="fa fa-upload"> Upload Data</i></a>
                         </ol>
                     </div>
                 </div>
@@ -24,7 +24,7 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">
-                                    Purchasing List
+                                    Search Purchasing List
                                 </h3>
                             </div>
                             <form action="" method="get">
@@ -70,25 +70,27 @@
                                                 <th>No</th>
                                                 <th>No PO</th>
                                                 <th>Vendor</th>
-                                                <th>Contact Person</th>
-                                                <th>Buyer</th>
+                                                <th>Remain</th>
                                                 <th>Delivery Date</th>
                                                 <th>Status</th>
-                                                <th>Action</th>
+                                                <th>Details</th>
                                             </tr>
                                         </thead>
                                         @forelse ($getRecord as $purchasing)
+                                            @php
+                                                $po = $purchasing->no_po;
+                                                $result = $purchasingSummary[$po] ?? ['remain' => 0]
+                                            @endphp
                                             <tbody>
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $purchasing->no_po }}</td>
                                                     <td>{{ $purchasing->vendor }}</td>
-                                                    <td>{{ $purchasing->contact_person }}</td>
-                                                    <td>{{ $purchasing->buyer }}</td>
+                                                    <td>{{ $result["remain"] }}</td>
                                                     <td>{{ $purchasing->delivery_date }}</td>
                                                     <td>
                                                         @if ($purchasing->status == "Open")
-                                                            <a href="{{ url("admin/transaction/stockin")}}" class="btn btn-outline-success"><i class="fa fa-arrow-right"></i> Open</a>
+                                                            <a href="{{ url("admin/transaction/stockin/" . $purchasing->no_po)}}" class="btn btn-outline-success"><i class="fa fa-arrow-right"></i> Open</a>
                                                         @else
                                                             Closed
                                                         @endif

@@ -19,8 +19,6 @@
   <link rel="stylesheet" href="{{ url('backend/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css')}}">
   <!-- iCheck -->
   <link rel="stylesheet" href="{{ url('backend/plugins/icheck-bootstrap/icheck-bootstrap.min.css')}}">
-  <!-- JQVMap -->
-  <link rel="stylesheet" href="{{ url('backend/plugins/jqvmap/jqvmap.min.css')}}">
   <!-- Theme style -->
   <link rel="stylesheet" href="{{ url('backend/dist/css/adminlte.min.css')}}">
   {{-- Custom CSS --}}
@@ -62,12 +60,6 @@
   <script src="{{ url('backend/plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
   <!-- ChartJS -->
   <script src="{{ url('backend/plugins/chart.js/Chart.min.js')}}"></script>
-  <!-- Sparkline -->
-  <script src="{{ url('backend/plugins/sparklines/sparkline.js')}}"></script>
-  <!-- JQVMap -->
-  <script src="{{ url('backend/plugins/jqvmap/jquery.vmap.min.js')}}"></script>
-  <script src="{{ url('backend/plugins/jqvmap/maps/jquery.vmap.usa.js')}}"></script>
-
   <!-- jQuery Knob Chart -->
   <script src="{{ url('backend/plugins/jquery-knob/jquery.knob.min.js')}}"></script>
   <!-- daterangepicker -->

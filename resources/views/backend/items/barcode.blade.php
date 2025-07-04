@@ -1,24 +1,21 @@
 @extends('backend.layouts.app')
 
 @section('content')
-<!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
     <div class="content-header">
         <div class="container-fluid">
-            <div class="row mb-6">
+            <div class="row mb-2">
                 <div class="col col-sm-6">
                     <h1>Barcode Print</h1>
                 </div><!-- /.col -->
                 <div class="col col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <a href="{{ url('admin/items/additem')}}" class="btn btn-primary">Add Barcode</a>
+                    <ol class="breadcrumb justify-content-end">
+                        <a href="{{ url('admin/items/additem')}}" class="btn btn-primary btn-sm">Add Item</a>
                     </ol>
                 </div><!-- /.col -->
             </div><!-- /.row -->
         </div><!-- /.container-fluid -->
     </div>
-    <!-- /.content-header -->
 
     <section class="content">
         <div class="container-fluid">
@@ -58,7 +55,7 @@
                                 <table class="table table-striped">
                                     <thead>
                                         <tr>
-                                            {{-- <th>No</th> --}}
+                                            <th>No</th>
                                             <th>Item Code</th>
                                             <th>Item Desc</th>
                                             {{-- <th>Image</th> --}}
@@ -69,7 +66,7 @@
                                     @forelse ($getRecord as $key => $value)
                                         <tbody>
                                             <tr>
-                                                {{-- <td>{{ $value->id}}</td> --}}
+                                                <td>{{ $loop->iteration}}</td>
                                                 <td>{{ $value->code}}</td>
                                                 <td>{{ $value->name}}</td>
                                                 {{-- <td>{!! DNS1D::getBarcodeHTML($value->code, 'C128', 1.0, 30) !!}</td> --}}
@@ -78,7 +75,7 @@
                                                         @csrf
                                                         <input type="hidden" name="code" value="{{ $value->code }}">
                                                         <input type="hidden" name="name" value="{{ $value->name }}">
-                                                        <input type="number" style="width: 35%" class="form-control" name="qty" required>
+                                                        <input type="number" class="form-control form-control-sm w-100" name="qty" required>
                                                 </td>
                                                 <td>
                                                         <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-plus-circle"></i></button>
@@ -114,7 +111,7 @@
                                         @if($addedBarcodes->count())
                                             <thead>
                                                 <tr>
-                                                    {{-- <th>No</th> --}}
+                                                    <th>No</th>
                                                     <th>Item Code</th>
                                                     <th>Item Desc</th>
                                                     {{-- <th>Barcode</th> --}}
@@ -125,7 +122,7 @@
                                             <tbody>
                                                 @foreach($addedBarcodes as $barcode)
                                                     <tr>
-                                                        {{-- <td>{{ $loop->iteration }}</td> --}}
+                                                        <td>{{ $loop->iteration }}</td>
                                                         <td>{{ $barcode->code }}</td>
                                                         <td>{{ $barcode->name }}</td>
                                                         {{-- <td>{!! DNS1D::getBarcodeHTML($barcode->code, 'C128', 1.0, 30) !!}</td> --}}
@@ -141,11 +138,12 @@
                                                         <td></td>
                                                         <td></td>
                                                         <td></td>
+                                                        <td></td>
                                                         <td>
                                                             <div class="d-flex flex-wrap">
                                                                 <a href="{{ url('admin/items/deleteall')}}" class="btn btn-danger mr-2 mb-2"><i class="fa fa-trash"></i> All</a>
                                                                 <a href="{{ url('admin/items/print')}}" class="btn btn-success mb-2">
-                                                                    <i class="fa fa-arrow-right"></i> Next Print
+                                                                    <i class="fa fa-arrow-right"></i> Print
                                                                 </a>
                                                             </div>
                                                         </td>

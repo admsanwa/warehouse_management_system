@@ -5,12 +5,12 @@
         <div class="content-header">
             <div class="container-fluid">
                 <div class="row mb-6">
-                    <div class="col-sm-6">
+                    <div class="col col-sm-6">
                         <h1>Upload Data</h1>
                     </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <a href="{{ url('admin/purchasing') }}" class="btn btn-primary">Purchasing List</a>
+                    <div class="col col-sm-6">
+                        <ol class="breadcrumb justify-content-end">
+                            <a href="{{ url('admin/purchasing') }}" class="btn btn-primary btn-sm">Purchasing List</a>
                         </ol>
                     </div>
                 </div>

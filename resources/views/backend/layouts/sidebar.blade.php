@@ -156,7 +156,7 @@
           <a href="{{ url('admin/stock')}}" class="nav-link @if (Request::segment(2) == 'stock') active @endif"">
               <i class=" nav-icon fa fa-recycle"></i>
             <p>
-              Stock
+              Stocks
             </p>
           </a>
         </li>
@@ -174,13 +174,20 @@
           </a>
           <ul class="collapse list-unstyled {{ Request::is('admin/transaction/*') ? 'show' : ''}} itemSubMenu" id="transactionSubMenu">
             <li class="nav-item">
-              <a href="{{ url('admin/transaction/stockin')}}" class="nav-link @if (Request::is('admin/transaction/stockin')) active @endif">
+              <a href="{{ url('admin/transaction/stockin')}}" class="nav-link @if (Request::is('admin/transaction/stockin') || Request::is('admin/transaction/stockin/*')) 
+              active @endif">
                 <p>Stock In</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="{{ url('admin/transaction/stockout')}}" class="nav-link @if (Request::is('admin/transaction/stockout')) active @endif">
+              <a href="{{ url('admin/transaction/stockout')}}" class="nav-link @if (Request::is('admin/transaction/stockout/*') || Request::is('admin/transaction/stockout'))
+              active @endif">
                 <p>Stock Out</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ url("admin/transaction/rfp") }}" class="nav-link @if (Request::is("admin/transaction/rfp")) active @endif">
+                <p>Receipt From Prod</p>
               </a>
             </li>
           </ul>
@@ -190,15 +197,27 @@
     </nav>
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-        <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
-        <li class="nav-item">
-          <a href="{{ url('admin/countries')}}" class="nav-link">
-            <i class="nav-icon fa fa-flag"></i>
+        <li class="nav-item {{Request::is("admin/quality/*") ? "menu-open" : "" }}">
+          <a href="#qualitySubMenu" data-toggle="collapse" aria-expanded="{{ Request::is("admin/quality/*") ? 'true' : 'false'}}" class="nav-link">
+            <i class="nav-icon fa fa-list"></i>
             <p>
-              Countries
+              Quality Control
+              <i class="right fas fa-angle-left"></i>
             </p>
           </a>
+
+          <ul class="collapse list-unstyled {{ Request::is("admin/quality/*") ? "show" : ""}} itemSubMenu" id="qualitySubMenu">
+            <li class="nav-item">
+              <a href="{{ url("admin/quality/list") }}" class="nav-link @if (Request::is("admin/quality/list")) active @endif">
+                <p>List</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ url("admin/quality/barcode") }}" class="nav-link @if (Request::is("admin/quality/barcode")) active @endif">
+                <p>Barcode</p>
+              </a>
+            </li>
+          </ul>
         </li>
       </ul>
     </nav>
@@ -206,13 +225,22 @@
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-        <li class="nav-item">
-          <a href="{{ url('admin/locations')}}" class="nav-link">
-            <i class="nav-icon fa fa-map-marker-alt"></i>
+        <li class="nav-item {{ Request::is("admin/reports/*") ? 'menu-open' : ''}}">
+          <a href="#reportSubMenu" data-toggle="collapse" aria-expanded="{{ Request::is("admin/reports/*")}}" class="nav-link" >
+            <i class="nav-icon fa fa-clipboard"></i>
             <p>
-              Locations
-            </p>
+              Reports
+              <i class="right fas fa-angle-left"></i>
+            </p>    
           </a>
+
+          <ul class="collapse list-unstyled {{Request::is('admin/reports/*') ? 'show' : ''}} itemSubMenu" id="reportSubMenu">
+            <li class="nav-item">
+              <a href="{{ url('admin/reports/finishgoods')}}" class="nav-link @if (Request::is('admin/reports/finishgoods')) active @endif">
+                <p>Finish Goods</p>
+              </a>
+            </li>
+          </ul>
         </li>
       </ul>
     </nav>

@@ -10,7 +10,7 @@
                 </div>
                 <div class="col col-sm-6">
                     <ol class="breadcrumb justify-content-end">
-                        <a href="{{ url('admin/transaction/stockout') }}" class="btn btn-primary btn-sm">Stock Out</a>
+                        <a href="{{ url('admin/quality/barcode') }}" class="btn btn-primary btn-sm">Barcode QC</a>
                     </ol>
                 </div>
             </div>
@@ -22,9 +22,9 @@
             <div class="card">
                 @include('_message')
                 <div class="card-header">
-                    <h3 class="card-title">Stock In</h3>
+                    <h3 class="card-title">Receipt from Production</h3>
                 </div>
-                <form action="{{ url('admin/transaction/stockin') }}" method="post" enctype="multipart/form-data">
+                <form action="{{ url('admin/transaction/rfp') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="card-body">
                         <div class="form-group row">
@@ -46,18 +46,15 @@
                                     <input type="file" accept="image/*" onchange="scanImage(this)" class="form-control">
                                 </div>
                             </div>
-                            <label for="" class="col-sm-4 col-form-lable">Item Code :</label>
+                            <label for="" class="col-sm-4 col-form-lable">Product Nomer :</label>
                             <div class="col-sm-6">
                                 <input type="number" name="id" id="id" class="form-control mt-2" hidden>
-                                <input type="text" name="item_code" id="item_code" class="form-control mt-2" readonly>
+                                <input type="number" name="number" id="number" value="{{ $number }}" class="form-control" hidden>
+                                <input type="text" name="prod_no" id="prod_no" class="form-control mt-2" readonly>
                             </div>
-                           <label for="" class="col-sm-4 col-form-lable">Item Description :</label>
+                            <label for="" class="col-sm-4 col-form-lable">Product Description :</label>
                             <div class="col-sm-6">
-                                <input type="text" name="item_desc" id="item_desc" class="form-control mt-2" readonly>
-                            </div>
-                            <label for="" class="col-sm-4 col-form-lable">On Hand :</label>
-                            <div class="col-sm-6">
-                                <input type="number" name="on_hand" id="on_hand" class="form-control mt-2" readonly>
+                                <input type="text" name="prod_desc" id="prod_desc" class="form-control mt-2" readonly>
                             </div>
                         </div>
                     </div>
@@ -70,19 +67,25 @@
                 </div>
                 <div class="card-body">
                     <div class="form-group row">
-                        <label for="" class="col-sm-4 col-form-lable">Nomer PO :</label>
+                        <label for="" class="col-sm-4 col-form-lable">Nomer IO :</label>
                         <div class="col-sm-6">
-                            @if ($getPos)
-                                <input type="number" name="no_po" id="no_po" value="{{ $getPos->no_po }}" class="form-control mt-2" readonly required>
-                            @else
-                                <select name="no_po" id="no_po" class="form-control mt-2" required>
-                                    <option value="">Select Nomer PO</option>
+                            @if ($getIos) 
+                                <input type="number" name="io" id="io"  class="form-control mt-2" readonly required>
+                            @else 
+                                <select name="io" id="io" class="form-control mt-2" required>
+                                    <option value="">Select Nomer IO</option>
                                 </select>
                             @endif
                         </div>
-                        <label for="" class="col-sm-4 col-form-lable">Good Receipt PO :</label>
+                        <label for="" class="col-sm-4 col-form-lable">Production Order</label>
                         <div class="col-sm-6">
-                            <input type="number" name="grpo" id="grpo" value="{{ $grpo }}" class="form-control mt-2" readonly required>
+                            @if ($getPos) 
+                                <input type="number" name="po" id="po"  class="form-control mt-2" readonly required>
+                            @else 
+                                <select name="po" id="po" class="form-control mt-2" required>
+                                    <option value="">Select Nomer PO</option>
+                                </select>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -108,36 +111,18 @@
             if (e.key === "Enter") {
                 const code = input.value.trim();
                 if (code !== "") {
-                                    document.getElementById('item_code').value = code;
+                    const parts = code.trim().split(/\s+/);
+                    const prod_no = parts[0];
+                    const prod_desc = parts.slice(1).join(" ");
+                    document.getElementById('prod_no').value = prod_no;
+                    document.getElementById("prod_desc").value = prod_desc;
 
-                    sendScannedCode(code);
+                    sendScannedCode(prod_no);
                     input.value = "";
                 }
             }
         });
-
-        let scanBuffer = "";
-        let scanTimer = null;
-
-        document.addEventListener("keydown", function(e) {
-        console.log("keypress");
-            const char = e.key;
-
-            if (scanTimer) clearTimeout(scanTimer);
-
-            if(char === "Enter") {
-                if (scanBuffer.length > 0) {
-                    sendScannedCode(scanBuffer.trim());
-                    scanBuffer = "";
-                }
-            } else {
-                scanBuffer += char;
-
-                scanTimer = setTimeout(() => {
-                    scanBuffer = "";
-                }, 500);
-            }
-        })
+       
     });
     let html5QrCode;
 
@@ -164,14 +149,18 @@
                         disableFlip: true         // Prevent flip issues on mirrored webcams
                     },
                     decodedText => {
-                        document.getElementById('item_code').value = decodedText;
+                        const parts = decodedText.trim().split(/\s+/);
+                        const prod_no = parts[0];
+                        const prod_desc = parts.slice(1).join(" ");
+                        document.getElementById('prod_no').value = prod_no;
+                        document.getElementById('prod_desc').value = prod_desc;
                         html5QrCode.stop();       // Stop scanning after successful read
-                        sendScannedCode(decodedText);
+                        sendScannedCode(prod_no);
                     },
                     error => {
-                       document.getElementById('item_code').value = decodedText;
+                        document.getElementById('prod_no').value = decodedText;
                         html5QrCode.stop();
-                        sendScannedCode(decodedText);
+                        sendScannedCode(prod_no);
 
                         console.warn("Scanning not found", error);
                     }
@@ -197,48 +186,67 @@
 
         html5Qr.scanFile(file, true)
             .then(decodedText => {
-                document.getElementById('item_code').value = decodedText;
-                sendScannedCode(decodedText);
+                try {
+                    const parts = decodedText.trim().split(/\s+/);
+                    const prod_no = parts[0];
+                    const prod_desc = parts.slice(1).join(" ");
+
+                    document.getElementById("prod_no").value = prod_no;
+                    document.getElementById("prod_desc").value = prod_desc;
+                    sendScannedCode(prod_no);
+                } catch (err) {
+                    console.error("Error handling scan result:", err);
+                    alert("Error handling scan result: " + err.message);
+                }
             })
             .catch(err => {
                 alert("Failed to scan image: " + err);
             });
     }
 
-    function sendScannedCode(code) {
-         const grpo = document.getElementById("grpo").value;
+    function sendScannedCode(prod_no) {
+        const number = document.getElementById("number").value;
+        const prod_desc = document.getElementById("prod_desc").value;
         // console.log("code", code);
-        fetch("/stockin-add", {
+        fetch("/rfp-add", {
             method: "POST",
             headers: {
                 "Content-Type"  : "application/json",
                 "Accept": "application/json",
                 "X-CSRF-TOKEN"  :   document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             },
-            body: JSON.stringify({ item_code: code, grpo: grpo })
+            body: JSON.stringify({ prod_no: prod_no, number: number, prod_desc: prod_desc })
         })
         .then(res => res.json())
         .then(data => {
-            const poSelect = document.getElementById('no_po');
-            poSelect.innerHTML = '<option value="">Select Nomer PO</option>'; // Clear old options
+            // console.log("data", data);
+            const iosSelect = document.getElementById('io');
+            iosSelect.innerHTML = '<option value="">Select Nomer IO</option>'; // Clear old options
+            const posSelect = document.getElementById("po");
+            posSelect.innerHTML = '<option value="">Select Nomer PO</option>';
      
             if (data.success) {
-                // console.log("grpo", data.grpo);
+                console.log("data", data);
                 document.getElementById("id").value = data.id;
-                document.getElementById("item_desc").value = data.name;  
-                document.getElementById("on_hand").value = data.on_hand;
                 
-                data.no_po.forEach(po => {
+                data.io.forEach(ios => {
                     const option = document.createElement('option');
-                    option.value = po.no_po;
-                    option.textContent = po.no_po;
-                    poSelect.appendChild(option);
+                    option.value = ios.io_no;
+                    option.textContent = ios.io_no;
+                    iosSelect.appendChild(option);
                 });
 
+                data.po.forEach(pos => {
+                    const option = document.createElement("option");
+                    option.value = pos.doc_num;
+                    option.textContent = pos.doc_num;
+                    posSelect.appendChild(option);
+                })
+
                 loadScannedBarcodes();
-                alert("Success Scan: " + data.name);
+                alert("Success Scan: " + data.prod_no);
             } else {
-                // console.log("grpo", data.grpo);
+                // console.log("prod_order", data.prod_order);
                 alert("Error: " + data.message);
             }
         })
@@ -250,7 +258,7 @@
     function loadScannedBarcodes() {
         let xhr = new XMLHttpRequest();
         let container = document.getElementById("scannedBarcodes");
-        const grpo = document.getElementById("grpo").value;
+        const number = document.getElementById("number").value;
 
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4 && xhr.status == 200) {
@@ -258,28 +266,30 @@
             }
         }
 
-        xhr.open("GET", "/scanned-barcodes/" + grpo , true)
+        xhr.open("GET", "/scanned-barcodes-rfp/" + number , true)
         xhr.send();
     }
 
     function AddStockupForm() {
-        const noPo = document.getElementById("no_po").value;
-        const grpo = document.getElementById("grpo").value;
+        const io = document.getElementById("io").value;
+        const po = document.getElementById("po").value;
+        const number = document.getElementById("number").value;
 
-        if (!noPo || !grpo) {
-            alert("Pastikan Nomer Purchasing Order atau Nomer GRPO di isi sebelum submit.");
+        if (!io || !po) {
+            alert("Pastikan mengisi nomer Production Order atau nomer IO di isi sebelum submit.");
             return false; // Prevent form submission
         }
 
-        document.getElementById("grpo_hidden").value = grpo;
-        document.getElementById("no_po_hidden").value = noPo;
+        document.getElementById("po_hidden").value = po;
+        document.getElementById("io_hidden").value = io;
+        document.getElementById("number_hidden").value = number;
         return true; // Allow form submission
     }
 
     function deleteItem(id) {
         if (!confirm("Yakin ingin menghapus item ini?")) return;
 
-        fetch("/admin/transaction/stockindelone/" + id, {
+        fetch("/admin/transaction/rfpdelone/" + id, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

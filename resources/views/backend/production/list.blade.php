@@ -4,12 +4,12 @@
         <div class="content-header">
             <div class="container-fluid">
                 <div class="row mb-12">
-                    <div class="col-sm-6">
+                    <div class="col col-sm-6">
                         <h1>Production</h1>
                     </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <a href="{{ url('admin/production/upload')}}" class="btn btn-primary"><i class="fa fa-upload"></i> Upload Data</a>
+                    <div class="col col-sm-6">
+                        <ol class="breadcrumb justify-content-end">
+                            <a href="{{ url('admin/production/upload')}}" class="btn btn-primary btn-sm"><i class="fa fa-upload"></i> Upload Data</a>
                         </ol>
                     </div>
                 </div>
@@ -66,26 +66,42 @@
                                     <table class="table table-striped">
                                         <thead>
                                             <tr>
+                                                <th>No</th>
                                                 <th>Product No</th>
                                                 <th>Prod Desc</th>
-                                                <th>Remarks</th>
+                                                <th>Remain</th>
                                                 <th>Doc Number</th>
-                                                <th>IO No</th>
+                                                <th>IO</th>
                                                 <th>Due Date</th>
                                                 <th>Status</th>
+                                                <th>Details</th>
                                             </tr>
                                         </thead>
                                         @forelse ($getRecord as $production )
+                                            @php
+                                                $po = $production->doc_num;
+                                                $result = $productionSummary[$po] ?? ['remain' => 0];
+                                            @endphp
                                             <tbody>
                                                 <tr>
+                                                    <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $production->prod_no }}</td>
                                                     <td>{{ $production->prod_desc }}</td>
-                                                    <td>{{ $production->remarks }}</td>
+                                                    <td>{{ $result['remain'] }}</td>
                                                     <td>{{ $production->doc_num }}</td>
                                                     <td>{{ $production->io_no }}</td>
                                                     <td>{{ $production->due_date }}</td>
-                                                    <td>{{ $production->status == 0 ? 'Planed' : 'Released' }} <a href="{{ url('admin/production/view/' . $production->id) }}" class="btn btn-primary"><i class="fa fa-eye"></i></a>
+                                                    <td>
+                                                        @if ($production->status == 0)
+                                                            <a href="{{ url("admin/transaction/stockout", $production->doc_num)}}" class="btn btn-sm btn-outline-success"><i class="fa fa-arrow-right"></i> Planed</a>
+                                                        @elseif ($production->status == 1)
+                                                           <a href="{{ url("admin/transaction/rfp")}}" class="btn btn-sm btn-outline-success"><i class="fa fa-arrow-right"></i> Released</a>
+                                                        @else 
+                                                            Closed
+                                                        @endif
                                                     </td>
+                                                    
+                                                    <td><a href="{{ url('admin/production/view/' . $production->id) }}" class="btn btn-primary"><i class="fa fa-eye"></i></a></td>
                                                 </tr>
                                         @empty
                                                 <tr>

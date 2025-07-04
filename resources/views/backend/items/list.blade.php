@@ -60,7 +60,6 @@
                                                 {{-- <th>On Hands</th> --}}
                                                 <th>Stock Min</th>
                                                 <th>Stock Max</th>
-                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         @forelse ($getRecord as $items)
@@ -73,10 +72,6 @@
                                                     <td>{{ $items->uom == 1 ? 'Pcs' : ($items->uom == 2 ? 'Unit' : 'Unknown')}}</td>
                                                     <td>{{ $items->stock_min }}</td>
                                                     <td>{{ $items->stock_max }}</td>
-                                                    <td>
-                                                        <a href="{{ url('admin/items/edit/'. $items->id) }}" class="btn btn-success btn-sm"><i class="fas fa-edit"></i></a>
-                                                        <a href="{{ url('admin/items/trash/' . $items->id) }}" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a>
-                                                    </td>
                                                 </tr>
                                                 @empty
                                                 <tr>

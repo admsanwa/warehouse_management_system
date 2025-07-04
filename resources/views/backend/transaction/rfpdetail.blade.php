@@ -6,7 +6,7 @@
             <div class="container-fluid">
                 <section class="row mb-2">
                     <div class="col col-sm-6">
-                        <h1>Item Stock In Details</h1>
+                        <h1>Receipt From Production Details</h1>
                     </div>
                 </section>
             </div>
@@ -25,12 +25,14 @@
                             </div>
                             <div class="card-body">
                                 <div class="form-group row">
-                                    <label for="" class="col-sm-2 col-form-lable">Nomer PO :</label>
-                                    <div class="col-sm-2">{{ $getRecord->no_po }}</div>
-                                    <label for="" class="col-sm-2 col-form-lable">Good Receipt PO :</label>
-                                    <div class="col-sm-2">{{ $getRecord->grpo }}</div>
-                                    <label for="" class="col-sm-2 col-form-lable">Scanned By :</label>
-                                    <div class="col-sm-2">{{ $getRecord->user->fullname }}</div>
+                                    <label for="" class="col-sm-3 col-form-lable">Number :</label>
+                                    <div class="col-sm-3">{{ $getRecord->number}}</div>
+                                    <label for="" class="col-sm-3 col-form-lable">Nomer IO :</label>
+                                    <div class="col-sm-3">{{ $getRecord->io }}</div>
+                                    <label for="" class="col-sm-3 col-form-lable">Production Order :</label>
+                                    <div class="col-sm-3">{{ $getRecord->prod_order }}</div>
+                                    <label for="" class="col-sm-3 col-form-lable">Scanned By :</label>
+                                    <div class="col-sm-3">{{ $getRecord->user->fullname }}</div>
                                 </div>
                             </div>
                         </div>        
@@ -43,22 +45,18 @@
                                             <thead>
                                                 <tr>
                                                     <th>No</th>
-                                                    <th>Item Code</th>
-                                                    <th>Item Description</th>
-                                                    <th>In Stock</th>
+                                                    <th>Product Nomer</th>
+                                                    <th>Product Description</th>
                                                     <th>Qty</th>
-                                                    <th>Total</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                               @foreach ($getData as $stockin)
+                                               @foreach ($getData as $rfp)
                                                <tr>
                                                    <td>{{ $loop->iteration }}</td>
-                                                   <td>{{ $stockin->item->code }}</td>
-                                                   <td>{{ $stockin->item->name }}</td>
-                                                   <td>{{ $stockin->on_hand - $stockin->qty}}</td>
-                                                   <td>{{ $stockin->qty }}</td>
-                                                   <td>{{ $stockin->on_hand }}</td>
+                                                   <td>{{ $rfp->production->prod_no }}</td>
+                                                   <td>{{ $rfp->production->prod_desc }}</td>
+                                                   <td>{{ $rfp->qty }}</td>
                                                 </tr>
                                                @endforeach
                                             </tbody>
@@ -73,8 +71,8 @@
                                 </div>
                             </div>   
                             <div class="card-footer">
-                                <a href="{{ url('admin/transaction/stockin')}}" class="btn btn-primary">Next</a>
-                                <a href="{{ url('admin/transaction/stockdel', $stockin->grpo) }}" class="btn btn-danger">Cancel</a>
+                                <a href="{{ url('admin/transaction/rfp')}}" class="btn btn-primary">Next</a>
+                                <a href="{{ url('admin/transaction/rfpdelete', $rfp->number) }}" class="btn btn-danger">Cancel</a>
                             </div>
                         </div>
                     </div>

@@ -5,13 +5,8 @@
         <div class="content-header">
             <div class="container-fluid">
                 <div class="row mb-2">
-                    <div class="col-sm-6">
+                    <div class="col col-sm-6">
                         <h1>Stock</h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <a href="{{ url('admin/stock/stockin')}}" class="btn btn-primary">Stock In</a>
-                        </ol>
                     </div>
                 </div>
             </div>
@@ -58,14 +53,13 @@
                                     List of All Stock
                                 </h3>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body p-0">
                                 <div class="table-responsive">
                                     <table class="table table-stripped">
                                         <thead>
                                             <tr>
                                                 <th>No</th>
                                                 <th>Item Code</th>
-                                                <th>Item</th>
                                                 <th>Item Desc</th>
                                                 <th>Stock</th>
                                                 <th>Stock In</th>
@@ -80,11 +74,11 @@
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $stock->item->code ?? 'N/A'}}</td>
                                             <td>{{ $stock->item->name ?? 'N/A'}}</td>
-                                            <td>{{ $stock->item->desc ?? 'N/A'}}</td>
                                             <td>{{ $stock->stock }}</td>
                                             <td>{{ $stock->stock_in }}</td>
                                             <td>{{ $stock->stock_out }}</td>
                                             <td>{{ $stock->on_hand }}</td>
+                                            <td>{{ $stock->item->stock_min > $stock->stock ? "Stock harus dibeli" : "-" }}</td>
                                            </tr>
                                        @empty
                                            <tr>

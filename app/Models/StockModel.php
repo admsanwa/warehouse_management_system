@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\ItemsModel;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\DB;
 
 class StockModel extends Model
 {
@@ -15,7 +16,8 @@ class StockModel extends Model
 
     static public function getRecord()
     {
-        $query = self::with('item');
+        $latestIds = self::select(DB::raw("max(id) as id"))->groupBy("item_id");
+        $query = self::with("item")->whereIn("id", $latestIds->pluck("id"))->orderBy("id", "desc");
 
         if (!empty(Request::get('item_code'))) {
             $query->whereHas('item', function ($q) {
@@ -35,7 +37,7 @@ class StockModel extends Model
             });
         }
 
-        return $query->orderBy('id', 'desc')->paginate(5);
+        return $query->paginate(5);
     }
 
     public function item()

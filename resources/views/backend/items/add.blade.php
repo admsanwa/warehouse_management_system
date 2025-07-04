@@ -9,8 +9,8 @@
                         <h1>Items</h1>
                     </div>
                     <div class="col col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <a href="{{url('admin/items/barcode')}}" class="btn btn-primary">Barcode Print</a>
+                        <ol class="breadcrumb justify-content-end">
+                            <a href="{{url('admin/items/barcode')}}" class="btn btn-primary btn-sm">Barcode Print</a>
                         </ol>
                     </div>
                 </div>
