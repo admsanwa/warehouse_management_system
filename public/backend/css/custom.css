@@ -11,3 +11,53 @@
 .itemSubMenu .nav-link p {
     margin-left: 35px;
 }
+
+.toast-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 9999;
+    padding: 32px 48px;
+    min-width: 400px;
+    max-width: 90vw;
+    border-radius: 12px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    transform: translate(-50%, -50%); /* Perfect center */
+    background-color: #28a745; /* green */
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.toast-notification.show {
+    display: block;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.05);
+}
+
+.toast-notification.success {
+    background-color: #28a745;
+}
+
+.toast-notification.error {
+    background-color: #dc3545;
+}
+
+.select2-container .select2-selection--single {
+    height: 38px !important;
+    line-height: 38px !important;
+    border: 1px solid #ced4da !important;
+    border-radius: 0.25rem !important;
+}
+
+.select2-container .select2-selection__rendered {
+    line-height: 36px !important;
+}
+
+.select2-container .select2-selection__arrow {
+    height: 36px !important;
+}

@@ -26,7 +26,7 @@ class ItemsModel extends Model
             $return = $return->where('name', 'LIKE', '%' . Request::get('name') . '%');
         }
 
-        $return = $return->orderBy('id', 'desc')->paginate(5);
+        $return = $return->orderBy('id', 'desc')->paginate(10);
         return $return;
     }
 
@@ -35,9 +35,37 @@ class ItemsModel extends Model
         return self::where('id', $id)->first();
     }
 
+    static public function getRecordThree($request)
+    {
+        // Subquery untuk ambil ID unik berdasarkan kondisi stock_min >= in_stock
+        $subQuery = self::selectRaw('MIN(id) as id')
+            ->whereColumn('stock_min', '>=', 'in_stock')
+            ->groupBy('code');
+
+        // Ambil record berdasarkan ID dari subquery
+        $return = self::whereIn('id', $subQuery);
+
+        // Apply filter jika ada request dari search form
+        if (!empty($request->code)) {
+            $return->where('code', 'LIKE', '%' . $request->code . '%');
+        }
+
+        if (!empty($request->name)) {
+            $return->where('name', 'LIKE', '%' . $request->name . '%');
+        }
+
+        // Pagination + Order
+        return $return->orderBy('id', 'desc')->paginate(5);
+    }
+
     public function stocks()
     {
-        return $this->hasMany(StockModel::class, 'item_id', 'id');
+        return $this->belongsTo(StockModel::class, 'id', 'item_id')->latest('id');
         // items.id -> stock.item_id
+    }
+
+    public function items_maklon()
+    {
+        return $this->hasMany(ItemsMaklonModel::class, 'code', 'code');
     }
 }

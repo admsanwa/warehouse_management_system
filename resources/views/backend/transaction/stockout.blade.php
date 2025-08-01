@@ -9,20 +9,19 @@
                         <div class="col col-sm-6">
                             <h1>Transactions</h1>
                         </div>
-                        <div class="col col-sm-6">
-                            <ol class="breadcrumb justify-content-end">
-                                <a href="{{ url('admin/transaction/stockin') }}" class="btn btn-primary btn-sm">Stock In</a>
-                            </ol>
-                        </div>
                     </section>
                 </div>
             </div>
         </div>
 
         <section class="content">
+            <input id="scannerInput" type="text" autofocus style="opacity: 0; position: absolute;">
             <div class="container-fluid">
                 <div class="card">
                     @include('_message')
+                    <div id="feedbackBox" class="toast-notification">
+                        <span id="feedbackMessage"></span>
+                    </div>
                     <div class="card-header">
                         <h3 class="card-title">Stock Out</h3>
                     </div>
@@ -94,7 +93,10 @@
                                     </select>
                                 @endif
                             </div>
-                            <input type="number" name="isp" id="isp" value="{{ $isp }}" style="display: none">
+                            <label for="" class="col-sm-4 col-form-lable">Issued from Production :</label>
+                            <div class="col-sm-6">
+                                <input type="number" name="isp" id="isp" value="{{ $isp }}" class="form-control mt-2" readonly required>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -108,43 +110,25 @@
         </section>
     </div>
 
-    {{-- <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script> --}}
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            loadScannedBarcodes();
             const input = document.getElementById("scannerInput");
 
             input.focus();
             input.addEventListener("keypress", function(e) {
+                // console.log("Pressed key:", e.key, e.keyCode);
                 if (e.key === "Enter") {
+                    e.preventDefault();
                     const code = input.value.trim();
                     if (code !== "") {
+                        document.getElementById('item_code').value = code;
                         sendScannedCode(code);
                         input.value = "";
                     }
                 }
             });
 
-            let scanBuffer = "";
-            let scanTimer = null;
-
-            document.addEventListener("keydown", function(e) {
-                const char = e.key;
-
-                if (scanTimer) clearTimeout(scanTimer);
-
-                if(char === "Enter") {
-                    if (scanBuffer.length > 0) {
-                        sendScannedCode(scanBuffer.trim());
-                        scanBuffer = "";
-                    }
-                } else {
-                    scanBuffer += char;
-
-                    scanTimer = setTimeout(() => {
-                        scanBuffer = "";
-                    }, 500);
-                }
-            })
         });
         let html5QrCode;
 
@@ -227,6 +211,7 @@
             })
             .then(res => res.json())
             .then(data => {
+                // console.log("data", data);
                 const ioSelect = document.getElementById("noio");
                 const prod_orderSelect = document.getElementById("prod_order");
                 ioSelect.innerHTML = '<option value="">Select Nomer IO</option>';
@@ -253,18 +238,24 @@
 
                     // console.log("po", data.no_po, "io", data.io_no, "prod", data.doc_num);
                     loadScannedBarcodes();
-                    alert("Success Scan: " + data.name);
+                    showToast("✅ Success Scan: " + data.name, 'success');
                 } else {
                     // console.log("grpo", data.grpo);
-                    alert("Error: " + data.message + " data prod order " + data.doc_num);
+                    showToast("❌ Error: " + data.message, 'error')                    
+                    document.getElementById("scannerInput").focus();
                 }
+            })
+            .finally(() => {
+                document.getElementById("scannerInput").focus();
             })
             .catch(error => {
                 console.error("Fetch error: ", error);
+                document.getElementById("scannerInput").focus();
             })
         }
 
         function loadScannedBarcodes() {
+            // console.log("run load");
             let xhr = new XMLHttpRequest();
             let container = document.getElementById("scannedBarcodes");
             let isp = document.getElementById("isp").value;
@@ -272,6 +263,13 @@
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == 4 && xhr.status == 200) {
                     container.innerHTML = xhr.responseText;
+
+                    document.getElementById("scannerInput").focus();
+                    document.getElementById("fileInput").style.display = "none";
+                    const fileInput = document.querySelector('#fileInput input[type="file"]');
+                    if (fileInput) {
+                        fileInput.value = "";
+                    }
                 }
             }
 
@@ -280,14 +278,13 @@
         }
 
         function AddStockupForm() {
-            const prod_order = document.getElementById("prod_order").value;
-            const noio = document.getElementById("noio").value;
-            const code = document.getElementById("item_code").value;
+            const prod_order    = document.getElementById("prod_order").value;
+            const noio          = document.getElementById("noio").value;
+            const code          = document.getElementById("item_code").value;
 
             if (!prod_order || !noio) {
-                alert("Pastikan Nomer Production Order atau Nomer IO di isi sebelum submit.");
+                showToast("❌ Error: Pastikan Nomer Production Order atau Nomer IO di isi sebelum submit!")
                 return false; // Prevent form submission
-                loadScannedBarcodes(code);
             }
 
             document.getElementById("io_hidden").value = noio;
@@ -310,13 +307,34 @@
                 return response.json();
             })
             .then((data) => {
-                console.log("Deleted:", data);
+                // console.log("Deleted:", data);
                 loadScannedBarcodes();
+                showToast("✅ Item berhasil dihapus", "success");
+            })
+            .finally(() => {
+                document.getElementById("scannerInput").focus();
             })
             .catch((err) => {
                 console.error(err);
-                alert("Gagal menghapus data.");
+                loadScannedBarcodes();
+                showToast("❌ Error: gagal menghapus data!")        
             });
+        }
+
+        function showToast(message, type = 'success') {
+            const box = document.getElementById('feedbackBox');
+            const text = document.getElementById('feedbackMessage');
+
+            box.classList.remove('success', 'error', 'show'); // remove existing styles
+            box.classList.add('toast-notification', type, 'show');
+
+            // Update content and styling
+            text.textContent = message;
+            box.classList.add('toast-notification', type, 'show');
+            setTimeout(() => {
+                box.classList.remove('show');
+                document.getElementById("scannerInput").focus();
+            }, 3000);
         }
 
     </script>   

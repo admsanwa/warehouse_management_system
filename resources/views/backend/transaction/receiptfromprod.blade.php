@@ -8,19 +8,18 @@
                 <div class="col col-sm-6">
                     <h1>Transactions</h1>
                 </div>
-                <div class="col col-sm-6">
-                    <ol class="breadcrumb justify-content-end">
-                        <a href="{{ url('admin/quality/barcode') }}" class="btn btn-primary btn-sm">Barcode QC</a>
-                    </ol>
-                </div>
             </div>
         </div>
     </div>
 
     <section class="content">
+        <input id="scannerInput" type="text" autofocus style="opacity: 0; position: absolute;">
         <div class="container-fluid">
             <div class="card">
                 @include('_message')
+                <div id="feedbackBox" class="toast-notification">
+                    <span id="feedbackMessage"></span>
+                </div>
                 <div class="card-header">
                     <h3 class="card-title">Receipt from Production</h3>
                 </div>
@@ -37,9 +36,6 @@
                                 <div class="mb-2">
                                     <button type="button" class="btn btn-sm btn-outline-primary mr-1" onclick="startCamera()">Use Camera</button>
                                     <button type="button" class="btn btn-sm btn-outline-secondary" onclick="showFileInput()">Upload Image</button>
-                                    <input id="scannerInput" type="text" autofocus style="opacity: 0; position: absolute;">
-
-                                    {{-- <input type="text" id="scannerInput" placeholder="Scan Barcode..." autofocus autocomplete="off" /> --}}
                                 </div>
                                 <div id="reader" style="width:300px; display: none;"></div>
                                 <div id="fileInput" style="display: none;">
@@ -49,7 +45,6 @@
                             <label for="" class="col-sm-4 col-form-lable">Product Nomer :</label>
                             <div class="col-sm-6">
                                 <input type="number" name="id" id="id" class="form-control mt-2" hidden>
-                                <input type="number" name="number" id="number" value="{{ $number }}" class="form-control" hidden>
                                 <input type="text" name="prod_no" id="prod_no" class="form-control mt-2" readonly>
                             </div>
                             <label for="" class="col-sm-4 col-form-lable">Product Description :</label>
@@ -87,6 +82,10 @@
                                 </select>
                             @endif
                         </div>
+                        <label for="" class="col-sm-4 col-form-lable">Number :</label>
+                        <div class="col-sm-6">
+                                <input type="number" name="number" id="number" value="{{ $number }}" class="form-control mt-2" readonly required>
+                        </div>
                     </div>
                 </div>
                 <div class="p-0" id="scannedBarcodes"></div>
@@ -104,11 +103,13 @@
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        loadScannedBarcodes();
         const input = document.getElementById("scannerInput");
 
         input.focus();
         input.addEventListener("keypress", function(e) {
             if (e.key === "Enter") {
+                e.preventDefault();
                 const code = input.value.trim();
                 if (code !== "") {
                     const parts = code.trim().split(/\s+/);
@@ -226,7 +227,7 @@
             posSelect.innerHTML = '<option value="">Select Nomer PO</option>';
      
             if (data.success) {
-                console.log("data", data);
+                // console.log("data", data);
                 document.getElementById("id").value = data.id;
                 
                 data.io.forEach(ios => {
@@ -244,14 +245,19 @@
                 })
 
                 loadScannedBarcodes();
-                alert("Success Scan: " + data.prod_no);
+                showToast("✅ Success Scan: " + data.prod_no, 'success');
             } else {
                 // console.log("prod_order", data.prod_order);
-                alert("Error: " + data.message);
+                showToast("❌ Error: " + data.message, 'error')                    
+                document.getElementById("scannerInput").focus();
             }
+        })
+        .finally(() => {
+            document.getElementById("scannerInput").focus();
         })
         .catch(error => {
             console.error("Fetch error: ", error);
+            document.getElementById("scannerInput").focus();
         })
     }
 
@@ -263,6 +269,13 @@
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4 && xhr.status == 200) {
                 container.innerHTML = xhr.responseText;
+
+                document.getElementById("scannerInput").focus();
+                document.getElementById("fileInput").style.display = "none";
+                const fileInput = document.querySelector('#fileInput input[type="file"]');
+                if (fileInput) {
+                    fileInput.value = "";
+                }
             }
         }
 
@@ -301,13 +314,30 @@
             return response.json();
         })
         .then((data) => {
-            console.log("Deleted:", data);
+            // console.log("Deleted:", data);
             loadScannedBarcodes();
+            showToast("✅ Item berhasil dihapus", "success");       
         })
         .catch((err) => {
             console.error(err);
             alert("Gagal menghapus data.");
         });
+    }
+
+    function showToast(message, type = 'success') {
+        const box = document.getElementById('feedbackBox');
+        const text = document.getElementById('feedbackMessage');
+
+        box.classList.remove('success', 'error', 'show'); // remove existing styles
+        box.classList.add('toast-notification', type, 'show');
+
+        // Update content and styling
+        text.textContent = message;
+        box.classList.add('toast-notification', type, 'show');
+        setTimeout(() => {
+            box.classList.remove('show');
+            document.getElementById("scannerInput").focus();
+        }, 3000);
     }
 
 </script>   

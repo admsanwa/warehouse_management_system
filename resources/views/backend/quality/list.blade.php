@@ -7,11 +7,6 @@
                     <div class="col col-sm-6">
                         <h1>Quality Control</h1>
                     </div>
-                    <div class="col col-sm-6">
-                        <ol class="breadcrumb justify-content-end">
-                            <a href="{{ url("admin/quality/barcode") }}" class="btn btn-primary btn-sm">Barcode QC</a>
-                        </ol>
-                    </div>
                 </div>
             </div>
         </div>
@@ -39,12 +34,16 @@
                                         </div>  
                                         <div class="form-group col-md-2">
                                             <label for="">IO</label>   
-                                            <input type="text" name="io_no" id="io_no" class="form-control" value="{{ Request()->io_no }}" placeholder="Enter IO">
+                                            <input type="text" name="no_io" id="no_io" class="form-control" value="{{ Request()->no_io }}" placeholder="Enter IO">
                                         </div> 
                                         <div class="form-group col-md-2">
-                                            <label for="">Result QC</label>   
-                                            <input type="text" name="resut" id="result" class="form-control" value="{{ Request()->result }}" placeholder="Enter Result Quality Control"> 
-                                        </div> 
+                                            <label for="">Result QC</label>
+                                            <select name="result" id="result" class="form-control">
+                                                <option value="">Select Result</option>
+                                                <option value="1" {{ request('result') == 1 ? 'selected' : ''}}>OK</option>
+                                                <option value="2" {{ request('result') == 2 ? 'selected' : ''}}>NG</option>
+                                            </select>
+                                        </div>
                                         <div class="form-group col-md-2">
                                             <button type="submit" class="btn btn-success" style="margin-top: 30px"><i class="fa fa-search"></i> Search</button>
                                             <a href="{{ url("admin/quality/list") }}" class="btn btn-warning" style="margin-top: 30px"><i class="fa fa-eraser"></i> Reset</a>
@@ -69,6 +68,7 @@
                                                 <th>Description</th>
                                                 <th>IO</th>
                                                 <th>QC</th>
+                                                <th>Remarks</th>
                                                 <th>Check</th>
                                             </tr>
                                         </thead>
@@ -86,12 +86,13 @@
                                                     <td>{{ $quality->prod_desc ?? "-"}}</td>
                                                     <td>{{ $quality->io_no }}</td>
                                                     <td>
-                                                        @if ($quality->quality && $quality->quality->result !== null)
-                                                            {{ $quality->quality->result === 1 ? "OK" : ($quality->quality->result === 2 ? "NG" : "-")}}
+                                                        @if ($quality->qualityTwo && $quality->qualityTwo->result !== null)
+                                                            {{ $quality->qualityTwo->result === 1 ? "OK" : ($quality->qualityTwo->result === 2 ? "NG" : "-")}}
                                                         @else
                                                            -
                                                         @endif
                                                     </td>
+                                                    <td>{{ $quality->qualityTwo->remark ?? "-"}}</td>
                                                     <td><a href="#" data-bs-toggle="modal" data-bs-target="#modal_{{ $quality->id }}"><i class="fa fa-eye"></i> Check</a></td>
                                                 </tr>
 

@@ -18,8 +18,7 @@ class EmployeesController extends Controller
 
     public function add(Request $request)
     {
-        $data['getJobs'] = JobsModel::getRecord($request);
-        return view('backend.employees.add', $data);
+        return view('backend.employees.add');
     }
 
     public function add_post(Request $request)
@@ -62,29 +61,26 @@ class EmployeesController extends Controller
     public function edit($id)
     {
         $data['getRecord'] = User::find($id);
-        $data['getJobs'] = JobsModel::get();
         return view('backend.employees.edit', $data);
     }
 
     public function update($id, Request $request)
     {
         $user = $request->validate([
+            'username'  => 'required',
+            'nik'       => 'required|numeric:min:3',
+            'department'    => 'required',
             'email' => 'required|unique:users,email,' . $id,
         ]);
 
-        $user                       = User::find($id);
+        $user                   = User::find($id);
         if ($user) {
-            $user->name                 = trim($request->name);
-            $user->last_name            = trim($request->last_name);
-            $user->email                = trim($request->email);
-            $user->phone_number         = trim($request->phone_number);
-            $user->hire_date            = trim($request->hire_date);
-            $user->job_id               = trim($request->job_id);
-            $user->salary               = trim($request->salary);
-            $user->commission_pct       = trim($request->commission_pct);
-            $user->manager_id           = trim($request->manager_id);
-            $user->department_id        = trim($request->department_id);
-            $user->role              = $user->role == 1 ? 1 : 0;
+            $user->username     = trim($request->username);
+            $user->fullname     = trim($request->fullname);
+            $user->nik          = trim($request->nik);
+            $user->department   = trim($request->department);
+            $user->level        = trim($request->level);
+            $user->email        = trim($request->email);
             $user->save();
 
             return redirect('admin/employees')->with('success', 'Employees succesfully update');

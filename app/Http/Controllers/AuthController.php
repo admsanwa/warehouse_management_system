@@ -33,16 +33,21 @@ class AuthController extends Controller
     {
         // dd($request->all());
         $user = request()->validate([
-            'username'              => 'required',
+            'username'          => 'required',
             'email'             => 'required|unique:users',
+            'department'        => 'required',
+            'level'             => 'required',
             'password'          => 'required|min:6|',
             'confirm_password'  => 'required_with:password|same:password|min:6|'
         ]);
 
         $user                   = new User;
-        $user->username             = trim($request->username);
+        $user->username         = trim($request->username);
         $user->fullname         = trim($request->fullname);
+        $user->nik              = trim($request->nik);
         $user->email            = trim($request->email);
+        $user->department       = trim($request->department);
+        $user->level            = trim($request->level);
         $user->password         = Hash::make($request->password);
         $user->remember_token   = Str::random(50);
         $user->save();
@@ -63,16 +68,11 @@ class AuthController extends Controller
 
     public function login_post(Request $request)
     {
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password], true)) {
+        $credentials = $request->only('email', 'password');
+        if (Auth::attempt($credentials)) {
             // dd(Auth::user()->toArray());
             // dd(Auth::user()->role);
-
-            if (Auth::user()->role == "1") {
-                $request->session()->regenerate();
-                return redirect()->intended('admin/dashboard');
-            } else {
-                return redirect('/')->with('error', 'No Admin availables.. please check');
-            }
+            return redirect()->intended('admin/dashboard');
         } else {
             return redirect()->back()->with('error', 'Please enter correct credentials');
         }

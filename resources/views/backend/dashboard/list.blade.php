@@ -30,14 +30,15 @@
             <!-- small box -->
             <div class="small-box bg-info">
               <div class="inner">
-                <h3>150</h3>
-
-                <p>New Orders</p>
+                <h3>{{ $needBuy }}</h3>
+                <p>Items to Purchase</p>
               </div>
               <div class="icon">
                 <i class="ion ion-bag"></i>
               </div>
-              <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <a href="{{ url("admin/dashboard/minstock") }}" class="small-box-footer">
+                  More info <i class="fas fa-arrow-circle-right"></i>
+              </a>
             </div>
           </div>
           <!-- ./col -->
@@ -45,14 +46,14 @@
             <!-- small box -->
             <div class="small-box bg-success">
               <div class="inner">
-                <h3>53<sup style="font-size: 20px">%</sup></h3>
+                <h3>{{ $prodRelease }}</h3>
 
-                <p>Bounce Rate</p>
+                <p>Production Release</p>
               </div>
               <div class="icon">
-                <i class="ion ion-stats-bars"></i>
+                <i class="ion ion-ios-cog-outline"></i>
               </div>
-              <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <a href="{{ url("admin/dashboard/prodrelease") }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
           <!-- ./col -->
@@ -60,14 +61,14 @@
             <!-- small box -->
             <div class="small-box bg-warning">
               <div class="inner">
-                <h3>44</h3>
+                <h3>{{ $afterCheck }}</h3>
 
-                <p>User Registrations</p>
+                <p>After Check</p>
               </div>
               <div class="icon">
-                <i class="ion ion-person-add"></i>
+                <i class="ion ion-android-checkmark-circle"></i>
               </div>
-              <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <a href="{{ url('admin/dashboard/aftercheck')}}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
           <!-- ./col -->
@@ -75,14 +76,70 @@
             <!-- small box -->
             <div class="small-box bg-danger">
               <div class="inner">
-                <h3>65</h3>
+                <h3>{{ $deliveryStatus }}</h3>
 
-                <p>Unique Visitors</p>
+                <p>Delivery Status</p>
               </div>
               <div class="icon">
-                <i class="ion ion-pie-graph"></i>
+                <i class="ion ion-ios-pricetags-outline"></i>
               </div>
-              <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <a href="{{ url("admin/dashboard/delivstatus")}}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+
+            </div>
+          </div>
+          <div class="col-lg-3 col-6">
+            <div class="small-box bg-info">
+              <div class="inner">
+                <h3>{{ $purchaseOrder }}</h3>
+
+                <p>Good Receipt PO</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-clipboard"></i>
+              </div>
+              <a href="{{ url("admin/dashboard/goodreceiptpo") }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3>{{ $goodIssued }}</h3>
+
+                <p>Good Issued</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-log-out"></i>
+              </div>
+              <a href="{{ url("admin/dashboard/goodissued") }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+          <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-warning">
+              <div class="inner">
+                <h3>{{ $goodReceipt }}</h3>
+
+                <p>Good Receipt</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-android-checkbox-outline"></i>
+              </div>
+              <a href="{{ url("admin/dashboard/goodreceipt") }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+          </div>
+           <div class="col-lg-3 col-6">
+            <!-- small box -->
+            <div class="small-box bg-danger">
+              <div class="inner">
+                <h3>{{ $rfp }}</h3>
+
+                <p>Receipt from Production</p>
+              </div>
+              <div class="icon">
+                <i class="ion ion-checkmark-circled"></i>
+              </div>
+              <a href="{{ url("admin/dashboard/rfp") }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
           <!-- ./col -->

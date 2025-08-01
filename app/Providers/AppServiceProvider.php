@@ -13,10 +13,16 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         // \URL::forceScheme('http');
+        // \URL::forceScheme('https');
+
 
         if (env('APP_ENV') !== 'local') {
             \URL::forceScheme('https');
         }
+
+        // if (app()->environment('production')) {
+        //     \URL::forceScheme('https');
+        // }
     }
 
     /**
@@ -25,5 +31,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Paginator::useBootstrap();
+
+        // \URL::forceScheme('http');
     }
 }

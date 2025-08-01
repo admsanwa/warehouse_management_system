@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Backend;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\ItemsMaklonModel;
+use App\Models\PurchaseOrderDetailsModel;
 use App\Models\PurchasingModel;
 use App\Models\StockModel;
 use Illuminate\Support\Facades\DB;
@@ -14,13 +16,16 @@ class PurchasingController extends Controller
 {
     public function index(Request $request)
     {
-        $getRecord = PurchasingModel::with("stocks")->get()->unique("no_po")->values();
-        $getPagination = PurchasingModel::getRecord($request);
+        $getRecord      = PurchasingModel::with("po_details")->get()->values();
+        $getRecordTwo   = PurchasingModel::with("maklon_details")->get()->values();
+        // $getRecord      = PurchaseOrderDetailsModel::with("stocks")->get()->unique("nopo")->values();
+        $getPagination  = PurchasingModel::getRecord($request);
 
         $purchasingSummary = [];
+        $purchasingSummaryTwo = [];
         foreach ($getRecord as $record) {
             $po = $record->no_po;
-            $purchaseQty = PurchasingModel::where("no_po", $po)->sum("qty");
+            $purchaseQty = PurchaseOrderDetailsModel::where("nopo", $po)->sum("qty");
             $stockInQty = StockModel::where("no_po", $po)->sum("qty");
 
             $purchasingSummary[$po] = [
@@ -28,14 +33,27 @@ class PurchasingController extends Controller
             ];
         }
 
-        return view("backend.purchasing.list", compact('getRecord', 'getPagination', 'purchasingSummary'));
+        foreach ($getRecordTwo as $record) {
+            $po             = $record->no_po;
+            $purchaseQty    = PurchaseOrderDetailsModel::where("nopo", $po)->sum("qty");
+            $goodReceipt    = ItemsMaklonModel::where("po", $po)
+                ->where(function ($query) {
+                    $query->whereNotNull("gr")->where("gr", "<>", 0);
+                })->sum("qty");
+
+            $purchasingSummaryTwo[$po] = [
+                'remain' => $purchaseQty - $goodReceipt
+            ];
+        }
+
+        return view("backend.purchasing.list", compact('getRecord', 'getPagination', 'purchasingSummary', 'purchasingSummaryTwo'));
     }
 
     public function view(Request $request, $id)
     {
         $getRecord  = PurchasingModel::find($id);
         $getPO      = PurchasingModel::where("id", $id)->value("no_po");
-        $getData    = PurchasingModel::where("no_po", $getPO)->get();
+        $getData    = PurchaseOrderDetailsModel::where("nopo", $getPO)->get();
         return view("backend.purchasing.view", compact('getRecord', 'getData', 'getPO'));
     }
 

@@ -10,11 +10,12 @@
                 </div>
                 <div class="modal-body">
                     <label for="check_{{ $quality->id }}">Quality Check</label>
-                    <select name="check" id="check_{{ $quality->id }}" class="form-control">
+                    <select name="check" id="check_{{ $quality->id }}" class="form-control" required>
                         <option value="">Select Assessment Quality</option>
                         <option value="1">OK</option>
                         <option value="2">NG</option>
                     </select>
+                    <input type="text" name="remark" id="remark_{{ $quality->id }}" class="form-control mt-2" placeholder=" Enter Remarks here" required>
                 </div>
                 <div class="modal-footer">
                     <a type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</a>

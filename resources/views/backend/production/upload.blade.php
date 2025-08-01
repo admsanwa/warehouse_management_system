@@ -10,7 +10,7 @@
                     </div>
                     <div class="col col-sm-6">
                         <ol class="breadcrumb justify-content-end">
-                            <a href="{{ url('admin/production') }}" class="btn btn-primary btn-sm"></i>Production List</a>
+                            <a href="{{ url('admin/production/po') }}" class="btn btn-primary btn-sm"></i>Production List</a>
                         </ol>
                     </div>
                 </div>

@@ -31,4 +31,9 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'sap_b1' => [
+        'base_url'  => env('SAP_B1_BASE', 'https:://your-sap-url.com/api'),
+        'token'     => env('SAP_B1_TOKEN')
+    ]
+
 ];

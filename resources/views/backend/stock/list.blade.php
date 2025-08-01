@@ -61,11 +61,10 @@
                                                 <th>No</th>
                                                 <th>Item Code</th>
                                                 <th>Item Desc</th>
-                                                <th>Stock</th>
+                                                <th>Stock SAP</th>
                                                 <th>Stock In</th>
                                                 <th>Stock Out</th>
-                                                <th>On Hand</th>
-                                                <th>Note</th>
+                                                <th>Available</th>
                                             </tr>
                                         </thead>
 
@@ -78,7 +77,6 @@
                                             <td>{{ $stock->stock_in }}</td>
                                             <td>{{ $stock->stock_out }}</td>
                                             <td>{{ $stock->on_hand }}</td>
-                                            <td>{{ $stock->item->stock_min > $stock->stock ? "Stock harus dibeli" : "-" }}</td>
                                            </tr>
                                        @empty
                                            <tr>

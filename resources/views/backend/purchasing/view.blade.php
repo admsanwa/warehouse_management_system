@@ -26,22 +26,28 @@
                             </div>
                             <div class="card-body">
                                 <div class="form-group row">
-                                    <label for="" class="col-sm-2 col-form-lable">Nomor PO :</label>
-                                    <div class="col-sm-4">{{ $getRecord->no_po }}</div>
-                                    <label for="" class="col-sm-2 col-form-lable">Buyer :</label>
-                                    <div class="col-sm-4">{{ $getRecord->buyer }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Nomor PO</label>
+                                    <div class="col-sm-2">: {{$getRecord->no_po }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Buyer</label>
+                                    <div class="col-sm-2">: {{ $getRecord->buyer }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">IO</label>
+                                    <div class="col-sm-2">: {{ $getRecord->io ?? "-" }}</div>
+
                                 </div>
                                 <div class="form-group row">
-                                    <label for="" class="col-sm-2 col-form-lable">Vendor :</label>
-                                    <div class="col-sm-4">{{ $getRecord->vendor }}</div>
-                                    <label for="" class="col-sm-2 col-form-lable">Delivery Date :</label>
-                                    <div class="col-sm-4">{{ $getRecord->delivery_date }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Vendor</label>
+                                    <div class="col-sm-2">: {{ $getRecord->vendor }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Delivery Date</label>
+                                    <div class="col-sm-2">: {{ $getRecord->delivery_date }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Internal No</label>
+                                    <div class="col-sm-2">: {{ $getRecord->internal_no ?? "-"}}</div>
+
                                 </div>
                                 <div class="form-group row">
-                                    <label for="" class="col-sm-2 col-form-lable">Contact Person :</label>
-                                    <div class="col-sm-4">{{ $getRecord->contact_person }}</div>
-                                    <label for="" class="col-sm-2 col-form-lable">Status :</label>
-                                    <div class="col-sm-4">{{ $getRecord->status == "Open" ? 'Open' : 'Closed' }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Contact Person</label>
+                                    <div class="col-sm-2">: {{ $getRecord->contact_person }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Status</label>
+                                    <div class="col-sm-2">: {{ $getRecord->status == "Open" ? 'Open' : 'Closed' }}</div>
                                 </div>
                             </div>
                         </div>
@@ -54,6 +60,7 @@
                                                 <tr>
                                                     <th>No</th>
                                                     <th>Item Code</th>
+                                                    <th>Item Type</th>
                                                     <th>Item Desc</th>
                                                     <th>Qty</th>
                                                     <th>Uom</th>
@@ -64,6 +71,7 @@
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $pos->item_code }}</td>
+                                                    <td>{{ $pos->item_type }}</td>
                                                     <td>{{ $pos->item_desc }}</td>
                                                     <td>{{ $pos->qty }}</td>
                                                     <td>{{ $pos->uom }}</td>
@@ -82,7 +90,11 @@
                             </div>
                             <div class="card-footer">
                                 <a href="{{ url('admin/purchasing') }}" class="btn btn-default">Back</a>
-                                <a href="{{ url("admin/transaction/stockin/" . $getPO)}}" class="btn btn-success">Scan Barcode</a>
+                                @if (stripos($pos->item_code, "Maklon") !== false)
+                                    <a href="{{ url("admin/transaction/goodissued")}}" class="btn btn-success">Good Issue</a>
+                                @else
+                                    <a href="{{ url("admin/transaction/stockin/" . $getPO)}}" class="btn btn-success">Scan Barcode</a>
+                                @endif
                             </div>
                         </div>
                     </div>

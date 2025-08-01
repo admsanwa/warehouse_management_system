@@ -12,7 +12,7 @@
                 </div><!-- /.col -->
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <a href="{{ url('admin/employees/add')}}" class="btn btn-primary">Add Employees</a>
+                        <a href="{{ url('/register')}}" class="btn btn-primary">Add Employees</a>
                     </ol>
                 </div><!-- /.col -->
             </div><!-- /.row -->
@@ -31,17 +31,17 @@
                         <form action="" method="get">
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="form-group col-md-1">
-                                        <label for="">ID</label>
-                                        <input type="number" name="id" value="{{ Request()->id}}" class="form-control" placeholder="Enter ID">
+                                    <div class="form-group col-md-2">
+                                        <label for="">Fullname</label>
+                                        <input type="text" name="fullname" value="{{ Request()->fullname}}" class="form-control" placeholder="Enter Fullname">
+                                    </div>
+                                    <div class="form-group col-md-2">
+                                        <label for="">NIK</label>
+                                        <input type="text" name="nik" value="{{ Request()->nik}}" class="form-control" placeholder="Enter NIK">
                                     </div>
                                     <div class="form-group col-md-3">
-                                        <label for="">First Name</label>
-                                        <input type="text" name="name" value="{{ Request()->name}}" class="form-control" placeholder="Enter First Name">
-                                    </div>
-                                    <div class="form-group col-md-3">
-                                        <label for="">Last Name</label>
-                                        <input type="text" name="last_name" value="{{ Request()->last_name}}" class="form-control" placeholder="Enter Last Name">
+                                        <label for="">Department</label>
+                                        <input type="text" name="department" value="{{ Request()->department}}" class="form-control" placeholder="Enter Department">
                                     </div>
                                     <div class="form-group col-md-3">
                                         <label for="">Email</label>
@@ -65,22 +65,22 @@
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
+                                        <th>No</th>
+                                        <th>FullName</th>
+                                        <th>NIK</th>
+                                        <th>Department</th>
                                         <th>Email</th>
-                                        <th>Is Role</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse ($getRecord as $value)
                                     <tr>
-                                        <td>{{ $value->id}}</td>
-                                        <td>{{ $value->name}}</td>
-                                        <td>{{ $value->last_name}}</td>
-                                        <td>{{ $value->email}}</td>
-                                        <td>{{ !empty($value->role) ? 'HR' : 'Employees'}}</td>
+                                        <td>{{ $loop->iteration}}</td>
+                                        <td>{{ $value->fullname}}</td>
+                                        <td>{{ $value->nik}}</td>
+                                        <td>{{ $value->department}}</td>
+                                        <td>{{ $value->email }}</td>
                                         <td>
                                             <a href="{{ url('admin/employees/view/' . $value->id) }}" class="btn btn-info">View</a>
                                             <a href="{{ url('admin/employees/edit/' . $value->id) }}" class="btn btn-primary">Edit</a>

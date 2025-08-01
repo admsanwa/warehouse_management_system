@@ -27,8 +27,8 @@ class RFPModel extends Model
         if (!empty(Request::get('prod_order'))) {
             $return = $return->where('prod_order', 'LIKE', '%' . Request::get('prod_order') . '%');
         }
-        if (!empty(Request::get('prod_no'))) {
-            $return = $return->where('prod_no', 'LIKE', '%' . Request::get('prod_no') . '%');
+        if (!empty(Request::get('prod_desc'))) {
+            $return = $return->where('prod_desc', 'LIKE', '%' . Request::get('prod_desc') . '%');
         }
 
         return $return->orderByDesc("id")->paginate(5);

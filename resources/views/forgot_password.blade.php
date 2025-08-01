@@ -51,9 +51,6 @@
       <p class="mb-1">
         <a href="{{ url('/')}}">Sign in</a>
       </p>
-      <p class="mb-0">
-        <a href="{{ url('register')}}" class="text-center">Register a new membership</a>
-      </p>
     </div>
     <!-- /.login-card-body -->
   </div>

@@ -8,19 +8,18 @@
                 <div class="col col-sm-6">
                     <h1>Transactions</h1>
                 </div>
-                <div class="col col-sm-6">
-                    <ol class="breadcrumb justify-content-end">
-                        <a href="{{ url('admin/transaction/stockout') }}" class="btn btn-primary btn-sm">Stock Out</a>
-                    </ol>
-                </div>
             </div>
         </div>
     </div>
 
     <section class="content">
+        <input id="scannerInput" type="text" autofocus style="opacity: 0; position: absolute;">
         <div class="container-fluid">
             <div class="card">
                 @include('_message')
+                <div id="feedbackBox" class="toast-notification">
+                    <span id="feedbackMessage"></span>
+                </div>
                 <div class="card-header">
                     <h3 class="card-title">Stock In</h3>
                 </div>
@@ -37,9 +36,6 @@
                                 <div class="mb-2">
                                     <button type="button" class="btn btn-sm btn-outline-primary mr-1" onclick="startCamera()">Use Camera</button>
                                     <button type="button" class="btn btn-sm btn-outline-secondary" onclick="showFileInput()">Upload Image</button>
-                                    <input id="scannerInput" type="text" autofocus style="opacity: 0; position: absolute;">
-
-                                    {{-- <input type="text" id="scannerInput" placeholder="Scan Barcode..." autofocus autocomplete="off" /> --}}
                                 </div>
                                 <div id="reader" style="width:300px; display: none;"></div>
                                 <div id="fileInput" style="display: none;">
@@ -98,46 +94,25 @@
 </div>
 
 <!-- Include barcode scanner JS -->
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        loadScannedBarcodes();
         const input = document.getElementById("scannerInput");
 
         input.focus();
         input.addEventListener("keypress", function(e) {
+            console.log("Pressed key:", e.key, e.keyCode);
             if (e.key === "Enter") {
+                e.preventDefault(); // ← 🛑 This stops the form from submitting
                 const code = input.value.trim();
                 if (code !== "") {
-                                    document.getElementById('item_code').value = code;
+                    document.getElementById('item_code').value = code;
 
                     sendScannedCode(code);
                     input.value = "";
                 }
             }
         });
-
-        let scanBuffer = "";
-        let scanTimer = null;
-
-        document.addEventListener("keydown", function(e) {
-        console.log("keypress");
-            const char = e.key;
-
-            if (scanTimer) clearTimeout(scanTimer);
-
-            if(char === "Enter") {
-                if (scanBuffer.length > 0) {
-                    sendScannedCode(scanBuffer.trim());
-                    scanBuffer = "";
-                }
-            } else {
-                scanBuffer += char;
-
-                scanTimer = setTimeout(() => {
-                    scanBuffer = "";
-                }, 500);
-            }
-        })
     });
     let html5QrCode;
 
@@ -206,7 +181,7 @@
     }
 
     function sendScannedCode(code) {
-         const grpo = document.getElementById("grpo").value;
+        const grpo = document.getElementById("grpo").value;
         // console.log("code", code);
         fetch("/stockin-add", {
             method: "POST",
@@ -223,7 +198,7 @@
             poSelect.innerHTML = '<option value="">Select Nomer PO</option>'; // Clear old options
      
             if (data.success) {
-                // console.log("grpo", data.grpo);
+                // console.log("data", data);
                 document.getElementById("id").value = data.id;
                 document.getElementById("item_desc").value = data.name;  
                 document.getElementById("on_hand").value = data.on_hand;
@@ -236,14 +211,19 @@
                 });
 
                 loadScannedBarcodes();
-                alert("Success Scan: " + data.name);
+                showToast("✅ Success Scan: " + data.name, 'success');
             } else {
                 // console.log("grpo", data.grpo);
-                alert("Error: " + data.message);
+                showToast("❌ Error: " + data.message, 'error');                    
+                document.getElementById("scannerInput").focus();
             }
         })
+        .finally(() => {
+                document.getElementById("scannerInput").focus();
+            })
         .catch(error => {
             console.error("Fetch error: ", error);
+            document.getElementById("scannerInput").focus();
         })
     }
 
@@ -251,13 +231,21 @@
         let xhr = new XMLHttpRequest();
         let container = document.getElementById("scannedBarcodes");
         const grpo = document.getElementById("grpo").value;
+        // console.log("grpo", grpo);
 
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4 && xhr.status == 200) {
                 container.innerHTML = xhr.responseText;
+
+                document.getElementById("scannerInput").focus();
+                document.getElementById("fileInput").style.display = "none";
+                const fileInput = document.querySelector('#fileInput input[type="file"]');
+                if (fileInput) {
+                    fileInput.value = "";
+                }
             }
         }
-
+        
         xhr.open("GET", "/scanned-barcodes/" + grpo , true)
         xhr.send();
     }
@@ -267,7 +255,7 @@
         const grpo = document.getElementById("grpo").value;
 
         if (!noPo || !grpo) {
-            alert("Pastikan Nomer Purchasing Order atau Nomer GRPO di isi sebelum submit.");
+            showToast("❌ Error: Pastikan Nomer Purchasing Order atau Nomer GRPO di isi sebelum submit!")
             return false; // Prevent form submission
         }
 
@@ -291,13 +279,34 @@
             return response.json();
         })
         .then((data) => {
-            console.log("Deleted:", data);
+            // console.log("Deleted:", data);
             loadScannedBarcodes();
+            showToast("✅ Item berhasil dihapus", "success");
+        })
+        .finally(() => {
+            document.getElementById("scannerInput").focus();
         })
         .catch((err) => {
             console.error(err);
-            alert("Gagal menghapus data.");
+            loadScannedBarcodes();
+            showToast("❌ Error: gagal menghapus data!")
         });
+    }
+
+    function showToast(message, type = 'success') {
+        const box = document.getElementById('feedbackBox');
+        const text = document.getElementById('feedbackMessage');
+
+        box.classList.remove('success', 'error', 'show'); // remove existing styles
+        box.classList.add('toast-notification', type, 'show');
+
+        // Update content and styling
+        text.textContent = message;
+        box.classList.add('toast-notification', type, 'show');
+        setTimeout(() => {
+            box.classList.remove('show');
+            document.getElementById("scannerInput").focus();
+        }, 3000);
     }
 
 </script>   

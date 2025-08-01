@@ -20,9 +20,9 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'fullname',
         'email',
-        'password',
-        'role'
+        'password'
     ];
 
     /**
@@ -50,14 +50,14 @@ class User extends Authenticatable
         $return = self::select('users.*');
 
         // search box start
-        if (!empty(Request::get('id'))) {
-            $return = $return->where('id', '=', Request::get('id'));
+        if (!empty(Request::get('fullname'))) {
+            $return = $return->where('fullname', '=', Request::get('fullname'));
         }
-        if (!empty(Request::get('name'))) {
-            $return = $return->where('name', '=', Request::get('name'));
+        if (!empty(Request::get('nik'))) {
+            $return = $return->where('nik', '=', Request::get('nik'));
         }
-        if (!empty(Request::get('last_name'))) {
-            $return = $return->where('last_name', '=', Request::get('last_name'));
+        if (!empty(Request::get('department'))) {
+            $return = $return->where('department', '=', Request::get('department'));
         }
         if (!empty(Request::get('email'))) {
             $return = $return->where('email', '=', Request::get('email'));

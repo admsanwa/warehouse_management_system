@@ -8,10 +8,6 @@
                     <div class="col col-sm-6">
                         <h1>Item Stock Out Details</h1>
                     </div>
-                    <div class="col col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <a href="{{ url("admin/transaction/stockout") }}" class="btn btn-primary">Stock Out</a>
-                        </ol>
                 </section>
             </div>
         </div>

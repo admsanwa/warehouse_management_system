@@ -7,6 +7,12 @@
                 <div class="row mb-6">
                     <div class="col-sm-6">
                         <h1>List Items</h1>
+                        <form action="{{ url('/api/v1/wms/items/sync') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn btn-primary">
+                                Sync
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -55,11 +61,13 @@
                                                 <th>No</th>
                                                 <th>Item Code</th>
                                                 <th>Item Description</th>
-                                                <th>Item Group</th>
                                                 <th>Uom</th>
                                                 {{-- <th>On Hands</th> --}}
                                                 <th>Stock Min</th>
-                                                <th>Stock Max</th>
+                                                <th>In Stock</th>
+                                                <th>Available</th>
+                                                <th>Note</th>
+                                                <th>Update</th>
                                             </tr>
                                         </thead>
                                         @forelse ($getRecord as $items)
@@ -68,10 +76,13 @@
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $items->code }}</td>
                                                     <td>{{ $items->name }}</td>
-                                                    <td>{{ $items->group == 1 ? 'Raw Material' : ($items->group == 2 ? 'Part Other' : ($items->group == 3 ? 'Unknown' : 'Null')) }}</td>
+                                                    {{-- <td>{{ $items->group == 1 ? 'Raw Material' : ($items->group == 2 ? 'Part Other' : ($items->group == 3 ? 'Unknown' : 'Null')) }}</td> --}}
                                                     <td>{{ $items->uom == 1 ? 'Pcs' : ($items->uom == 2 ? 'Unit' : 'Unknown')}}</td>
                                                     <td>{{ $items->stock_min }}</td>
-                                                    <td>{{ $items->stock_max }}</td>
+                                                    <td>{{ $items->in_stock }}</td>
+                                                    <td>{{ $items->stocks->on_hand ?? 0}}</td>
+                                                    <td>{{ $items->stock_min > ($items->stocks->on_hand ?? 0)  ? "Stock harus dibeli" : "-" }}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($items->updated_at)->format('Y-m-d') }}</td>
                                                 </tr>
                                                 @empty
                                                 <tr>

@@ -5,12 +5,7 @@
             <div class="container-fluid">
                 <div class="row mb-6">
                     <div class="col col-sm-6">
-                        <h1>Print Barcode After Check</h1>
-                    </div>
-                    <div class="col col-sm-6">
-                        <ol class="breadcrumb justify-content-end">
-                            <a href="{{ url("admin/quality/list")}}" class="btn btn-primary btn-sm">List QC</a>
-                        </ol>
+                        <h1>Print Barcode</h1>
                     </div>
                 </div>
             </div>
@@ -22,7 +17,7 @@
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">Search Barcode QC List</h3>
+                                <h3 class="card-title">Search Barcode List</h3>
                             </div>
                             <form action="" method="get">
                                 <div class="card-body">
@@ -51,7 +46,7 @@
                         @include("_message")
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">List Barcode QC</h3>
+                                <h3 class="card-title">List Barcode</h3>
                             </div>
                             <div class="card-body p-0">
                                 <div class="table-responsive">
@@ -62,13 +57,12 @@
                                                 <th>Product Nomer</th>
                                                 <th>Description</th>
                                                 <th>IO</th>
-                                                <th>QC</th>
                                                 <th>Qty</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
                                         @forelse ($getRecord as $barcode)
-                                            <form method="get" action="{{ url('admin/quality/add') }}" enctype="multipart/form-data">
+                                            <form method="get" action="{{ url('admin/production/add') }}" enctype="multipart/form-data">
                                                 @csrf
                                                 <tbody>
                                                     <tr>
@@ -82,13 +76,6 @@
                                                             <input type="hidden" name="prod_desc" value="{{ $barcode->prod_desc }}">
                                                         </td>
                                                         <td>{{ $barcode->quality->io }}</td>
-                                                        <td>
-                                                            @if ($barcode->quality && $barcode->quality->result !== null)
-                                                                {{ $barcode->quality->result === 1 ? "OK" : ($barcode->quality->result === 2 ? "NG" : "-") }}
-                                                            @else
-                                                                -
-                                                            @endif
-                                                        </td>
                                                         <td>
                                                             <input type="number" name="qty" style="width: 70px;" class="form-control" required>
                                                         </td>
@@ -143,7 +130,7 @@
                                                         <td>{{ $barcode->prod_desc }}</td>
                                                         {{-- <td>{!! DNS1D::getBarcodeHTML($barcode->code, 'C128', 1.0, 30) !!}</td> --}}
                                                         <td>{{ $barcode->qty }}</td>
-                                                        <td><a href="{{ url('admin/quality/delete/'. $barcode->id)}}" onclick="return confirm('Are you sure you want to delete?')" 
+                                                        <td><a href="{{ url('admin/production/delete/'. $barcode->id)}}" onclick="return confirm('Are you sure you want to delete?')" 
                                                             class="btn btn-danger btn-sm"><i class="fa fa-minus"></i></a>
                                                         </td>
                                                     </tr>
@@ -157,8 +144,8 @@
                                                         <td></td>
                                                         <td>
                                                             <div class="d-flex flex-wrap">
-                                                                <a href="{{ url('admin/quality/deleteall')}}" class="btn btn-danger mr-2 mb-2"><i class="fa fa-trash"></i> All</a>
-                                                                <a href="{{ url('admin/quality/print')}}" class="btn btn-success mb-2">
+                                                                <a href="{{ url('admin/production/deleteall')}}" class="btn btn-danger mr-2 mb-2"><i class="fa fa-trash"></i> All</a>
+                                                                <a href="{{ url('admin/production/print')}}" class="btn btn-success mb-2">
                                                                     <i class="fa fa-arrow-right"></i> Print
                                                                 </a>
                                                             </div>

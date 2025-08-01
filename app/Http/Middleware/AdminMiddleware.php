@@ -11,12 +11,7 @@ class AdminMiddleware
     {
         if (Auth::check()) {
 
-            if (Auth::user()->role == 1) {
-                return $next($request);
-            } else {
-                Auth::logout();
-                return redirect(url('/'));
-            }
+            return $next($request);
         } else {
             Auth::logout();
             return redirect(url('/'));

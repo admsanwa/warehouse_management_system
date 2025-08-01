@@ -32,12 +32,27 @@ class PurchasingModel extends Model
             $return = $return->where('delivery_date', 'LIKE', '%' . Request::get('delivery_date') . 'delivery_date');
         }
 
-        $return = $return->orderBy('id', 'desc')->paginate(5);
+        $return = $return->orderBy('id', 'desc')->paginate(10);
         return $return;
     }
 
     public function stocks()
     {
         return $this->belongsTo(StockModel::class, "no_po", "no_po");
+    }
+
+    public function items_maklon()
+    {
+        return $this->belongsTo(ItemsMaklonModel::class);
+    }
+
+    public function po_details()
+    {
+        return $this->belongsTo(PurchaseOrderDetailsModel::class, "id", "po_id");
+    }
+
+    public function maklon_details()
+    {
+        return $this->belongsTo(ItemsMaklonModel::class, "no_po", "po");
     }
 }

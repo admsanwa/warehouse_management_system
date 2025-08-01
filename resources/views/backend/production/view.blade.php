@@ -27,7 +27,7 @@
                             <div class="card-body">
                                 <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">Status :</label>
-                                    <div class="col-sm-4">{{ $getRecord->status == 0 ? 'Planed' : 'Released' }}</div>
+                                    <div class="col-sm-4">{{ $getRecord->status == 0 ? 'Planned' : ($getRecord->status == 1 ? 'Released' : 'Closed') }}</div>
                                         <label for="" class="col-sm-2 col-form-lable">Doc Number :</label>
                                     <div class="col-sm-4">{{ $getRecord->doc_num }}</div>
                                 </div>
@@ -85,7 +85,9 @@
                             </div>
                             <div class="card-footer">
                                 @if ($getRecord->status == 0)
-                                    <a href="{{ url("admin/transaction/stockout", $getRecord->doc_num) }}" class="btn btn-success">Scan Barcode</a>
+                                    <a href="{{ url("admin/transaction/stockout", $pos->doc_num)}}" class="btn btn-success"><i class="fa fa-arrow-right"></i> Planned</a>
+                                @elseif ($getRecord->status == 1)
+                                    <a href="{{ url("admin/transaction/rfp")}}" class="btn btn-success"><i class="fa fa-arrow-right"></i> Released</a>
                                 @endif
                                 <button onclick="history.back()" class="btn btn-default">Back</button>
                             </div>

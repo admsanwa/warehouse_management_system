@@ -27,8 +27,8 @@
 <!-- Main Sidebar Container -->
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
   <!-- Brand Logo -->
-  <a href="index3.html" class="brand-link">
-    <img src="{{ url('backend/dist/img/AdminLTELogo.png')}}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+  <a href="{{ url('admin/dashboard')}}" class="brand-link">
+    <img src="{{ asset('assets/images/logo/bullet-logo.png') }}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
     <span class="brand-text font-weight-light">WMS</span>
   </a>
 
@@ -40,14 +40,14 @@
         <img src="{{ url('backend/dist/img/user2-160x160.jpg')}}" class="img-circle elevation-2" alt="User Image">
       </div>
       <div class="info">
-        <a href="#" class="d-block">{{ Auth::user()->name}}</a>
+        <a href="#" class="d-block">{{ Auth::user()->fullname}}</a>
       </div>
     </div>
 
     <!-- SidebarSearch Form -->
     <div class="form-inline">
       <div class="input-group" data-widget="sidebar-search">
-        <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
+        <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search" id="sidebarSearchInput">
         <div class="input-group-append">
           <button class="btn btn-sidebar">
             <i class="fas fa-search fa-fw"></i>
@@ -71,8 +71,6 @@
         </li>
       </ul>
     </nav>
-
-    <!-- Items Menu -->
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <li class="nav-item {{ Request::is('admin/items/*') ? 'menu-open' : '' }}">
@@ -104,7 +102,6 @@
           
       </ul>
     </nav>
-    
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <!-- Add icons to the links using the .nav-icon class
@@ -138,13 +135,47 @@
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-        <li class="nav-item">
-          <a href="{{ url('admin/production')}}" class="nav-link @if (Request::segment(2) == 'production') active @endif">
+        <li class="nav-item {{ Request::is("admin/production/*") ? 'menu-open' : ''}}">
+          <a href="#prodSubMenu" data-toggle="collapse" aria-expanded="{{ Request::is('admin/production/*') ? 'true' : 'false'}}" class="nav-link">
             <i class="nav-icon fa fa-cogs"></i>
             <p>
               Production
+              <i class="right fas fa-angle-left"></i>
             </p>
           </a>
+
+          <ul class="collapse list-unstyled {{ Request::is('admin/production/*') ? 'show' : ''}} itemSubMenu" id="prodSubMenu">
+            <li class="nav-item">
+              <a href="{{ url('admin/production/po')}}" class="nav-link @if (Request::is('admin/production/po')) active @endif">
+                <p>Production Order</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ url('admin/production/bon') }}" class="nav-link @if (Request::is('admin/production/bon')) active @endif">
+                <p>Bon Pembelian Barang</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ url('admin/production/listbon') }}" class="nav-link @if (Request::is('admin/production/listbon')) active @endif">
+                <p>List Bon</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ url('admin/production/memo')}}" class="nav-link @if (Request::is('admin/production/memo')) active @endif">
+                <p>Memo</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ url('admin/production/listmemo')}}" class="nav-link @if (Request::is('admin/production/listmemo')) active @endif">
+                <p>List Memo</p>
+              </a>
+            </li>
+             <li class="nav-item">
+              <a href="{{ url("admin/production/barcode") }}" class="nav-link">
+                <p>Barcode</p>
+              </a>
+            </li>
+          </ul>
         </li>
       </ul>
     </nav>
@@ -190,6 +221,59 @@
                 <p>Receipt From Prod</p>
               </a>
             </li>
+            <li class="nav-item">
+              <a href="{{ url("admin/transaction/goodissued")}}" class="nav-link @if (Request::is("admin/transaction/goodissued")) active @endif">
+                <p>Good Issue</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ url("admin/transaction/goodreceipt")}}" class="nav-link @if (Request::is("admin/transaction/goodreceipt")) active @endif">
+                <p>Good Receipt</p>
+              </a>
+            </li>
+          </ul>
+          
+        </li>
+      </ul>
+    </nav>
+    <nav class="mt-2">
+      <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <li class="nav-item {{ Request::is('admin/list/*') ? 'menu-open' : '' }}">
+          <a href="#listtransactionSubMenu" data-toggle="collapse" aria-expanded="{{ Request::is('admin/list/*') ? 'true' : 'false' }}" class="nav-link">
+            <i class="nav-icon fa fa-file-contract"></i>
+            <p>
+              List Transactions
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+          <ul class="collapse list-unstyled {{ Request::is('admin/listtransaction/*') ? 'show' : ''}} itemSubMenu" id="listtransactionSubMenu">
+            <li class="nav-item">
+              <a href="{{ url('admin/listtransaction/stockin')}}" class="nav-link @if (Request::is('admin/listtransaction/stockin') || Request::is('admin/listtransaction/stockin/*')) 
+              active @endif">
+                <p>List Stock In</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ url('admin/listtransaction/stockout')}}" class="nav-link @if (Request::is('admin/listtransaction/stockout/*') || Request::is('admin/listtransaction/stockout'))
+              active @endif">
+                <p>List Stock Out</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ url("admin/listtransaction/rfp") }}" class="nav-link @if (Request::is("admin/listtransaction/rfp")) active @endif">
+                <p>List Receipt From Prod</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ url("admin/listtransaction/goodissued")}}" class="nav-link @if (Request::is("admin/listtransaction/goodissued")) active @endif">
+                <p>List Good Issue</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ url("admin/listtransaction/goodreceipt")}}" class="nav-link @if (Request::is("admin/listtransaction/goodreceipt")) active @endif">
+                <p>List Good Receipt</p>
+              </a>
+            </li>
           </ul>
           
         </li>
@@ -213,8 +297,8 @@
               </a>
             </li>
             <li class="nav-item">
-              <a href="{{ url("admin/quality/barcode") }}" class="nav-link @if (Request::is("admin/quality/barcode")) active @endif">
-                <p>Barcode</p>
+              <a href="{{ url("admin/quality/history") }}" class="nav-link @if (Request::is("admin/quality/history")) active @endif">
+                <p>History</p>
               </a>
             </li>
           </ul>
@@ -226,7 +310,7 @@
         <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
         <li class="nav-item {{ Request::is("admin/reports/*") ? 'menu-open' : ''}}">
-          <a href="#reportSubMenu" data-toggle="collapse" aria-expanded="{{ Request::is("admin/reports/*")}}" class="nav-link" >
+          <a href="#reportSubMenu" data-toggle="collapse" aria-expanded="{{ Request::is("admin/reports/*")}}" class="nav-link">
             <i class="nav-icon fa fa-clipboard"></i>
             <p>
               Reports
@@ -248,13 +332,29 @@
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-        <li class="nav-item">
-          <a href="{{ url('admin/regions')}}" class="nav-link">
-            <i class="nav-icon fa fa-asterisk"></i>
+        <li class="nav-item {{ Request::is("admin/delivery/*") ? 'menu-open' : ''}}">
+          <a href="#deliverySubMenu" data-toggle="collapse" aria-expanded="{{ Request::is("admin/delivery/*")}}" class="nav-link">
+            <i class="nav-icon fa fa-truck"></i>
             <p>
-              Regions
+              Delivery
+              <i class="right fas fa-angle-left"></i>
             </p>
           </a>
+
+          <ul class="collapse list-unstyled {{Request::is('admin/delivery/*') ? 'show' : ''}} itemSubMenu" id="deliverySubMenu">
+            <li class="nav-item">
+              <a href="{{ url('admin/delivery/list')}}" class="nav-link @if (Request::is('admin/delivery/list')) active @endif">
+                <p>List Delivery</p>
+              </a>
+            </li>
+          </ul>
+          <ul class="collapse list-unstyled {{Request::is('admin/delivery/*') ? 'show' : ''}} itemSubMenu" id="deliverySubMenu">
+            <li class="nav-item">
+              <a href="{{ url('admin/delivery/history')}}" class="nav-link @if (Request::is('admin/delivery/history')) active @endif">
+                <p>History Delivery</p>
+              </a>
+            </li>
+          </ul>
         </li>
       </ul>
     </nav>
@@ -262,3 +362,23 @@
   </div>
   <!-- /.sidebar -->
 </aside>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.getElementById('sidebarSearchInput');
+
+    searchInput.addEventListener("keyup", function() {
+      const query     = this.value.toLowerCase();
+      const menuItems = document.querySelectorAll(".nav-sidebar .nav-item");
+
+      menuItems.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        if (text.includes(query)) {
+          item.style.display = ""
+        } else {
+          item.style.display = "none";
+        }
+      });
+    })
+  })
+</script>

@@ -15,9 +15,9 @@ class ItemsController extends Controller
 {
     public function index(Request $request)
     {
-        $user = Auth::user()->username;
-        $getRecord = ItemsModel::getRecord($request);
-        $addedBarcodes = BarcodeModel::where('username', $user)->latest()->take(5)->get();
+        $user           = Auth::user()->username;
+        $getRecord      = ItemsModel::getRecord($request);
+        $addedBarcodes  = BarcodeModel::where('username', $user)->latest()->take(5)->get();
 
         return view("backend.items.barcode", compact('getRecord', 'addedBarcodes'));
     }

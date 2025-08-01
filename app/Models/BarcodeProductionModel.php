@@ -6,7 +6,7 @@ use Auth;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class barcodeQualityModel extends Model
+class BarcodeProductionModel extends Model
 {
     use HasFactory;
 

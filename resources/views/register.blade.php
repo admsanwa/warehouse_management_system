@@ -47,12 +47,39 @@
               </div>
             </div>
           </div>
+           <span style="color: red">{{ $errors->first("nik")}}</span>
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="NIK" name="nik" value="{{ old('nik')}}">
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-address-card"></span>
+              </div>
+            </div>
+          </div>
           <span style="color: red" class="duplicate_message">{{ $errors->first('email')}}</span>
           <div class="input-group mb-3">
             <input type="text" class="form-control" placeholder="Email" name="email" required value="{{ old('email')}}" onblur="duplicateEmail(this)">
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-envelope"></span>
+              </div>
+            </div>
+          </div>
+          <span style="color: red">{{ $errors->first('department')}}</span>
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Department" name="department" required value="{{ old('department')}}">
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fas fa-user-tie"></span>
+              </div>
+            </div>
+          </div>
+          <span style="color: red">{{ $errors->first('level')}}</span>
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Level" name="level" required value="{{ old('level')}}">
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <span class="fa fa-user-tie"></span>
               </div>
             </div>
           </div>
@@ -88,10 +115,6 @@
         </form>
 
         <!-- /.social-auth-links -->
-
-        <p class="mb-1">
-          <a href="{{ url('forgot-password')}}">I forgot my password</a>
-        </p>
         <p class="mb-0">
           <a href="{{ url('/')}}" class="text-center">Sign In</a>
         </p>

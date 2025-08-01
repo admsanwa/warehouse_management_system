@@ -5,7 +5,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col col-sm-6">
-                        <h1>Finish Goods</h1>
+                        <h1>Semi Finish Goods</h1>
                     </div>
                 </div>
             </div>

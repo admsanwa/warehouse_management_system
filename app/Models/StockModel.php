@@ -40,9 +40,28 @@ class StockModel extends Model
         return $query->paginate(5);
     }
 
+    static public function getData()
+    {
+        $query = self::with("item");
+
+        if (!empty(Request::get('item_code'))) {
+            $query->whereHas('item', function ($q) {
+                $q->where('code', 'LIKE', '%' . Request::get('item_code') . '%');
+            });
+        }
+
+        if (!empty(Request::get('item_desc'))) {
+            $query->whereHas('item', function ($q) {
+                $q->where('name', 'LIKE', '%' . Request::get('item_desc') . '%');
+            });
+        }
+
+        return $query;
+    }
+
     public function item()
     {
-        return $this->belongsTo(ItemsModel::class, 'item_id', 'id');
+        return $this->belongsTo(ItemsModel::class, 'item_code', 'code');
         // stock.item_id -> items.id
     }
 
