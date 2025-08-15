@@ -14,6 +14,7 @@
                         <option value="">Select Assessment Quality</option>
                         <option value="1">OK</option>
                         <option value="2">NG</option>
+                        <option value="3">Need Approval</option>
                     </select>
                     <input type="text" name="remark" id="remark_{{ $quality->id }}" class="form-control mt-2" placeholder=" Enter Remarks here" required>
                 </div>

@@ -56,7 +56,6 @@
                                                 <th>No</th>
                                                 <th>Product Nomer</th>
                                                 <th>Description</th>
-                                                <th>IO</th>
                                                 <th>Qty</th>
                                                 <th>Action</th>
                                             </tr>
@@ -75,7 +74,6 @@
                                                             {{ $barcode->prod_desc }}
                                                             <input type="hidden" name="prod_desc" value="{{ $barcode->prod_desc }}">
                                                         </td>
-                                                        <td>{{ $barcode->quality->io }}</td>
                                                         <td>
                                                             <input type="number" name="qty" style="width: 70px;" class="form-control" required>
                                                         </td>

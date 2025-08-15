@@ -56,7 +56,14 @@
       </div>
     </div>
 
+    @php
+      $authDept = Auth::user()->department;
+    @endphp
+
     <!-- Sidebar Menu -->
+    {{-- Dashboard --}}
+    @if ($authDept == 'IT' || $authDept == "Production and Warehouse" || $authDept == "Fabrication" || $authDept == "PPIC" || $authDept == "Purchasing" 
+    || $authDept == "Production" || $authDept == 'Quality Control' || $authDept == "Procurement, Installation and Delivery")  
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <!-- Add icons to the links using the .nav-icon class
@@ -71,6 +78,10 @@
         </li>
       </ul>
     </nav>
+    @endif
+
+    {{-- Items --}}
+    @if ($authDept == 'IT' || $authDept == "Production and Warehouse" || $authDept == "Fabrication" || $authDept == "PPIC" || $authDept == 'Purchasing')
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <li class="nav-item {{ Request::is('admin/items/*') ? 'menu-open' : '' }}">
@@ -82,26 +93,35 @@
             </p>
           </a>
           <ul class="collapse list-unstyled {{ Request::is('admin/items/*') ? 'show' : '' }} itemSubMenu" id="itemSubMenu">
+            @if ($authDept == 'IT')
             <li class="nav-item">
               <a href="{{ url('admin/items/additem') }}" class="nav-link @if (Request::is('admin/items/additem')) active @endif">
                 <p>Add/Upload Items</p>
               </a>
             </li>
+            @endif
+            @if ($authDept == 'IT' || $authDept == 'PPIC' || $authDept == 'Purchasing' || $authDept == 'Production and Warehouse')
             <li class="nav-item">
               <a href="{{ url('admin/items/list') }}" class="nav-link @if (Request::is('admin/items/list')) active @endif">
                 <p>List Items</p>
               </a>
             </li>
+            @endif
+            @if ($authDept == 'IT' || $authDept == 'Production and Warehouse')
             <li class="nav-item">
               <a href="{{ url('admin/items/barcode') }}" class="nav-link @if (Request::is('admin/items/barcode')) active @endif">
                 <p>Barcode Print</p>
               </a>
             </li>
+            @endif
           </ul>
         </li>
-          
       </ul>
     </nav>
+    @endif
+
+    {{-- Employees --}}
+    @if ( $authDept == "IT")
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <!-- Add icons to the links using the .nav-icon class
@@ -117,6 +137,10 @@
         </li>
       </ul>
     </nav>
+    @endif
+
+    {{-- Purchasing --}}
+    @if ( $authDept == "IT" || $authDept == "Purchasing" || $authDept == "Production and Warehouse")
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <!-- Add icons to the links using the .nav-icon class
@@ -131,6 +155,11 @@
         </li>
       </ul>
     </nav>
+    @endif
+
+    {{-- Production --}}
+    @if ($authDept == "IT" || $authDept == "Production and Warehouse" || $authDept == "PPIC" || $authDept == 'Purchasing' || $authDept == 'Procurement, Installation and Delivery'
+    || $authDept == 'Production')
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <!-- Add icons to the links using the .nav-icon class
@@ -145,40 +174,56 @@
           </a>
 
           <ul class="collapse list-unstyled {{ Request::is('admin/production/*') ? 'show' : ''}} itemSubMenu" id="prodSubMenu">
+            @if ($authDept == 'PPIC' || $authDept == 'Production and Warehouse' || $authDept == 'IT' || $authDept == 'Procurement, Installation and Delivery')
             <li class="nav-item">
               <a href="{{ url('admin/production/po')}}" class="nav-link @if (Request::is('admin/production/po')) active @endif">
                 <p>Production Order</p>
               </a>
             </li>
+            @endif
+            @if ($authDept == 'IT' || $authDept == 'PPIC' || $authDept == 'Procurement, Installation and Delivery')
             <li class="nav-item">
               <a href="{{ url('admin/production/bon') }}" class="nav-link @if (Request::is('admin/production/bon')) active @endif">
                 <p>Bon Pembelian Barang</p>
               </a>
             </li>
+            @endif
+            @if ($authDept == 'IT' || $authDept == 'PPIC' || $authDept == 'Purchasing' || $authDept == 'Procurement, Installation and Delivery')
             <li class="nav-item">
               <a href="{{ url('admin/production/listbon') }}" class="nav-link @if (Request::is('admin/production/listbon')) active @endif">
                 <p>List Bon</p>
               </a>
             </li>
+            @endif
+            @if ($authDept == 'IT' || $authDept == 'PPIC' || $authDept == 'Procurement, Installation and Delivery')
             <li class="nav-item">
               <a href="{{ url('admin/production/memo')}}" class="nav-link @if (Request::is('admin/production/memo')) active @endif">
                 <p>Memo</p>
               </a>
             </li>
+            @endif
+            @if ($authDept == 'IT' || $authDept == 'PPIC' || $authDept == 'Production and Warehouse' || $authDept == 'Procurement, Installation and Delivery')
             <li class="nav-item">
               <a href="{{ url('admin/production/listmemo')}}" class="nav-link @if (Request::is('admin/production/listmemo')) active @endif">
                 <p>List Memo</p>
               </a>
             </li>
-             <li class="nav-item">
+            @endif
+            @if ($authDept == 'IT' || $authDept == 'PPIC' || $authDept == 'Procurement, Installation and Delivery' || $authDept == 'Production')
+            <li class="nav-item">
               <a href="{{ url("admin/production/barcode") }}" class="nav-link">
                 <p>Barcode</p>
               </a>
             </li>
+            @endif
           </ul>
         </li>
       </ul>
     </nav>
+    @endif
+
+    {{-- Stocks --}}
+    @if ($authDept == "IT" || $authDept == "Production and Warehouse" || $authDept == 'PPIC')
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <!-- Add icons to the links using the .nav-icon class
@@ -193,6 +238,10 @@
         </li>
       </ul>
     </nav>
+    @endif
+
+    {{-- Transactions --}}
+    @if ($authDept == "IT" || $authDept == "Production and Warehouse" || $authDept == 'Production')
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <li class="nav-item {{ Request::is('admin/transaction/*') ? 'menu-open' : '' }}">
@@ -204,38 +253,52 @@
             </p>
           </a>
           <ul class="collapse list-unstyled {{ Request::is('admin/transaction/*') ? 'show' : ''}} itemSubMenu" id="transactionSubMenu">
+            @if ($authDept == 'IT' || $authDept == 'Production and Warehouse')
             <li class="nav-item">
               <a href="{{ url('admin/transaction/stockin')}}" class="nav-link @if (Request::is('admin/transaction/stockin') || Request::is('admin/transaction/stockin/*')) 
               active @endif">
                 <p>Stock In</p>
               </a>
             </li>
+            @endif
+            @if ($authDept == 'IT' || $authDept == 'Production and Warehouse' || $authDept == 'Production')
             <li class="nav-item">
               <a href="{{ url('admin/transaction/stockout')}}" class="nav-link @if (Request::is('admin/transaction/stockout/*') || Request::is('admin/transaction/stockout'))
               active @endif">
                 <p>Stock Out</p>
               </a>
             </li>
+            @endif
+            @if ($authDept == 'IT' || $authDept == 'Production and Warehouse')
             <li class="nav-item">
               <a href="{{ url("admin/transaction/rfp") }}" class="nav-link @if (Request::is("admin/transaction/rfp")) active @endif">
                 <p>Receipt From Prod</p>
               </a>
             </li>
+            @endif
+            @if ($authDept == 'IT' || $authDept == 'Production and Warehouse')
             <li class="nav-item">
               <a href="{{ url("admin/transaction/goodissued")}}" class="nav-link @if (Request::is("admin/transaction/goodissued")) active @endif">
                 <p>Good Issue</p>
               </a>
             </li>
+            @endif
+            @if ($authDept == 'IT' || $authDept == 'Production and Warehouse')
             <li class="nav-item">
               <a href="{{ url("admin/transaction/goodreceipt")}}" class="nav-link @if (Request::is("admin/transaction/goodreceipt")) active @endif">
                 <p>Good Receipt</p>
               </a>
             </li>
+            @endif
           </ul>
           
         </li>
       </ul>
     </nav>
+    @endif
+
+    {{-- List Transactions --}}
+    @if ($authDept == "IT")
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <li class="nav-item {{ Request::is('admin/list/*') ? 'menu-open' : '' }}">
@@ -279,6 +342,10 @@
         </li>
       </ul>
     </nav>
+    @endif
+
+    {{-- Quality --}}
+    @if ($authDept == 'Quality Control' || $authDept == 'IT')
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <li class="nav-item {{Request::is("admin/quality/*") ? "menu-open" : "" }}">
@@ -305,6 +372,10 @@
         </li>
       </ul>
     </nav>
+    @endif
+
+    {{-- Reports --}}
+    @if ($authDept == 'IT' || $authDept == 'Production and Warehouse' || $authDept == 'PPIC' || $authDept == 'Quality Control' || $authDept == 'Procurement, Installation and Delivery')
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <!-- Add icons to the links using the .nav-icon class
@@ -328,6 +399,10 @@
         </li>
       </ul>
     </nav>
+    @endif
+
+    {{-- Delivery --}}
+    @if ($authDept == 'IT' || $authDept == 'Production and Warehouse' || $authDept == 'Procurement, Installation and Delivery')
     <nav class="mt-2">
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <!-- Add icons to the links using the .nav-icon class
@@ -342,22 +417,28 @@
           </a>
 
           <ul class="collapse list-unstyled {{Request::is('admin/delivery/*') ? 'show' : ''}} itemSubMenu" id="deliverySubMenu">
+            @if ($authDept == 'IT' || $authDept == 'Production and Warehouse' || $authDept == 'Procurement, Installation and Delivery')
             <li class="nav-item">
               <a href="{{ url('admin/delivery/list')}}" class="nav-link @if (Request::is('admin/delivery/list')) active @endif">
                 <p>List Delivery</p>
               </a>
             </li>
+            @endif
           </ul>
           <ul class="collapse list-unstyled {{Request::is('admin/delivery/*') ? 'show' : ''}} itemSubMenu" id="deliverySubMenu">
+            @if ($authDept == 'IT' || $authDept == 'Procurement, Installation and Delivery')
             <li class="nav-item">
               <a href="{{ url('admin/delivery/history')}}" class="nav-link @if (Request::is('admin/delivery/history')) active @endif">
                 <p>History Delivery</p>
               </a>
             </li>
+            @endif
           </ul>
         </li>
       </ul>
     </nav>
+    @endif
+
     <!-- /.sidebar-menu -->
   </div>
   <!-- /.sidebar -->

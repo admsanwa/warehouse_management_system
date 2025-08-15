@@ -25,12 +25,32 @@
                             </div>
                             <div class="card-body">
                                 <div class="form-group row">
-                                    <label for="" class="col-sm-2 col-form-lable">Nomer PO :</label>
-                                    <div class="col-sm-2">{{ $getRecord->no_po }}</div>
-                                    <label for="" class="col-sm-2 col-form-lable">Good Receipt PO :</label>
-                                    <div class="col-sm-2">{{ $getRecord->grpo }}</div>
-                                    <label for="" class="col-sm-2 col-form-lable">Scanned By :</label>
-                                    <div class="col-sm-2">{{ $getRecord->user->fullname }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Nomer PO</label>
+                                    <div class="col-sm-2">: {{ $getRecord->no_po }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Good Receipt PO</label>
+                                    <div class="col-sm-2">: {{ $getRecord->grpo }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Scanned By</label>
+                                    <div class="col-sm-2">: {{ $getRecord->user->fullname }}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">Vendor Code</label>
+                                    <div class="col-sm-2">: {{ $getRecord->grpoData->vendor_code }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Vendor</label>
+                                    <div class="col-sm-2">: {{ $getRecord->grpoData->vendor }}</div>  
+                                    <label for="" class="col-sm-2 col-form-lable">Vendor Ref No</label>
+                                    <div class="col-sm-2">: {{ $getRecord->grpoData->vendor_ref_no}}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">No IO</label>
+                                    <div class="col-sm-2">: {{ $getRecord->grpoData->io }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">No SO</label>
+                                    <div class="col-sm-2">: {{ $getRecord->grpoData->so }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Posting Date</label>
+                                    <div class="col-sm-2">: {{ \Carbon\Carbon::parse($getRecord->created_at)->format('Y-m-d')}}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">Remarks</label>
+                                    <div class="col-sm-6">: {{ $getRecord->grpoData->remarks }}</div>
                                 </div>
                             </div>
                         </div>        
@@ -48,6 +68,7 @@
                                                     <th>In Stock</th>
                                                     <th>Qty</th>
                                                     <th>Total</th>
+                                                    <th>Uom</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -59,6 +80,7 @@
                                                    <td>{{ $stockin->on_hand - $stockin->qty}}</td>
                                                    <td>{{ $stockin->qty }}</td>
                                                    <td>{{ $stockin->on_hand }}</td>
+                                                   <td>{{ $stockin->item->uom }}</td>
                                                 </tr>
                                                @endforeach
                                             </tbody>

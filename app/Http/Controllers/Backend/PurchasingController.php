@@ -32,7 +32,6 @@ class PurchasingController extends Controller
                 'remain' => $purchaseQty - $stockInQty
             ];
         }
-
         foreach ($getRecordTwo as $record) {
             $po             = $record->no_po;
             $purchaseQty    = PurchaseOrderDetailsModel::where("nopo", $po)->sum("qty");
@@ -91,7 +90,7 @@ class PurchasingController extends Controller
                         'vendor'          => $row[1],
                         'contact_person'  => $row[2],
                         'buyer'           => $row[3],
-                        'delivery_date' => Carbon::createFromFormat('d.m.Y', $row[4])->format('Y-m-d'),
+                        'posting_date' => Carbon::createFromFormat('d.m.Y', $row[4])->format('Y-m-d'),
                         'status'          => $row[5],
                         'item_code'       => $row[6],
                         'item_type'       => $row[7],

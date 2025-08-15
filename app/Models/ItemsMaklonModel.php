@@ -44,4 +44,14 @@ class ItemsMaklonModel extends Model
     {
         return $this->belongsTo(User::class, "scanned_by", "username");
     }
+
+    public function good_issue()
+    {
+        return $this->belongsTo(goodissueModel::class, "po", "po");
+    }
+
+    public function good_receipt()
+    {
+        return $this->belongsTo(goodreceiptModel::class, "po", "po");
+    }
 }

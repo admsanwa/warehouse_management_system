@@ -21,11 +21,16 @@
     </div>
     <!-- /.content-header -->
 
+    @php
+      $authDept = Auth::user()->department;
+    @endphp
+
     <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
         <!-- Small boxes (Stat box) -->
         <div class="row">
+          @if ($authDept == 'PPIC' || $authDept == 'IT' || $authDept == 'Purchasing' || $authDept == 'Production and Warehouse')
           <div class="col-lg-3 col-6">
             <!-- small box -->
             <div class="small-box bg-info">
@@ -41,6 +46,8 @@
               </a>
             </div>
           </div>
+          @endif
+          @if ($authDept == 'PPIC' || $authDept == 'IT' || $authDept == 'Production and Warehouse' || $authDept == 'Production')
           <!-- ./col -->
           <div class="col-lg-3 col-6">
             <!-- small box -->
@@ -56,7 +63,9 @@
               <a href="{{ url("admin/dashboard/prodrelease") }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
+          @endif
           <!-- ./col -->
+          @if ($authDept == 'IT' || $authDept == 'Quality Control')
           <div class="col-lg-3 col-6">
             <!-- small box -->
             <div class="small-box bg-warning">
@@ -71,7 +80,9 @@
               <a href="{{ url('admin/dashboard/aftercheck')}}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
+          @endif
           <!-- ./col -->
+          @if ($authDept == 'IT' || $authDept == 'Procurement, Installation and Delivery')
           <div class="col-lg-3 col-6">
             <!-- small box -->
             <div class="small-box bg-danger">
@@ -87,6 +98,8 @@
 
             </div>
           </div>
+          @endif
+          @if ($authDept == 'IT' || $authDept == 'Production and Warehouse')
           <div class="col-lg-3 col-6">
             <div class="small-box bg-info">
               <div class="inner">
@@ -100,6 +113,8 @@
               <a href="{{ url("admin/dashboard/goodreceiptpo") }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
+          @endif
+          @if ($authDept == 'IT' || $authDept == 'Production and Warehouse')
           <div class="col-lg-3 col-6">
             <!-- small box -->
             <div class="small-box bg-success">
@@ -114,6 +129,8 @@
               <a href="{{ url("admin/dashboard/goodissued") }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
+          @endif
+          @if ($authDept == 'IT' || $authDept == 'Production and Warehouse')
           <div class="col-lg-3 col-6">
             <!-- small box -->
             <div class="small-box bg-warning">
@@ -128,6 +145,8 @@
               <a href="{{ url("admin/dashboard/goodreceipt") }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
+          @endif
+          @if ($authDept == 'IT' || $authDept == 'Production and Warehouse')
            <div class="col-lg-3 col-6">
             <!-- small box -->
             <div class="small-box bg-danger">
@@ -142,6 +161,7 @@
               <a href="{{ url("admin/dashboard/rfp") }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
             </div>
           </div>
+          @endif
           <!-- ./col -->
         </div>
         <!-- /.row -->

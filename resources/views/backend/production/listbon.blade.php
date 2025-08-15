@@ -61,18 +61,24 @@
                                                 <th>IO</th>
                                                 <th>Project</th>
                                                 <th>Date</th>
+                                                <th>Status</th>
                                                 <th>Details</th>
                                             </tr>
                                         </thead>
                                         @forelse ($getRecord as $bon)
                                             <tbody>
-                                                <tr>
-                                                    <td>{{ $bon->no }}</td>
+                                                <tr class="{{ $bon->highlight ? 'table-primary' : '' }}">
+                                                    <td>
+                                                        @if($bon->highlight)
+                                                            <i class="fa fa-circle text-primary ms-2" style="font-size:10px; margin-right:10px;" title="Recommended"></i>
+                                                        @endif
+                                                        {{ $bon->no }}</td>
                                                     <td>{{ $bon->io }}</td>
                                                     <td>{{ $bon->project }}</td>
                                                     <td>{{ $bon->date }}</td>
+                                                    <td>{{ $bon->status }}</td>
                                                     <td>
-                                                        <a href="{{ url('admin/production/bondetails/' . $bon->id) }}" class="btn btn-primary"><div class="fa fa-eye"></div></a>
+                                                        <a href="{{ url('admin/production/bondetails/' . $bon->id) }}" class="btn btn-primary"><div class="fa fa-eye"></div></a> 
                                                     </td>
                                                 </tr>
                                         @empty

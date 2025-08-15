@@ -32,7 +32,7 @@
                                     <div class="row">
                                         <div class="form-group col-md-2">
                                             <label for="">Delivery Date</label>
-                                            <input type="date" name="delivery_date" class="form-control" value="{{ Request()->delivery_date }}">
+                                            <input type="date" name="posting_date" class="form-control" value="{{ Request()->posting_date }}">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">No PO</label>
@@ -94,7 +94,7 @@
                                                             {{ $result["remain"] }}
                                                         @endif
                                                     </td>
-                                                    <td>{{ $purchasing->delivery_date }}</td>
+                                                    <td>{{ $purchasing->posting_date }}</td>
                                                     <td>
                                                         @if ($purchasing->status == "Open" && stripos($purchasing->po_details->item_code, "Maklon") !== false)
                                                             <a href="{{ url("admin/transaction/goodissued")}}" class="btn btn-outline-success"><i class="fa fa-arrow-right"></i> Open GI</a>

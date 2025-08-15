@@ -25,14 +25,44 @@
                             </div>
                             <div class="card-body">
                                 <div class="form-group row">
-                                    <label for="" class="col-sm-3 col-form-lable">Nomer IO :</label>
-                                    <div class="col-sm-3">{{ $getRecord->io }}</div>
-                                    <label for="" class="col-sm-3 col-form-lable">Purchase Order :</label>
-                                    <div class="col-sm-3">{{ $getRecord->po }}</div>
-                                    <label for="" class="col-sm-3 col-form-lable">Internal No :</label>
-                                    <div class="col-sm-3">{{ $getRecord->internal_no }}</div>
-                                    <label for="" class="col-sm-3 col-form-lable">Scanned By :</label>
-                                    <div class="col-sm-3">{{ $getRecord->user->fullname }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Number</label>
+                                    <div class="col-sm-2">: {{ $getRecord->gi }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Warehouse</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_issue->whse }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Project Code</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_issue->project_code }}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">Vendor Code</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_issue->vendor_code }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Distr. Rule</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_issue->distr_rule }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Internal No</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_issue->internal_no }}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">Posting Date</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_issue->updated_at }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">No PO</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_issue->po }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">IO</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_issue->io }}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">SO</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_issue->so }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Reason</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_issue->reason }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Type Inv Transaction</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_issue->type_inv_transaction }}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">Surat Jalan</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_issue->no_surat_jalan }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">No Inv Transfer</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_issue->no_inventory_tf }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Remarks</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_issue->remarks }}</div>
                                 </div>
                             </div>
                         </div>        

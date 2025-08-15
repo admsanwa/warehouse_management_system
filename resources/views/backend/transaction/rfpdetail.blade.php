@@ -25,14 +25,32 @@
                             </div>
                             <div class="card-body">
                                 <div class="form-group row">
-                                    <label for="" class="col-sm-3 col-form-lable">Number :</label>
-                                    <div class="col-sm-3">{{ $getRecord->number}}</div>
-                                    <label for="" class="col-sm-3 col-form-lable">Nomer IO :</label>
-                                    <div class="col-sm-3">{{ $getRecord->io }}</div>
-                                    <label for="" class="col-sm-3 col-form-lable">Production Order :</label>
-                                    <div class="col-sm-3">{{ $getRecord->prod_order }}</div>
-                                    <label for="" class="col-sm-3 col-form-lable">Scanned By :</label>
-                                    <div class="col-sm-3">{{ $getRecord->user->fullname }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">No Prod Order</label>
+                                    <div class="col-sm-2">: {{ $getRecord->prod_order }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Number</label>
+                                    <div class="col-sm-2">: {{ $getRecord->number }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Scanned By</label>
+                                    <div class="col-sm-2">: {{ $getRecord->user->fullname }}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">No IO</label>
+                                    <div class="col-sm-2">: {{ $getRecord->io }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">No SO</label>
+                                    <div class="col-sm-2">: {{ $getRecord->so }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Posting Date</label>
+                                    <div class="col-sm-2">: {{ \Carbon\Carbon::parse($getRecord->created_at)->format('Y-m-d')}}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">Project Code</label>
+                                    <div class="col-sm-2">: {{ $getRecord->project_code }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Warehouse</label>
+                                    <div class="col-sm-2">: {{ $getRecord->whse }}</div>  
+                                    <label for="" class="col-sm-2 col-form-lable">Reason</label>
+                                    <div class="col-sm-2">: {{ $getRecord->reason}}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">Remarks</label>
+                                    <div class="col-sm-6">: {{ $getRecord->remarks }}</div>
                                 </div>
                             </div>
                         </div>        
@@ -48,6 +66,7 @@
                                                     <th>Product Nomer</th>
                                                     <th>Product Description</th>
                                                     <th>Qty</th>
+                                                    <th>Uom</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -57,6 +76,7 @@
                                                    <td>{{ $rfp->production->prod_no }}</td>
                                                    <td>{{ $rfp->production->prod_desc }}</td>
                                                    <td>{{ $rfp->qty }}</td>
+                                                   <td>{{ $rfp->items->uom ?? "-" }}</td>
                                                 </tr>
                                                @endforeach
                                             </tbody>

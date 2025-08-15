@@ -45,8 +45,9 @@
                                             <label for="">Result QC</label>
                                             <select name="result" id="result" class="form-control">
                                                 <option value="">Select Result</option>
-                                                <option value="1" {{ request('result') == 1 ? 'selected' : ''}}>OK</option>
-                                                <option value="2" {{ request('result') == 2 ? 'selected' : ''}}>NG</option>
+                                                <option value="1" {{ Request('result') == 1 ? 'selected' : ''}}>OK</option>
+                                                <option value="2" {{ Request('result') == 2 ? 'selected' : ''}}>NG</option>
+                                                <option value="3" {{ Request('result') == 3 ? 'selected' : ''}}>Need Approval</option>
                                             </select>
                                         </div>
                                         <div class="form-group col-md-2">
@@ -92,7 +93,7 @@
                                                     <td>{{ $quality->io }}</td>
                                                     <td>
                                                         @if ($quality->result !== null)
-                                                            {{ $quality->result === 1 ? "OK" : ($quality->result === 2 ? "NG" : "-")}}
+                                                            {{ $quality->result === 1 ? "OK" : ($quality->result === 2 ? "NG" : ($quality->result === 3 ? "Need Approval" : "-"))}}
                                                         @else
                                                            -
                                                         @endif

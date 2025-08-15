@@ -68,6 +68,7 @@
                                                 <th>Description</th>
                                                 <th>IO</th>
                                                 <th>QC</th>
+                                                <th>Status</th>
                                                 <th>Remarks</th>
                                                 <th>Check</th>
                                             </tr>
@@ -87,9 +88,16 @@
                                                     <td>{{ $quality->io_no }}</td>
                                                     <td>
                                                         @if ($quality->qualityTwo && $quality->qualityTwo->result !== null)
-                                                            {{ $quality->qualityTwo->result === 1 ? "OK" : ($quality->qualityTwo->result === 2 ? "NG" : "-")}}
+                                                            {{ $quality->qualityTwo->result === 1 ? "OK" : ($quality->qualityTwo->result === 2 ? "NG" : ($quality->qualityTwo->result === 3 ? "Need Approval" : "-" ))}}
                                                         @else
                                                            -
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        @if ( $quality->qualityTwo && $quality->qualityTwo->result_by === "delvi" )
+                                                            {{ "Approve by " . $quality->qualityTwo->user->fullname}}
+                                                        @else
+                                                            -
                                                         @endif
                                                     </td>
                                                     <td>{{ $quality->qualityTwo->remark ?? "-"}}</td>

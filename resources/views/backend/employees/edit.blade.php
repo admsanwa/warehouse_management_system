@@ -68,12 +68,25 @@
                                         <input type="text" name="level" value="{{ $getRecord->level}}" class="form-control required" required placeholder="Enter Level">
                                     </div>
                                 </div>
-                                 <div class="form-group row">
+                                <div class="form-group row">
                                     <label class="col-sm-2 col-form-lable">Email<span style="color: red">*</span>
                                     </label>
                                     <div class="col-sm-10">
                                         <span style="color: red">{{ $errors->first('email')}}</span>
                                         <input type="text" name="email" value="{{ $getRecord->email }}" class="form-control" required placeholder="Enter Email">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">Signature</label>
+                                    <div class="col-sm-10">
+                                        <input type="file" name="sign" class="form-control" accept="image/*">
+                                        
+                                        @if($getRecord->sign)
+                                            <p class="mt-2">Current Signature:</p>
+                                            <img src="{{ asset('assets/images/sign/' . $getRecord->sign) }}" 
+                                                alt="User Signature" 
+                                                style="max-height: 100px;">
+                                        @endif
                                     </div>
                                 </div>
                             </div>

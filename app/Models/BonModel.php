@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Sign;
 use Request;
 
 class BonModel extends Model
@@ -82,5 +83,15 @@ class BonModel extends Model
     public function details()
     {
         return $this->hasMany(BonDetailsModel::class, 'bon_id');
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by', 'fullname');
+    }
+
+    public function signBon()
+    {
+        return $this->belongsTo(SignBonModel::class, 'no', 'no_bon');
     }
 }

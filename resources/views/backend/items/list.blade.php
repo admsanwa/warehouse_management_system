@@ -64,7 +64,7 @@
                                                 <th>Uom</th>
                                                 {{-- <th>On Hands</th> --}}
                                                 <th>Stock Min</th>
-                                                <th>In Stock</th>
+                                                <th>Stock SAP</th>
                                                 <th>Available</th>
                                                 <th>Note</th>
                                                 <th>Update</th>

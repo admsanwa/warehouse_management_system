@@ -48,6 +48,7 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('admin/dashboard/goodissued', [DashboardController::class, 'good_issued']);
     Route::get('admin/dashboard/goodreceipt', [DashboardController::class, 'good_receipt']);
     Route::get('admin/dashboard/rfp', [DashboardController::class, 'receipt_from_prod']);
+    Route::get('admin/production/clear-bon-notif', [DashboardController::class, 'clearBonNotif']);
 
     // employee
     Route::get('admin/employees', [EmployeesController::class, 'index']);
@@ -85,6 +86,7 @@ Route::group(['middleware' => 'admin'], function () {
     Route::post('admin/production/bon', [ProductionController::class, 'create_bon']);
     Route::get('admin/production/listbon', [ProductionController::class, 'list_bon']);
     Route::get('admin/production/bondetails/{id}', [ProductionController::class, 'bon_details']);
+    Route::post('/approve-bon', [ProductionController::class, 'approve_bon']);
     // memo
     Route::get('admin/production/memo', [ProductionController::class, 'memo']);
     Route::post('admin/production/memo', [ProductionController::class, 'create_memo']);

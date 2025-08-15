@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Models\goodissueModel;
+use App\Models\goodreceiptModel;
+use App\Models\grpoModel;
+use App\Models\IFPModel;
 use App\Models\ItemsMaklonModel;
 use App\Models\ItemsModel;
 use App\Models\ProductionModel;
@@ -100,7 +104,7 @@ class TransactionController extends Controller
     public function stock_up(Request $request)
     {
         $validated = $request->validate([
-            'stocks'    => 'required|array',
+            'stocks'        => 'required|array',
             'stocks.*.id'   => 'required|integer|exists:stocks,id',
             'stocks.*.item_code'    => 'required|string',
             'stocks.*.qty'  => 'required|numeric|min:1',
@@ -114,7 +118,7 @@ class TransactionController extends Controller
                 $latestStockin  = StockModel::where("item_code", $itemCode)->whereNotNull("stock_in")->orderByDesc("id")->value("stock_in");
                 $latestOnhand   = StockModel::where("item_code", $itemCode)->whereNotNull("on_hand")->orderByDesc("id")->value("on_hand");
             }
-            $stock = StockModel::find($stockData["id"]);
+            $stock  = StockModel::find($stockData["id"]);
             if ($stock) {
                 $stock->no_po   = trim($request->nopo);
                 $stock->qty     = $stockData["qty"];
@@ -124,6 +128,28 @@ class TransactionController extends Controller
                 $stock->is_temp = false;
                 $stock->save();
             }
+        }
+
+        // save grpo table
+        $po = PurchasingModel::where('no_po', trim($request->nopo))->first();
+        if (!$po) {
+            throw new \Exception('PO not found');
+        }
+
+        try {
+            $grpo = grpoModel::updateOrCreate(
+                ['no_po' => trim($request->nopo)],
+                [
+                    'vendor_code'   => $po->vendor_code,
+                    'vendor'        => $po->vendor,
+                    'vendor_ref_no' => $po->vendor_ref_no,
+                    'io'            => $po->io,
+                    'so'            => $po->so,
+                    'remarks'       => trim($request->remarks)
+                ]
+            );
+        } catch (\Throwable $e) {
+            dd($e->getMessage(), $e->getFile(), $e->getLine(), $e->getTraceAsString());
         }
 
         return redirect('admin/transaction/stockdet/' . $request->input("grpo"))->with('success', 'Telah berhasil menambahkan item yang sudah di scan');
@@ -156,6 +182,7 @@ class TransactionController extends Controller
         // dd("qty po", $getQtyPo, "qty stock", $getQtyStocks, "Result Qty", $resultQty, "get PO", $getPO->id);
 
         // delete data
+        grpoModel::where("no_po", $getRecord->no_po)->delete();
         if ($records->isEmpty()) {
             return redirect("admin/transaction/stockin")->with("error", "Tidak ada data yang dihapus");
         }
@@ -181,7 +208,7 @@ class TransactionController extends Controller
     public function stock_det(Request $request, $grpo)
     {
         $getRecord  = StockModel::where("grpo", $grpo)->first();
-        $getData    = StockModel::where('grpo', 'like', "%{$grpo}%")->orderBy('id', 'desc')->paginate(5);
+        $getData    = StockModel::where("grpo", $grpo)->orderBy('id', 'desc')->paginate(5);
 
         // set value PO
         $items          = ItemsModel::where("code", $getRecord->item_code)->first();
@@ -250,9 +277,8 @@ class TransactionController extends Controller
             ]);
         }
         $docNums            = ProductionOrderDetailsModel::where("item_code", $barcode)->pluck("doc_num")->toArray();
-        $productionOrders   = ProductionModel::where("status", 0)->whereIn("doc_num", $docNums)->distinct()->get();
-        $ios                = ProductionModel::select("io_no")->where("status", 0)->where("doc_num", $docNums)->distinct()->get();
-        $latestOnhand       = StockModel::where("item_code", $items->code)->whereNotNull("on_hand")->orderByDesc('id')->value("on_hand") ?? 0;
+        $productionOrders   = ProductionModel::where("status", "Released")->whereIn("doc_num", $docNums)->distinct()->get();
+        $latestOnhand       = ItemsModel::where("code", $items->code)->whereNotNull("in_stock")->orderByDesc('id')->value("in_stock") ?? 0;
         $latestStock        = StockModel::where("item_code", $items->code)->whereNotNull("stock")->orderByDesc("id")->value("stock") ?? 0;
         $latestStockIn      = StockModel::where("item_code", $items->code)->whereNotNull("stock_in")->orderByDesc("id")->value("stock_in") ?? 0;
         $user               = Auth::user()->id;
@@ -274,7 +300,6 @@ class TransactionController extends Controller
                     'success'   => true,
                     'code'      => $items->code,
                     'name'      => $items->name, // tambahkan ini
-                    'io_no'     => $ios,
                     'doc_num'   => $productionOrders,
                     'on_hand'   => $latestOnhand,
                 ]);
@@ -300,7 +325,7 @@ class TransactionController extends Controller
             "stocks"    => 'required|array',
             "stocks.*.id"   => 'required|integer|exists:stocks,id',
             "stocks.*.item_code" => 'required|string',
-            "stocks.*.qty"  => 'required|numeric|min:1'
+            "stocks.*.qty"  => 'required|numeric|min:0.0001'
         ]);
 
         foreach ($validated["stocks"] as $stockData) {
@@ -313,13 +338,35 @@ class TransactionController extends Controller
             $stock = StockModel::find($stockData["id"]);
             if ($stock) {
                 $stock->qty         = $stockData["qty"];
-                $stock->prod_order  = $request->prod_order;
+                $stock->prod_order  = trim($request->prod_order);
                 $stock->stock       = ($latestStock ?? 0) - $stockData["qty"];
                 $stock->stock_out   = ($latestStockOut ?? 0) + $stockData["qty"];
                 $stock->on_hand     = ($latestOnhand ?? 0) - $stockData["qty"];
                 $stock->is_temp     = false;
                 $stock->save();
             }
+        }
+
+        // save ifp table
+        $po = ProductionModel::where('doc_num', trim($request->prod_order))->first();
+        if (!$po) {
+            throw new \Exception('Prod Order not found');
+        }
+
+        try {
+            $ifp = IFPModel::updateOrCreate(
+                ['no_po' => trim($request->prod_order)],
+                [
+                    'project_code'  => $po->project_code,
+                    'whse'          => "BK001",
+                    'reason'        => trim($request->reason),
+                    'io'            => $po->io_no,
+                    'so'            => $po->sales_order,
+                    'remarks'       => trim($request->remarks)
+                ]
+            );
+        } catch (\Throwable $e) {
+            dd($e->getMessage(), $e->getFile(), $e->getLine(), $e->getTraceAsString());
         }
 
         return redirect("admin/transaction/stockoutdet/" . $stock->isp)->with("success", "Telah berhasil mengeluarkan item yang sudah di scan");
@@ -331,26 +378,6 @@ class TransactionController extends Controller
         $getData    = StockModel::where("isp", $isp)->orderByDesc("id")->paginate(5);
         $prodOrder  = $getRecord->prod_order;
         $getProd    = ProductionModel::where("doc_num", $prodOrder)->first();
-        $getIo      = $getProd->io_no;
-
-        // set value Prod order
-        $items          = ItemsModel::where("code", $getRecord->item_code)->first();
-        $getPO          = ProductionModel::with("po_details")->where("doc_num", $getRecord->prod_order)->first();
-        $getQtyPo       = ProductionOrderDetailsModel::where("doc_num", $getRecord->prod_order)->whereNotNull("qty")->sum("qty") ?? 0;
-        $getQtyStocks   = StockModel::where("prod_order", $getRecord->prod_order)->whereNotNull("qty")->sum("qty") ?? 0;
-        $getItemStocks  = StockModel::where("prod_order", $getRecord->prod_order)->where("item_code", $getRecord->item_code)->whereNotNull("qty")->first();
-        $getIdStocks    = $getItemStocks->id;
-
-        $resultQty = $getQtyPo - $getQtyStocks;
-        if ($resultQty < 0) {
-            StockModel::where("id", $getIdStocks)->update(["note" => "Stock Out over qty from Prod Order"]);
-            ProductionModel::where("id", $getPO->id)->update(["status" => 1]);
-        } else if ($resultQty == 0) {
-            ProductionModel::where("id", $getPO->id)->update(["status" => 1]);
-        } else if ($resultQty > 0) {
-            StockModel::where("id", $getIdStocks)->update(["note" => Null]);
-            ProductionModel::where("id", $getPO->id)->update(["status" => 0]);
-        }
 
         // dd("qty po", $getQtyPo, "qty stock", $getQtyStocks, "Result Qty", $resultQty, "get PO", $getPO->id);
         return view("backend.transaction.stockoutdet", compact("getRecord", "getData", "getProd"));
@@ -375,23 +402,7 @@ class TransactionController extends Controller
         $getRecord  = StockModel::where("isp", $isp)->first();
 
         // set value Prod order
-        $items          = ItemsModel::where("code", $getRecord->item_code)->first();
-        $getPO          = ProductionModel::select("id")->where("doc_num", $getRecord->prod_order)->first();
-        $getQtyPo       = ProductionOrderDetailsModel::where("doc_num", $getRecord->prod_order)->whereNotNull("qty")->sum("qty") ?? 0;
-        $getQtyStocks   = StockModel::where("id", $getRecord->id)->where("no_po", $getRecord->no_po)->whereNotNull("qty")->sum("qty") ?? 0;
-        $getItemStocks  = StockModel::where("no_po", $getRecord->no_po)->where("item_code", $items->code)->whereNotNull("qty")->first();
-        $getIdStocks    = $getItemStocks->id;
-        $resultQty      = $getQtyPo - $getQtyStocks;
-        if ($resultQty < 0) {
-            ProductionModel::where("id", $getPO->id)->update(["status" => 1]);
-            StockModel::where("id", $getIdStocks)->update(["note" => "Stock In over qty from PO"]);
-        } else if ($resultQty == 0) {
-            ProductionModel::where("id", $getPO->id)->update(["status" => 1]);
-        } else if ($resultQty > 0) {
-            ProductionModel::where("id", $getPO->id)->update(["status" => 0]);
-            $resultQty;
-        }
-        // dd("qty po", $getQtyPo, "qty stock", $getQtyStocks, "Result Qty", $resultQty, "get PO", $getPO->id);
+        $getPO          = ProductionModel::where("doc_num", $getRecord->prod_order)->first();
 
         // delete data
         if ($records->isEmpty()) {
@@ -400,6 +411,7 @@ class TransactionController extends Controller
         $itemNames = $records->map(function ($records) {
             return $records->item->name ?? "Tidak dikenal";
         })->implode(", ");
+        IFPModel::where("no_po", $getPO->doc_num)->delete();
         StockModel::where("isp", $isp)->delete();
 
         return redirect('admin/transaction/stockout')->with('warning', "Membatalkan item(s) {$itemNames}!");
@@ -437,7 +449,6 @@ class TransactionController extends Controller
             ]);
         }
 
-        $iopo   = ProductionModel::select("io_no")->where("status", 1)->where("prod_no", $barcode)->distinct()->get();
         $po     = ProductionModel::select("doc_num")->where("status", 1)->where("prod_no", $barcode)->distinct()->get();
         $user   = Auth::user()->username;
 
@@ -445,17 +456,19 @@ class TransactionController extends Controller
         $rfp                = new RFPModel();
         $rfp->number        = trim($request->input("number"));
         $rfp->io            = "-";
+        $rfp->so            = "-";
         $rfp->prod_order    = 0;
         $rfp->prod_no       = $prodOrder->prod_no;
         $rfp->prod_desc     = $prodOrder->prod_desc;
         $rfp->qty           = 0;
+        $rfp->project_code  = "-";
+        $rfp->whse          = "-";
         $rfp->scanned_by    = $user;
         $rfp->save();
 
         if ($request->expectsJson()) {
             return response()->json([
                 "success"   => true,
-                "io"        => $iopo,
                 "po"        => $po,
                 "prod_no"   => $prodOrder->prod_no,
                 "message"   => "Produk berhasil di scan!"
@@ -479,11 +492,17 @@ class TransactionController extends Controller
         ]);
 
         foreach ($validated["rfp"] as $rfpData) {
-            $rfp = RFPModel::find($rfpData["id"]);
+            $po     = ProductionModel::where('doc_num', trim($request->prod_order))->first();
+            $rfp    = RFPModel::find($rfpData["id"]);
             if ($rfp) {
-                $rfp->io = trim($request->input("io"));
-                $rfp->prod_order = trim($request->input("prod_order"));
-                $rfp->qty = $rfpData["qty"];
+                $rfp->io            = $po->io_no;
+                $rfp->prod_order    = trim($request->input("prod_order"));
+                $rfp->qty           = $rfpData["qty"];
+                $rfp->so            = $po->sales_order;
+                $rfp->project_code  = trim($request->input("project_code"));
+                $rfp->whse          = trim($request->input("whse"));
+                $rfp->reason        = trim($request->input("reason"));
+                $rfp->remarks       = trim($request->input("remarks"));
                 $rfp->save();
             }
         }
@@ -554,6 +573,7 @@ class TransactionController extends Controller
         return redirect("admin/transaction/rfp")->with("warning", "Membatalkan product {$prods}!");
     }
 
+    // good issue
     public function good_issued(Request $request)
     {
         $temp               = ItemsMaklonModel::orderByDesc('id')->where('is_temp', true)->first();
@@ -580,20 +600,17 @@ class TransactionController extends Controller
                 'message' => "Produk tidak ditemukan untuk barcode: " . $barcode . ". Pastikan produk sesuai dan scan kembali"
             ]);
         }
-        $on_hand        = ItemsMaklonModel::where("code", $barcode)->orderByDesc("id")->value("in_stock") ?? 0;
+        $on_hand        = ItemsModel::where("code", $barcode)->orderByDesc("id")->value("in_stock") ?? 0;
         $purchaseOrders = PurchasingModel::where("status", "Open")->pluck("no_po");
-        $io             = PurchasingModel::where("status", "Open")->pluck("io");
-        $internal_no    = PurchasingModel::where("status", "Open")->pluck("internal_no");
 
         // save db
         $goodissue = new ItemsMaklonModel();
         $goodissue->gi          = $gi;
         $goodissue->gr          = 0;
         $goodissue->po          = 0;
-        $goodissue->io          = 0;
-        $goodissue->internal_no = 0;
         $goodissue->code        = $items->code;
         $goodissue->name        = $items->name;
+        $goodissue->uom         = $items->uom;
         $goodissue->in_stock    = 0;
         $goodissue->qty         = 0;
         $goodissue->stock_min   = 0;
@@ -607,8 +624,6 @@ class TransactionController extends Controller
             "message"   => "Item berhasil di scan!",
             "on_hand"   => $on_hand,
             "pos"       => $purchaseOrders ?? 0,
-            "io"        => $io ?? 0,
-            "internal_no"   => $internal_no ?? 0
         ]);
     }
 
@@ -633,12 +648,40 @@ class TransactionController extends Controller
             $maklonItems = ItemsMaklonModel::select("in_stock")->where("po", $request->po)->orderByDesc("id")->first();
             if ($gi) {
                 $gi->po         = trim($request->po);
-                $gi->io         = trim($request->io ?? 0);
                 $gi->in_stock   = $maklonItems->in_stock ?? 0;
                 $gi->qty        = $giData["qty"];
                 $gi->is_temp    = false;
                 $gi->save();
             }
+        }
+
+        // save gi table
+        $po = PurchasingModel::where('no_po', trim($request->po))->first();
+        if (!$po) {
+            throw new \Exception('PO not found');
+        }
+
+        try {
+            $gi = goodissueModel::updateOrCreate(
+                ['po' => trim($request->nopo)],
+                [
+                    'po'            => $po->no_po,
+                    'io'            => $po->io,
+                    'internal_no'   => $po->internal_no,
+                    'so'            => $po->so,
+                    'no_surat_jalan'    => trim($request->no_surat_jalan),
+                    'no_inventory_tf'   => trim($request->no_inventory_tf),
+                    'type_inv_transaction'  => trim($request->type_inv_transaction),
+                    'reason'        => trim($request->reason),
+                    'whse'          => trim($request->whse),
+                    'project_code'  => trim($request->project_code),
+                    'distr_rule'    => $po->distr_rule,
+                    'vendor_code'   => $po->vendor_code,
+                    'remarks'       => trim($request->remarks)
+                ]
+            );
+        } catch (\Throwable $e) {
+            dd($e->getMessage(), $e->getFile(), $e->getLine(), $e->getTraceAsString());
         }
         // dd($request->all());
 
@@ -687,12 +730,14 @@ class TransactionController extends Controller
         $prods = $records->map(function ($records) {
             return $records->name ?? "Tidak dikenal";
         })->implode(", ");
+        goodissueModel::where("po", $getPo)->delete();
         ItemsMaklonModel::where("gi", $gi)->delete();
         // dd("prods", $prods, "getPo", $getPo, "gi", $gi);
 
         return redirect("admin/transaction/goodissued")->with("warning", "Membatalkan product {$prods}!");
     }
 
+    // good receipt
     public function good_receipt(Request $request)
     {
         $temp               = ItemsMaklonModel::orderByDesc('id')->where('is_temp', true)->first();
@@ -721,18 +766,15 @@ class TransactionController extends Controller
         }
         $on_hand        = ItemsModel::where("code", $barcode)->orderByDesc("id")->value("in_stock") ?? 0;
         $purchaseOrders = PurchasingModel::where("status", "GR")->pluck("no_po");
-        $io             = PurchasingModel::where("status", "GR")->pluck("io");
-        $internal_no    = PurchasingModel::where("status", "GR")->pluck("internal_no");
 
         // save db
         $goodreceipt = new ItemsMaklonModel();
         $goodreceipt->gi          = 0;
         $goodreceipt->gr          = $gr;
         $goodreceipt->po          = 0;
-        $goodreceipt->io          = 0;
-        $goodreceipt->internal_no = 0;
         $goodreceipt->code        = $items->code;
         $goodreceipt->name        = $items->name;
+        $goodreceipt->uom         = $items->uom;
         $goodreceipt->in_stock    = 0;
         $goodreceipt->qty         = 0;
         $goodreceipt->stock_min   = 0;
@@ -746,8 +788,6 @@ class TransactionController extends Controller
             "message"   => "Item berhasil di scan!",
             "on_hand"   => $on_hand,
             "pos"       => $purchaseOrders ?? 0,
-            "io"        => $io ?? 0,
-            "internal_no"   => $internal_no ?? 0
         ]);
     }
 
@@ -796,6 +836,39 @@ class TransactionController extends Controller
                 $items->save();
             }
         }
+
+        // save gi table
+        $po = PurchasingModel::where('no_po', trim($request->po))->first();
+        $maklonItems = ItemsMaklonModel::where("po", trim($request->po))->first();
+        if (!$po) {
+            throw new \Exception('PO not found');
+        }
+
+        try {
+            $gr = goodreceiptModel::updateOrCreate(
+                ['po' => trim($request->nopo)],
+                [
+                    'po'            => $po->no_po,
+                    'io'            => $po->io,
+                    'internal_no'   => $po->internal_no,
+                    'so'            => $po->so,
+                    'no_gi'         => $maklonItems->gi,
+                    'no_surat_jalan'    => trim($request->no_surat_jalan),
+                    'ref_surat_jalan'   => trim($request->ref_surat_jalan),
+                    'no_inventory_tf'   => trim($request->no_inventory_tf),
+                    'type_inv_transaction'  => trim($request->type_inv_transaction),
+                    'reason'        => trim($request->reason),
+                    'whse'          => trim($request->whse),
+                    'project_code'  => trim($request->project_code),
+                    'distr_rule'    => $po->distr_rule,
+                    'vendor_code'   => $po->vendor_code,
+                    'acct_code'     => $po->acct_code,
+                    'remarks'       => trim($request->remarks)
+                ]
+            );
+        } catch (\Throwable $e) {
+            dd($e->getMessage(), $e->getFile(), $e->getLine(), $e->getTraceAsString());
+        }
         // dd($request->all());
 
         return redirect("admin/transaction/grdetail/" . $request->input("gr"))->with("success", "Telah berhasil good receipt");
@@ -842,6 +915,7 @@ class TransactionController extends Controller
         $prods = $records->map(function ($records) {
             return $records->name ?? "Tidak dikenal";
         })->implode(", ");
+        goodreceiptModel::where("po", $getPo)->delete();
         ItemsMaklonModel::where("gr", $gr)->delete();
         // dd("prods", $prods, "getPo", $getPo, "gr", $gr);
 

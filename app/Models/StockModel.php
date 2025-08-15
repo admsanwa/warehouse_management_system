@@ -16,7 +16,7 @@ class StockModel extends Model
 
     static public function getRecord()
     {
-        $latestIds = self::select(DB::raw("max(id) as id"))->groupBy("item_id");
+        $latestIds = self::select(DB::raw("max(id) as id"))->groupBy("item_code");
         $query = self::with("item")->whereIn("id", $latestIds->pluck("id"))->orderBy("id", "desc");
 
         if (!empty(Request::get('item_code'))) {
@@ -68,5 +68,15 @@ class StockModel extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'scanned_by', 'id');
+    }
+
+    public function grpoData()
+    {
+        return $this->belongsTo(grpoModel::class, 'no_po', 'no_po');
+    }
+
+    public function ifpData()
+    {
+        return $this->belongsTo(IFPModel::class, 'prod_order', 'no_po');
     }
 }

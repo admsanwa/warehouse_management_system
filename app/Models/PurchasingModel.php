@@ -12,7 +12,7 @@ class PurchasingModel extends Model
 
     protected $table = 'purchase_order';
 
-    protected $fillable = ['no_po', 'vendor', 'contact_person', 'buyer', 'delivery_date', 'status', 'item_code', 'item_type', 'item_desc', 'qty', 'uom'];
+    protected $fillable = ['no_po', 'vendor', 'contact_person', 'buyer', 'posting_date', 'status', 'item_code', 'item_type', 'item_desc', 'qty', 'uom'];
 
     static public function getRecord()
     {
@@ -28,8 +28,8 @@ class PurchasingModel extends Model
         if (!empty(Request::get('contact_person'))) {
             $return = $return->where('contact_person', 'LIKE', '%' . Request::get('contact_person') . '%');
         }
-        if (!empty(Request::get('delivery_date'))) {
-            $return = $return->where('delivery_date', 'LIKE', '%' . Request::get('delivery_date') . 'delivery_date');
+        if (!empty(Request::get('posting_date'))) {
+            $return = $return->where('posting_date', 'LIKE', '%' . Request::get('posting_date') . 'posting_date');
         }
 
         $return = $return->orderBy('id', 'desc')->paginate(10);

@@ -43,4 +43,9 @@ class RFPModel extends Model
     {
         return $this->belongsTo(User::class, "scanned_by", "username");
     }
+
+    public function items()
+    {
+        return $this->belongsTo(ItemsModel::class, "prod_no", "code");
+    }
 }

@@ -60,7 +60,7 @@ class ItemsModel extends Model
 
     public function stocks()
     {
-        return $this->belongsTo(StockModel::class, 'id', 'item_id')->latest('id');
+        return $this->belongsTo(StockModel::class, 'code', 'item_code')->latest('id');
         // items.id -> stock.item_id
     }
 

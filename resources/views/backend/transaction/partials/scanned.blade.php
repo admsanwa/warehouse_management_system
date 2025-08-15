@@ -2,6 +2,7 @@
     @csrf
     <input type="hidden" name="nopo" id="no_po_hidden">
     <input type="hidden" name="grpo" id="grpo_hidden">
+    <input type="hidden" name="remarks" id="remark_hidden">
     <div class="table-responsive">
         <table class="table table-striped table-borderd table-sm">
             @if (isset($scannedBarcodes) && $scannedBarcodes->count())
@@ -11,7 +12,8 @@
                         <th>Item Code</th>
                         <th>Item Desc</th>
                         <th>Qty</th>
-                        <th>Action</th>
+                        <th>Uom</th>
+                        <th>Delete</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -28,6 +30,9 @@
                                 <input type="number" name="stocks[{{ $index }}][qty]" class="form-control" value="0">
                             </td>
                             <td>
+                                {{ $stocks->item->uom}}
+                            </td>
+                            <td>
                                 <button type="button" onclick="deleteItem({{ $stocks->id }})" class="btn btn-danger btn-sm">
                                     <i class="fa fa-trash"></i>
                                 </button>
@@ -39,7 +44,7 @@
         </table>
         <div class="card">
             <div class="card-footer">
-                <div class="col col-sm-11">
+                <div class="col col-sm-12">
                     <button type="submit" onclick="return AddStockupForm();" class="btn btn-success float-right"><i class="fa fa-check"></i> Add</button>
                 </div>
             </div>

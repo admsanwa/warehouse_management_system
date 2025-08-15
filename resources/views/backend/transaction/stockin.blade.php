@@ -80,6 +80,10 @@
                         <div class="col-sm-6">
                             <input type="number" name="grpo" id="grpo" value="{{ $grpo }}" class="form-control mt-2" readonly required>
                         </div>
+                        <label for="" class="col-sm-4 col-form-lable">Remarks :</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="remarks" id="remarks" class="form-control mt-2" placeholder="Masukkan keterangan proyek disini" required>
+                        </div>
                     </div>
                 </div>
                 <div class="p-0" id="scannedBarcodes"></div>
@@ -253,6 +257,7 @@
     function AddStockupForm() {
         const noPo = document.getElementById("no_po").value;
         const grpo = document.getElementById("grpo").value;
+        const remark = document.getElementById("remarks").value;
 
         if (!noPo || !grpo) {
             showToast("❌ Error: Pastikan Nomer Purchasing Order atau Nomer GRPO di isi sebelum submit!")
@@ -261,6 +266,7 @@
 
         document.getElementById("grpo_hidden").value = grpo;
         document.getElementById("no_po_hidden").value = noPo;
+        document.getElementById("remark_hidden").value = remark;
         return true; // Allow form submission
     }
 

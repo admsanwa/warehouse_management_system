@@ -73,27 +73,54 @@
 
                     <div class="card-body">
                         <div class="form-group row">
-                            <label for="" class="col-sm-4 col-form-lable">IO :</label>
-                            <div class="col-sm-6">
-                                <select name="io" id="io" class="form-control mt-2" required>
-                                    <option value="">Select Nomer IO</option>
-                                </select>
-                            </div>
                             <label for="" class="col-sm-4 col-form-lable">PO Maklon : </label>
                             <div class="col-sm-6">
                                 <select name="pom" id="pom" class="form-control mt-2" required>
                                     <option value="">Select Nomer Purchase Order Maklon</option>
                                 </select>
                             </div>
-                            <label for="" class="col-sm-4 col-form-lable">Internal No : </label>
-                            <div class="col-sm-6">
-                                <select name="internal_no" id="internal_no" class="form-control mt-2" required>
-                                    <option value="">Select Internal Nomer</option>
-                                </select>
-                            </div>
-                            <label for="" class="col-sm-4 col-form-lable">Good Issue :</label>
+                            <label for="" class="col-sm-4 col-form-lable">Goods Issue :</label>
                             <div class="col-sm-6">
                                 <input type="number" name="gi" id="gi" value="{{ $gi }}" class="form-control mt-2" readonly required>
+                            </div>
+                            <label for="" class="col-sm-4 col-form-lable">Alasan Goods Issue :</label>
+                            <div class="col-sm-6">
+                                <input type="text" name="reason" id="reason" class="form-control mt-2" placeholder="Masukkan Alasan Goods Issue" required>
+                            </div>
+                            <label for="" class="col-sm-4 col-form-lable">Default Warehouse :</label>
+                            <div class="col-sm-6">
+                                <select name="whse" id="whse" class="form-control mt-2">
+                                    <option value="">Select Default Warehouse</option>
+                                    <option value="BK903">BK903</option>
+                                    <option value="BK001">BK001</option>
+                                </select>
+                            </div>
+                            <label for="" class="col-sm-4 col-form-lable">Default Project Code :</label>
+                            <div class="col-sm-6">
+                                <select name="project_code" id="project_code" class="form-control mt-2">
+                                    <option value="">Select Project Code</option>
+                                    <option value="-BKS">-BKS</option>
+                                </select>
+                            </div>
+                            <label for="" class="col-sm-4 col-form-lable">No Surat Jalan :</label>
+                            <div class="col-sm-6">
+                                <input type="text" name="no_surat_jalan" id="no_surat_jalan" class="form-control mt-2" placeholder="Masukkan No Surat Jalan" required>
+                            </div>
+                            <label for="" class="col-sm-4 col-form-lable">No Inventory Transfer :</label>
+                            <div class="col-sm-6">
+                                <input type="number" name="no_inventory_tf" id="no_inventory_tf" class="form-control mt-2" placeholder="Masukkan No Inventory Transfer" required>
+                            </div>
+                            <label for="" class="col-sm-4 col-form-lable">Type Inventory Transaction :</label>
+                            <div class="col-sm-6">
+                                <select name="type_inv_transaction" id="type_inv_transaction" class="form-control mt-2">
+                                    <option value="">Select Type Inventory Transaction</option>
+                                    <option value="for Stock">for Stock</option>
+                                    <option value="for Order">for Order</option>
+                                </select>
+                            </div>
+                            <label for="" class="col-sm-4 col-form-lable">Remarks :</label>
+                            <div class="col-sm-6">
+                                <input type="text" name="remarks" id="remarks" class="form-control mt-2" placeholder="Masukkan Keterangan" required>
                             </div>
                         </div>
                     </div>
@@ -210,22 +237,11 @@
             .then(res => res.json())
             .then(data => {
                 console.log("data", data);
-                const ioSelect  = document.getElementById("io");
                 const pomSelect = document.getElementById("pom");
-                const inoSelect = document.getElementById("internal_no");
-                ioSelect.innerHTML = '<option value="">Select Nomer IO</option>';
-                pomSelect.innerHTML = '<option value="">Select Nomer Purchase Order Maklon</option>';
-                inoSelect.innerHTML = '<option value="">Select Internal Nomer</option>'
-        
+                pomSelect.innerHTML = '<option value="">Select Nomer Purchase Order Maklon</option>';        
                 document.getElementById("on_hand").value = data.on_hand;
                 document.getElementById("item_desc").value = data.name;
 
-                data.io.forEach(ios => {
-                    const option = document.createElement("option");
-                    option.value = ios;
-                    option.textContent = ios;
-                    ioSelect.appendChild(option);
-                });
 
                 data.pos.forEach(pom => {
                     const option = document.createElement("option");
@@ -233,13 +249,6 @@
                     option.textContent = pom;
                     pomSelect.appendChild(option);
                 });
-
-                data.internal_no.forEach(ino => {
-                    const option = document.createElement("option");
-                    option.value = ino;
-                    option.textContent  = ino;
-                    inoSelect.appendChild(option);
-                })
 
                 // console.log("po", data.no_po, "io", data.io_no, "prod", data.doc_num);
                 loadScannedBarcodes();
@@ -276,9 +285,15 @@
         }
 
         function AddGoodIssueForm() {
-            const po = document.getElementById("pom").value;
-            const io = document.getElementById("io").value;
-            const gi = document.getElementById("gi").value;
+            const po     = document.getElementById("pom").value;
+            const gi     = document.getElementById("gi").value;
+            const reason = document.getElementById("reason").value;
+            const projectCode = document.getElementById("project_code").value;
+            const whse  = document.getElementById("whse").value;
+            const no_surat_jalan  = document.getElementById("no_surat_jalan").value;
+            const no_inventory_tf  = document.getElementById("no_inventory_tf").value;
+            const type_inv_transaction  = document.getElementById("type_inv_transaction").value;
+            const remarks = document.getElementById("remarks").value;
             // console.log("io", io, "po", po, "gi", gi);
 
             if (!po || !gi) {
@@ -286,9 +301,15 @@
                 return false; // Prevent form submission
             }
 
-            document.getElementById("io_hidden").value = io;
             document.getElementById("po_hidden").value = po;
-            document.getElementById("gi_hidden").value = gi;
+            document.getElementById("gi_hidden").value = gi;    
+            document.getElementById("reason_hidden").value = reason;
+            document.getElementById("project_hidden").value = projectCode;
+            document.getElementById("whse_hidden").value = whse;
+            document.getElementById("no_surat_jalan_hidden").value = no_surat_jalan;
+            document.getElementById("no_inventory_tf_hidden").value = no_inventory_tf;
+            document.getElementById("type_inv_transaction_hidden").value = type_inv_transaction;
+            document.getElementById("remarks_hidden").value = remarks;
             return true; // Allow form submission
         }
 

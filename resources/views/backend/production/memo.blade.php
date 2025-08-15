@@ -43,7 +43,12 @@
                                     <div class="form-group row">
                                         <label for="" class="col-sm-3 col-form-lable">Hal :</label>
                                         <div class="col-sm-6">
-                                            <input type="text" name="description" id="description" class="form-control" placeholder="Enter Keterangan Hal">
+                                            <select name="description" id="description" class="form-control">
+                                                <option value="">Select Description Here</option>
+                                                <option value="Stock Produksi">Stock Produksi</option>
+                                                <option value="Kirim barang ke maklon">Kirim barang ke maklon</option>
+                                                <option value="Pengiriman material/komponen">Pengiriman material/komponen</option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -74,7 +79,7 @@
                                             </div>
                                             <div class="form-group row">
                                                 <label for="" class="col-sm-3 col-form-lable">Unit :</label>
-                                                <div class="col-sm-3">
+                                                <div class="col-sm-2">
                                                     <input type="text" name="unit[]" class="form-control" placeholder="Enter Unit">
                                                 </div>
                                                 <p>W :</p>
@@ -87,7 +92,7 @@
                                                 </div>
                                                 <p>Qty :</p>
                                                 <div class="col-sm-1">
-                                                    <input type="number" name="qty[]" class="form-control" placeholder="Enter Height">
+                                                    <input type="number" name="qty[]" class="form-control" placeholder="Enter Quantity">
                                                 </div>
                                                 <p>Uom :</p>
                                                 <div class="col-sm-1">

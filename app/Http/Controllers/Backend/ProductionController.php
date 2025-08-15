@@ -10,6 +10,7 @@ use App\Models\ItemsModel;
 use App\Models\MemoModel;
 use App\Models\ProductionModel;
 use App\Models\ProductionOrderDetailsModel;
+use App\Models\SignBonModel;
 use App\Models\SignModel;
 use App\Models\StockModel;
 use Illuminate\Http\Request;
@@ -22,8 +23,8 @@ class ProductionController extends Controller
 {
     public function index(Request $request)
     {
-        $getData = ProductionModel::withCount("stocks")->orderBy("id", "desc")->paginate(10);
-        $getRecord    = ProductionOrderDetailsModel::with("stocks")->get()->unique("doc_num")->values();
+        $getData    = ProductionModel::withCount("stocks")->orderBy("id", "desc")->paginate(10);
+        $getRecord  = ProductionOrderDetailsModel::with("stocks")->get()->unique("doc_num")->values();
 
         $productionSummary = [];
         foreach ($getRecord as $record) {
@@ -320,16 +321,55 @@ class ProductionController extends Controller
 
     public function list_bon(Request $request)
     {
-        $getRecord = BonModel::getRecord($request);
+        $getRecord   = BonModel::getRecord($request);
+        $user       = Auth::user();
 
-        return view('backend.production.listbon', compact('getRecord'));
+        foreach ($getRecord as $record) {
+            $signApprove    = SignBonModel::where('no_bon', $record->no)->where('sign', 1)->first();
+            $signBuyer      = SignBonModel::where('no_bon', $record->no)->where('sign', 1)->where('department', 'Purchasing')
+                ->whereHas('user', function ($q) {
+                    $q->where('department', 'Purchasing');
+                })
+                ->first();;
+
+            $record->status = ($signApprove && $signBuyer)
+                ? 'Approve'
+                : 'Pending';
+
+            $record->highlight = ($user->nik === "06067" && !$signApprove || $user->nik === "08517" && !$signBuyer || $user->nik === "250071" && !$signBuyer);
+        }
+        return view('backend.production.listbon', compact('getRecord', 'user'));
     }
 
     public function bon_details($id)
     {
-        $bon        = BonModel::with('details')->findOrFail($id);
-        $user       = Auth::user();
-        $getSign    = null;
-        return view("backend.production.showbon", compact('bon', 'getSign', 'user'));
+        $bon            = BonModel::with(['details', 'createdBy'])->findOrFail($id);
+        $user           = Auth::user();
+        $signApprove    = SignBonModel::with('user')->where('no_bon', $bon->no)->where('sign', 1)->first();
+        $signBuyer      = SignBonModel::with('user')->where('no_bon', $bon->no)->where('sign', 1)->where('department', 'Purchasing')
+            ->whereHas('user', function ($q) {
+                $q->where('department', 'Purchasing');
+            })
+            ->first();;
+
+        return view("backend.production.showbon", compact('bon', 'user', 'signApprove', 'signBuyer'));
+    }
+
+    public function approve_bon(Request $request)
+    {
+        $no   = $request->input("no_bon");
+        $user = Auth::user();
+
+        $sign = new SignBonModel();
+        $sign->no_bon = $no;
+        $sign->nik = $user->nik;
+        $sign->department = $user->department;
+        $sign->sign = 1;
+        $sign->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => "Successfully approve bon"
+        ]);
     }
 }

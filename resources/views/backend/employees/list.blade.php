@@ -82,9 +82,9 @@
                                         <td>{{ $value->department}}</td>
                                         <td>{{ $value->email }}</td>
                                         <td>
-                                            <a href="{{ url('admin/employees/view/' . $value->id) }}" class="btn btn-info">View</a>
-                                            <a href="{{ url('admin/employees/edit/' . $value->id) }}" class="btn btn-primary">Edit</a>
-                                            <a href="{{ url('admin/employees/delete/' .$value->id) }}" onclick="return confirm('Are you sure you want to delete?')" class="btn btn-danger">Delete</a>
+                                            <a href="{{ url('admin/employees/view/' . $value->id) }}" class="btn btn-sm btn-info">View</a>
+                                            <a href="{{ url('admin/employees/edit/' . $value->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                                            <a href="{{ url('admin/employees/delete/' .$value->id) }}" onclick="return confirm('Are you sure you want to delete?')" class="btn btn-sm btn-danger">Delete</a>
                                         </td>
                                     </tr>
                                     @empty

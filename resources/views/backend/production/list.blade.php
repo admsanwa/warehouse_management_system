@@ -92,10 +92,8 @@
                                                     <td>{{ $production->io_no }}</td>
                                                     <td>{{ $production->due_date }}</td>
                                                     <td>
-                                                        @if ($production->status == 0)
-                                                            <a href="{{ url("admin/transaction/stockout", $production->doc_num)}}" class="btn btn-sm btn-outline-success"><i class="fa fa-arrow-right"></i> Planned</a>
-                                                        @elseif ($production->status == 1)
-                                                           <a href="{{ url("admin/transaction/rfp")}}" class="btn btn-sm btn-outline-success"><i class="fa fa-arrow-right"></i> Released</a>
+                                                        @if ($production->status == "Released")
+                                                            <a href="{{ url("admin/transaction/stockout", $production->doc_num)}}" class="btn btn-sm btn-outline-success"><i class="fa fa-arrow-right"></i> Released</a>
                                                         @else 
                                                             Closed
                                                         @endif

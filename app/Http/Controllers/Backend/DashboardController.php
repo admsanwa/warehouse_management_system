@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\BonModel;
 use App\Models\DeliveryModel;
 use App\Models\ItemsModel;
 use App\Models\ProductionModel;
@@ -13,16 +14,19 @@ use App\Models\PurchasingModel;
 use App\Models\QualityModel;
 use App\Models\RFPModel;
 use App\Models\StockModel;
+use Auth;
 
 class DashboardController extends Controller
 {
     public function dashboard(Request $request)
     {
+        // get value
         $getItems       = ItemsModel::whereColumn('stock_min', '>=', 'in_stock')->get()->unique('code');
         $getQuality     = QualityModel::whereNotNull("result")->get()->unique('io');
         $getDelivery    = DeliveryModel::whereNotNull("status")->get()->unique('io');
         $getProd        = ProductionModel::where("status", 1)->get();
 
+        // count value
         $needBuy        = $getItems->count();
         $afterCheck     = $getQuality->count();
         $deliveryStatus = $getDelivery->count();
@@ -51,7 +55,23 @@ class DashboardController extends Controller
             ->filter($request) // <-- using the scope
             ->count();
 
+        // notif modal
+        $user       = Auth::user();
+        $hasPending = BonModel::whereDoesntHave("signBon", function ($q) {
+            $q->where('sign', 1);
+        })->exists();
+
+        if ($user->nik === "06067" && $hasPending || $user->nik === "08517" && $hasPending || $user->nik === "250071" && $hasPending) {
+            session()->flash('bonPending', true);
+        }
+
         return view('backend.dashboard.list', compact('needBuy', 'afterCheck', 'deliveryStatus', 'prodRelease', 'purchaseOrder', 'goodIssued', 'goodReceipt', 'rfp'));
+    }
+
+    public function clearBonNotif()
+    {
+        session()->forget('bonPending');
+        return redirect('admin/production/listbon');
     }
 
     public function min_stock(Request $request)

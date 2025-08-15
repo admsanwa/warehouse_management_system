@@ -62,16 +62,6 @@
                 </div>
                 <div class="card-body">
                     <div class="form-group row">
-                        <label for="" class="col-sm-4 col-form-lable">Nomer IO :</label>
-                        <div class="col-sm-6">
-                            @if ($getIos) 
-                                <input type="number" name="io" id="io"  class="form-control mt-2" readonly required>
-                            @else 
-                                <select name="io" id="io" class="form-control mt-2" required>
-                                    <option value="">Select Nomer IO</option>
-                                </select>
-                            @endif
-                        </div>
                         <label for="" class="col-sm-4 col-form-lable">Production Order</label>
                         <div class="col-sm-6">
                             @if ($getPos) 
@@ -84,7 +74,30 @@
                         </div>
                         <label for="" class="col-sm-4 col-form-lable">Number :</label>
                         <div class="col-sm-6">
-                                <input type="number" name="number" id="number" value="{{ $number }}" class="form-control mt-2" readonly required>
+                            <input type="number" name="number" id="number" value="{{ $number }}" class="form-control mt-2" readonly required>
+                        </div>
+                        <label for="" class="col-sm-4 col-form-lable">Alasan Receipt Production :</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="reason" id="reason" class="form-control mt-2" placeholder="Masukkan Alasan Receipt Production">
+                        </div>
+                        <label for="" class="col-sm-4 col-form-lable">Default Warehouse :</label>
+                        <div class="col-sm-6">
+                            <select name="whse" id="whse" class="form-control mt-2" required>
+                                <option value="">Select Default Warehouse</option>
+                                <option value="BK903">BK903</option>
+                                <option value="BK001">BK001</option>
+                            </select>
+                        </div>
+                        <label for="" class="col-sm-4 col-form-lable">Default Project Code :</label>
+                        <div class="col-sm-6">
+                            <select name="project_code" id="project_code" class="form-control mt-2" required>
+                                <option value="">Select Project Code</option>
+                                <option value="-BKS">-BKS</option>
+                            </select>
+                        </div>
+                        <label for="" class="col-sm-4 col-form-lable">Remarks :</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="remarks" id="remarks" class="form-control mt-2" placeholder="Masukkan Keterangan">
                         </div>
                     </div>
                 </div>
@@ -221,22 +234,13 @@
         .then(res => res.json())
         .then(data => {
             // console.log("data", data);
-            const iosSelect = document.getElementById('io');
-            iosSelect.innerHTML = '<option value="">Select Nomer IO</option>'; // Clear old options
             const posSelect = document.getElementById("po");
             posSelect.innerHTML = '<option value="">Select Nomer PO</option>';
      
             if (data.success) {
                 // console.log("data", data);
                 document.getElementById("id").value = data.id;
-                
-                data.io.forEach(ios => {
-                    const option = document.createElement('option');
-                    option.value = ios.io_no;
-                    option.textContent = ios.io_no;
-                    iosSelect.appendChild(option);
-                });
-
+    
                 data.po.forEach(pos => {
                     const option = document.createElement("option");
                     option.value = pos.doc_num;
@@ -284,18 +288,26 @@
     }
 
     function AddStockupForm() {
-        const io = document.getElementById("io").value;
         const po = document.getElementById("po").value;
         const number = document.getElementById("number").value;
+        const reason = document.getElementById("reason").value;
+        const whse = document.getElementById("whse").value;
+        const projectCode = document.getElementById("project_code").value;
+        const remarks = document.getElementById("remarks").value;
+        console.log("po", po);
 
-        if (!io || !po) {
-            alert("Pastikan mengisi nomer Production Order atau nomer IO di isi sebelum submit.");
+        if (!po || !whse) {
+            alert("Pastikan mengisi nomer Production Order di isi sebelum submit.");
             return false; // Prevent form submission
         }
 
         document.getElementById("po_hidden").value = po;
-        document.getElementById("io_hidden").value = io;
         document.getElementById("number_hidden").value = number;
+        document.getElementById("reason_hidden").value = reason;
+        document.getElementById("whse_hidden").value = whse;
+        document.getElementById("projectCode_hidden").value = projectCode;
+        document.getElementById("remarks_hidden").value = remarks;
+
         return true; // Allow form submission
     }
 

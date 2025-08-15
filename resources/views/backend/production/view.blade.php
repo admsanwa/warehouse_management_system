@@ -26,26 +26,48 @@
                             </div>
                             <div class="card-body">
                                 <div class="form-group row">
-                                    <label for="" class="col-sm-2 col-form-lable">Status :</label>
-                                    <div class="col-sm-4">{{ $getRecord->status == 0 ? 'Planned' : ($getRecord->status == 1 ? 'Released' : 'Closed') }}</div>
-                                        <label for="" class="col-sm-2 col-form-lable">Doc Number :</label>
-                                    <div class="col-sm-4">{{ $getRecord->doc_num }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Status</label>
+                                    <div class="col-sm-4">: {{ $getRecord->status }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">IO No</label>
+                                    <div class="col-sm-4">: {{ $getRecord->io_no }}</div>
                                 </div>
                                 <div class="form-group row">
-                                    <label for="" class="col-sm-2 col-form-lable">Product No :</label>
-                                    <div class="col-sm-4">{{ $getRecord->prod_no }}</div>
-                                        <label for="" class="col-sm-2 col-form-lable">Due Date :</label>
-                                    <div class="col-sm-4">{{ $getRecord->due_date}}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Doc Number</label>
+                                    <div class="col-sm-4">: {{ $getRecord->doc_num }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Product Type</label>
+                                    <div class="col-sm-4">: {{ $getRecord->prod_type }}</div>
                                 </div>
                                 <div class="form-group row">
-                                    <label for="" class="col-sm-2 col-form-lable">Product Desc :</label>
-                                    <div class="col-sm-4">{{ $getRecord->prod_desc }}</div>
-                                    <label for="" class="col-sm-2 col-form-lable">IO No :</label>
-                                    <div class="col-sm-4">{{ $getRecord->io_no }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Product No</label>
+                                    <div class="col-sm-4">: {{ $getRecord->prod_no }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Project Code</label>
+                                    <div class="col-sm-4">: {{ $getRecord->project_code }}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">Product Desc</label>
+                                    <div class="col-sm-4">: {{ $getRecord->prod_desc }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Contract</label>
+                                    <div class="col-sm-4">: {{ $getRecord->contract }}</div>
                                 </div>  
                                 <div class="form-group row">
-                                    <label for="" class="col-sm-2 col-form-lable">Remarks :</label>
-                                    <div class="col-sm-10">{{ $getRecord->remarks }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Sales Order</label>
+                                    <div class="col-sm-4">: {{ $getRecord->sales_order}}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Contract Adendum</label>
+                                    <div class="col-sm-4">: {{ $getRecord->contract_adendum }}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">Distr. Rule</label>
+                                    <div class="col-sm-4">: {{ $getRecord->distr_rule}}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">No Internal</label>
+                                    <div class="col-sm-4">: {{ $getRecord->no_internal }}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">Due Date</label>
+                                    <div class="col-sm-4">: {{ $getRecord->due_date}}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">Remarks</label>
+                                    <div class="col-sm-10">: {{ $getRecord->remarks }}</div>
                                 </div>
                             </div>
                         </div>
@@ -84,10 +106,8 @@
                                 </div>
                             </div>
                             <div class="card-footer">
-                                @if ($getRecord->status == 0)
-                                    <a href="{{ url("admin/transaction/stockout", $pos->doc_num)}}" class="btn btn-success"><i class="fa fa-arrow-right"></i> Planned</a>
-                                @elseif ($getRecord->status == 1)
-                                    <a href="{{ url("admin/transaction/rfp")}}" class="btn btn-success"><i class="fa fa-arrow-right"></i> Released</a>
+                                @if ($getRecord->status == "Released")
+                                    <a href="{{ url("admin/transaction/stockout", $pos->doc_num)}}" class="btn btn-success"><i class="fa fa-arrow-right"></i> Released</a>
                                 @endif
                                 <button onclick="history.back()" class="btn btn-default">Back</button>
                             </div>

@@ -73,16 +73,6 @@
 
                     <div class="card-body">
                         <div class="form-group row">
-                            <label for="" class="col-sm-4 col-form-lable">Nomer IO :</label>
-                            <div class="col-sm-6">
-                                @if ($getPos )
-                                    <input type="text" name="noio" id="noio" value="{{ $getPos->io_no ?? 0 }}" class="form-control mt-2" readonly required>
-                                @else
-                                    <select name="noio" id="noio" class="form-control mt-2" required>
-                                        <option value="">Select Nomer IO</option>
-                                    </select>
-                                @endif
-                            </div>
                             <label for="" class="col-sm-4 col-form-lable">Production Order : </label>
                             <div class="col-sm-6">
                                 @if ($getPos)
@@ -96,6 +86,14 @@
                             <label for="" class="col-sm-4 col-form-lable">Issued from Production :</label>
                             <div class="col-sm-6">
                                 <input type="number" name="isp" id="isp" value="{{ $isp }}" class="form-control mt-2" readonly required>
+                            </div>
+                            <label for="" class="col-sm-4 col-form-lable">Alasan Goods Issue :</label>
+                            <div class="col-sm-6">
+                                <input type="text" name="reason" id="reason" class="form-control mt-2" placeholder="Masukkan Alasan Goods Issue">
+                            </div>
+                            <label for="" class="col-sm-4 col-form-lable">Remarks :</label>
+                            <div class="col-sm-6">
+                                <textarea type="text" name="remarks" id="remarks" class="form-control mt-2" placeholder="Masukkan Keterangan">{{ $getPos->remarks }}</textarea>
                             </div>
                         </div>
                     </div>
@@ -212,22 +210,13 @@
             .then(res => res.json())
             .then(data => {
                 // console.log("data", data);
-                const ioSelect = document.getElementById("noio");
                 const prod_orderSelect = document.getElementById("prod_order");
-                ioSelect.innerHTML = '<option value="">Select Nomer IO</option>';
                 prod_orderSelect.innerHTML = '<option value="">Select Nomer Order Production</option>';
         
                 if (Array.isArray(data.doc_num) && data.doc_num.length > 0) {
                     // console.log("grpo", data.grpo);
                     document.getElementById("item_desc").value = data.name;  
                     document.getElementById("on_hand").value = data.on_hand;
-
-                    data.io_no.forEach(ios => {
-                        const option = document.createElement("option");
-                        option.value = ios.io_no;
-                        option.textContent = ios.io_no;
-                        ioSelect.appendChild(option);
-                    });
 
                     data.doc_num.forEach(prod_order => {
                         const option = document.createElement("option");
@@ -278,17 +267,19 @@
         }
 
         function AddStockupForm() {
-            const prod_order    = document.getElementById("prod_order").value;
-            const noio          = document.getElementById("noio").value;
-            const code          = document.getElementById("item_code").value;
+            const prod_order = document.getElementById("prod_order").value;
+            const reason = document.getElementById("reason").value;
+            const remarks = document.getElementById("remarks").value;
+            // console.log("reason", reason, "remarks", remarks);
 
-            if (!prod_order || !noio) {
-                showToast("❌ Error: Pastikan Nomer Production Order atau Nomer IO di isi sebelum submit!")
+            if (!prod_order || !reason || !remarks) {
+                showToast("❌ Error: Pastikan semua masukkan di isi sebelum submit!")
                 return false; // Prevent form submission
             }
 
-            document.getElementById("io_hidden").value = noio;
             document.getElementById("prod_order_hidden").value = prod_order;
+            document.getElementById("reason_hidden").value = reason;
+            document.getElementById("remarks_hidden").value = remarks;
             return true; // Allow form submission
         }
 

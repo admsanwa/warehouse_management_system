@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\JobsModel;
 use App\Models\User;
 use Monolog\Handler\RedisHandler;
+use Str;
 
 class EmployeesController extends Controller
 {
@@ -67,10 +68,11 @@ class EmployeesController extends Controller
     public function update($id, Request $request)
     {
         $user = $request->validate([
-            'username'  => 'required',
-            'nik'       => 'required|numeric:min:3',
+            'username'      => 'required',
+            'nik'           => 'required|numeric:min:3',
             'department'    => 'required',
-            'email' => 'required|unique:users,email,' . $id,
+            'email'         => 'required|unique:users,email,' . $id,
+            'sign'          => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Validate signature file
         ]);
 
         $user                   = User::find($id);
@@ -81,6 +83,23 @@ class EmployeesController extends Controller
             $user->department   = trim($request->department);
             $user->level        = trim($request->level);
             $user->email        = trim($request->email);
+            if ($request->hasFile('sign')) {
+                // Delete old file if exists
+                if ($user->sign && file_exists(public_path('assets/images/sign/' . $user->sign))) {
+                    unlink(public_path('assets/images/sign/' . $user->sign));
+                }
+
+                // Save new file
+                $file      = $request->file('sign');
+                $username   = Str::slug($user->username, '_'); // Safe for filename
+                $timestamp  = now()->setTimezone('Asia/Jakarta')->format('Ymd'); // e.g. 20250801_153045
+                $filename  = $timestamp . '_' . $username . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('assets/images/sign/'), $filename);
+
+                $user->sign = $filename;
+            }
+            // dd($user);
+
             $user->save();
 
             return redirect('admin/employees')->with('success', 'Employees succesfully update');

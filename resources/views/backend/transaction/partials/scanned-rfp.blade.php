@@ -1,8 +1,11 @@
 <form id="stockupForm" action="{{ url("admin/transaction/rfpup")}}" method="post">
     @csrf
     <input type="hidden" name="prod_order" id="po_hidden">
-    <input type="hidden" name="io" id="io_hidden">
     <input type="hidden" name="number" id="number_hidden">
+    <input type="hidden" name="reason" id="reason_hidden">
+    <input type="hidden" name="whse" id="whse_hidden">
+    <input type="hidden" name="project_code" id="projectCode_hidden">
+    <input type="hidden" name="remarks" id="remarks_hidden">
     <div class="table-responsive">
         <table class="table table-striped table-borderd table-sm">
             @if (isset($scannedBarcodes) && $scannedBarcodes->count())
@@ -12,7 +15,8 @@
                         <th>Product Nomer</th>
                         <th>Product Desc</th>
                         <th>Qty</th>
-                        <th>Action</th>
+                        <th>Uom</th>
+                        <th>Delete</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -26,6 +30,7 @@
                             <td>
                                 <input type="number" name="rfp[{{ $index }}][qty]" class="form-control" value="0">
                             </td>
+                            <td>{{ $rfp->items->uom ?? "-" }}</td>
                             <td>
                                 <button type="button" onclick="deleteItem({{ $rfp->id }})" class="btn btn-danger btn-sm">
                                     <i class="fa fa-trash"></i>

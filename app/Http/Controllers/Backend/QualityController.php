@@ -25,7 +25,7 @@ class QualityController extends Controller
             ->orderByDesc('latest_quality_id')
             ->filter($request) // <-- using the scope
             ->get();
-        // dd($getRecord->first()->quality);
+        // dd($getRecord->first()->qualityTwo);
         // dd(DB::getQueryLog());
 
         return view("backend.quality.list", compact("getRecord"));

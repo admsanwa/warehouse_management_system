@@ -40,6 +40,41 @@
 
     @yield('content')
 
+    @if(session('bonPending'))
+    <!-- Modal Notifikasi -->
+    <div class="modal fade" id="bonPendingModal" tabindex="-1" role="dialog" aria-labelledby="bonPendingModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="bonPendingModalLabel">Pending Approval</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <div class="modal-body">
+            You have an unapproved BON!
+          </div>
+
+          <div class="modal-footer">
+            <a href="{{ url('admin/production/clear-bon-notif') }}" class="btn btn-success">Show BON</a>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var myModal = new bootstrap.Modal(document.getElementById('bonPendingModal'));
+        myModal.show();
+    });
+    </script>
+    @endif
+
+
     @include('backend.layouts.footer')
 
     <!-- Control Sidebar -->

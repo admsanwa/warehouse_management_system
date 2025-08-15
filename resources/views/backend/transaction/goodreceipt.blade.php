@@ -73,27 +73,58 @@
 
                     <div class="card-body">
                         <div class="form-group row">
-                            <label for="" class="col-sm-4 col-form-lable">IO :</label>
-                            <div class="col-sm-6">
-                                <select name="io" id="io" class="form-control mt-2" required>
-                                    <option value="">Select Nomer IO</option>
-                                </select>
-                            </div>
                             <label for="" class="col-sm-4 col-form-lable">PO Maklon : </label>
                             <div class="col-sm-6">
                                 <select name="pom" id="pom" class="form-control mt-2" required>
                                     <option value="">Select Nomer Purchase Order Maklon</option>
                                 </select>
                             </div>
-                            <label for="" class="col-sm-4 col-form-lable">Internal No : </label>
-                            <div class="col-sm-6">
-                                <select name="internal_no" id="internal_no" class="form-control mt-2" required>
-                                    <option value="">Select Internal Nomer</option>
-                                </select>
-                            </div>
                             <label for="" class="col-sm-4 col-form-lable">Good Receipt :</label>
                             <div class="col-sm-6">
                                 <input type="number" name="gr" id="gr" value="{{ $gr }}" class="form-control mt-2" readonly required>
+                            </div>
+                            <label for="" class="col-sm-4 col-form-lable">Alasan Goods Receipt :</label>
+                            <div class="col-sm-6">
+                                <input type="text" name="reason" id="reason" class="form-control mt-2" placeholder="Masukkan Alasan Goods Receipt" required>
+                            </div>
+                            <label for="" class="col-sm-4 col-form-lable">Default Warehouse :</label>
+                            <div class="col-sm-6">
+                                <select name="whse" id="whse" class="form-control mt-2">
+                                    <option value="">Select Default Warehouse</option>
+                                    <option value="BK903">BK903</option>
+                                    <option value="BK001">BK001</option>
+                                </select>
+                            </div>
+                            <label for="" class="col-sm-4 col-form-lable">Default Project Code :</label>
+                            <div class="col-sm-6">
+                                <select name="project_code" id="project_code" class="form-control mt-2">
+                                    <option value="">Select Project Code</option>
+                                    <option value="-BKS">-BKS</option>
+                                </select>
+                            </div>
+                            <label for="" class="col-sm-4 col-form-lable">No Surat Jalan :</label>
+                            <div class="col-sm-6">
+                                <input type="text" name="no_surat_jalan" id="no_surat_jalan" class="form-control mt-2" placeholder="Masukkan No Surat Jalan" required>
+                            </div>
+                            <label for="" class="col-sm-4 col-form-lable">No Inventory Transfer :</label>
+                            <div class="col-sm-6">
+                                <input type="number" name="no_inventory_tf" id="no_inventory_tf" class="form-control mt-2" placeholder="Masukkan No Inventory Transfer" required>
+                            </div>
+                            <label for="" class="col-sm-4 col-form-lable">Type Inventory Transaction :</label>
+                            <div class="col-sm-6">
+                                <select name="type_inv_transaction" id="type_inv_transaction" class="form-control mt-2">
+                                    <option value="">Select Type Inventory Transaction</option>
+                                    <option value="for Stock">for Stock</option>
+                                    <option value="for Order">for Order</option>
+                                </select>
+                            </div>
+                            <label for="" class="col-sm-4 col-form-lable">No Surat Jalan Barang Datang :</label>
+                            <div class="col-sm-6">
+                                <input type="text" name="ref_surat_jalan" id="ref_surat_jalan" class="form-control mt-2" placeholder="Masukkan No Surat Jalan Barang Datang" required>
+                            </div>
+                            <label for="" class="col-sm-4 col-form-lable">Remarks :</label>
+                            <div class="col-sm-6">
+                                <input type="text" name="remarks" id="remarks" class="form-control mt-2" placeholder="Masukkan Keterangan" required>
                             </div>
                         </div>
                     </div>
@@ -210,12 +241,8 @@
             .then(res => res.json())
             .then(data => {
                 // console.log("data", data);
-                const ioSelect  = document.getElementById("io");
                 const pomSelect = document.getElementById("pom");
-                const inoSelect = document.getElementById("internal_no");
-                ioSelect.innerHTML = '<option value="">Select Nomer IO</option>';
                 pomSelect.innerHTML = '<option value="">Select Nomer Purchase Order Maklon</option>';
-                inoSelect.innerHTML = '<option value="">Select Internal Nomer</option>'
         
                 document.getElementById("on_hand").value = data.on_hand;
                 document.getElementById("item_desc").value = data.name;
@@ -226,21 +253,6 @@
                     option.textContent = pom;
                     pomSelect.appendChild(option);
                 });
-
-                data.io.forEach(ios => {
-                    const option = document.createElement("option");
-                    option.value = ios;
-                    option.textContent = ios;
-                    ioSelect.appendChild(option);
-                });
-
-
-                data.internal_no.forEach(ino => {
-                    const option = document.createElement("option");
-                    option.value = ino;
-                    option.textContent  = ino;
-                    inoSelect.appendChild(option);
-                })
 
                 // console.log("po", data.no_po, "io", data.io_no, "prod", data.doc_num);
                 loadScannedBarcodes();
@@ -277,9 +289,15 @@
 
         function AddGoodReceiptForm() {
             const po = document.getElementById("pom").value;
-            const io = document.getElementById("io").value;
-            const internal_no   = document.getElementById("internal_no").value;
             const gr = document.getElementById("gr").value;
+            const reason = document.getElementById("reason").value;
+            const projectCode = document.getElementById("project_code").value;
+            const whse  = document.getElementById("whse").value;
+            const no_surat_jalan  = document.getElementById("no_surat_jalan").value;
+            const no_inventory_tf  = document.getElementById("no_inventory_tf").value;
+            const type_inv_transaction  = document.getElementById("type_inv_transaction").value;
+            const ref_surat_jalan  = document.getElementById("ref_surat_jalan").value;
+            const remarks = document.getElementById("remarks").value;
             // console.log("io", io, "po", po, "gr", gr);
 
             if (!po || !gr) {
@@ -287,10 +305,16 @@
                 return false; // Prevent form submission
             }
 
-            document.getElementById("io_hidden").value = io;
             document.getElementById("po_hidden").value = po;
             document.getElementById("gr_hidden").value = gr;
-            document.getElementById("internal_no_hidden").value = internal_no;
+            document.getElementById("reason_hidden").value = reason;
+            document.getElementById("project_hidden").value = projectCode;
+            document.getElementById("whse_hidden").value = whse;
+            document.getElementById("no_surat_jalan_hidden").value = no_surat_jalan;
+            document.getElementById("no_inventory_tf_hidden").value = no_inventory_tf;
+            document.getElementById("type_inv_transaction_hidden").value = type_inv_transaction;
+            document.getElementById("ref_surat_jalan_hidden").value = ref_surat_jalan;
+            document.getElementById("remarks_hidden").value = remarks;
             return true; // Allow form submission
         }
 

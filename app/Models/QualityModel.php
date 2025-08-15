@@ -42,4 +42,9 @@ class QualityModel extends Model
     {
         return $this->belongsTo(ProductionModel::class, 'io', 'io_no')->latest("id");
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'result_by', 'username');
+    }
 }

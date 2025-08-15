@@ -27,27 +27,57 @@
                             <div class="card-body">
                                 <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">Nomor PO</label>
-                                    <div class="col-sm-2">: {{$getRecord->no_po }}</div>
-                                    <label for="" class="col-sm-2 col-form-lable">Buyer</label>
-                                    <div class="col-sm-2">: {{ $getRecord->buyer }}</div>
+                                    <div class="col-sm-4">: {{$getRecord->no_po ?? "-" }}</div>
                                     <label for="" class="col-sm-2 col-form-lable">IO</label>
-                                    <div class="col-sm-2">: {{ $getRecord->io ?? "-" }}</div>
-
+                                    <div class="col-sm-4">: {{ $getRecord->io ?? "-" }}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">Vendor Code</label>
+                                    <div class="col-sm-4">: {{ $getRecord->vendor_code ?? "-" }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Internal No</label>
+                                    <div class="col-sm-4">: {{ $getRecord->internal_no ?? "-" }}</div>
                                 </div>
                                 <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">Vendor</label>
-                                    <div class="col-sm-2">: {{ $getRecord->vendor }}</div>
-                                    <label for="" class="col-sm-2 col-form-lable">Delivery Date</label>
-                                    <div class="col-sm-2">: {{ $getRecord->delivery_date }}</div>
-                                    <label for="" class="col-sm-2 col-form-lable">Internal No</label>
-                                    <div class="col-sm-2">: {{ $getRecord->internal_no ?? "-"}}</div>
-
+                                    <div class="col-sm-4">: {{ $getRecord->vendor ?? "-" }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">No SO</label>
+                                    <div class="col-sm-4">: {{ $getRecord->so ?? "-"}}</div>
+                                </div>
+                                 <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">Vendor Ref No</label>
+                                    <div class="col-sm-4">: {{ $getRecord->vendor_ref_no ?? "-" }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Approved By</label>
+                                    <div class="col-sm-4">: {{ $getRecord->approved_by ?? "-" }}</div>
                                 </div>
                                 <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">Contact Person</label>
-                                    <div class="col-sm-2">: {{ $getRecord->contact_person }}</div>
+                                    <div class="col-sm-4">: {{ $getRecord->contact_person ?? "-" }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Knowing By</label>
+                                    <div class="col-sm-4">: {{ $getRecord->knowing_by ?? "-" }}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">Buyer</label>
+                                    <div class="col-sm-4">: {{ $getRecord->buyer ?? "-" }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Contract</label>
+                                    <div class="col-sm-4">: {{ $getRecord->contract ?? "-" }}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">Posting Date</label>
+                                    <div class="col-sm-4">: {{ $getRecord->posting_date ?? "-" }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Contract Addendum</label>
+                                    <div class="col-sm-4">: {{ $getRecord->contract_addendum ?? "-" }}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">Account Code</label>
+                                    <div class="col-sm-4">: {{ $getRecord->acct_code ?? "-" }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Distr. Rule</label>
+                                    <div class="col-sm-4">: {{ $getRecord->distr_rule ?? "-" }}</div>
+                                </div>
+                                <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">Status</label>
-                                    <div class="col-sm-2">: {{ $getRecord->status == "Open" ? 'Open' : 'Closed' }}</div>
+                                    <div class="col-sm-4">: {{ $getRecord->status == "Open" ? 'Open' : 'Closed' }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Note</label>
+                                    <div class="col-sm-4">: {{ $getRecord->note ?? "-" }}</div>
                                 </div>
                             </div>
                         </div>
@@ -90,10 +120,14 @@
                             </div>
                             <div class="card-footer">
                                 <a href="{{ url('admin/purchasing') }}" class="btn btn-default">Back</a>
-                                @if (stripos($pos->item_code, "Maklon") !== false)
+                                @if ($getRecord->status == "Open" && stripos($pos->item_code, "Maklon") !== false)
                                     <a href="{{ url("admin/transaction/goodissued")}}" class="btn btn-success">Good Issue</a>
-                                @else
+                                @elseif ($getRecord->status == "GR")
+                                    <a href="{{ url("admin/transaction/goodreceipt") }}" class="btn btn-success">Good Receipt</a>
+                                @elseif ($getRecord->status == "Open")
                                     <a href="{{ url("admin/transaction/stockin/" . $getPO)}}" class="btn btn-success">Scan Barcode</a>
+                                @else
+                                    Closed
                                 @endif
                             </div>
                         </div>

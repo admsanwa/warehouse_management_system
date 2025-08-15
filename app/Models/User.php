@@ -63,7 +63,7 @@ class User extends Authenticatable
             $return = $return->where('email', '=', Request::get('email'));
         }
 
-        $return = $return->orderBy('id', 'desc')->paginate(5);
+        $return = $return->orderBy('id', 'desc')->paginate(10);
         return $return;
     }
 

@@ -2,116 +2,6 @@
 
 @section('content')
 <style>
-   body {
-        font-family: Arial, sans-serif;
-        color: #000;
-        margin: 0;
-        padding: 0;
-    }
-
-    .memo-container {
-        width: 210mm;
-        min-height: 297mm;
-        margin: 0 auto;
-        padding: 20mm;
-        background: #fff;
-        box-shadow: 0 0 5px 5px rgba(0,0,0,0.1);
-        border: 1px solid #ddd;
-    }
-
-    @media print {
-        @page {
-            size: A4;
-            margin: 20mm;
-        }
-
-        body {
-            margin: 0;
-        }
-
-        #no-print {
-            display: none;
-        }
-
-        .memo-container {
-            margin: 0;
-            width: 95%;
-            padding: 10mm 10mm; /* inner padding (print safe zone) */
-            box-sizing: border-box;
-        }
-
-        footer,
-        #main-footer,
-        .footer {
-            display: none !important;
-        }
-    }
-
-    .memo-header {
-        border-bottom: 2px solid #000;
-        padding-bottom: 10px;
-        margin-bottom: 20px;
-    }
-
-    .memo-header img {
-        max-height: 60px;
-    }
-
-    .company-address {
-        font-size: 12px;
-        color: #555;
-    }
-
-    h4.memo-title {
-        text-align: center;
-        text-decoration: underline;
-        font-weight: bold;
-        margin: 20px 0;
-    }
-
-    .table-borderless td {
-        padding: 5px 10px;
-    }
-
-    .details-table th {
-        background-color: #f2f2f2;
-        text-align: center;
-    }
-
-    .details-table td {
-        vertical-align: top;
-    }
-
-    .signature-block {
-        margin-top: 50px;
-    }
-
-    .signature-name {
-        margin-top: 80px;
-        font-weight: bold;
-        text-decoration: underline;
-    }
-
-    .btn-print {
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
-
-    .signature-name {
-        font-size: 14px;
-        margin-top: 4px;
-    }
-
-    .signature-dept {
-        font-size: 13px;
-        color: #6c757d;
-    }
-
-    .img-sign img {
-        border-bottom: 1px solid #ccc;
-        padding-bottom: 4px;
-    }
-
     .box {
         display: inline-block;
         min-width: 180px;
@@ -139,6 +29,7 @@
             <div class="box">
                 <div class="d-flex justify-content-between">
                     <span>No :</span>
+                    <input type="hidden" id="no_bon" value="{{ $bon->no }}">
                     <span>{{ $bon->no }}</span>
                 </div>
                 <div class="d-flex justify-content-between">
@@ -196,50 +87,52 @@
 
 
     <div class="signature-block row mt-5">
-        <div class="col md-4 text-center">
-            <div class="fw-bold mb-1">Hormat Kami,</div>
-            <div class="img-sign mb-2"><img src="{{ asset('assets/images/sign/delvi.png')}}" width="100" alt="sign"></div>
-            <div class="signature-name fw-semibold">( DELVI WINOSRI )</div>
-            <div class="signature-dept text-muted small">Procurement, Installation and Delivery</div>
+        @if ($signApprove)
+            <div class="col md-4 text-center col-sign" style="display: {{ $signApprove->sign === 1 ? 'block' : 'none'}}">
+            <div class="fw-bold mb-1">Disetujui Oleh,</div>
+            <div class="img-sign mb-2"><img src="{{ asset('assets/images/sign/' . $signApprove->user->sign) }}" width="100" height="65" alt="sign"></div>
+            <div class="signature-name fw-semibold">{{( $signApprove->user->fullname )}}</div>
+            <div class="signature-dept text-muted small">{{ $signApprove->user->department }}</div>
         </div>
-        <div class="col md-4 text-center col-sign" style="display: {{ $getSign === 1 ? 'block' : 'none'}}">
-            <div class="fw-bold mb-1">Mengetahui,</div>
-            <div class="img-sign mb-2"><img src="{{ asset('assets/images/sign/benny.png')}}" width="100" alt="sign"></div>
-            <div class="signature-name fw-semibold">( BENNY THIOWIJAYA )</div>
-            <div class="signature-dept text-muted small">West Production and Warehouse Team</div>
+        @endif
+        @if ($signBuyer)
+            <div class="col md-4 text-center col-sign" style="display: {{ $signBuyer->sign === 1 ? 'block' : 'none'}}">
+            <div class="fw-bold mb-1">Bagian Pembeli,</div>
+            <div class="img-sign mb-2"><img src="{{ asset('assets/images/sign/' . $signBuyer->user->sign)}}" width="100" height="65" alt="sign"></div>
+            <div class="signature-name fw-semibold">{{( $signBuyer->user->fullname )}}</div>
+            <div class="signature-dept text-muted small">{{ $signBuyer->user->department }}</div>
         </div>
-         <div class="col md-4 text-center col-sign" style="display: {{ $getSign === 1 ? 'block' : 'none'}}">
+        @endif
+        <div class="col md-4 text-center col-sign">
             <div class="fw-bold mb-1">Pemesan,</div>
-            <div class="img-sign mb-2"><img src="{{ asset('assets/images/sign/benny.png')}}" width="100" alt="sign"></div>
-            <div class="signature-name fw-semibold">( BENNY THIOWIJAYA )</div>
-            <div class="signature-dept text-muted small">West Production and Warehouse Team</div>
-        </div>
-        <div class="col md-4 text-center col-backup" style="display: {{ $getSign === 1 ? 'none' : 'block'}}">
+            <div class="img-sign mb-2"><img src="{{ asset('assets/images/sign/' . $bon->createdBy->sign) }}" width="100" height="65" alt="sign"></div>
+            <div class="signature-name fw-semibold">{{( $bon->createdBy->fullname )}}</div>
+            <div class="signature-dept text-muted small">{{ $bon->createdBy->department }}</div>
         </div>
     </div>
-
     <div id="no-print">
         <button class="btn btn-primary btn-print" onclick="window.print()">
             <i class="fa fa-print"></i> Print Memo
         </button>
-        <button class="btn btn-success" onclick="approve()" style="display: {{ $user === '05993' ? 'block' : 'none'}}">
-            <i class="fa fa-check-circle">Approve</i>
+        <button class="btn btn-success" onclick="approve()" style="display: {{ ($user->nik === '250071' || $user->nik === '08517' || $user->nik === '06067') ? 'block' : 'none'}}">
+            <i class="fa fa-check-circle"> Approve</i>
         </button>
     </div>
 </div>
 <script>
     function approve() {
-        const no_memo = document.getElementById("no_memo").value;
-        if(!confirm("Are you sure ask approve to production?")) return;
+        const no_bon = document.getElementById("no_bon").value;
+        // console.log("no", no_bon);
+        if(!confirm("Are you sure approve to bon this?")) return;
 
-        fetch("/approve-memo", {
+        fetch("/approve-bon", {
             method: "POST",
             headers: {
                 "Content-Type" : "application/json",
                 "Accept": "application/json",
                 "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             },
-            body: JSON.stringify({ no_memo: no_memo })
+            body: JSON.stringify({ no_bon: no_bon })
         })
         .then(res => res.json())
         .then(data => {

@@ -25,14 +25,52 @@
                             </div>
                             <div class="card-body">
                                 <div class="form-group row">
-                                    <label for="" class="col-sm-3 col-form-lable">Nomer IO :</label>
-                                    <div class="col-sm-3">{{ $getRecord->io }}</div>
-                                    <label for="" class="col-sm-3 col-form-lable">Purchase Order :</label>
-                                    <div class="col-sm-3">{{ $getRecord->po }}</div>
-                                    <label for="" class="col-sm-3 col-form-lable">Internal No :</label>
-                                    <div class="col-sm-3">{{ $getRecord->internal_no }}</div>
-                                    <label for="" class="col-sm-3 col-form-lable">Scanned By :</label>
-                                    <div class="col-sm-3">{{ $getRecord->user->fullname }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Number</label>
+                                    <div class="col-sm-2">: {{ $getRecord->gr }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Warehouse</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_receipt->whse }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Project Code</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_receipt->project_code }}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">Vendor Code</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_receipt->vendor_code }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Distr. Rule</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_receipt->distr_rule }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Internal No</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_receipt->internal_no }}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">Posting Date</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_receipt->updated_at }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">No PO</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_receipt->po }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">IO</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_receipt->io }}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">SO</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_receipt->so }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">No Inv Transfer</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_receipt->no_inventory_tf }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Type Inv Transaction</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_receipt->type_inv_transaction }}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">Surat Jalan</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_receipt->no_surat_jalan }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">SJ Barang Datang</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_receipt->ref_surat_jalan }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Refer No Good Issue</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_receipt->no_gi }}</div>
+                                </div>
+                                  <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">Account Code</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_receipt->acct_code }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Reason</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_receipt->reason }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Remarks</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_receipt->remarks }}</div>
                                 </div>
                             </div>
                         </div>        
