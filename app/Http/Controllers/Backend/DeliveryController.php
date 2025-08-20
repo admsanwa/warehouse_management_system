@@ -13,13 +13,13 @@ class DeliveryController extends Controller
     public function index(Request $request)
     {
         $getRecord = ProductionModel::with(['delivery', 'quality'])
-            ->where('status', 2)
+            ->where('status', "Closed")
             ->whereHas('quality', function ($q) {
                 $q->where('result', 1);
             })
             ->filter($request)
             ->orderBy('id', 'desc')
-            ->get();
+            ->paginate(10);
         // dd($request);
 
         return view("backend.delivery.list", compact('getRecord'));

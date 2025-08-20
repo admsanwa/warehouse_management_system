@@ -75,8 +75,20 @@
                                         </thead>
                                         <tbody>
                                             @forelse ($getRecord as $quality)
-                                                <tr>
-                                                    <td>{{ $loop->iteration }}</td>
+                                                <tr class="
+                                                    @if($quality->qualityTwo && $quality->qualityTwo->result === 3)
+                                                        table-primary
+                                                    @else
+                                                        ''
+                                                    @endif
+                                                ">
+                                                    <td>
+                                                        @if($quality->qualityTwo && $quality->qualityTwo->result === 3)
+                                                            <i class="fa fa-circle text-primary ms-2"
+                                                            style="font-size:10px; margin-right:10px;"
+                                                            title="Need Approval"></i>
+                                                        @endif
+                                                            {{ $loop->iteration }}</td>
                                                     <td>
                                                         @if ($quality->prod_no)
                                                            <a style="background-color: #e9e9ff" href="{{ url("admin/production/" . $quality->prod_no)}}">{{ $quality->prod_no }}</a> 
@@ -104,7 +116,7 @@
                                                     <td><a href="#" data-bs-toggle="modal" data-bs-target="#modal_{{ $quality->id }}"><i class="fa fa-eye"></i> Check</a></td>
                                                 </tr>
 
-                                                @include('partials.modal.assessment', ['quality' => $quality])
+                                                @include('partials.modal.assessment', ['quality' => $quality], ['user' => $user])
                                             @empty
                                                 <tr>
                                                     <td colspan="100%">No Record Found</td>
@@ -116,8 +128,8 @@
                             </div>
                             <div class="card-footer">
                                 <div class="d-flex justify-content-end px-2 py-2">
-                                    <div class="overflow-x:auto; max-width:100px">
-                                        {{-- {!! $getRecord->onEachSide(1)->appends(request()->except('page'))->links() !!} --}}
+                                    <div style="overflow-x:auto; max-width:100px">
+                                        {!! $getRecord->onEachSide(1)->appends(request()->except('page'))->links() !!}
                                     </div>
                                 </div>
                             </div>

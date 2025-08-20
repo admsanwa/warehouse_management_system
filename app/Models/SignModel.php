@@ -15,4 +15,9 @@ class SignModel extends Model
     {
         return $this->belongsTo(SignModel::class, 'no_memo', 'no');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'nik', 'nik');
+    }
 }

@@ -56,6 +56,7 @@
                                                 <th>No</th>
                                                 <th>Product Nomer</th>
                                                 <th>Description</th>
+                                                <th>IO</th>
                                                 <th>Qty</th>
                                                 <th>Action</th>
                                             </tr>
@@ -74,6 +75,7 @@
                                                             {{ $barcode->prod_desc }}
                                                             <input type="hidden" name="prod_desc" value="{{ $barcode->prod_desc }}">
                                                         </td>
+                                                        <td>{{ $barcode->io_no }}</td>
                                                         <td>
                                                             <input type="number" name="qty" style="width: 70px;" class="form-control" required>
                                                         </td>
@@ -96,7 +98,7 @@
                             <div class="card-footer">
                                 <div class="d-flex justify-content-end px-2 py-2">
                                     <div class="overflow-x:auto max-width:100px">
-
+                                         {!! $getRecord->onEachSide(1)->appends(request()->except('page'))->links() !!}
                                     </div>
                                 </div>
                             </div>

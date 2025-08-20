@@ -75,35 +75,43 @@
     <p>Demikian hal ini kami sampaikan, atas perhatiannya kami ucapkan terima kasih.</p>
 
     <div class="signature-block row mt-5">
-        <div class="col md-4 text-center">
-            <div class="fw-bold mb-1">Hormat Kami,</div>
-            <div class="img-sign mb-2"><img src="{{ asset('assets/images/sign/delvi.png')}}" width="100" alt="sign"></div>
-            <div class="signature-name fw-semibold">( DELVI WINOSRI )</div>
-            <div class="signature-dept text-muted small">Procurement, Installation and Delivery</div>
-        </div>
-        <div class="col md-4 text-center col-sign" style="display: {{ $getSign === 1 ? 'block' : 'none'}}">
+         @if ($signProd)
+            <div class="col md-4 text-center col-sign" style="display: {{ $signProd->sign === 1 ? 'block' : 'none'}}">
             <div class="fw-bold mb-1">Mengetahui,</div>
-            <div class="img-sign mb-2"><img src="{{ asset('assets/images/sign/benny.png')}}" width="100" alt="sign"></div>
-            <div class="signature-name fw-semibold">( BENNY THIOWIJAYA )</div>
-            <div class="signature-dept text-muted small">West Production and Warehouse Team</div>
+            <div class="img-sign mb-2"><img src="{{ asset('assets/images/sign/' . $signProd->user->sign)}}" width="100" height="65" alt="sign"></div>
+            <div class="signature-name fw-semibold">{{( $signProd->user->fullname )}}</div>
+            <div class="signature-dept text-muted small">{{ $signProd->user->department }}</div>
         </div>
-        <div class="col md-4 text-center col-backup" style="display: {{ $getSign === 1 ? 'none' : 'block'}}">
+        @endif
+        @if ($signApprove)
+            <div class="col md-4 text-center col-sign" style="display: {{ $signApprove->sign === 1 ? 'block' : 'none'}}">
+            <div class="fw-bold mb-1">Disetujui Oleh,</div>
+            <div class="img-sign mb-2"><img src="{{ asset('assets/images/sign/' . $signApprove->user->sign) }}" width="100" height="65" alt="sign"></div>
+            <div class="signature-name fw-semibold">{{( $signApprove->user->fullname )}}</div>
+            <div class="signature-dept text-muted small">{{ $signApprove->user->department }}</div>
+        </div>
+        @endif
+        <div class="col md-4 text-center col-sign">
+            <div class="fw-bold mb-1">Dibuat Oleh,</div>
+            <div class="img-sign mb-2"><img src="{{ asset('assets/images/sign/' . $memo->createdBy->sign) }}" width="100" height="65" alt="sign"></div>
+            <div class="signature-name fw-semibold">{{( $memo->createdBy->fullname )}}</div>
+            <div class="signature-dept text-muted small">{{ $memo->createdBy->department }}</div>
         </div>
     </div>
-
+    
     <div id="no-print">
         <button class="btn btn-primary btn-print" onclick="window.print()">
             <i class="fa fa-print"></i> Print Memo
         </button>
-        <button class="btn btn-success" onclick="approve()" style="display: {{ $user === '05993' ? 'block' : 'none'}}">
-            <i class="fa fa-check-circle">Approve</i>
+        <button class="btn btn-success" onclick="approve()" style="display: {{ ($user->nik === '05993' || $user->nik === '06067') ? 'block' : 'none'}}">
+            <i class="fa fa-check-circle"> Approve</i>
         </button>
     </div>
 </div>
 <script>
     function approve() {
         const no_memo = document.getElementById("no_memo").value;
-        if(!confirm("Are you sure ask approve to production?")) return;
+        if(!confirm("Are you sure approve this memo?")) return;
 
         fetch("/approve-memo", {
             method: "POST",

@@ -31,7 +31,7 @@ class RFPModel extends Model
             $return = $return->where('prod_desc', 'LIKE', '%' . Request::get('prod_desc') . '%');
         }
 
-        return $return->orderByDesc("id")->paginate(5);
+        return $return->orderByDesc("id");
     }
 
     public function production()

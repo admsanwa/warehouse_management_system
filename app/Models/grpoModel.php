@@ -18,6 +18,9 @@ class grpoModel extends Model
         'vendor_ref_no',
         'io',
         'so',
+        'internal_no',
+        'whse',
+        'note',
         'remarks'
     ];
 }

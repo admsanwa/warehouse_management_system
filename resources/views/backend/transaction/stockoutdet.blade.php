@@ -77,9 +77,9 @@
                                                    <td>{{ $loop->iteration }}</td>
                                                    <td>{{ $stockout->item->code }}</td>
                                                    <td>{{ $stockout->item->name }}</td>
-                                                   <td>{{ $stockout->on_hand + $stockout->qty}}</td>
+                                                   <td>{{ $stockout->stock + $stockout->stock_in }}</td>
                                                    <td>{{ $stockout->qty }}</td>
-                                                   <td>{{ $stockout->on_hand }}</td>
+                                                   <td>{{ ($stockout->stock + $stockout->stock_in) - $stockout->stock_out }}</td>
                                                    <td>{{ $stockout->item->uom }}</td>
                                                 </tr>
                                                @endforeach

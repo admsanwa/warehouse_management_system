@@ -45,9 +45,9 @@
                                             <label for="">Product Desc</label>
                                             <input type="text" name="prod_desc" class="form-control" placeholder="Enter Product Description">
                                         </div>
-                                         <div class="form-group col-md-2">
-                                            <button type="submit" class="btn btn-primary" style="margin-top: 30px"><i class="fa fa-search"></i> Search</button>
-                                            <a href="{{ url('admin/production/po')}}" class="btn btn-warning" style="margin-top: 30px"><i class="fa fa-eraser"></i> Reset</a>
+                                         <div class="form-group col-md-3">
+                                            <button type="submit" class="btn btn-primary" style="margin-top: 20px"><i class="fa fa-search"></i> Search</button>
+                                            <a href="{{ url('admin/production/po')}}" class="btn btn-warning" style="margin-top: 20px"><i class="fa fa-eraser"></i> Reset</a>
                                         </div>
                                     </div>
                                 </div>

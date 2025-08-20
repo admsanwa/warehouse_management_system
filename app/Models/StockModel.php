@@ -37,7 +37,7 @@ class StockModel extends Model
             });
         }
 
-        return $query->paginate(5);
+        return $query->paginate(10);
     }
 
     static public function getData()

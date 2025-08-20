@@ -37,7 +37,7 @@
                                             <label for="">Item Description</label>
                                             <input type="text" name="item_desc" class="form-control" value="{{ Request()->item_desc }}" placeholder="Enter Item Desc">
                                         </div>
-                                        <div class="form-group col-md-2">
+                                        <div class="form-group col-md-3">
                                             <button type="submit" class="btn btn-primary" style="margin-top: 30px"><i class="fa fa-search"></i> Search</button>
                                             <a href="{{ url('admin/stock') }}" class="btn btn-warning" style="margin-top: 30px"><i class="fa fa-eraser"></i>Reset</a>
                                         </div>
@@ -65,6 +65,7 @@
                                                 <th>Stock In</th>
                                                 <th>Stock Out</th>
                                                 <th>Available</th>
+                                                <th>Uom</th>
                                             </tr>
                                         </thead>
 
@@ -76,7 +77,8 @@
                                             <td>{{ $stock->stock }}</td>
                                             <td>{{ $stock->stock_in }}</td>
                                             <td>{{ $stock->stock_out }}</td>
-                                            <td>{{ $stock->on_hand }}</td>
+                                            <td>{{ ($stock->stock + $stock->stock_in) - $stock->stock_out }}</td>
+                                            <td>{{ $stock->item->uom }}</td>
                                            </tr>
                                        @empty
                                            <tr>

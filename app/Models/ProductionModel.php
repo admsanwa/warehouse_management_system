@@ -29,7 +29,7 @@ class ProductionModel extends Model
             $return = $return->where('doc_num', 'LIKE', '%' . Request::get('doc_num') . '%');
         }
 
-        $return = $return->orderBy('id', 'desc')->paginate(5);
+        $return = $return->orderBy('id', 'desc')->paginate(10);
         return $return;
     }
 

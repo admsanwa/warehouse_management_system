@@ -62,17 +62,23 @@
                                                 <th>Project</th>
                                                 <th>IO</th>
                                                 <th>Due Date</td>
+                                                <td>Status</td>
                                                 <th>Details</th>
                                             </tr>
                                         </thead>
                                         @forelse ($getRecord as $memo)
                                             <tbody>
-                                                <tr>
-                                                    <td>{{ $memo->no }}</td>
+                                                <tr class="{{ $memo->highlight ? 'table-primary' : '' }}">
+                                                    <td>
+                                                        @if($memo->highlight)
+                                                            <i class="fa fa-circle text-primary ms-2" style="font-size:10px; margin-right:10px;" title="Recommended"></i>
+                                                        @endif
+                                                        {{ $memo->no }}</td>
                                                     <td>{{ $memo->description }}</td>
                                                     <td>{{ $memo->project }}</td>
                                                     <td>{{ $memo->io }}</td>
                                                     <td>{{ $memo->due_date }}</td>
+                                                    <td>{{ $memo->status }}</td>
                                                     <td>
                                                         <a href="{{ url('admin/production/memodetails/' . $memo->id) }}" class="btn btn-primary"><div class="fa fa-eye"></div></a>
                                                     </td>

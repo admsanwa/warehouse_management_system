@@ -33,7 +33,7 @@
                                             <label for="">Item Name</label>
                                             <input type="text" class="form-control" value="{{ Request()->name }}" name="name" placeholder="Enter Items Name">
                                         </div>
-                                        <div class="form-group col-md-2">
+                                        <div class="form-group col-md-3">
                                             <button type="submit" class="btn btn-primary" style="margin-top: 30px;"><i class="fa fa-search"></i> Search</button>
                                             <a href="{{ url('admin/dashboard/minstock')}}" class="btn btn-warning" style="margin-top: 30px;"><i class="fa fa-eraser"></i> Reset</a>
                                         </div>
@@ -64,26 +64,30 @@
                                                 <th>Update</th>
                                             </tr>
                                         </thead>
-                                        @forelse ($getRecord as $items)
-                                            <tbody>
+                                       <tbody>
+                                            @foreach ($getRecord as $items)
+                                                @php
+                                                    $available = $items->in_stock + $items->last_in - $items->last_out;
+                                                @endphp
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $items->code }}</td>
                                                     <td>{{ $items->name }}</td>
-                                                    {{-- <td>{{ $items->group == 1 ? 'Raw Material' : ($items->group == 2 ? 'Part Other' : ($items->group == 3 ? 'Unknown' : 'Null')) }}</td> --}}
-                                                    <td>{{ $items->uom == 1 ? 'Pcs' : ($items->uom == 2 ? 'Unit' : 'Unknown')}}</td>
+                                                    <td>{{ $items->uom ? $items->uom : '-'}}</td>
                                                     <td>{{ $items->stock_min }}</td>
                                                     <td>{{ $items->in_stock }}</td>
-                                                    <td>{{ $items->stocks->on_hand ?? 0}}</td>
-                                                    <td>{{ $items->stock_min > ($items->stocks->on_hand ?? 0)  ? "Stock harus dibeli" : "-" }}</td>
+                                                    <td>{{ $available }}</td>
+                                                    <td>{{ $items->stock_min >= $available ? "Stock harus dibeli" : "-" }}</td>
                                                     <td>{{ \Carbon\Carbon::parse($items->updated_at)->format('Y-m-d') }}</td>
                                                 </tr>
-                                                @empty
-                                                <tr>
-                                                    <td colspan="100%">No Record Found</td>
-                                                </tr>
+                                            @endforeach
+
+                                            @if ($getRecord->isEmpty())
+                                            <tr>
+                                                <td colspan="100%">No Record Found</td>
+                                            </tr>
+                                            @endif
                                             </tbody>
-                                        @endforelse
                                     </table>
                                 </div>
                                 <div class="card-footer">

@@ -10,7 +10,13 @@ class ReportsController extends Controller
 {
     public function finish_goods(Request $request)
     {
-        $getRecord = RFPModel::getRecord($request);
+        $getRecord = RFPModel::getRecord($request)->where("prod_no", "LIKE", "SI%")->paginate(10);
         return view('backend.reports.finishgoods', compact('getRecord'));
+    }
+
+    public function semifg(Request $request)
+    {
+        $getRecord = RFPModel::getRecord($request)->where("prod_no", "NOT LIKE", "SI%")->paginate(10);
+        return view("backend.reports.semifg", compact("getRecord"));
     }
 }
