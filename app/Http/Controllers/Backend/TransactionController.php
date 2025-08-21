@@ -19,11 +19,45 @@ use App\Models\StockModel;
 use Illuminate\Http\Request;
 use illuminate\support\facades\Auth;
 use phpDocumentor\Reflection\Types\Null_;
+use App\Services\SapService;
+use Illuminate\Support\Arr;
 
 class TransactionController extends Controller
 {
     // stock in
+    protected $sap;
+
+    public function __construct(SapService $sap)
+    {
+        $this->sap = $sap;
+    }
+
     public function stock_in(Request $request)
+    {
+        $po       = $request->get('po');
+        $docEntry = $request->get('docEntry');
+        $poData   = [];
+
+        // if ($po && $docEntry) {
+        //     $param = [
+        //         "page"     => (int) $request->get('page', 1),
+        //         "limit"    => (int) $request->get('limit', 10),
+        //         "DocNum"   => $po,
+        //         "DocEntry" => $docEntry,
+        //     ];
+
+        //     $get_po = $this->sap->getPurchaseOrders($param);
+
+        //     if (Arr::get($get_po, 'success')) {
+        //         $poData = Arr::get($get_po, 'data.0', []);
+        //     }
+        // }
+
+        return view('api.transaction.stockin', compact('po', 'docEntry'));
+    }
+
+
+    public function stock_in_old(Request $request)
     {
         $temp           = StockModel::where('is_temp', true)->orderByDesc('id')->first();
         $latestStock    = StockModel::whereNotNull('grpo')->orderByDesc('id')->first();
@@ -49,10 +83,89 @@ class TransactionController extends Controller
         }
         $getPos         = null;
         $getPos = PurchasingModel::where("no_po", $po)->first();
-        return view('backend.transaction.stockin', compact('grpo', 'getPos'));
+        return view('api.transaction.stockin', compact('grpo', 'getPos'));
     }
 
     public function scan_and_store(Request $request)
+    {
+        $warehouse = "BK001";
+        $barcode    = $request->input("item_code");
+        $po    = $request->input("po");
+        $docEntry    = $request->input("docEntry");
+
+        $items      = $this->sap->getStockItems(['ItemCode' => $barcode, "WhsCode" => $warehouse, "Limit" => 1, "Page" => 1]);
+        if ($items['success'] !== true) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal terhubung dengan data SAP, silakan coba beberapa saat lagi'
+            ]);
+        }
+        if ($items['total'] === 0) {
+            return response()->json([
+                'success' => false,
+                'message' => "Produk tidak ditemukan untuk barcode: " . $barcode . ". Pastikan produk sesuai dan Scan kembali!"
+            ]);
+        }
+        $poParam = [
+            "page"     => 1,
+            "limit"    => 50,
+            "ItemCode" => $barcode
+        ];
+        if ($docEntry) {
+            $poParam['DocEntry'] = $docEntry;
+        }
+        if ($po) {
+            $poParam['DocNum'] = $po;
+        }
+        $get_po = $this->sap->getPurchaseOrders($poParam);
+
+        if (!Arr::get($get_po, 'success')) {
+            return response()->json([
+                'success' => false,
+                'message' => "Nomor PO tidak ditemukan untuk barcode: " . $barcode . ". Pastikan produk sesuai dan Scan kembali!"
+            ]);
+        }
+        if ($docEntry && $po) {
+            $poData = Arr::get($get_po, 'data.0', []);
+        } else {
+            $poData = Arr::get($get_po, 'data', []);
+        }
+        $item = Arr::get($items, 'data.0', []);
+        $warehouseStock = collect($item['warehouses'])->firstWhere('WhsCode', $warehouse);
+
+
+        // $poDetails      = PurchaseOrderDetailsModel::where("item_code", $barcode)->pluck('nopo')->unique()->toArray();
+        // $purchaseOrders = PurchasingModel::select("no_po")->where("status", "Open")->whereIn('no_po', $poDetails)->distinct()->get();
+        // $latestOnhand   = StockModel::where("item_code", $items->code)->whereNotNull("on_hand")->orderByDesc('id')->value("on_hand") ?? 0;
+        // $latestStock    = StockModel::where("item_code", $items->code)->whereNotNull("stock")->orderByDesc("id")->value("stock") ?? 0;
+        // $latestStockOut = StockModel::where("item_code", $items->code)->whereNotNull("stock_out")->orderByDesc("id")->value("stock_out") ?? 0;
+        // $user           = Auth::user()->id;
+
+        // save db
+        // $stock              = new StockModel();
+        // $stock->grpo        = trim($request->input("grpo"));
+        // $stock->item_code   = $items->code;
+        // $stock->stock       = $latestStock;
+        // $stock->stock_out   = $latestStockOut;
+        // $stock->scanned_by  = $user;
+        // $stock->is_temp     = true;
+        // $stock->save();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success'   => true,
+                'itemCode' => $item['ItemCode'],
+                'ItemName' => $item['ItemName'],
+                'warehouseStock' => $warehouseStock,
+                'items' => $items,
+                'poData' => $poData,
+                // 'Po_details'    => $poDetails,
+                'message'   => 'Item berhasil di scan!'
+            ]);
+        }
+    }
+
+    public function scan_and_store_old(Request $request)
     {
         $barcode    = $request->input("item_code");
         $items      = ItemsModel::where('code', $barcode)->first();
@@ -102,6 +215,93 @@ class TransactionController extends Controller
     }
 
     public function stock_up(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'no_po'        => 'required',
+                'grpo'         => 'required',
+                'cardName'     => 'required',
+                'cardCode'     => 'required',
+                'docDate'      => 'required|date',
+                'remarks'      => 'required|string',
+                'numAtCard'    => 'nullable|string',
+                'U_MEB_NO_IO'  => 'nullable|string',
+                'U_MEB_No_SO'  => 'nullable|string',
+                'stocks'                       => 'required|array|min:1',
+                'stocks.*.BaseEntry'           => 'nullable',
+                'stocks.*.LineNum'             => 'required',
+                'stocks.*.ItemCode'            => 'required|string',
+                'stocks.*.Dscription'          => 'nullable|string',
+                'stocks.*.qty'                 => 'required|numeric|min:1',
+                'stocks.*.PriceBefDi'          => 'nullable|numeric',
+                'stocks.*.DiscPrcnt'           => 'nullable|numeric',
+                'stocks.*.VatGroup'            => 'nullable|string',
+                'stocks.*.AcctCode'            => 'nullable|string',
+                'stocks.*.OcrCode'             => 'nullable|string',
+                'stocks.*.FreeText'            => 'nullable|string',
+                'stocks.*.UnitMsr'             => 'nullable|string',
+            ]);
+
+            // Header
+            $postData = [
+                'CardCode'     => $validated['cardCode'],
+                'CardName'     => $validated['cardName'],
+                'DocDate'      => $validated['docDate'],
+                'NumAtCard'    => $validated['numAtCard'] ?? null,
+                'Comments'     => $validated['remarks'],
+                'U_MEB_NO_IO'  => $validated['U_MEB_NO_IO'] ?? null,
+                'U_MEB_No_SO'  => $validated['U_MEB_No_SO'] ?? null,
+                'Lines'        => []
+            ];
+
+            // Detail
+            $lines = [];
+            foreach ($validated['stocks'] as $row) {
+                $lines[] = [
+                    'BaseEntry'   => $row['BaseEntry'] ?? null,
+                    'BaseLineNum' => $row['LineNum'] ?? null,
+                    'ItemCode'    => $row['ItemCode'],
+                    'Dscription'  => $row['Dscription'] ?? null,
+                    'Quantity'    => $row['qty'],
+                    'PriceBefDi'  => $row['PriceBefDi'] ?? null,
+                    'DiscPrcnt'   => $row['DiscPrcnt'] ?? null,
+                    'VatGroup'    => $row['VatGroup'] ?? null,
+                    'AcctCode'    => $row['AcctCode'] ?? null,
+                    'OcrCode'     => $row['OcrCode'] ?? null,
+                    'FreeText'    => $row['FreeText'] ?? null,
+                    'UnitMsr'     => $row['UnitMsr'] ?? null,
+                ];
+            }
+            $postData['Lines'] = $lines;
+
+            // TODO: Simpan ke database atau kirim ke API SAP
+            $post_grpo = $this->sap->postGrpo($postData);
+            if (!isset($post_grpo['success']) || $post_grpo['success'] === false) {
+                throw new \Exception($post_grpo['message'] ?? 'SAP GRPO failed without message');
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Telah berhasil menambahkan item yang sudah di scan',
+                'request' => $postData,
+                'response' => $post_grpo,
+            ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors'  => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
+    public function stock_up_old(Request $request)
     {
         $validated = $request->validate([
             'stocks'        => 'required|array',

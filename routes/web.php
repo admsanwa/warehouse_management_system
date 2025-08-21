@@ -75,8 +75,11 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('admin/items/upload', [ItemsController::class, 'upload']);
 
     // Purchasing
+    Route::get('admin/purchasing_old', [PurchasingController::class, 'old_index']);
+    Route::get('admin/purchasing/view_old/{id}', [PurchasingController::class, 'old_view']);
+
     Route::get('admin/purchasing', [PurchasingController::class, 'index']);
-    Route::get('admin/purchasing/view/{id}', [PurchasingController::class, 'view']);
+    Route::get('admin/purchasing/view', [PurchasingController::class, 'view']);
     Route::get('admin/purchasing/upload', [PurchasingController::class, 'upload_form']);
     Route::post('admin/purchasing/upload', [PurchasingController::class, 'upload']);
 
@@ -118,11 +121,13 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('/scanned-barcodes/{grpo}', [TransactionController::class, 'getScannedBarcodes']);
     Route::post('/stockin-add', [TransactionController::class, 'scan_and_store']);
     Route::get('admin/transaction/stockin', [TransactionController::class, 'stock_in']);
-    Route::get('admin/transaction/stockin/{po}', [TransactionController::class, 'stockin_po']);
+    // Route::get('admin/transaction/stockin/{po}', [TransactionController::class, 'stockin_po']);
     Route::post('admin/transaction/stockup', [TransactionController::class, 'stock_up']);
     Route::get('admin/transaction/stockdel/{grpo}', [TransactionController::class, 'stock_del']);
     Route::post("admin/transaction/stockindelone/{id}", [TransactionController::class, 'stockin_delone']);
     Route::get('admin/transaction/stockdet/{grpo}', [TransactionController::class, 'stock_det']);
+
+    //stockin db
     // stockout    
     Route::get('admin/transaction/stockout', [TransactionController::class, 'stock_out']);
     Route::get("admin/transaction/stockout/{prod_order}", [TransactionController::class, 'stockout_po']);

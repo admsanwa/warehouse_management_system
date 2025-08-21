@@ -11,10 +11,74 @@ use App\Models\StockModel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use App\Services\SapService;
+use Illuminate\Support\Arr;
 
 class PurchasingController extends Controller
 {
+    protected $sap;
+
+    public function __construct(SapService $sap)
+    {
+        $this->sap = $sap;
+    }
+
     public function index(Request $request)
+    {
+        $param = [
+            "page" => (int) $request->get('page', 1),
+            "limit" => (int) $request->get('limit', 10),
+            "DocStatus" => $request->get('docStatus', 'Open'),
+            "DocNum" => $request->get('docNum'),
+            "DocDate" => $request->get('docDate'),
+            "DocDueDate" => $request->get('docDueDate'),
+            "CardName" =>  $request->get('cardName')
+        ];
+
+        $orders = $this->sap->getPurchaseOrders($param);
+        if (empty($orders) || $orders['success'] !== true) {
+            return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
+        }
+
+        $totalPages = ceil($orders['total'] / $param['limit']);
+
+        return view('api.purchasing.list', [
+            'orders'      => $orders['data'] ?? [],
+            'page'        => $orders['page'],
+            'limit'       => $orders['limit'],
+            'total'       => $orders['total'],
+            'totalPages'  => $totalPages,
+        ]);
+    }
+
+    public function view(Request $request)
+    {
+        $param = [
+            "page" => (int) $request->get('page', 1),
+            "limit" => (int) $request->get('limit', 10),
+            "DocNum" =>  $request->query('docNum'),
+            "DocEntry" => $request->query('docEntry'),
+        ];
+        $orders = $this->sap->getPurchaseOrders($param);
+
+        if (empty($orders) || !Arr::get($orders, 'success')) {
+            return back()->with(
+                'error',
+                Arr::get($orders, 'message', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.')
+            );
+        }
+
+        $po = Arr::get($orders, 'data.0', []);
+        $lines = Arr::get($po, 'Lines', []);
+
+        return view('api.purchasing.view', [
+            'po'    => $po,
+            'lines' => $lines,
+        ]);
+    }
+
+
+    public function old_index(Request $request)
     {
         $getRecord      = PurchasingModel::with("po_details")->get()->values();
         $getRecordTwo   = PurchasingModel::with("maklon_details")->get()->values();
@@ -48,7 +112,7 @@ class PurchasingController extends Controller
         return view("backend.purchasing.list", compact('getRecord', 'getPagination', 'purchasingSummary', 'purchasingSummaryTwo'));
     }
 
-    public function view(Request $request, $id)
+    public function old_view(Request $request, $id)
     {
         $getRecord  = PurchasingModel::find($id);
         $getPO      = PurchasingModel::where("id", $id)->value("no_po");
