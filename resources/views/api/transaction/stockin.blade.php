@@ -81,12 +81,13 @@
                                             <option value="">Select Nomor PO</option>
                                         </select>
                                     @endif
+                                    <input type="hidden" name="docEntry" id="docEntry" value="{{ $docEntry ?? '' }}" />
                                 </div>
-                                <label class="col-sm-4 col-form-label">Good Receipt PO :</label>
+                                {{-- <label class="col-sm-4 col-form-label">Good Receipt PO :</label>
                                 <div class="col-sm-8">
-                                    <input type="number" name="grpo" id="grpo" value="{{ $docEntry ?? '' }}"
+                                    <input type="hidden" name="grpo" id="grpo" value="{{ $docEntry ?? '' }}"
                                         class="form-control mt-2" readonly required>
-                                </div>
+                                </div> --}}
                                 <label class="col-sm-4 col-form-label">Vendor:</label>
                                 <div class="col-sm-8">
                                     <input type="text" name="cardName" id="cardName" value=""
@@ -267,7 +268,7 @@
         }
 
         function sendScannedCode(code) {
-            const grpo = document.getElementById("grpo").value;
+            const docEntry = document.getElementById("docEntry").value;
             const noPo = document.getElementById("no_po").value;
             // console.log("code", code);
             fetch("/stockin-add", {
@@ -280,7 +281,7 @@
                     body: JSON.stringify({
                         item_code: code,
                         po: noPo,
-                        docEntry: grpo
+                        docEntry: docEntry
                     })
                 })
                 .then(res => res.json())
@@ -342,7 +343,7 @@
         }
 
         function appendDataOnPo(data) {
-            document.getElementById("grpo").value = data.DocEntry;
+            document.getElementById("docEntry").value = data.DocEntry;
             document.getElementById("cardName").value = data.CardName;
             document.getElementById("cardCode").value = data.CardCode;
             document.getElementById("docDate").value = data.DocDate;
@@ -358,34 +359,42 @@
             if (fileInput) {
                 fileInput.value = "";
             }
-            let container = document.getElementById("scannedBarcodes");
-            const tBody = document.getElementById("itemRows")
-            items.forEach((stocks, index) => {
-                const row = `
+
+            const tBody = document.getElementById("itemRows");
+            const itemCode = document.getElementById("item_code").value;
+
+            items.forEach((stocks) => {
+                if (stocks.ItemCode == itemCode) {
+                    const idx = tBody.rows.length;
+
+                    const description = (stocks.Dscription ?? "") +
+                        (stocks.FreeTxt ? " - " + stocks.FreeTxt : "");
+
+                    const row = `
                     <tr>
-                        <td>${index + 1}</td>
+                        <td>${idx + 1}</td>
                         <td>
                             ${stocks.ItemCode}
-                            <input type="hidden" name="stocks[${index}][LineNum]" value="${stocks.LineNum}">
-                            <input type="hidden" name="stocks[${index}][BaseEntry]" value="${stocks.DocEntry}">
-                            <input type="hidden" name="stocks[${index}][ItemCode]" value="${stocks.ItemCode}">
+                            <input type="hidden" name="stocks[${idx}][LineNum]" value="${stocks.LineNum}">
+                            <input type="hidden" name="stocks[${idx}][BaseEntry]" value="${stocks.DocEntry}">
+                            <input type="hidden" name="stocks[${idx}][ItemCode]" value="${stocks.ItemCode}">
                         </td>
                         <td>
-                            ${stocks.Dscription+" - "+ stocks.FreeTxt ?? ""}
-                            <input type="hidden" name="stocks[${index}][Dscription]" value="${stocks.Dscription}">
+                            ${description}
+                            <input type="hidden" name="stocks[${idx}][Dscription]" value="${stocks.Dscription ?? ""}">
                         </td>
                         <td>
-                            <input type="number" name="stocks[${index}][qty]" class="form-control" value="0">
-                            <input type="hidden" name="stocks[${index}][PriceBefDi]" value="${stocks.PriceBefDi}">
-                            <input type="hidden" name="stocks[${index}][DiscPrcnt]" value="${stocks.DiscPrcnt}">
-                            <input type="hidden" name="stocks[${index}][VatGroup]" value="${stocks.VatGroup}">
-                            <input type="hidden" name="stocks[${index}][AcctCode]" value="${stocks.AcctCode}">
-                            <input type="hidden" name="stocks[${index}][OcrCode]" value="${stocks.OcrCode}">
-                            <input type="hidden" name="stocks[${index}][FreeText]" value="${stocks.FreeTxt}">
+                            <input type="number" name="stocks[${idx}][qty]" class="form-control" value="0">
+                            <input type="hidden" name="stocks[${idx}][PriceBefDi]" value="${stocks.PriceBefDi}">
+                            <input type="hidden" name="stocks[${idx}][DiscPrcnt]" value="${stocks.DiscPrcnt}">
+                            <input type="hidden" name="stocks[${idx}][VatGroup]" value="${stocks.VatGroup}">
+                            <input type="hidden" name="stocks[${idx}][AcctCode]" value="${stocks.AcctCode}">
+                            <input type="hidden" name="stocks[${idx}][OcrCode]" value="${stocks.OcrCode}">
+                            <input type="hidden" name="stocks[${idx}][FreeTxt]" value="${stocks.FreeTxt ?? ""}">
                         </td>
                         <td>
-                            ${stocks.UnitMsr?? ""}
-                            <input type="hidden" name="stocks[${index}][UnitMsr]" value="${stocks.UnitMsr}">
+                            ${stocks.UnitMsr ?? ""}
+                            <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${stocks.UnitMsr ?? ""}">
                         </td>
                         <td>
                             <button type="button" onclick="deleteItem(this)" class="btn btn-danger btn-sm">
@@ -393,10 +402,12 @@
                             </button>
                         </td>
                     </tr>
-                        `;
-                tBody.insertAdjacentHTML("beforeend", row);
+                    `;
+                    tBody.insertAdjacentHTML("beforeend", row);
+                }
             });
         }
+
 
         function deleteItem(button) {
             if (!confirm("Yakin ingin menghapus item ini?")) return;
@@ -412,10 +423,10 @@
             btn.disabled = true;
 
             const noPo = document.getElementById("no_po").value;
-            const grpo = document.getElementById("grpo").value;
+            const docEntry = document.getElementById("docEntry").value;
             const remark = document.getElementById("remarks").value;
-            if (!noPo || !grpo || !remark) {
-                showToast("❌ Error: Pastikan Nomer Purchasing Order atau Nomer GRPO di isi sebelum submit!")
+            if (!noPo || !docEntry) {
+                showToast("❌ Error: Pastikan Nomer Purchasing Order di isi sebelum submit!")
                 btn.disabled = false;
                 return false;
             }
@@ -433,8 +444,9 @@
                 .then(data => {
                     if (data.success) {
                         showToast("✅ Berhasil" + data.message, "success");
+                        btn.disabled = false;
                         setTimeout(() => {
-                            window.location.reload();
+                            // window.location.reload();
                         }, 1000)
                     } else {
                         if (data.errors) {

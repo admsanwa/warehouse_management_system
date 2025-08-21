@@ -91,10 +91,14 @@
                             <div class="col-sm-6">
                                 <input type="text" name="reason" id="reason" class="form-control mt-2" placeholder="Masukkan Alasan Goods Issue">
                             </div>
-                            <label for="" class="col-sm-4 col-form-lable">Remarks :</label>
-                            <div class="col-sm-6">
-                                <textarea type="text" name="remarks" id="remarks" class="form-control mt-2" placeholder="Masukkan Keterangan">{{ $getPos->remarks }}</textarea>
-                            </div>
+                            @if ($getPos)
+                                <label for="" class="col-sm-4 col-form-lable">Remarks :</label>
+                                <div class="col-sm-6">
+                                        <textarea type="text" name="remarks" id="remarks" class="form-control mt-2" placeholder="Masukkan Keterangan"> {{ $getPos->remarks ?? "-" }} </textarea> 
+                                </div>
+                            @else
+                                <textarea type="text" name="remarks" id="remarks" class="form-control mt-2" hidden>{{ $getPos->remarks ?? "" }}</textarea> 
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -272,7 +276,7 @@
             const remarks = document.getElementById("remarks").value;
             // console.log("reason", reason, "remarks", remarks);
 
-            if (!prod_order || !reason || !remarks) {
+            if (!prod_order || !reason ) {
                 showToast("❌ Error: Pastikan semua masukkan di isi sebelum submit!")
                 return false; // Prevent form submission
             }

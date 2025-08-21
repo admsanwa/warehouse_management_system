@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProductionModel;
+use App\Models\ProductionOrderDetailsModel;
+use App\Models\PurchaseOrderDetailsModel;
 use App\Models\QualityModel;
+use App\Models\StockModel;
 use Auth;
 use DB;
 use Illuminate\Http\Request;
@@ -13,8 +16,6 @@ class QualityController extends Controller
 {
     public function index(Request $request)
     {
-        DB::enableQueryLog();
-
         $getRecord = ProductionModel::with('qualityTwo')
             ->addSelect([
                 'latest_quality_id' => QualityModel::select('id')
@@ -24,11 +25,34 @@ class QualityController extends Controller
             ])
             ->orderByDesc('latest_quality_id')
             ->filter($request) // <-- using the scope
-            ->get();
+            ->paginate(10);
+
+        $getRecord->getCollection()->transform(function ($record) {
+            $orderQty   = ProductionOrderDetailsModel::where("doc_num", $record->doc_num)->sum("qty");
+            $stockQty   = StockModel::where("prod_order", $record->doc_num)->sum("qty");
+
+            $record->result         = $orderQty - $stockQty; // tambahkan field baru ke object
+            $record->is_completed   = $orderQty <= $stockQty; // true/false
+
+            return $record;
+        });
         // dd($getRecord->first()->qualityTwo);
         // dd(DB::getQueryLog());
+        $user = Auth::user();
 
-        return view("backend.quality.list", compact("getRecord"));
+        $notifications = $getRecord->getCollection()->filter(function ($item) use ($user) {
+            return $item->qualityTwo
+                && $item->qualityTwo->result === 3   // Need Approval
+                && $user->nik === "06067";           // sesuai nik
+        });
+
+        $filtered = $getRecord->getCollection()->filter(function ($item) {
+            return $item->is_completed;
+        });
+
+        $getRecord->setCollection($filtered);
+
+        return view("backend.quality.list", compact("getRecord", "notifications", "user"));
     }
 
     public function result(Request $request, $prod_no)

@@ -41,11 +41,16 @@
                                             <label for="">IO</label>   
                                             <input type="text" name="io_no" id="io_no" class="form-control" value="{{ Request()->io_no }}" placeholder="Enter IO">
                                         </div> 
-                                        <div class="form-group col-md-2">
-                                            <label for="">Status</label>   
-                                            <input type="text" name="status" id="status" class="form-control" value="{{ Request()->status }}" placeholder="Enter Status Tracker">
+                                         <div class="form-group col-md-2">
+                                            <label for="">Status Tracker</label>   
+                                            <select name="status" id="status" class="form-control">
+                                                <option value="">Select Status Tracker</option>
+                                                <option value="Pick Up">Pick Up</option>
+                                                <option value="On Delivery">On Delivery</option> 
+                                                <option value="Done">Done</option>
+                                            </select>
                                         </div> 
-                                        <div class="form-group col-md-2">
+                                        <div class="form-group col-md-3">
                                             <button type="submit" class="btn btn-success" style="margin-top: 30px"><i class="fa fa-search"></i> Search</button>
                                             <a href="{{ url("admin/delivery") }}" class="btn btn-warning" style="margin-top: 30px"><i class="fa fa-eraser"></i> Reset</a>
                                         </div>
@@ -69,7 +74,7 @@
                                                 <th>Description</th>
                                                 <th>IO</th>
                                                 <th>Status</th>
-                                                <th>Date</th>
+                                                <th>Status Date</th>
                                                 <th>Remarks</th>
                                                 <th>Estimate</th>
                                             </tr>
@@ -106,7 +111,7 @@
                             <div class="card-footer">
                                 <div class="d-flex justify-content-end px-2 py-2">
                                     <div class="overflow-x:auto; max-width:100px">
-                                        {{-- {!! $getRecord->onEachSide(1)->appends(request()->except('page'))->links() !!} --}}
+                                        {!! $getRecord->onEachSide(1)->appends(request()->except('page'))->links() !!}
                                     </div>
                                 </div>
                             </div>

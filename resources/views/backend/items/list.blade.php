@@ -39,7 +39,7 @@
                                             <label for="">Item Name</label>
                                             <input type="text" class="form-control" value="{{ Request()->name }}" name="name" placeholder="Enter Items Name">
                                         </div>
-                                        <div class="form-group col-md-2">
+                                        <div class="form-group col-md-3">
                                             <button type="submit" class="btn btn-primary" style="margin-top: 30px;"><i class="fa fa-search"></i> Search</button>
                                             <a href="{{ url('admin/items/list')}}" class="btn btn-warning" style="margin-top: 30px;"><i class="fa fa-eraser"></i> Reset</a>
                                         </div>
@@ -77,11 +77,11 @@
                                                     <td>{{ $items->code }}</td>
                                                     <td>{{ $items->name }}</td>
                                                     {{-- <td>{{ $items->group == 1 ? 'Raw Material' : ($items->group == 2 ? 'Part Other' : ($items->group == 3 ? 'Unknown' : 'Null')) }}</td> --}}
-                                                    <td>{{ $items->uom == 1 ? 'Pcs' : ($items->uom == 2 ? 'Unit' : 'Unknown')}}</td>
+                                                    <td>{{ $items->uom ? $items->uom : '-' }}</td>
                                                     <td>{{ $items->stock_min }}</td>
                                                     <td>{{ $items->in_stock }}</td>
-                                                    <td>{{ $items->stocks->on_hand ?? 0}}</td>
-                                                    <td>{{ $items->stock_min > ($items->stocks->on_hand ?? 0)  ? "Stock harus dibeli" : "-" }}</td>
+                                                    <td>{{ ($items->in_stock + ($items->stocks->stock_in ?? 0) - ($items->stocks->stock_out ?? 0)) ?? 0 }}</td>
+                                                    <td>{{ $items->stock_min >= ($items->in_stock + ($items->stocks->stock_in ?? 0) - ($items->stocks->stock_out ?? 0)) ?? 0  ? "Stock harus dibeli" : "-" }}</td>
                                                     <td>{{ \Carbon\Carbon::parse($items->updated_at)->format('Y-m-d') }}</td>
                                                 </tr>
                                                 @empty

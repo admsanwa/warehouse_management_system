@@ -33,7 +33,7 @@ class DeliveryModel extends Model
             $query = $query->where('status', 'LIKE', '%' . Request::get('status') . '%');
         }
 
-        return $query->orderBy('id', 'desc')->paginate(5);
+        return $query->orderBy('id', 'desc')->paginate(10);
     }
 
     public function production()

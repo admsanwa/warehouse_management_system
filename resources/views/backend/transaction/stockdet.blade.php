@@ -26,31 +26,40 @@
                             <div class="card-body">
                                 <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">Nomer PO</label>
-                                    <div class="col-sm-2">: {{ $getRecord->no_po }}</div>
+                                    <div class="col-sm-2">: {{ $getRecord->no_po ?? "-" }}</div>
                                     <label for="" class="col-sm-2 col-form-lable">Good Receipt PO</label>
-                                    <div class="col-sm-2">: {{ $getRecord->grpo }}</div>
+                                    <div class="col-sm-2">: {{ $getRecord->grpo ?? "-" }}</div>
                                     <label for="" class="col-sm-2 col-form-lable">Scanned By</label>
-                                    <div class="col-sm-2">: {{ $getRecord->user->fullname }}</div>
+                                    <div class="col-sm-2">: {{ $getRecord->user->fullname ?? "-" }}</div>
                                 </div>
                                 <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">Vendor Code</label>
-                                    <div class="col-sm-2">: {{ $getRecord->grpoData->vendor_code }}</div>
+                                    <div class="col-sm-2">: {{ $getRecord->grpoData->vendor_code ?? "-" }}</div>
                                     <label for="" class="col-sm-2 col-form-lable">Vendor</label>
-                                    <div class="col-sm-2">: {{ $getRecord->grpoData->vendor }}</div>  
+                                    <div class="col-sm-2">: {{ $getRecord->grpoData->vendor ?? "-" }}</div>  
                                     <label for="" class="col-sm-2 col-form-lable">Vendor Ref No</label>
-                                    <div class="col-sm-2">: {{ $getRecord->grpoData->vendor_ref_no}}</div>
+                                    <div class="col-sm-2">: {{ $getRecord->grpoData->vendor_ref_no ?? "-" }}</div>
                                 </div>
                                 <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">No IO</label>
-                                    <div class="col-sm-2">: {{ $getRecord->grpoData->io }}</div>
+                                    <div class="col-sm-2">: {{ $getRecord->grpoData->io ?? "-" }}</div>
                                     <label for="" class="col-sm-2 col-form-lable">No SO</label>
-                                    <div class="col-sm-2">: {{ $getRecord->grpoData->so }}</div>
+                                    <div class="col-sm-2">: {{ $getRecord->grpoData->so ?? "-" }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Internal No</label>
+                                    <div class="col-sm-2">: {{ $getRecord->grpoData->internal_no ?? "-" }}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">Warehouse</label>
+                                    <div class="col-sm-2">: {{ $getRecord->grpoData->whse ?? "-" }}</div>
                                     <label for="" class="col-sm-2 col-form-lable">Posting Date</label>
                                     <div class="col-sm-2">: {{ \Carbon\Carbon::parse($getRecord->created_at)->format('Y-m-d')}}</div>
                                 </div>
                                 <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">Remarks</label>
-                                    <div class="col-sm-6">: {{ $getRecord->grpoData->remarks }}</div>
+                                    <div class="col-sm-4">: {{ $getRecord->grpoData->remarks ?? "-" }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Note</label>
+                                    <div class="col-sm-4">: {{ $getRecord->grpoData->note ?? "-" }}</div>
+
                                 </div>
                             </div>
                         </div>        
@@ -77,9 +86,9 @@
                                                    <td>{{ $loop->iteration }}</td>
                                                    <td>{{ $stockin->item->code }}</td>
                                                    <td>{{ $stockin->item->name }}</td>
-                                                   <td>{{ $stockin->on_hand - $stockin->qty}}</td>
+                                                   <td>{{ $stockin->stock }}</td>
                                                    <td>{{ $stockin->qty }}</td>
-                                                   <td>{{ $stockin->on_hand }}</td>
+                                                   <td>{{ $stockin->stock + $stockin->stock_in }}</td>
                                                    <td>{{ $stockin->item->uom }}</td>
                                                 </tr>
                                                @endforeach

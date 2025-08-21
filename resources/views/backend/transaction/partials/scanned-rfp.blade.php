@@ -3,8 +3,6 @@
     <input type="hidden" name="prod_order" id="po_hidden">
     <input type="hidden" name="number" id="number_hidden">
     <input type="hidden" name="reason" id="reason_hidden">
-    <input type="hidden" name="whse" id="whse_hidden">
-    <input type="hidden" name="project_code" id="projectCode_hidden">
     <input type="hidden" name="remarks" id="remarks_hidden">
     <div class="table-responsive">
         <table class="table table-striped table-borderd table-sm">

@@ -35,7 +35,7 @@ class MemoModel extends Model
             $return = $return->where('io', 'LIKE', '%' . Request::get('io') . '%');
         }
 
-        $return = $return->orderBy('id', 'desc')->paginate(5);
+        $return = $return->orderBy('id', 'desc')->paginate(10);
         return $return;
     }
 
@@ -83,5 +83,15 @@ class MemoModel extends Model
     public function details()
     {
         return $this->hasMany(memoDetailModel::class, 'memo_id');
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by', 'fullname');
+    }
+
+    public function sign()
+    {
+        return $this->belongsTo(SignModel::class, 'no', 'no_memo');
     }
 }

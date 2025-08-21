@@ -87,21 +87,6 @@
                             <div class="col-sm-6">
                                 <input type="text" name="reason" id="reason" class="form-control mt-2" placeholder="Masukkan Alasan Goods Issue" required>
                             </div>
-                            <label for="" class="col-sm-4 col-form-lable">Default Warehouse :</label>
-                            <div class="col-sm-6">
-                                <select name="whse" id="whse" class="form-control mt-2">
-                                    <option value="">Select Default Warehouse</option>
-                                    <option value="BK903">BK903</option>
-                                    <option value="BK001">BK001</option>
-                                </select>
-                            </div>
-                            <label for="" class="col-sm-4 col-form-lable">Default Project Code :</label>
-                            <div class="col-sm-6">
-                                <select name="project_code" id="project_code" class="form-control mt-2">
-                                    <option value="">Select Project Code</option>
-                                    <option value="-BKS">-BKS</option>
-                                </select>
-                            </div>
                             <label for="" class="col-sm-4 col-form-lable">No Surat Jalan :</label>
                             <div class="col-sm-6">
                                 <input type="text" name="no_surat_jalan" id="no_surat_jalan" class="form-control mt-2" placeholder="Masukkan No Surat Jalan" required>
@@ -285,14 +270,12 @@
         }
 
         function AddGoodIssueForm() {
-            const po     = document.getElementById("pom").value;
-            const gi     = document.getElementById("gi").value;
+            const po = document.getElementById("pom").value;
+            const gi = document.getElementById("gi").value;
             const reason = document.getElementById("reason").value;
-            const projectCode = document.getElementById("project_code").value;
-            const whse  = document.getElementById("whse").value;
-            const no_surat_jalan  = document.getElementById("no_surat_jalan").value;
-            const no_inventory_tf  = document.getElementById("no_inventory_tf").value;
-            const type_inv_transaction  = document.getElementById("type_inv_transaction").value;
+            const no_surat_jalan = document.getElementById("no_surat_jalan").value;
+            const no_inventory_tf = document.getElementById("no_inventory_tf").value;
+            const type_inv_transaction = document.getElementById("type_inv_transaction").value;
             const remarks = document.getElementById("remarks").value;
             // console.log("io", io, "po", po, "gi", gi);
 
@@ -304,8 +287,6 @@
             document.getElementById("po_hidden").value = po;
             document.getElementById("gi_hidden").value = gi;    
             document.getElementById("reason_hidden").value = reason;
-            document.getElementById("project_hidden").value = projectCode;
-            document.getElementById("whse_hidden").value = whse;
             document.getElementById("no_surat_jalan_hidden").value = no_surat_jalan;
             document.getElementById("no_inventory_tf_hidden").value = no_inventory_tf;
             document.getElementById("type_inv_transaction_hidden").value = type_inv_transaction;

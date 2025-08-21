@@ -5,7 +5,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col col-sm-6">
-                        <h1>Finish Goods</h1>
+                        <h1>Semi Finish Goods</h1>
                     </div>
                 </div>
             </div>
@@ -17,7 +17,7 @@
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">Search List Finish Goods</h3>
+                                <h3 class="card-title">Search List Semi Finish Goods</h3>
                             </div>
                             <form action="" method="get">
                                 <div class="card-body">
@@ -50,7 +50,7 @@
                         @include('_message')
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">List Finish Goods</h3>
+                                <h3 class="card-title">List Semi Finish Goods</h3>
                             </div>
                             <div class="card-body p-0">
                                 <div class="table-responsive">
@@ -67,15 +67,15 @@
                                             </tr>   
                                         </thead>
                                         <tbody>
-                                             @forelse ($getRecord as $fg)
+                                             @forelse ($getRecord as $sfg)
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
-                                                    <td>{{ $fg->number}}</td>
-                                                    <td>{{ $fg->io}}</td>
-                                                    <td>{{ $fg->prod_order }}</td>
-                                                    <td>{{ $fg->prod_no}} </td>
-                                                    <td>{{ $fg->prod_desc }}</td>
-                                                    <td>{{ $fg->qty }}</td>
+                                                    <td>{{ $sfg->number}}</td>
+                                                    <td>{{ $sfg->io}}</td>
+                                                    <td>{{ $sfg->prod_order }}</td>
+                                                    <td>{{ $sfg->prod_no}} </td>
+                                                    <td>{{ $sfg->prod_desc }}</td>
+                                                    <td>{{ $sfg->qty }}</td>
                                                 </tr>
                                             @empty
                                                 <tr>

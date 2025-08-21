@@ -3,8 +3,6 @@
     <input type="hidden" name="po" id="po_hidden">
     <input type="hidden" name="gi" id="gi_hidden">
     <input type="hidden" name="reason" id="reason_hidden">
-    <input type="hidden" name="project_code" id="project_hidden">
-    <input type="hidden" name="whse" id="whse_hidden">
     <input type="hidden" name="no_surat_jalan" id="no_surat_jalan_hidden">
     <input type="hidden" name="no_inventory_tf" id="no_inventory_tf_hidden">
     <input type="hidden" name="type_inv_transaction" id="type_inv_transaction_hidden">

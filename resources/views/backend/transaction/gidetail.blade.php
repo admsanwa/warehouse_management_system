@@ -61,8 +61,10 @@
                                     <div class="col-sm-2">: {{ $getRecord->good_issue->no_surat_jalan }}</div>
                                     <label for="" class="col-sm-2 col-form-lable">No Inv Transfer</label>
                                     <div class="col-sm-2">: {{ $getRecord->good_issue->no_inventory_tf }}</div>
+                                </div>
+                                 <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">Remarks</label>
-                                    <div class="col-sm-2">: {{ $getRecord->good_issue->remarks }}</div>
+                                    <div class="col-sm-6">: {{ $getRecord->good_issue->remarks }}</div>
                                 </div>
                             </div>
                         </div>        
@@ -80,6 +82,7 @@
                                                     <th>In Stock</th>
                                                     <th>Qty</th>
                                                     <th>Total</th>
+                                                    <th>Uom</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -90,7 +93,8 @@
                                                    <td>{{ $goodissue->name }}</td>
                                                    <td>{{ $goodissue->in_stock}}</td>
                                                    <td>{{ $goodissue->qty }}</td>
-                                                   <td>{{ $goodissue->in_stock -  $goodissue->qty }}</td>
+                                                   <td>{{ $goodissue->in_stock - $goodissue->qty }}</td>
+                                                   <td>{{ $goodissue->uom }}</td>
                                                 </tr>
                                                @endforeach
                                             </tbody>

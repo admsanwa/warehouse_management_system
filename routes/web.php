@@ -49,6 +49,8 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('admin/dashboard/goodreceipt', [DashboardController::class, 'good_receipt']);
     Route::get('admin/dashboard/rfp', [DashboardController::class, 'receipt_from_prod']);
     Route::get('admin/production/clear-bon-notif', [DashboardController::class, 'clearBonNotif']);
+    Route::get('admin/production/clear-memo-notif', [DashboardController::class, 'clearMemoNotif']);
+    Route::get('admin/production/clear-qc-notif', [DashboardController::class, 'clearQcNotif']);
 
     // employee
     Route::get('admin/employees', [EmployeesController::class, 'index']);
@@ -126,8 +128,6 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('admin/transaction/stockdel/{grpo}', [TransactionController::class, 'stock_del']);
     Route::post("admin/transaction/stockindelone/{id}", [TransactionController::class, 'stockin_delone']);
     Route::get('admin/transaction/stockdet/{grpo}', [TransactionController::class, 'stock_det']);
-
-    //stockin db
     // stockout    
     Route::get('admin/transaction/stockout', [TransactionController::class, 'stock_out']);
     Route::get("admin/transaction/stockout/{prod_order}", [TransactionController::class, 'stockout_po']);
@@ -171,6 +171,7 @@ Route::group(['middleware' => 'admin'], function () {
 
     // Reports
     Route::get("admin/reports/finishgoods", [ReportsController::class, "finish_goods"]);
+    Route::get("admin/reports/semifg", [ReportsController::class, "semifg"]);
 
     // delivery
     Route::get("admin/delivery/list", [DeliveryController::class, "index"]);

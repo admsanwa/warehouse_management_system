@@ -114,6 +114,7 @@ class ProductionController extends Controller
         return redirect("admin/production/view/" . $prod);
     }
 
+    // memo
     public function memo(Request $request)
     {
         $number = MemoModel::generateNumber();
@@ -171,38 +172,61 @@ class ProductionController extends Controller
     public function list_memo(Request $request)
     {
         $getRecord = MemoModel::getRecord($request);
+        $user      = Auth::user();
+        foreach ($getRecord as $record) {
+            $signApprove    = SignModel::where('no_memo', $record->no)->where('sign', 1)->first();
+            $signProd       = SignModel::where('no_memo', $record->no)->where('sign', 1)->where('department', 'Production and Warehouse')
+                ->whereHas('user', function ($q) {
+                    $q->where('department', 'Production and Warehouse');
+                })
+                ->first();;
+
+            $record->status = ($signApprove)
+                ? 'Approve'
+                : 'Pending';
+
+            $record->highlight = ($user->nik === "06067" && !$signApprove || $user->nik === "05993" && !$signProd);
+        }
+
         return view('backend.production.listmemo', compact('getRecord'));
     }
 
     public function detail_memo(Request $request, $id)
     {
-        $memo       = MemoModel::with('details')->findOrFail($id);
-        $getSign    = SignModel::where('no_memo', $memo->no)->where('nik', '05993')->value('sign') ?? 0;
-        $user       = Auth::user()->nik;
+        $memo           = MemoModel::with(['details', 'createdBy'])->findOrFail($id);
+        $user           = Auth::user();
+        $signApprove    = SignModel::with('user')->where('no_memo', $memo->no)->where('sign', 1)->first();
+        $signProd       = SignModel::with('user')->where('no_memo', $memo->no)->where('sign', 1)->where('department', 'Production and Warehouse')
+            ->whereHas('user', function ($q) {
+                $q->where('department', 'Production and Warehouse');
+            })
+            ->first();;
+
         // dd($getSign);
-        return view('backend.production.showmemo', compact('memo', 'getSign', 'user'));
+        return view('backend.production.showmemo', compact('memo', 'user', 'signApprove', 'signProd'));
     }
 
     public function approve(Request $request)
     {
-        $no = $request->input("no_memo");
-        $user = Auth::user();
+        $no     = $request->input("no_memo");
+        $user   = Auth::user();
 
-        $sign = new SignModel();
-        $sign->no_memo = $no;
+        $sign               = new SignModel();
+        $sign->no_memo      = $no;
         $sign->nik = $user->nik;
-        $sign->sign = 1;
+        $sign->department   = $user->department;
+        $sign->sign         = 1;
         $sign->save();
 
         return response()->json([
             'success' => true,
-            'message' => "Successfully ask approve to production"
+            'message' => "Successfully approve to production"
         ]);
     }
 
     public function barcode(Request $request)
     {
-        $getRecord     = ProductionModel::where("status", 1)->get();
+        $getRecord     = ProductionModel::where("status", "Released")->paginate(10);
         $user          = Auth::user()->username;
         $addedBarcodes = BarcodeProductionModel::where('username', $user)->latest()->take(5)->get();
 
@@ -262,6 +286,7 @@ class ProductionController extends Controller
         return redirect()->back()->with("error", "Berhasil hapus semua barcode print");
     }
 
+    // bon
     public function bon()
     {
         $user   = Auth::user();
@@ -338,6 +363,7 @@ class ProductionController extends Controller
 
             $record->highlight = ($user->nik === "06067" && !$signApprove || $user->nik === "08517" && !$signBuyer || $user->nik === "250071" && !$signBuyer);
         }
+
         return view('backend.production.listbon', compact('getRecord', 'user'));
     }
 
@@ -360,11 +386,11 @@ class ProductionController extends Controller
         $no   = $request->input("no_bon");
         $user = Auth::user();
 
-        $sign = new SignBonModel();
-        $sign->no_bon = $no;
-        $sign->nik = $user->nik;
-        $sign->department = $user->department;
-        $sign->sign = 1;
+        $sign               = new SignBonModel();
+        $sign->no_bon       = $no;
+        $sign->nik          = $user->nik;
+        $sign->department   = $user->department;
+        $sign->sign         = 1;
         $sign->save();
 
         return response()->json([

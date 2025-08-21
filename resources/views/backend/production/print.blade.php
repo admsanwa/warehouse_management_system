@@ -68,6 +68,8 @@
                         <div class="barcode-text me-4 text-end">
                             <div class="item-code">{{ $barcodes->prod_no }}</div>
                             <div class="item-name">{{ $barcodes->prod_desc }}</div>
+                            <div class="item-name">NO IO : {{ $barcodes->io }}</div>
+                            <div class="item-name">Tanggal produksi : {{ \Carbon\Carbon::parse($barcodes->created_at)->format('d/m/Y') }}</div>
                         </div>
                     </div>
                 @endfor

@@ -46,7 +46,7 @@
                                             <label for="">Contact Person</label>
                                             <input type="text" name="contact_person" class="form-control" value="{{ Request()->contact_person }}" placeholder="Enter Contact Person">
                                         </div>
-                                        <div class="form-group col-md-2">
+                                        <div class="form-group col-md-3">
                                             <button type="submit" class="btn btn-primary" style="margin-top: 30px"><i class="fa fa-search"></i> Search</button>
                                             <a href="{{ url('admin/purchasing')}}" class="btn btn-warning" style="margin-top: 30px"><i class="fa fa-eraser"></i> Reset</a>
                                         </div>

@@ -54,20 +54,16 @@
                                         <div class="form-group col-md-2">
                                             <label for="docStatus">Status</label>
                                             <select name="docStatus" id="docStatus" class="form-control">
-                                                <option value="">-- Choose Status --</option>
+                                                <option value="" disabled>-- Choose Status --</option>
                                                 @foreach (['Open', 'Close', 'All'] as $status)
                                                     @php
-                                                        $value =
-                                                            strtolower($status) === 'all' ? '' : strtolower($status);
+                                                        $value = $status == 'All' ? '' : $status;
                                                     @endphp
                                                     <option value="{{ $value }}"
-                                                        {{ request('docStatus')
-                                                            ? strtolower(request('docStatus')) === strtolower($value)
-                                                            : strtolower($status) === 'open' }}>
+                                                        {{ Request()->docStatus == $value ? 'selected' : '' }}>
                                                         {{ $status }}
                                                     </option>
                                                 @endforeach
-
                                             </select>
                                         </div>
                                         <div class="form-group d-flex align-items-end gap-2">

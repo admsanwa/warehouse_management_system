@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BonModel;
 use App\Models\DeliveryModel;
 use App\Models\ItemsModel;
+use App\Models\MemoModel;
 use App\Models\ProductionModel;
 use App\Models\ProductionOrderDetailsModel;
 use App\Models\PurchaseOrderDetailsModel;
@@ -15,19 +16,32 @@ use App\Models\QualityModel;
 use App\Models\RFPModel;
 use App\Models\StockModel;
 use Auth;
+use DB;
 
 class DashboardController extends Controller
 {
     public function dashboard(Request $request)
     {
         // get value
-        $getItems       = ItemsModel::whereColumn('stock_min', '>=', 'in_stock')->get()->unique('code');
         $getQuality     = QualityModel::whereNotNull("result")->get()->unique('io');
         $getDelivery    = DeliveryModel::whereNotNull("status")->get()->unique('io');
-        $getProd        = ProductionModel::where("status", 1)->get();
+        $getProd        = ProductionModel::where("status", "Released")->get();
 
         // count value
-        $needBuy        = $getItems->count();
+        $latestStock = DB::table('stocks as s1')
+            ->select('s1.item_code', 's1.stock_in', 's1.stock_out', 's1.id as stock_id')
+            ->whereRaw('s1.id = (SELECT MAX(s2.id) FROM stocks s2 WHERE s2.item_code = s1.item_code)');
+
+        $needBuy = ItemsModel::leftJoinSub($latestStock, 'latest', function ($join) {
+            $join->on('latest.item_code', '=', 'items.code');
+        })
+            ->select('items.id', 'items.code', 'items.name', 'items.uom', 'items.stock_min', 'items.in_stock', 'items.updated_at')
+            ->selectRaw('COALESCE(latest.stock_in,0) as last_in')
+            ->selectRaw('COALESCE(latest.stock_out,0) as last_out')
+            ->selectRaw('latest.stock_id')
+            ->whereRaw('items.stock_min >= (items.in_stock + (COALESCE(latest.stock_in,0) - COALESCE(latest.stock_out,0)))')
+            ->orderByDesc('latest.stock_id')
+            ->count();
         $afterCheck     = $getQuality->count();
         $deliveryStatus = $getDelivery->count();
         $prodRelease    = $getProd->count();
@@ -56,13 +70,23 @@ class DashboardController extends Controller
             ->count();
 
         // notif modal
-        $user       = Auth::user();
-        $hasPending = BonModel::whereDoesntHave("signBon", function ($q) {
+        $user           = Auth::user();
+        $hasPending     = BonModel::whereDoesntHave("signBon", function ($q) {
             $q->where('sign', 1);
         })->exists();
+        $hasPendingMemo = MemoModel::whereDoesntHave("sign", function ($q) {
+            $q->where('sign', 1);
+        })->exists();
+        $hasQcPending      = QualityModel::where("result", 3)->get();
 
         if ($user->nik === "06067" && $hasPending || $user->nik === "08517" && $hasPending || $user->nik === "250071" && $hasPending) {
             session()->flash('bonPending', true);
+        }
+        if ($user->nik === "06067" && $hasPendingMemo) {
+            session()->flash('memoPending', true);
+        }
+        if ($user->nik === "06067" && $hasQcPending) {
+            session()->flash('qcPending', true);
         }
 
         return view('backend.dashboard.list', compact('needBuy', 'afterCheck', 'deliveryStatus', 'prodRelease', 'purchaseOrder', 'goodIssued', 'goodReceipt', 'rfp'));
@@ -74,9 +98,34 @@ class DashboardController extends Controller
         return redirect('admin/production/listbon');
     }
 
+    public function clearMemoNotif()
+    {
+        session()->forget('memoPending');
+        return redirect('admin/production/listmemo');
+    }
+
+    public function clearQcNotif()
+    {
+        session()->forget('qcPending');
+        return redirect('admin/quality/list');
+    }
+
     public function min_stock(Request $request)
     {
-        $getRecord = ItemsModel::getRecordThree($request);
+        $latestStock = DB::table('stocks as s1')
+            ->select('s1.item_code', 's1.stock_in', 's1.stock_out', 's1.id as stock_id')
+            ->whereRaw('s1.id = (SELECT MAX(s2.id) FROM stocks s2 WHERE s2.item_code = s1.item_code)');
+
+        $getRecord = ItemsModel::leftJoinSub($latestStock, 'latest', function ($join) {
+            $join->on('latest.item_code', '=', 'items.code');
+        })
+            ->select('items.id', 'items.code', 'items.name', 'items.uom', 'items.stock_min', 'items.in_stock', 'items.updated_at')
+            ->selectRaw('COALESCE(latest.stock_in,0) as last_in')
+            ->selectRaw('COALESCE(latest.stock_out,0) as last_out')
+            ->selectRaw('latest.stock_id')
+            ->whereRaw('items.stock_min >= (items.in_stock + (COALESCE(latest.stock_in,0) - COALESCE(latest.stock_out,0)))')
+            ->orderByDesc('latest.stock_id')
+            ->paginate(10);
 
         return view("backend.dashboard.minstock", compact('getRecord'));
     }
@@ -98,7 +147,7 @@ class DashboardController extends Controller
     public function deliv_status(Request $request)
     {
         $getRecord = ProductionModel::with(['delivery', 'quality'])
-            ->where('status', 2)
+            ->where('status', "Closed")
             ->whereHas('quality', function ($q) {
                 $q->where('result', 1);
             })
@@ -115,7 +164,7 @@ class DashboardController extends Controller
 
     public function prod_release(Request $request)
     {
-        $getData    = ProductionModel::withCount("stocks")->where('status', 1)->orderBy("id", "desc")->paginate(10);
+        $getData    = ProductionModel::withCount("stocks")->where('status', "Released")->orderBy("id", "desc")->paginate(10);
         $getRecord  = ProductionOrderDetailsModel::with("stocks")->get()->unique("doc_num")->values();
 
         $productionSummary = [];
