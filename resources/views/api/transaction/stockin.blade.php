@@ -294,6 +294,10 @@
                         document.getElementById("item_desc").value = data.ItemName;
                         document.getElementById("on_hand").value = data.warehouseStock.OnHand;
                         const poData = data.poData;
+                        if (!poData) {
+                            showToast("❌ Error: Nomor PO tidak ditemukan untuk barcode ini", 'error');
+                            return;
+                        }
                         // console.log("posData: ", poData.length);
                         if (poSelect instanceof HTMLSelectElement && Array.isArray(poData) && poData.length > 0) {
                             // simpan ke temporary data untuk select handling
