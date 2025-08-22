@@ -10,9 +10,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use App\Services\SapService;
 
 class ItemsController extends Controller
 {
+    protected $sap;
+
+    public function __construct(SapService $sap)
+    {
+        $this->sap = $sap;
+    }
     public function index(Request $request)
     {
         $user           = Auth::user()->username;
@@ -99,6 +106,38 @@ class ItemsController extends Controller
     }
 
     public function list(Request $request)
+    {
+        $param = [
+            'ItemCode' => $request->get('item_code'),
+            "WhsCode" =>  'BK001',
+            "ItemName" => $request->get('item_desc'),
+            "page" => (int) $request->get('page', 1),
+            "limit" => (int) $request->get('limit', 10),
+        ];
+        $getRecord      = $this->sap->getStockItems($param);
+
+        if (empty($getRecord) || $getRecord['success'] !== true) {
+            return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
+        }
+
+        $totalPages = ceil($getRecord['total'] / $param['limit']);
+        return view("api.items.list", [
+            'getRecord'      => $getRecord['data'] ?? [],
+            'page'        => $getRecord['page'],
+            'limit'       => $getRecord['limit'],
+            'total'       => $getRecord['total'],
+            'totalPages'  => $totalPages,
+            'stockNotes' => $request->get('stockNotes', 2),
+            'defaultWh' => $param['WhsCode'],
+            'stockStatus' => [
+                0 => 'Semua',
+                1 => 'Stock harus dibeli',
+                2 => 'Stock tidak harus dibeli',
+            ]
+        ]);
+    }
+
+    public function list_old(Request $request)
     {
         $getRecord = ItemsModel::getRecord($request);
         return view("backend.items.list", compact('getRecord'));
