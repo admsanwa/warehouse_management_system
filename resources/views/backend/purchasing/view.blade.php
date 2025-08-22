@@ -76,8 +76,12 @@
                                 <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">Status</label>
                                     <div class="col-sm-4">: {{ $getRecord->status == "Open" ? 'Open' : 'Closed' }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">No Series</label>
+                                    <div class="col-sm-4">: {{ $getRecord->no_series ?? "-" }}</div>
+                                </div>
+                                <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">Note</label>
-                                    <div class="col-sm-4">: {{ $getRecord->note ?? "-" }}</div>
+                                    <div class="col-sm-8">: {{ $getRecord->note ?? "-" }}</div>
                                 </div>
                             </div>
                         </div>

@@ -27,7 +27,7 @@
                             <td>{{ $stocks->item->name }}</td>
                             <td>
                                 <input type="hidden" name="stocks[{{ $index }}][id]" value="{{ $stocks->id }}">
-                                <input type="number" name="stocks[{{ $index }}][qty]" class="form-control" value="0">
+                                <input type="number" name="stocks[{{ $index }}][qty]" class="form-control-sm text-center" style="max-width: 60px">
                             </td>
                             <td>
                                 {{ $stocks->item->uom}}

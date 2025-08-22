@@ -25,10 +25,10 @@ class TransactionController extends Controller
     // stock in
     public function stock_in(Request $request)
     {
-        $temp           = StockModel::where('is_temp', true)->orderByDesc('id')->first();
-        $latestStock    = StockModel::whereNotNull('grpo')->orderByDesc('id')->first();
+        $temp           = StockModel::where('is_temp', true)->where("grpo", ">", 0)->orderByDesc('id')->first();
+        $latestStock    = StockModel::where('grpo', ">", 0)->orderByDesc('id')->first();
         if ($temp) {
-            $grpo       = $temp->grpo;
+            $grpo       = $latestStock && $latestStock->grpo ? $latestStock->grpo : 1;
         } else {
             $grpo       = $latestStock && $latestStock->grpo ? ((int)$latestStock->grpo + 1) : 1;
         }
@@ -40,10 +40,10 @@ class TransactionController extends Controller
     public function stockin_po(Request $request, $po)
     {
 
-        $temp           = StockModel::where('is_temp', true)->orderByDesc('id')->first();
-        $latestStock    = StockModel::whereNotNull('grpo')->orderByDesc('id')->first();
+        $temp           = StockModel::where('is_temp', true)->where("grpo", ">", 0)->orderByDesc('id')->first();
+        $latestStock    = StockModel::where('grpo', ">", 0)->orderByDesc('id')->first();
         if ($temp) {
-            $grpo       = $temp->grpo;
+            $grpo       = $latestStock && $latestStock->grpo ? $latestStock->grpo : 1;
         } else {
             $grpo       = $latestStock && $latestStock->grpo ? ((int)$latestStock->grpo + 1) : 1;
         }
@@ -135,6 +135,7 @@ class TransactionController extends Controller
             $grpo = grpoModel::updateOrCreate(
                 ['no_po' => trim($request->nopo)],
                 [
+                    'no_series'     => $po->no_series,
                     'vendor_code'   => $po->vendor_code,
                     'vendor'        => $po->vendor,
                     'vendor_ref_no' => $po->vendor_ref_no,
@@ -231,8 +232,8 @@ class TransactionController extends Controller
     // stockout
     public function stock_out()
     {
-        $temp           = StockModel::where('is_temp', true)->orderByDesc('id')->first();
-        $latestStockOut = StockModel::whereNotNull('isp')->orderByDesc('id')->first();
+        $temp           = StockModel::where('is_temp', true)->where('isp', ">", 0)->orderByDesc('id')->first();
+        $latestStockOut = StockModel::where('isp', ">", 0)->orderByDesc('id')->first();
         if ($temp) {
             $isp        = $latestStockOut && $latestStockOut->isp ? $latestStockOut->isp : 1;
         } else {
@@ -246,8 +247,8 @@ class TransactionController extends Controller
 
     public function stockout_po($prod_order)
     {
-        $temp           = StockModel::where('is_temp', true)->orderByDesc('id')->first();
-        $latestStockOut = StockModel::whereNotNull('isp')->orderByDesc('id')->first();
+        $temp           = StockModel::where('is_temp', true)->where('isp', ">", 0)->orderByDesc('id')->first();
+        $latestStockOut = StockModel::where('isp', ">", 0)->orderByDesc('id')->first();
         if ($temp) {
             $isp        = $latestStockOut && $latestStockOut->isp ? $latestStockOut->isp : 1;
         } else {
@@ -352,12 +353,13 @@ class TransactionController extends Controller
             $ifp = IFPModel::updateOrCreate(
                 ['no_po' => trim($request->prod_order)],
                 [
+                    'no_series'     => $po->no_series,
                     'project_code'  => $po->project_code,
                     'whse'          => "BK001",
                     'reason'        => trim($request->reason),
                     'io'            => $po->io_no,
                     'so'            => $po->sales_order,
-                    'remarks'       => trim($request->remarks)
+                    'remarks'       => $po->remarks ?? trim($request->remarks),
                 ]
             );
         } catch (\Throwable $e) {
@@ -417,11 +419,11 @@ class TransactionController extends Controller
     {
         session()->forget('first_scan');
         $temp   = RFPModel::orderByDesc('id')->where('is_temp', true)->first();
-        $rfp    = RFPModel::whereNotNull('number')->orderByDesc('id')->first();
+        $rfp    = RFPModel::where('number', ">", 0)->orderByDesc('id')->first();
         if (!$temp) {
             $number = $rfp && $rfp->number ? ((int)$rfp->number + 1) : 1;
         } else {
-            $number = $rfp->number;
+            $number = $rfp && $rfp->number ? $rfp->number : 1;
         }
 
         $getIos     = null;
@@ -456,6 +458,7 @@ class TransactionController extends Controller
         // save db
         $rfp                = new RFPModel();
         $rfp->number        = trim($request->input("number"));
+        $rfp->no_series     = "-";
         $rfp->io            = "-";
         $rfp->so            = "-";
         $rfp->prod_order    = 0;
@@ -498,6 +501,7 @@ class TransactionController extends Controller
             $rfp    = RFPModel::find($rfpData["id"]);
             if ($rfp) {
                 $rfp->io            = $po->io_no ?? "";
+                $rfp->no_series     = $po->no_series ?? "-";
                 $rfp->prod_order    = trim($request->input("prod_order"));
                 $rfp->qty           = $rfpData["qty"];
                 $rfp->so            = $po->sales_order ?? "";
@@ -528,15 +532,15 @@ class TransactionController extends Controller
     public function rfp_detail(Request $request, $number)
     {
         $getRecord  = RFPModel::where("number", $number)->first();
-        $RFPQty     = RFPModel::where("prod_order", $getRecord->prod_order)->whereNotNull('qty')->value('qty');
-        $getPO      = RFPModel::where("number", $number)->whereNotNull('qty')->value('prod_order');
-        $getData    = RFPModel::where("number", $number)->orderByDesc("id")->paginate(5);
+        $RFPQty     = RFPModel::where("prod_order", $getRecord->prod_order)->where('qty', '>', 0)->value('qty');
+        $getPO      = RFPModel::where("number", $number)->where('qty', '>', 0)->value('prod_order');
+        $getData    = RFPModel::where("number", $number)->orderByDesc("id")->paginate(10);
         if ($RFPQty > 0) {
             ProductionModel::where('doc_num', $getPO)->update(['status' => 'Closed']);
         }
 
         // save table items
-        if ($getRecord->prod_no) {
+        if (!$getRecord->prod_no) {
             $items = new ItemsModel();
             $items->code        = $getRecord->prod_no;
             $items->name        = $getRecord->prod_desc;
@@ -579,12 +583,12 @@ class TransactionController extends Controller
     // good issue
     public function good_issued(Request $request)
     {
-        $temp               = ItemsMaklonModel::orderByDesc('id')->where('is_temp', true)->first();
-        $latestItemsMaklon  = ItemsMaklonModel::where('gi', '!=', 0)->whereNotNull('gi')->orderByDesc('id')->first();
+        $temp               = ItemsMaklonModel::orderByDesc('id')->where("gi", ">", 0)->where('is_temp', true)->first();
+        $latestItemsMaklon  = ItemsMaklonModel::where('gi', '>', 0)->orderByDesc('id')->first();
         if (!$temp) {
             $gi = $latestItemsMaklon && $latestItemsMaklon->gi ? ((int)$latestItemsMaklon->gi + 1) : 1;
         } else {
-            $gi = $latestItemsMaklon->gi;
+            $gi = $latestItemsMaklon && $latestItemsMaklon->gi ? $latestItemsMaklon->gi : 1;
         }
         // dd($temp, $latestItemsMaklon);
 
@@ -669,9 +673,9 @@ class TransactionController extends Controller
 
         try {
             $gi = goodissueModel::updateOrCreate(
-                ['po' => trim($request->nopo)],
+                ['po' => trim($request->po)],
                 [
-                    'po'            => $po->no_po,
+                    'no_series'      => $po->no_series,
                     'io'            => $po->io,
                     'internal_no'   => $po->internal_no,
                     'so'            => $po->so,
@@ -711,8 +715,8 @@ class TransactionController extends Controller
         $getData    = ItemsMaklonModel::where('gi', $gi)->orderBy('id', 'desc')->paginate(5);
 
         // set value po
-        $getQtyPo       = PurchaseOrderDetailsModel::where("nopo", $getRecord->po)->whereNotNull("qty")->sum("qty") ?? 0;
-        $giQty          = ItemsMaklonModel::where("po", $getRecord->po)->where("gi", $gi)->whereNotNull('qty')->sum('qty') ?? 0;
+        $getQtyPo       = PurchaseOrderDetailsModel::where("nopo", $getRecord->po)->where("qty", ">", 0)->sum("qty") ?? 0;
+        $giQty          = ItemsMaklonModel::where("po", $getRecord->po)->where("gi", ">", 0)->where("qty", ">", 0)->sum("qty") ?? 0;
         $getPO          = PurchasingModel::with("po_details")->where("no_po", $getRecord->po)->first();
         $resultQty      = $getQtyPo - $giQty;
         if ($resultQty < 0) {
@@ -749,12 +753,12 @@ class TransactionController extends Controller
     // good receipt
     public function good_receipt(Request $request)
     {
-        $temp               = ItemsMaklonModel::orderByDesc('id')->where('is_temp', true)->first();
-        $latestItemsMaklon  = ItemsMaklonModel::where('gr', '!=', 0)->whereNotNull('gr')->orderByDesc('id')->first();
+        $temp               = ItemsMaklonModel::orderByDesc('id')->where("gr", ">", 0)->where('is_temp', true)->first();
+        $latestItemsMaklon  = ItemsMaklonModel::where('gr', '>', 0)->orderByDesc('id')->first();
         if (!$temp) {
             $gr       = $latestItemsMaklon && $latestItemsMaklon->gr ? ((int)$latestItemsMaklon->gr + 1) : 1;
         } else {
-            $gr       = $latestItemsMaklon->gr;
+            $gr       = $latestItemsMaklon && $latestItemsMaklon->gr ? $latestItemsMaklon->gr : 1;
         }
         // dd($temp);
 
@@ -774,6 +778,9 @@ class TransactionController extends Controller
             ]);
         }
         $on_hand        = ItemsModel::where("code", $barcode)->orderByDesc("id")->value("in_stock") ?? 0;
+        $latestStockIn  = StockModel::where("item_code", $items->code)->where("stock_in", ">", 0)->orderByDesc("id")->value("stock_in") ?? 0;
+        $latestStockOut = StockModel::where("item_code", $items->code)->where("stock_out", ">", 0)->orderByDesc("id")->value("stock_out") ?? 0;
+        $on_hand        = ($items->in_stock + $latestStockIn) - $latestStockOut;
         $purchaseOrders = PurchasingModel::where("status", "GR")->pluck("no_po");
 
         // save db
@@ -833,8 +840,6 @@ class TransactionController extends Controller
             $maklonItems    = ItemsMaklonModel::select("in_stock")->where("po", $request->po)->where('code', $gr->code)->orderByDesc("id")->first();
             if ($gr) {
                 $gr->po             = trim($request->po);
-                $gr->io             = trim($request->io ?? 0);
-                $gr->internal_no    = trim($request->internal_no);
                 $gr->in_stock       = $maklonItems ? $maklonItems->in_stock + $grData["qty"] : $grData["qty"];
                 $gr->qty            = $grData["qty"];
                 $gr->is_temp        = false;
@@ -855,9 +860,9 @@ class TransactionController extends Controller
 
         try {
             $gr = goodreceiptModel::updateOrCreate(
-                ['po' => trim($request->nopo)],
+                ['po' => trim($request->po)],
                 [
-                    'po'            => $po->no_po,
+                    'no_series'     => $po->no_series,
                     'io'            => $po->io,
                     'internal_no'   => $po->internal_no,
                     'so'            => $po->so,
@@ -867,8 +872,8 @@ class TransactionController extends Controller
                     'no_inventory_tf'   => trim($request->no_inventory_tf),
                     'type_inv_transaction'  => trim($request->type_inv_transaction),
                     'reason'        => trim($request->reason),
-                    'whse'          => trim($request->whse),
-                    'project_code'  => trim($request->project_code),
+                    'whse'          => "BK001",
+                    'project_code'  => trim($request->project_code) ?? "-",
                     'distr_rule'    => $po->distr_rule,
                     'vendor_code'   => $po->vendor_code,
                     'acct_code'     => $po->acct_code,
@@ -889,10 +894,10 @@ class TransactionController extends Controller
         $getData    = ItemsMaklonModel::where('gr', $gr)->orderBy('id', 'desc')->paginate(5);
 
         // set value po
-        $getQtyPo       = PurchaseOrderDetailsModel::where("nopo", $getRecord->po)->whereNotNull("qty")->sum("qty") ?? 0;
-        $grQty          = ItemsMaklonModel::where("po", $getRecord->po)->where("gr", $gr)->whereNotNull('qty')->sum('qty') ?? 0;
+        $getQtyPo       = PurchaseOrderDetailsModel::where("nopo", $getRecord->po)->where("qty", ">", 0)->sum("qty") ?? 0;
+        $grQty          = ItemsMaklonModel::where("po", $getRecord->po)->where("gr", ">", 0)->where('qty', ">", 0)->sum('qty') ?? 0;
         $getPO          = PurchasingModel::with("po_details")->where("no_po", $getRecord->po)->first();
-        $resultQty = $getQtyPo - $grQty;
+        $resultQty      = $getQtyPo - $grQty;
         if ($resultQty < 0) {
             PurchasingModel::where("no_po", $getPO->no_po)->update(["status" => "Closed"]);
         } else if ($resultQty == 0) {

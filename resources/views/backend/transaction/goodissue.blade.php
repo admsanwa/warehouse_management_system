@@ -279,8 +279,8 @@
             const remarks = document.getElementById("remarks").value;
             // console.log("io", io, "po", po, "gi", gi);
 
-            if (!po || !gi) {
-                alert("Pastikan Nomer Purchase Order atau Nomer IO di isi sebelum submit.");
+            if (!po || !gi || !no_surat_jalan || !no_inventory_tf || !type_inv_transaction) {
+                alert("Pastikan semua masukkan di isi sebelum submit.");
                 return false; // Prevent form submission
             }
 

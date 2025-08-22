@@ -31,7 +31,7 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="form-group col-md-2">
-                                            <label for="">Delivery Date</label>
+                                            <label for="">Posting Date</label>
                                             <input type="date" name="posting_date" class="form-control" value="{{ Request()->posting_date }}">
                                         </div>
                                         <div class="form-group col-md-2">
@@ -43,8 +43,16 @@
                                             <input type="text" name="vendor" class="form-control" value="{{ Request()->vendor }}" placeholder="Enter Vendor Name">
                                         </div>
                                         <div class="form-group col-md-2">
-                                            <label for="">Contact Person</label>
-                                            <input type="text" name="contact_person" class="form-control" value="{{ Request()->contact_person }}" placeholder="Enter Contact Person">
+                                            <label for="">No Series</label>
+                                            <select name="no_series" id="no_series" class="form-control">
+                                                <option value="">Select No Series</option>
+                                                @foreach ($getPagination->unique('no_series') as $series)
+                                                    <option value="{{ $series->no_series }}"
+                                                        {{ Request()->no_series == $series->no_series ? 'selected' : ''}}>
+                                                        {{ $series->no_series }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                         <div class="form-group col-md-3">
                                             <button type="submit" class="btn btn-primary" style="margin-top: 30px"><i class="fa fa-search"></i> Search</button>
@@ -73,6 +81,7 @@
                                                 <th>Remain</th>
                                                 <th>Posting Date</th>
                                                 <th>Status</th>
+                                                <th>No Series</th>
                                                 <th>Details</th>
                                             </tr>
                                         </thead>
@@ -88,7 +97,7 @@
                                                     <td>{{ $purchasing->no_po }}</td>
                                                     <td>{{ $purchasing->vendor }}</td>
                                                     <td>
-                                                        @if ($purchasing->status == "Open" && stripos($purchasing->po_details->item_code, "Maklon") !== false)
+                                                        @if (stripos($purchasing->po_details->item_code, "Maklon") !== false)
                                                             {{ $resultTwo["remain"] }}
                                                         @else
                                                             {{ $result["remain"] }}
@@ -106,6 +115,7 @@
                                                             Closed
                                                         @endif
                                                     </td>
+                                                    <td>{{ $purchasing->no_series }}</td>
                                                     <td>
                                                         <a href="{{ url('admin/purchasing/view/' . $purchasing->id)}}" class="btn btn-primary"><i class="fa fa-eye"></i></a>
                                                     </td>

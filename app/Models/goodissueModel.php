@@ -13,6 +13,7 @@ class goodissueModel extends Model
 
     protected $fillable = [
         'po',
+        'no_series',
         'io',
         'internal_no',
         'so',

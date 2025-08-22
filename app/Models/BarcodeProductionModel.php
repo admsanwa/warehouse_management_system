@@ -21,4 +21,9 @@ class BarcodeProductionModel extends Model
 
         return $return;
     }
+
+    public function po()
+    {
+        return $this->belongsTo(ProductionModel::class, "prod_no", "prod_no");
+    }
 }

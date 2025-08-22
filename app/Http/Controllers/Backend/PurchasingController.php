@@ -35,13 +35,10 @@ class PurchasingController extends Controller
         foreach ($getRecordTwo as $record) {
             $po             = $record->no_po;
             $purchaseQty    = PurchaseOrderDetailsModel::where("nopo", $po)->sum("qty");
-            $goodReceipt    = ItemsMaklonModel::where("po", $po)
-                ->where(function ($query) {
-                    $query->whereNotNull("gr")->where("gr", "<>", 0);
-                })->sum("qty");
+            $goodReceiptQty    = ItemsMaklonModel::where("po", $po)->where("gr", ">", 0)->sum("qty");
 
             $purchasingSummaryTwo[$po] = [
-                'remain' => $purchaseQty - $goodReceipt
+                'remain' => $purchaseQty - $goodReceiptQty
             ];
         }
 

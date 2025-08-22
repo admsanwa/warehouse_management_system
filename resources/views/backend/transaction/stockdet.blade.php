@@ -53,6 +53,9 @@
                                     <div class="col-sm-2">: {{ $getRecord->grpoData->whse ?? "-" }}</div>
                                     <label for="" class="col-sm-2 col-form-lable">Posting Date</label>
                                     <div class="col-sm-2">: {{ \Carbon\Carbon::parse($getRecord->created_at)->format('Y-m-d')}}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">No Series</label>
+                                    <div class="col-sm-2">: {{ $getRecord->grpoData->no_series ?? "-" }}</div>
+
                                 </div>
                                 <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">Remarks</label>

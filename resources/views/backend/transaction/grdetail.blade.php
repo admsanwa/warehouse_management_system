@@ -64,13 +64,17 @@
                                     <label for="" class="col-sm-2 col-form-lable">Refer No Good Issue</label>
                                     <div class="col-sm-2">: {{ $getRecord->good_receipt->no_gi }}</div>
                                 </div>
-                                  <div class="form-group row">
+                                <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">Account Code</label>
                                     <div class="col-sm-2">: {{ $getRecord->good_receipt->acct_code }}</div>
                                     <label for="" class="col-sm-2 col-form-lable">Reason</label>
                                     <div class="col-sm-2">: {{ $getRecord->good_receipt->reason }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">No Series</label>
+                                    <div class="col-sm-2">: {{ $getRecord->good_receipt->no_series }}</div>
+                                </div>
+                                <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">Remarks</label>
-                                    <div class="col-sm-2">: {{ $getRecord->good_receipt->remarks }}</div>
+                                    <div class="col-sm-6">: {{ $getRecord->good_receipt->remarks }}</div>
                                 </div>
                             </div>
                         </div>        

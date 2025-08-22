@@ -34,7 +34,7 @@
                                             <label for="">IO</label>
                                             <input type="text" name="io" id="io" class="form-control" placeholder="Enter IO">
                                         </div>
-                                        <div class="form-group col-md-2">
+                                        <div class="form-group col-md-3">
                                             <button type="submit" class="btn btn-success" style="margin-top: 30px;"><i class="fa fa-search"></i> Search</button>
                                             <a href="{{ url("admin/quality/barcode")}}" class="btn btn-warning" style="margin-top: 30px;"><i class="fa fa-eraser"></i> Reset</a>
                                         </div>
