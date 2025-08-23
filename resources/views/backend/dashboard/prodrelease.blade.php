@@ -45,7 +45,19 @@
                                             <label for="">Product Desc</label>
                                             <input type="text" name="prod_desc" class="form-control" placeholder="Enter Product Description">
                                         </div>
-                                         <div class="form-group col-md-2">
+                                        <div class="form-group col-md-2">
+                                            <label for="">No Series</label>
+                                            <select name="no_series" id="no_series" class="form-control">
+                                                <option value="">Select No Series</option>
+                                                @foreach ($getSeries->unique('no_series') as $series)
+                                                    <option value="{{ $series->no_series }}"
+                                                        {{ Request()->no_series == $series->no_series ? 'selected' : ''}}>
+                                                        {{ $series->no_series }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                         <div class="form-group col-md-3">
                                             <button type="submit" class="btn btn-primary" style="margin-top: 30px"><i class="fa fa-search"></i> Search</button>
                                             <a href="{{ url('admin/production/po')}}" class="btn btn-warning" style="margin-top: 30px"><i class="fa fa-eraser"></i> Reset</a>
                                         </div>
@@ -73,6 +85,7 @@
                                                 <th>Doc Number</th>
                                                 <th>IO</th>
                                                 <th>Due Date</th>
+                                                <th>No Series</th>
                                                 <th>Status</th>
                                                 <th>Details</th>
                                             </tr>
@@ -91,13 +104,21 @@
                                                     <td>{{ $production->doc_num }}</td>
                                                     <td>{{ $production->io_no }}</td>
                                                     <td>{{ $production->due_date }}</td>
+                                                    <td>{{ $production->no_series }}</td>
                                                     <td>
-                                                        @if ($production->status == 0)
-                                                            <a href="{{ url("admin/transaction/stockout", $production->doc_num)}}" class="btn btn-sm btn-outline-success"><i class="fa fa-arrow-right"></i> Planned</a>
-                                                        @elseif ($production->status == 1)
-                                                           <a href="{{ url("admin/transaction/rfp")}}" class="btn btn-sm btn-outline-success"><i class="fa fa-arrow-right"></i> Released</a>
-                                                        @else 
-                                                            Closed
+                                                       @if (($user->department == 'Production and Warehouse' && $user->level == 'Manager' || $user->department == 'Production and Warehouse' && $user->level == 'Supervisor') || 
+                                                            $user->department == 'Procurement, Installation and Delivery' && $user->level == 'Manager' || $user->department == 'PPIC')
+                                                            @if ($production->status == "Released")
+                                                                Released
+                                                            @else 
+                                                                Closed
+                                                            @endif
+                                                        @else
+                                                            @if ($production->status == "Released")
+                                                                <a href="{{ url("admin/transaction/stockout", $production->doc_num)}}" class="btn btn-sm btn-outline-success"><i class="fa fa-arrow-right"></i> Released</a>
+                                                            @else 
+                                                                Closed
+                                                            @endif
                                                         @endif
                                                     </td>
                                                     

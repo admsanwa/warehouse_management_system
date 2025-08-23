@@ -25,7 +25,9 @@ class ProductionController extends Controller
     {
         $getData    = ProductionModel::withCount("stocks")->orderBy("id", "desc")->paginate(10);
         $getRecord  = ProductionOrderDetailsModel::with("stocks")->get()->unique("doc_num")->values();
-        $getSeries  = ProductionModel::getRecord($request);
+        $getSeries  = ProductionModel::getRecord($request)->paginate(10);
+        $user       = Auth::user();
+
 
         $productionSummary = [];
         foreach ($getRecord as $record) {
@@ -38,7 +40,7 @@ class ProductionController extends Controller
                 "remain" => $productionQty - $stockOutQty
             ];
         }
-        return view('backend.production.list', compact('getData', 'productionSummary', 'getRecord', 'getSeries'));
+        return view('backend.production.list', compact('getData', 'productionSummary', 'getRecord', 'getSeries', 'user'));
     }
 
     public function view(Request $request, $id)

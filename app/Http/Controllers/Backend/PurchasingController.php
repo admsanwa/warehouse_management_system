@@ -8,6 +8,7 @@ use App\Models\ItemsMaklonModel;
 use App\Models\PurchaseOrderDetailsModel;
 use App\Models\PurchasingModel;
 use App\Models\StockModel;
+use Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
@@ -20,6 +21,7 @@ class PurchasingController extends Controller
         $getRecordTwo   = PurchasingModel::with("maklon_details")->get()->values();
         // $getRecord      = PurchaseOrderDetailsModel::with("stocks")->get()->unique("nopo")->values();
         $getPagination  = PurchasingModel::getRecord($request);
+        $user           = Auth::user();
 
         $purchasingSummary = [];
         $purchasingSummaryTwo = [];
@@ -42,7 +44,7 @@ class PurchasingController extends Controller
             ];
         }
 
-        return view("backend.purchasing.list", compact('getRecord', 'getPagination', 'purchasingSummary', 'purchasingSummaryTwo'));
+        return view("backend.purchasing.list", compact('getRecord', 'getPagination', 'purchasingSummary', 'purchasingSummaryTwo', 'user'));
     }
 
     public function view(Request $request, $id)

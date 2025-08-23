@@ -46,6 +46,14 @@
                                             <input type="text" name="prod_desc" class="form-control" placeholder="Enter Product Description">
                                         </div>
                                         <div class="form-group col-md-2">
+                                            <label for="">Status</label>
+                                            <select name="status" id="status" class="form-control">
+                                                <option value="">Select Status</option>
+                                                <option value="Released">Released</option>
+                                                <option value="Closed">Closed</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-md-2">
                                             <label for="">No Series</label>
                                             <select name="no_series" id="no_series" class="form-control">
                                                 <option value="">Select No Series</option>
@@ -106,10 +114,19 @@
                                                     <td>{{ $production->due_date }}</td>
                                                     <td>{{ $production->no_series }}</td>
                                                     <td>
-                                                        @if ($production->status == "Released")
-                                                            <a href="{{ url("admin/transaction/stockout", $production->doc_num)}}" class="btn btn-sm btn-outline-success"><i class="fa fa-arrow-right"></i> Released</a>
-                                                        @else 
-                                                            Closed
+                                                        @if (($user->department == 'Production and Warehouse' && $user->level == 'Manager' || $user->department == 'Production and Warehouse' && $user->level == 'Supervisor') || 
+                                                            $user->department == 'Procurement, Installation and Delivery' && $user->level == 'Manager' || $user->department == 'PPIC')
+                                                            @if ($production->status == "Released")
+                                                                Released
+                                                            @else 
+                                                                Closed
+                                                            @endif
+                                                        @else
+                                                            @if ($production->status == "Released")
+                                                                <a href="{{ url("admin/transaction/stockout", $production->doc_num)}}" class="btn btn-sm btn-outline-success"><i class="fa fa-arrow-right"></i> Released</a>
+                                                            @else 
+                                                                Closed
+                                                            @endif
                                                         @endif
                                                     </td>
                                                     

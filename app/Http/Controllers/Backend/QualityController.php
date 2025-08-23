@@ -79,6 +79,7 @@ class QualityController extends Controller
     public function history(Request $request)
     {
         $getRecord = QualityModel::getRecord($request);
-        return view("backend.quality.history", compact("getRecord"));
+        $user      = Auth::user();
+        return view("backend.quality.history", compact("getRecord", "user"));
     }
 }

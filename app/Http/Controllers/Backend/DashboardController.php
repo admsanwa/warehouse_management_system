@@ -164,8 +164,10 @@ class DashboardController extends Controller
 
     public function prod_release(Request $request)
     {
-        $getData    = ProductionModel::withCount("stocks")->where('status', "Released")->orderBy("id", "desc")->paginate(10);
+        $getData    = ProductionModel::getRecord($request)->withCount("stocks")->where('status', 'Released')->orderBy("id", "desc")->paginate(10);
         $getRecord  = ProductionOrderDetailsModel::with("stocks")->get()->unique("doc_num")->values();
+        $getSeries  = ProductionModel::getRecord($request)->get();
+        $user       = Auth::user();
 
         $productionSummary = [];
         foreach ($getRecord as $record) {
@@ -178,12 +180,13 @@ class DashboardController extends Controller
                 "remain" => $productionQty - $stockOutQty
             ];
         }
-        return view('backend.production.list', compact('getData', 'productionSummary'));
+        return view('backend.dashboard.prodrelease', compact('getData', 'productionSummary', 'getSeries', 'user'));
     }
 
     public function grpo(Request $request)
     {
         $getRecord      = PurchasingModel::with("po_details")->get()->values();
+        $user           = Auth::user();
         // $getRecord      = PurchaseOrderDetailsModel::with("stocks")->get()->unique("nopo")->values();
         $getPagination = PurchasingModel::where('status', 'Open')
             ->whereHas('po_details', function ($query) {
@@ -203,7 +206,7 @@ class DashboardController extends Controller
             ];
         }
 
-        return view("backend.dashboard.goodreceiptpo", compact('getRecord', 'getPagination', 'purchasingSummary'));
+        return view("backend.dashboard.goodreceiptpo", compact('getRecord', 'getPagination', 'purchasingSummary', 'user'));
     }
 
     public function good_issued(Request $request)
@@ -234,6 +237,7 @@ class DashboardController extends Controller
     public function good_receipt(Request $request)
     {
         $getRecord      = PurchasingModel::with("po_details")->get()->values();
+        $user           = Auth::user();
         // $getRecord      = PurchaseOrderDetailsModel::with("stocks")->get()->unique("nopo")->values();
         $getPagination = PurchasingModel::where('status', 'GR')
             ->whereHas('po_details', function ($query) {
@@ -253,7 +257,7 @@ class DashboardController extends Controller
             ];
         }
 
-        return view("backend.dashboard.goodreceiptpo", compact('getRecord', 'getPagination', 'purchasingSummary'));
+        return view("backend.dashboard.goodreceiptpo", compact('getRecord', 'getPagination', 'purchasingSummary', 'user'));
     }
 
     public function receipt_from_prod(Request $request)
