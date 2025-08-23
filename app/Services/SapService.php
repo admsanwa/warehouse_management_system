@@ -42,13 +42,26 @@ class SapService
         return $response->json();
     }
 
-
     public function getProductionOrders($param)
     {
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
         ])->get("{$this->baseUrl}/api/inbound/production-orders", $param);
+
+        if ($response->failed()) {
+            throw new \Exception('Failed to fetch Purchase Orders: ' . $response->body());
+        }
+
+        return $response->json();
+    }
+
+    public function getSeries($param)
+    {
+        $response = Http::withHeaders([
+            'Accept'     => 'application/json',
+            'X-API-Key'  => $this->apiKey,
+        ])->get("{$this->baseUrl}/api/inbound/series", $param);
 
         if ($response->failed()) {
             throw new \Exception('Failed to fetch Purchase Orders: ' . $response->body());
@@ -72,7 +85,6 @@ class SapService
                 'payload'  => $param,
             ]);
         }
-
         return $response->json();
     }
 }

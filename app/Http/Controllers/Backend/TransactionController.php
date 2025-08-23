@@ -769,6 +769,14 @@ class TransactionController extends Controller
     // good issue
     public function good_issued(Request $request)
     {
+        $po       = $request->get('po');
+        $docEntry = $request->get('docEntry');
+
+        return view('api.transaction.goodissue', compact('po', 'docEntry'));
+    }
+
+    public function good_issued_old(Request $request)
+    {
         $temp               = ItemsMaklonModel::orderByDesc('id')->where('is_temp', true)->first();
         $latestItemsMaklon  = ItemsMaklonModel::where('gi', '!=', 0)->whereNotNull('gi')->orderByDesc('id')->first();
         if (!$temp) {
@@ -782,6 +790,47 @@ class TransactionController extends Controller
     }
 
     public function scan_and_out(Request $request)
+    {
+        $barcode    = $request->input("item_code");
+        $gi         = $request->input("gi");
+        $items      = ItemsModel::where("code", $barcode)->first();
+        $user       = Auth::user()->username;
+        if (!$items) {
+            return response()->json([
+                'success' => false,
+                'message' => "Produk tidak ditemukan untuk barcode: " . $barcode . ". Pastikan produk sesuai dan scan kembali"
+            ]);
+        }
+        $on_hand        = ItemsMaklonModel::where("code", $barcode)->orderByDesc("id")->value("in_stock") ?? 0;
+        $purchaseOrders = PurchasingModel::with("po_details")->whereHas("po_details", function ($q) {
+            $q->where('item_code', 'LIKE', '%Maklon%');
+        })->where("status", "Open")->where("status", "!=", "GR")->pluck("no_po");
+
+        // save db
+        // $goodissue = new ItemsMaklonModel();
+        // $goodissue->gi          = $gi;
+        // $goodissue->gr          = 0;
+        // $goodissue->po          = 0;
+        // $goodissue->code        = $items->code;
+        // $goodissue->name        = $items->name;
+        // $goodissue->uom         = $items->uom;
+        // $goodissue->in_stock    = 0;
+        // $goodissue->qty         = 0;
+        // $goodissue->stock_min   = 0;
+        // $goodissue->scanned_by  = $user;
+        // $goodissue->is_temp     = true;
+        // $goodissue->save();
+
+        return response()->json([
+            "success"   => true,
+            "name"      => $items->name,
+            "message"   => "Item berhasil di scan!",
+            "on_hand"   => $on_hand,
+            "pos"       => $purchaseOrders ?? 0,
+        ]);
+    }
+
+    public function scan_and_out_old(Request $request)
     {
         $barcode    = $request->input("item_code");
         $gi         = $request->input("gi");

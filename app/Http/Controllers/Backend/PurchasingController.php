@@ -78,6 +78,36 @@ class PurchasingController extends Controller
             'lines' => $lines,
         ]);
     }
+    public function series_search(Request $request)
+    {
+        $searchQuery = $request->get('q');
+
+        $param = [
+            'page'       => 1,
+            'limit'      => 100,
+            'Locked'     => 'N', // biasanya artinya "Not Locked" / masih aktif
+            'SeriesName' => $searchQuery,
+        ];
+
+        $getSeries = $this->sap->getSeries($param);
+
+        if (empty($getSeries) || $getSeries['success'] !== true) {
+            return response()->json([
+                'results' => []
+            ]);
+        }
+
+        $series = collect($getSeries['data'] ?? [])->map(function ($item) {
+            return [
+                'id'   => $item['Series'] ?? $item['id'],
+                'text' => $item['SeriesName'] ?? $item['name'],
+            ];
+        });
+
+        return response()->json([
+            'results' => $series
+        ]);
+    }
 
 
     public function old_index(Request $request)

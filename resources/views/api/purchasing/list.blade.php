@@ -66,6 +66,11 @@
                                                 @endforeach
                                             </select>
                                         </div>
+                                        <div class="form-group col-md-2">
+                                            <label for="series">Series</label>
+                                            <select name="series" class="form-control" id="seriesSelect">
+                                            </select>
+                                        </div>
                                         <div class="form-group d-flex align-items-end gap-2">
                                             <button type="submit" class="btn btn-primary mr-2">
                                                 <i class="fa fa-search mr-1"></i> Search
@@ -117,7 +122,7 @@
                                                         @endphp
                                                         @if ($order['DocStatus'] == 'Open' && $itemCode)
                                                             @if (stripos($itemCode, 'Maklon') !== false)
-                                                                <a href="{{ url('admin/transaction/goodissued') }}"
+                                                                <a href="{{ url('admin/transaction/goodissued?po=' . $order['DocNum'] . '&docEntry=' . $order['DocEntry']) }}"
                                                                     class="btn btn-outline-success">
                                                                     <i class="fa fa-arrow-right"></i> Open GI
                                                                 </a>
@@ -156,21 +161,23 @@
                                         @endforelse
                                     </table>
                                 </div>
+                                @php
+                                    $query = request()->all();
+                                @endphp
                                 <div class="card-footer">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <span>
                                             Showing page <b class="text-primary">{{ $page }}</b> of
-                                            {{ $totalPages }}
-                                            (Total {{ $total }} records)
+                                            {{ $totalPages }} (Total {{ $total }} records)
                                         </span>
 
                                         <div class="btn-group">
                                             {{-- First + Previous --}}
                                             @if ($page > 1)
-                                                <a href="{{ url('/admin/purchasing?page=1&limit=' . $limit) }}"
+                                                <a href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['page' => 1, 'limit' => $limit])) }}"
                                                     class="btn btn-outline-primary btn-sm" aria-label="First Page">First</a>
 
-                                                <a href="{{ url('/admin/purchasing?page=' . ($page - 1) . '&limit=' . $limit) }}"
+                                                <a href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['page' => $page - 1, 'limit' => $limit])) }}"
                                                     class="btn btn-outline-primary btn-sm"
                                                     aria-label="Previous Page">Previous</a>
                                             @endif
@@ -182,15 +189,14 @@
 
                                             {{-- Next + Last --}}
                                             @if ($page < $totalPages)
-                                                <a href="{{ url('/admin/purchasing?page=' . ($page + 1) . '&limit=' . $limit) }}"
+                                                <a href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['page' => $page + 1, 'limit' => $limit])) }}"
                                                     class="btn btn-outline-primary btn-sm" aria-label="Next Page">Next</a>
 
-                                                <a href="{{ url('/admin/purchasing?page=' . $totalPages . '&limit=' . $limit) }}"
+                                                <a href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['page' => $totalPages, 'limit' => $limit])) }}"
                                                     class="btn btn-outline-primary btn-sm" aria-label="Last Page">Last</a>
                                             @endif
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
@@ -199,4 +205,47 @@
             </div>
         </section>
     </div>
+    <script>
+        window.addEventListener("load", function() {
+            const selectSeries = $("#seriesSelect");
+            selectSeries.select2({
+                placeholder: "Pilih series...",
+                allowClear: true,
+                width: "100%",
+                language: {
+                    inputTooShort: function() {
+                        return "Ketik untuk mencari...";
+                    },
+                    noResults: function() {
+                        return "Tidak ada data ditemukan";
+                    },
+                    searching: function() {
+                        return "Sedang mencari...";
+                    }
+                },
+                ajax: {
+                    url: "/purchasing/seriesSearch",
+                    dataType: "json",
+                    delay: 250,
+                    data: function(params) {
+                        if (!params) {
+                            return;
+                        }
+                        return {
+                            q: params.term
+                        };
+                    },
+                    processResults: function(data) {
+                        console.log("Response dari server:", data); // cek di console
+                        return {
+                            results: (data.results || []).map(item => ({
+                                id: item.id,
+                                text: `${item.id} - ${item.text}`
+                            }))
+                        };
+                    }
+                }
+            });
+        });
+    </script>
 @endsection

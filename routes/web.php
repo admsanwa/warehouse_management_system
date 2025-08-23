@@ -79,6 +79,7 @@ Route::group(['middleware' => 'admin'], function () {
     // Purchasing
     Route::get('admin/purchasing_old', [PurchasingController::class, 'old_index']);
     Route::get('admin/purchasing/view_old/{id}', [PurchasingController::class, 'old_view']);
+    Route::get('/purchasing/seriesSearch', [PurchasingController::class, 'series_search']);
 
     Route::get('admin/purchasing', [PurchasingController::class, 'index']);
     Route::get('admin/purchasing/view', [PurchasingController::class, 'view']);
