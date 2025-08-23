@@ -105,7 +105,8 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get("admin/production/delete/{id}", [ProductionController::class, "delete"]);
     Route::get("admin/production/deleteall", [ProductionController::class, "deleteall"]);
     Route::get('admin/production/po', [ProductionController::class, 'index']);
-    Route::get('admin/production/view/{id}', [ProductionController::class, 'view']);
+    Route::get('admin/production/view', [ProductionController::class, 'view']);
+    // Route::get('admin/production/view/{id}', [ProductionController::class, 'view']);
     Route::get('admin/production/upload', [ProductionController::class, 'upload_form']);
     Route::post('admin/production/upload', [ProductionController::class, 'upload']);
     Route::get('admin/production/{prod_no}', [ProductionController::class, 'view_prod']);

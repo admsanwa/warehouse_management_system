@@ -18,10 +18,73 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use App\Services\SapService;
+use Illuminate\Support\Arr;
 
 class ProductionController extends Controller
 {
+    protected $sap;
+
+    public function __construct(SapService $sap)
+    {
+        $this->sap = $sap;
+    }
+
     public function index(Request $request)
+    {
+        $param = [
+            "page" => (int) $request->get('page', 1),
+            "limit" => (int) $request->get('limit', 10),
+            "DocNum" => $request->get('doc_num'),
+            "U_MEB_NO_IO" => $request->get('io_no'),
+            "ItemCode" =>  $request->get('prod_no'),
+            "ItemName" =>  $request->get('prod_desc'),
+            "Status" =>  $request->get('status'),
+        ];
+
+        $getProds = $this->sap->getProductionOrders($param);
+        if (empty($getProds) || $getProds['success'] !== true) {
+            abort(500, 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
+        }
+
+        $totalPages = ceil($getProds['total'] / $param['limit']);
+
+        return view('api.production.list', [
+            'getProds'      => $getProds['data'] ?? [],
+            'page'        => $getProds['page'],
+            'limit'       => $getProds['limit'],
+            'total'       => $getProds['total'],
+            'totalPages'  => $totalPages,
+        ]);
+    }
+
+    public function view(Request $request)
+    {
+        $param = [
+            "page" => (int) $request->get('page', 1),
+            "limit" => (int) $request->get('limit', 10),
+            "DocNum" =>  $request->query('docNum'),
+            "DocEntry" => $request->query('docEntry'),
+        ];
+        $prods = $this->sap->getProductionOrders($param);
+
+        if (empty($prods) || !Arr::get($prods, 'success')) {
+            return back()->with(
+                'error',
+                Arr::get($prods, 'message', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.')
+            );
+        }
+
+        $prod = Arr::get($prods, 'data.0', []);
+        $lines = Arr::get($prod, 'Lines', []);
+
+        return view('api.production.view', [
+            'getRecord'    => $prod,
+            'lines' => $lines,
+        ]);
+    }
+
+    public function index_old(Request $request)
     {
         $getData    = ProductionModel::withCount("stocks")->orderBy("id", "desc")->paginate(10);
         $getRecord  = ProductionOrderDetailsModel::with("stocks")->get()->unique("doc_num")->values();
@@ -40,7 +103,7 @@ class ProductionController extends Controller
         return view('backend.production.list', compact('getData', 'productionSummary', 'getRecord'));
     }
 
-    public function view(Request $request, $id)
+    public function view_old(Request $request, $id)
     {
         $getRecord   = ProductionModel::find($id);
         $getDocnum   = ProductionModel::where("id", $id)->value("doc_num");

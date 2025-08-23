@@ -429,8 +429,8 @@
             const noPo = document.getElementById("no_po").value;
             const docEntry = document.getElementById("docEntry").value;
             const remark = document.getElementById("remarks").value;
-            if (!noPo || !docEntry) {
-                showToast("❌ Error: Pastikan Nomer Purchasing Order di isi sebelum submit!")
+            if (!noPo || !docEntry || !remark) {
+                showToast("❌ Error: Pastikan Nomer Purchasing Order dan Remark di isi sebelum submit!")
                 btn.disabled = false;
                 return false;
             }
