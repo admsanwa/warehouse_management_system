@@ -55,9 +55,9 @@
                                             <label for="docStatus">Status</label>
                                             <select name="docStatus" id="docStatus" class="form-control">
                                                 <option value="" disabled>-- Choose Status --</option>
-                                                @foreach (['Open', 'Close', 'All'] as $status)
+                                                @foreach ($statuses as $status)
                                                     @php
-                                                        $value = $status == 'All' ? '' : $status;
+                                                        $value = $status == 'Open' ? 'Open' : $status;
                                                     @endphp
                                                     <option value="{{ $value }}"
                                                         {{ Request()->docStatus == $value ? 'selected' : '' }}>

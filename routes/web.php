@@ -124,6 +124,7 @@ Route::group(['middleware' => 'admin'], function () {
     // stockin
     Route::get('/scanned-barcodes/{grpo}', [TransactionController::class, 'getScannedBarcodes']);
     Route::post('/stockin-add', [TransactionController::class, 'scan_and_store']);
+    Route::get('/grpo-histories', [TransactionController::class, 'grpo_histories']);
     Route::get('admin/transaction/stockin', [TransactionController::class, 'stock_in']);
     // Route::get('admin/transaction/stockin/{po}', [TransactionController::class, 'stockin_po']);
     Route::post('admin/transaction/stockup', [TransactionController::class, 'stock_up']);

@@ -28,7 +28,7 @@ class PurchasingController extends Controller
         $param = [
             "page" => (int) $request->get('page', 1),
             "limit" => (int) $request->get('limit', 10),
-            "DocStatus" => $request->get('docStatus'),
+            "DocStatus" => $request->get('docStatus', 'Open'),
             "DocNum" => $request->get('docNum'),
             "DocDueDate" => $request->get('docDueDate'),
             "CardName" =>  $request->get('cardName')
@@ -50,6 +50,11 @@ class PurchasingController extends Controller
             'limit'       => $orders['limit'],
             'total'       => $orders['total'],
             'totalPages'  => $totalPages,
+            'statuses' => [
+                'Open',
+                'Close',
+                'All'
+            ]
         ]);
     }
 

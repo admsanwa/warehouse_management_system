@@ -21,6 +21,7 @@ use illuminate\support\facades\Auth;
 use phpDocumentor\Reflection\Types\Null_;
 use App\Services\SapService;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 
 class TransactionController extends Controller
 {
@@ -73,83 +74,106 @@ class TransactionController extends Controller
 
     public function scan_and_store(Request $request)
     {
-        $warehouse = "BK001";
-        $barcode    = $request->input("item_code");
-        $po    = $request->input("po");
-        $docEntry    = $request->input("docEntry");
+        $validated = $request->validate([
+            'item_code' => 'required|string',
+            'po'        => 'nullable|string',
+            'docEntry'  => 'nullable|string',
+        ]);
 
-        $items      = $this->sap->getStockItems(['ItemCode' => $barcode, "WhsCode" => $warehouse, "Limit" => 1, "Page" => 1]);
-        if ($items['success'] !== true) {
+        $warehouse = "BK001";
+        $barcode   = $validated['item_code'];
+
+        $items = $this->sap->getStockItems([
+            'ItemCode' => $barcode,
+            'WhsCode'  => $warehouse,
+            'Limit'    => 1,
+            'Page'     => 1
+        ]);
+
+        if (!Arr::get($items, 'success')) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal terhubung dengan data SAP, silakan coba beberapa saat lagi'
+                'message' => 'Gagal terhubung dengan SAP, coba lagi beberapa saat'
             ]);
         }
-        if ($items['total'] === 0) {
+
+        if (empty(Arr::get($items, 'total'))) {
             return response()->json([
                 'success' => false,
-                'message' => "Produk tidak ditemukan untuk barcode: " . $barcode . ". Pastikan produk sesuai dan Scan kembali!"
+                'message' => "Produk tidak ditemukan untuk barcode: {$barcode}. Scan ulang!"
             ]);
         }
+
+        // Build PO params
         $poParam = [
-            "page"     => 1,
-            "limit"    => 100,
-            "ItemCode" => $barcode,
+            "page"      => 1,
+            "limit"     => 100,
+            "ItemCode"  => $barcode,
             "DocStatus" => "Open"
         ];
-        if ($docEntry) {
-            $poParam['DocEntry'] = $docEntry;
+        if (!empty($validated['docEntry'])) {
+            $poParam['DocEntry'] = $validated['docEntry'];
         }
-        if ($po) {
-            $poParam['DocNum'] = $po;
+        if (!empty($validated['po'])) {
+            $poParam['DocNum'] = $validated['po'];
         }
+
         $get_po = $this->sap->getPurchaseOrders($poParam);
 
-        if (!Arr::get($get_po, 'success')) {
+        if (!Arr::get($get_po, 'success') || empty(Arr::get($get_po, 'data'))) {
             return response()->json([
                 'success' => false,
-                'message' => "Nomor PO tidak ditemukan untuk barcode: " . $barcode . ". Pastikan produk sesuai dan Scan kembali!"
+                'message' => "Nomor PO tidak ditemukan untuk barcode: {$barcode}"
             ]);
         }
-        if ($docEntry && $po) {
+
+        if ($validated['docEntry'] && $validated['po']) {
             $poData = Arr::get($get_po, 'data.0', []);
         } else {
             $poData = Arr::get($get_po, 'data', []);
         }
-        $item = Arr::get($items, 'data.0', []);
-        $warehouseStock = collect($item['warehouses'])->firstWhere('WhsCode', $warehouse);
+        $item   = Arr::get($items, 'data.0', []);
 
+        $warehouseStock = collect(Arr::get($item, 'warehouses', []))
+            ->firstWhere('WhsCode', $warehouse);
 
-        // $poDetails      = PurchaseOrderDetailsModel::where("item_code", $barcode)->pluck('nopo')->unique()->toArray();
-        // $purchaseOrders = PurchasingModel::select("no_po")->where("status", "Open")->whereIn('no_po', $poDetails)->distinct()->get();
-        // $latestOnhand   = StockModel::where("item_code", $items->code)->whereNotNull("on_hand")->orderByDesc('id')->value("on_hand") ?? 0;
-        // $latestStock    = StockModel::where("item_code", $items->code)->whereNotNull("stock")->orderByDesc("id")->value("stock") ?? 0;
-        // $latestStockOut = StockModel::where("item_code", $items->code)->whereNotNull("stock_out")->orderByDesc("id")->value("stock_out") ?? 0;
-        // $user           = Auth::user()->id;
-
-        // save db
-        // $stock              = new StockModel();
-        // $stock->grpo        = trim($request->input("grpo"));
-        // $stock->item_code   = $items->code;
-        // $stock->stock       = $latestStock;
-        // $stock->stock_out   = $latestStockOut;
-        // $stock->scanned_by  = $user;
-        // $stock->is_temp     = true;
-        // $stock->save();
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'success'   => true,
-                'itemCode' => $item['ItemCode'],
-                'ItemName' => $item['ItemName'],
-                'warehouseStock' => $warehouseStock,
-                'items' => $items,
-                'poData' => $poData,
-                // 'Po_details'    => $poDetails,
-                'message'   => 'Item berhasil di scan!'
-            ]);
-        }
+        return response()->json([
+            'success'        => true,
+            'itemCode'       => Arr::get($item, 'ItemCode'),
+            'ItemName'       => Arr::get($item, 'ItemName'),
+            'warehouseStock' => $warehouseStock,
+            'items'          => $items,
+            'poData'         => $poData,
+            'message'        => 'Item berhasil di scan!'
+        ]);
     }
+
+    public function grpo_histories(Request $request)
+    {
+        $validated = $request->validate([
+            'DocNum'   => 'required|string',
+            'DocEntry' => 'required|string',
+        ]);
+
+        $grpo_histories = GrpoModel::where('no_po', $validated['DocNum'])
+            ->where('base_entry', $validated['DocEntry'])
+            ->orderBy('created_at', 'desc') // ganti field order sesuai kebutuhan
+            ->get();
+
+        if ($grpo_histories->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data GRPO history tidak ditemukan'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data'    => $grpo_histories
+        ]);
+    }
+
+
 
     public function scan_and_store_old(Request $request)
     {
@@ -200,12 +224,15 @@ class TransactionController extends Controller
         return view("backend.transaction.partials.scanned", compact('scannedBarcodes'));
     }
 
+    // POST GRPO
     public function stock_up(Request $request)
     {
+        $post_grpo = null;
+        $postData  = [];
+
         try {
             $validated = $request->validate([
                 'no_po'        => 'required',
-                // 'docEntry'         => 'required',
                 'cardName'     => 'required',
                 'cardCode'     => 'required',
                 'docDate'      => 'required|date',
@@ -213,6 +240,7 @@ class TransactionController extends Controller
                 'numAtCard'    => 'nullable|string',
                 'U_MEB_NO_IO'  => 'nullable|string',
                 'U_MEB_No_SO'  => 'nullable|string',
+                'U_MEB_Ket_Pur' => 'nullable|string',
                 'stocks'                       => 'required|array|min:1',
                 'stocks.*.BaseEntry'           => 'nullable',
                 'stocks.*.LineNum'             => 'required',
@@ -228,22 +256,24 @@ class TransactionController extends Controller
                 'stocks.*.UnitMsr'             => 'nullable|string',
             ]);
 
-            // Header
+            // Header untuk API
             $postData = [
-                'CardCode'     => $validated['cardCode'],
-                'CardName'     => $validated['cardName'],
-                // 'DocDate'      => $validated['docDate'],
-                'DocDate'      => date("Y/m/d"),
-                'NumAtCard'    => $validated['numAtCard'] ?? null,
-                'Comments'     => $validated['remarks'],
-                'U_MEB_NO_IO'  => $validated['U_MEB_NO_IO'] ?? null,
-                'U_MEB_No_SO'  => $validated['U_MEB_No_SO'] ?? null,
-                'Lines'        => []
+                'CardCode'    => $validated['cardCode'],
+                'CardName'    => $validated['cardName'],
+                'DocDate'     => date("Y/m/d"),
+                'NumAtCard'   => $validated['numAtCard'] ?? null,
+                'Comments'    => $validated['remarks'],
+                'U_MEB_NO_IO' => $validated['U_MEB_NO_IO'] ?? null,
+                'U_MEB_No_SO' => $validated['U_MEB_No_SO'] ?? null,
+                'Lines'       => []
             ];
 
-            // Detail
-            $lines = [];
+            $lines        = [];
+            $insertedData = [];
+            $user         = Auth::id();
+
             foreach ($validated['stocks'] as $row) {
+                // untuk API SAP
                 $lines[] = [
                     'BaseEntry'   => $row['BaseEntry'] ?? null,
                     'BaseLineNum' => $row['LineNum'] ?? null,
@@ -258,20 +288,51 @@ class TransactionController extends Controller
                     'FreeText'    => $row['FreeText'] ?? null,
                     'UnitMsr'     => $row['UnitMsr'] ?? null,
                 ];
+
+                // untuk DB
+                $insertedData[] = [
+                    'no_po'        => $validated['no_po'],
+                    'vendor_code'  => $validated['cardCode'],
+                    'vendor'  => $validated['cardName'],
+                    'vendor_ref_no' => $validated['numAtCard'],
+                    'io'           => $validated['U_MEB_NO_IO'],
+                    'so'           => $validated['U_MEB_No_SO'],
+                    'internal_no'  => $row['U_MEB_Ket_Pur'] ?? null,
+                    'base_entry'   => $row['BaseEntry'] ?? null,
+                    'line_num'     => $row['LineNum'] ?? null,
+                    'item_code'    => $row['ItemCode'] ?? null,
+                    'item_desc'    => $row['Dscription'] ?? null,
+                    'qty'    => $row['qty'] ?? null,
+                    'uom'    => $row['UnitMsr'] ?? null,
+                    'whse'    => 'BK001',
+                    'note'    => '-',
+                    'user_id'      => $user,
+                    'created_at'   => now(),
+                    'updated_at'   => now()
+                ];
             }
             $postData['Lines'] = $lines;
 
-            // TODO: Simpan ke database atau kirim ke API SAP
+            DB::beginTransaction();
+
+            // Call API SAP
             $post_grpo = $this->sap->postGrpo($postData);
-            if (!isset($post_grpo['success']) || $post_grpo['success'] === false) {
+            if (empty($post_grpo['success'])) {
                 throw new \Exception($post_grpo['message'] ?? 'SAP GRPO failed without message');
             }
 
+            // Insert ke DB
+            if (!empty($insertedData)) {
+                GrpoModel::insert($insertedData);
+            }
+
+            DB::commit();
+
             return response()->json([
-                'success' => true,
-                'message' => 'Telah berhasil menambahkan item yang sudah di scan',
-                'request' => $postData,
-                'response' => $post_grpo,
+                'success'  => true,
+                'message'  => 'Telah berhasil menambahkan item yang sudah di scan',
+                'request'  => $postData,
+                'response' => $post_grpo ?? [],
             ], 200);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
@@ -279,17 +340,19 @@ class TransactionController extends Controller
                 'message' => 'Validasi gagal',
                 'errors'  => $e->errors(),
                 'request' => $postData,
-                'response' => $post_grpo,
+                'response' => $post_grpo ?? [],
             ], 422);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
                 'request' => $postData,
-                'response' => $post_grpo,
+                'response' => $post_grpo ?? [],
             ], 500);
         }
     }
+
 
     public function stock_up_old(Request $request)
     {

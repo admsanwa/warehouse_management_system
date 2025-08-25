@@ -13,7 +13,11 @@ class grpoModel extends Model
 
     protected $fillable = [
         'no_po',
+        'base_entry',
+        'line_num',
+        'item_code',
         'vendor_code',
+        'user_id',
         'vendor',
         'vendor_ref_no',
         'io',

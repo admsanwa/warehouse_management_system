@@ -91,8 +91,7 @@
                                                     );
                                                     $showRow = false;
                                                     $checkStockNotes =
-                                                        $warehouseStock['OnHand'] < $warehouseStock['MinStock'] &&
-                                                        $warehouseStock['MinStock'] > $warehouseStock['Available'];
+                                                        $warehouseStock['OnHand'] < $warehouseStock['MinStock'];
 
                                                     $showRow = false;
                                                     if ($stockNotes == 0) {

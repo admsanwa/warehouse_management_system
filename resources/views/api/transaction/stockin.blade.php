@@ -118,6 +118,11 @@
                                     <input type="text" name="U_MEB_No_SO" id="U_MEB_No_SO" value=""
                                         class="form-control mt-2" readonly required>
                                 </div>
+                                <label class="col-sm-4 col-form-label">No Internal Production :</label>
+                                <div class="col-sm-8">
+                                    <input type="text" name="U_MEB_Ket_Pur" id="U_MEB_Ket_Pur" value=""
+                                        class="form-control mt-2" readonly required>
+                                </div>
                                 <label class="col-sm-4 col-form-label">Remarks :</label>
                                 <div class="col-sm-8">
                                     <input type="text" name="remarks" id="remarks" class="form-control mt-2"
@@ -134,6 +139,7 @@
                                             <th>No</th>
                                             <th>Item Code</th>
                                             <th>Item Desc</th>
+                                            <th>Open Qty</th>
                                             <th>Qty</th>
                                             <th>Uom</th>
                                             {{-- <th>Delete</th> --}}
@@ -162,7 +168,30 @@
                         </div>
                     </div>
                 </form>
-
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">History GRPO</h3>
+                    </div>
+                    <div class="card-body px-2">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-borderd table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>No PO</th>
+                                        <th>Item Code</th>
+                                        <th>Item Desc</th>
+                                        <th>Qty</th>
+                                        <th>Uom</th>
+                                        <th>Tanggal Dibuat</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="grpoHistoriesTbody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     </div>
@@ -172,7 +201,6 @@
         let tempPoData = [];
         document.addEventListener("DOMContentLoaded", function() {
             const input = document.getElementById("scannerInput");
-
             input.focus();
             input.addEventListener("keypress", function(e) {
                 console.log("Pressed key:", e.key, e.keyCode);
@@ -189,7 +217,7 @@
             });
             const poSelect = document.getElementById('no_po');
             poSelect.addEventListener("change", function() {
-                clearDataOnPo()
+                clearFormData();
                 const tBody = document.getElementById("itemRows");
                 tBody.innerHTML = "";
                 const selectedDocNum = this.value;
@@ -197,6 +225,7 @@
                 const selectedPO = tempPoData.find(po => po.DocNum === selectedDocNum);
                 // console.log("Selected PO: ", selectedPO);
                 appendDataOnPo(selectedPO);
+                loadGrpoHistories(data);
             });
         });
         let html5QrCode;
@@ -245,7 +274,6 @@
         function showFileInput() {
             document.getElementById("reader").style.display = "none";
             document.getElementById("fileInput").style.display = "block";
-
             if (html5QrCode) {
                 html5QrCode.stop().catch(err => {});
             }
@@ -270,7 +298,10 @@
         function sendScannedCode(code) {
             const docEntry = document.getElementById("docEntry").value;
             const noPo = document.getElementById("no_po").value;
-            // console.log("code", code);
+            const fileInputWrapper = document.getElementById("fileInput");
+            clearFormData();
+            const fileInput = fileInputWrapper.querySelector("input[type='file']");
+            fileInput.disabled = true;
             fetch("/stockin-add", {
                     method: "POST",
                     headers: {
@@ -296,6 +327,7 @@
                         const poData = data.poData;
                         if (!poData) {
                             showToast("❌ Error: Nomor PO tidak ditemukan untuk barcode ini", 'error');
+                            fileInput.disabled = false;
                             return;
                         }
                         // console.log("posData: ", poData.length);
@@ -329,21 +361,25 @@
                     }
                 })
                 .finally(() => {
+                    if (fileInput) fileInput.disabled = false;
                     document.getElementById("scannerInput").focus();
                 })
                 .catch(error => {
+                    if (fileInput) fileInput.disabled = false;
                     console.error("Fetch error: ", error);
                     document.getElementById("scannerInput").focus();
                 })
         }
 
-        function clearDataOnPo() {
+        function clearFormData() {
             document.getElementById("cardName").value = "";
             document.getElementById("cardCode").value = "";
             document.getElementById("docDate").value = "";
             document.getElementById("numAtCard").value = "";
             document.getElementById("U_MEB_No_SO").value = "";
             document.getElementById("U_MEB_NO_IO").value = "";
+            document.getElementById("itemRows").innerHTML = "";
+            document.getElementById("grpoHistoriesTbody").innerHTML = "";
         }
 
         function appendDataOnPo(data) {
@@ -354,8 +390,10 @@
             document.getElementById("numAtCard").value = data.NumAtCard;
             document.getElementById("U_MEB_No_SO").value = data.U_MEB_No_SO;
             document.getElementById("U_MEB_NO_IO").value = data.U_MEB_NO_IO;
+            document.getElementById("U_MEB_Ket_Pur").value = data.U_MEB_Ket_Pur;
             // console.log(data);
             loadScannedBarcodes(data.Lines);
+            loadGrpoHistories(data);
         }
 
         function loadScannedBarcodes(items) {
@@ -366,7 +404,6 @@
 
             const tBody = document.getElementById("itemRows");
             const itemCode = document.getElementById("item_code").value;
-
             items.forEach((stocks) => {
                 if (stocks.ItemCode == itemCode) {
                     const idx = tBody.rows.length;
@@ -387,6 +424,7 @@
                             ${description}
                             <input type="hidden" name="stocks[${idx}][Dscription]" value="${stocks.Dscription ?? ""}">
                         </td>
+                        <td>-</td>
                         <td>
                             <input type="number" name="stocks[${idx}][qty]" class="form-control" value="0">
                             <input type="hidden" name="stocks[${idx}][PriceBefDi]" value="${stocks.PriceBefDi}">
@@ -472,6 +510,48 @@
             return false; // Allow form submission
         }
 
+        function loadGrpoHistories(data) {
+            fetch(`/grpo-histories?DocEntry=${data.DocEntry}&DocNum=${data.DocNum}`, {
+                    method: "GET",
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                })
+                .then(response => response.json())
+                .then(res => {
+                    const tBody = document.getElementById("grpoHistoriesTbody");
+                    tBody.innerHTML = "";
+
+                    if (res.success && res.data.length > 0) {
+                        res.data.forEach((item, index) => {
+                            const trHTML = `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${item.no_po ?? "-"}</td>
+                        <td>${item.item_code ?? "-"}</td>
+                        <td>${item.item_desc ?? "-"}</td>
+                        <td>${item.qty ?? 0}</td>
+                        <td>${item.uom ?? "-"}</td>
+                        <td>${item.created_at ?formatTimestamp(item.created_at): "-"}</td>
+                    </tr>
+                `;
+                            tBody.insertAdjacentHTML("beforeend", trHTML);
+                        });
+                    } else {
+                        tBody.insertAdjacentHTML(
+                            "beforeend",
+                            `<tr><td colspan="7" class="text-center">Data tidak ditemukan</td></tr>`
+                        );
+                    }
+                })
+                .catch(err => {
+                    console.error("Error:", err);
+                    const tBody = document.getElementById("grpoHistoriesTbody");
+                    tBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Gagal memuat data</td></tr>`;
+                });
+        }
+
+
         function showToast(message, type = 'success') {
             const box = document.getElementById('feedbackBox');
             const text = document.getElementById('feedbackMessage');
@@ -486,6 +566,18 @@
                 box.classList.remove('show');
                 document.getElementById("scannerInput").focus();
             }, 3000);
+        }
+
+        function formatTimestamp(dateString) {
+            if (!dateString) return "-";
+            const date = new Date(dateString);
+            return date.toLocaleString("id-ID", {
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
         }
     </script>
 @endsection
