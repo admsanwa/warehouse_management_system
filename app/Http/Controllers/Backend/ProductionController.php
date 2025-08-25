@@ -44,7 +44,7 @@ class ProductionController extends Controller
 
         $getProds = $this->sap->getProductionOrders($param);
         if (empty($getProds) || $getProds['success'] !== true) {
-            abort(500, 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
+            return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
         }
 
         $totalPages = ceil($getProds['total'] / $param['limit']);

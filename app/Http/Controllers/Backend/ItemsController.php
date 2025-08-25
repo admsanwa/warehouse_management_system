@@ -22,6 +22,28 @@ class ItemsController extends Controller
     }
     public function index(Request $request)
     {
+        $param = [
+            'ItemCode' => $request->get('code'),
+            "ItemName" => $request->get('name'),
+            "page" => (int) $request->get('page', 1),
+            "limit" => (int) $request->get('limit', 10),
+        ];
+        $user           = Auth::user()->username;
+        $getItems      = $this->sap->getItems($param);
+        $addedBarcodes  = BarcodeModel::where('username', $user)->latest()->take(5)->get();
+        $totalPages = ceil($getItems['total'] / $param['limit']);
+
+        return view("api.items.barcode", [
+            'items'      => $getItems['data'] ?? [],
+            'page'        => $getItems['page'],
+            'limit'       => $getItems['limit'],
+            'total'       => $getItems['total'],
+            'totalPages'  => $totalPages,
+            'addedBarcodes'  => $addedBarcodes,
+        ]);
+    }
+    public function index_old(Request $request)
+    {
         $user           = Auth::user()->username;
         $getRecord      = ItemsModel::getRecord($request);
         $addedBarcodes  = BarcodeModel::where('username', $user)->latest()->take(5)->get();
