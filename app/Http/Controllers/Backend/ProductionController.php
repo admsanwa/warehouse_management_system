@@ -39,7 +39,7 @@ class ProductionController extends Controller
             "U_MEB_NO_IO" => $request->get('io_no'),
             "ItemCode" =>  $request->get('prod_no'),
             "ItemName" =>  $request->get('prod_desc'),
-            "Status" =>  $request->get('status'),
+            "Status" =>  $request->get('status', 'Released'),
         ];
 
         $getProds = $this->sap->getProductionOrders($param);

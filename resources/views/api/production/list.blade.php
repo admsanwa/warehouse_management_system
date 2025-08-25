@@ -54,9 +54,9 @@
                                             <label for="status">Status</label>
                                             <select name="status" id="status" class="form-control">
                                                 <option value="" disabled>-- Choose Status --</option>
-                                                @foreach (['Released', 'Closed', 'Cancelled', 'All'] as $status)
+                                                @foreach (['Released', 'Close', 'Cancelled', 'All'] as $status)
                                                     @php
-                                                        $value = $status == 'All' ? '' : $status;
+                                                        $value = $status == 'Released' ? 'Released' : $status;
                                                     @endphp
                                                     <option value="{{ $value }}"
                                                         {{ Request()->status == $value ? 'selected' : '' }}>
