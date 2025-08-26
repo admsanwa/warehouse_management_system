@@ -62,7 +62,7 @@ class ProductionController extends Controller
     {
         $param = [
             "page" => (int) $request->get('page', 1),
-            "limit" => (int) $request->get('limit', 10),
+            "limit" => (int) $request->get('limit', 1),
             "DocNum" =>  $request->query('docNum'),
             "DocEntry" => $request->query('docEntry'),
         ];
@@ -288,6 +288,35 @@ class ProductionController extends Controller
     }
 
     public function barcode(Request $request)
+    {
+        $param = [
+            "page" => (int) $request->get('page', 1),
+            "limit" => (int) $request->get('limit', 10),
+            "U_MEB_NO_IO" => $request->get('io'),
+            "ItemCode" =>  $request->get('prod_no'),
+            "ItemName" =>  $request->get('prod_desc'),
+            "Status" =>  $request->get('status', 'Released'),
+        ];
+
+        $getProds = $this->sap->getProductionOrders($param);
+        if (empty($getProds) || $getProds['success'] !== true) {
+            return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
+        }
+        $user          = Auth::user()->username;
+        $addedBarcodes = BarcodeProductionModel::where('username', $user)->latest()->take(5)->get();
+        $totalPages = ceil($getProds['total'] / $param['limit']);
+        // dd($getProd);
+        return view("api.production.barcode",  [
+            'prods'      => $getProds['data'] ?? [],
+            'page'        => $getProds['page'],
+            'limit'       => $getProds['limit'],
+            'total'       => $getProds['total'],
+            'totalPages'  => $totalPages,
+            'addedBarcodes'  => $addedBarcodes,
+        ]);
+    }
+
+    public function barcode_old(Request $request)
     {
         $getRecord     = ProductionModel::where("status", "Released")->paginate(10);
         $user          = Auth::user()->username;
