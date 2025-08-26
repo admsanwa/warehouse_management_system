@@ -119,7 +119,7 @@
                                                         @endif
                                                     </td>
 
-                                                    <td><a href="{{ url('admin/production/view?docEntry' . $production['DocEntry'] . '&docNum=' . $production['DocNum']) }}"
+                                                    <td><a href="{{ url('admin/production/view?docEntry=' . $production['DocEntry'] . '&docNum=' . $production['DocNum']) }}"
                                                             class="btn btn-primary"><i class="fa fa-eye"></i></a></td>
                                                 </tr>
                                             @empty
