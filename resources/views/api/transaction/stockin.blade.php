@@ -133,7 +133,7 @@
                         <div class="px-2" id="scannedBarcodes">
                             @csrf
                             <div class="table-responsive">
-                                <table class="table table-striped table-borderd table-sm">
+                                <table class="table table-striped table-borderd table-sm nowrap">
                                     <thead>
                                         <tr>
                                             <th>No</th>
@@ -174,7 +174,7 @@
                     </div>
                     <div class="card-body px-2">
                         <div class="table-responsive">
-                            <table class="table table-striped table-borderd table-sm">
+                            <table class="table table-striped table-borderd table-sm nowrap">
                                 <thead>
                                     <tr>
                                         <th>No</th>
@@ -225,7 +225,7 @@
                 const selectedPO = tempPoData.find(po => po.DocNum === selectedDocNum);
                 // console.log("Selected PO: ", selectedPO);
                 appendDataOnPo(selectedPO);
-                loadGrpoHistories(data);
+                loadGrpoHistories(selectedPO);
             });
         });
         let html5QrCode;
@@ -426,7 +426,7 @@
                         </td>
                         <td>-</td>
                         <td>
-                            <input type="number" name="stocks[${idx}][qty]" class="form-control" value="0">
+                            <input type="number" name="stocks[${idx}][qty]" class="form-control" style="min-width:80px !important;" value="0">
                             <input type="hidden" name="stocks[${idx}][PriceBefDi]" value="${stocks.PriceBefDi}">
                             <input type="hidden" name="stocks[${idx}][DiscPrcnt]" value="${stocks.DiscPrcnt}">
                             <input type="hidden" name="stocks[${idx}][VatGroup]" value="${stocks.VatGroup}">
