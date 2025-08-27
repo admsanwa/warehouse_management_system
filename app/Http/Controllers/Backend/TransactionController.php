@@ -897,8 +897,8 @@ class TransactionController extends Controller
             $validated = $request->validate([
                 'no_po'        => 'nullable',
                 'remarks'      => 'required|string',
-                'no_surat_jalan'      => 'required|string',
-                'no_inventory_tf'      => 'required|string',
+                'no_surat_jalan'      => 'nullable|string',
+                'no_inventory_tf'      => 'nullable|string',
                 'type_inv_transaction'      => 'required|string',
                 'internal_no'      => 'nullable|string',
                 'no_io'      => 'nullable|string',
