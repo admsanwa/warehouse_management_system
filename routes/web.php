@@ -159,6 +159,7 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get("admin/transaction/gidelete/{gi}", [TransactionController::class, "gi_delete"]);
     // goodreceipt
     Route::get("admin/transaction/goodreceipt", [TransactionController::class, "good_receipt"]);
+    Route::post("/save_gr", [TransactionController::class, 'save_good_receipt']);
     Route::post("/good-receipt", [TransactionController::class, "scan_and_greceipt"]);
     Route::get("/scanned-barcodes-gr/{gr}", [TransactionController::class, "get_scanned_gr"]);
     Route::post("admin/transaction/grdelone/{id}", [TransactionController::class, "gr_delone"]);
@@ -183,12 +184,11 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get("admin/delivery/history", [DeliveryController::class, "history"]);
 
     // get data api
-        Route::get('/purchasing/seriesSearch', [PurchasingController::class, 'series_search']);
+    Route::get('/purchasing/seriesSearch', [PurchasingController::class, 'series_search']);
     Route::get('/purchaseOrderSearch', [PurchasingController::class, 'po_search']);
     Route::get('/warehouseSearch', [ItemsController::class, 'warehouse_search']);
     Route::get('/costCenterSearch', [ItemsController::class, 'cost_center_search']);
     Route::get('/projectSearch', [ItemsController::class, 'project_search']);
-
 });
 
 Route::get('logout', [AuthController::class, 'logout']);

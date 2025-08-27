@@ -7,12 +7,13 @@
                 <div class="container-fluid">
                     <section class="row mb-2">
                         <div class="col col-sm-6">
-                            <h1>Good Issue</h1>
+                            <h1>Good Receipt</h1>
                         </div>
                     </section>
                 </div>
             </div>
         </div>
+
         <section class="content">
             <input id="scannerInput" type="text" autofocus style="opacity: 0; position: absolute;">
             <div class="container-fluid">
@@ -22,17 +23,17 @@
                         <span id="feedbackMessage"></span>
                     </div>
                     <div class="card-header">
-                        <h3 class="card-title">Good Issue</h3>
+                        <h3 class="card-title">Good Receipt</h3>
                     </div>
                     <div class="card-body">
                         <div class="form-group row">
                             <label class="col-sm-4 col-form-lable">Scan Barcode :</label>
                             <div class="col-sm-8">
                                 <span class="badge bg-info text-dark mb-2">
-                                    <i class="fas fa-info-circle"> Untuk Scan Item/Barang keluar ke Vendor</i>
+                                    <i class="fas fa-info-circle"> Untuk Scan Item/Barang Masuk dr Vendor</i>
                                 </span>
                                 <div class="mb-2">
-                                    <button type="button" class="btn btn-sm btn-outline-danger mr-1"
+                                    <button type="button" class="btn btn-sm btn-outline-primary mr-1"
                                         onclick="startCamera()">Use Camera</button>
                                     <button type="button" class="btn btn-sm btn-outline-secondary"
                                         onclick="showFileInput()">Upload Image</button>
@@ -65,8 +66,9 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
-                <form id="goodIssueForm">
+                <form id="goodReceiptForm">
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">Recently Scanned</h3>
@@ -91,23 +93,36 @@
                                         <option value="" disabled selected>Pilih Warehouse</option>
                                     </select>
                                 </div>
-                                <label for="" class="col-sm-4 col-form-lable">Alasan Goods Issue :</label>
+                                <label for="" class="col-sm-4 col-form-lable">Alasan Goods Receipt :</label>
                                 <div class="col-sm-6 mb-2">
                                     <select name="reason" id="reason" class="form-control mt-2" required>
-                                        <option value="" disabled selected>Pilih Alasan</option>
-                                        @foreach ($gi_reasons as $key => $item)
+                                        <option value="" disabled selected>Pilih Alasan :</option>
+                                        @foreach ($gr_reasons as $key => $item)
                                             <option value="{{ $key }}">{{ $key }} - {{ $item }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
-                                <label for="" class="col-sm-4 col-form-lable">No Surat Jalan :</label>
+                                <label for="" class="col-sm-4 col-form-lable">Project :</label>
                                 <div class="col-sm-6 mb-2">
+                                    <select name="project" id="project" class="form-control mt-2" required>
+                                    </select>
+                                </div>
+                                <label for="" class="col-sm-4 col-form-lable">No Surat Jalan :</label>
+                                <div class="col-sm-6">
                                     <input type="text" name="no_surat_jalan" id="no_surat_jalan"
                                         class="form-control mt-2" placeholder="Masukkan No Surat Jalan" required>
                                 </div>
-                                <label for="" class="col-sm-4 col-form-lable">Internal No :</label>
-                                <div class="col-sm-6 mb-2">
+                                <label for="" class="col-sm-4 col-form-lable">No Surat Jalan Barang Datang
+                                    :</label>
+                                <div class="col-sm-6">
+                                    <input type="text" name="ref_surat_jalan" id="ref_surat_jalan"
+                                        class="form-control mt-2" placeholder="Masukkan No Surat Jalan Barang Datang"
+                                        required>
+                                </div>
+                                <label for="" class="col-sm-4 col-form-lable">Internal No
+                                    :</label>
+                                <div class="col-sm-6">
                                     <input type="text" name="internal_no" id="internal_no" class="form-control mt-2"
                                         placeholder="Masukkan Internal No" required>
                                 </div>
@@ -121,8 +136,14 @@
                                     <input type="text" name="no_so" id="no_so" class="form-control mt-2"
                                         placeholder="Masukkan Nomor SO" required>
                                 </div>
+                                <label for="" class="col-sm-4 col-form-lable">No. Good Issue
+                                    :</label>
+                                <div class="col-sm-6">
+                                    <input type="text" name="no_gi" id="no_gi" class="form-control mt-2"
+                                        placeholder="Masukkan No Good Issue" required>
+                                </div>
                                 <label for="" class="col-sm-4 col-form-lable">No Inventory Transfer :</label>
-                                <div class="col-sm-6 mb-2">
+                                <div class="col-sm-6">
                                     <input type="number" name="no_inventory_tf" id="no_inventory_tf"
                                         class="form-control mt-2" placeholder="Masukkan No Inventory Transfer" required>
                                 </div>
@@ -130,25 +151,20 @@
                                 <div class="col-sm-6 mb-2">
                                     <select name="type_inv_transaction" id="type_inv_transaction"
                                         class="form-control mt-2" required>
-                                        <option value="" disabled selected>Pilih Inventory Transfer</option>
+                                        <option value="" disabled selected>Pilih Inventory Transfer :</option>
                                         @foreach ($inv_trans_reasons as $key => $item)
                                             <option value="{{ $key }}">{{ $key }} - {{ $item }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
-                                <label for="" class="col-sm-4 col-form-lable">Project</label>
-                                <div class="col-sm-6 mb-2">
-                                    <select name="project" id="project" class="form-control mt-2" required>
-                                    </select>
-                                </div>
-                                <label for="" class="col-sm-4 col-form-lable">OCR / Distribution Rules</label>
+                                <label for="" class="col-sm-4 col-form-lable">OCR / Distribution Rules :</label>
                                 <div class="col-sm-6 mb-2">
                                     <select name="cost_center" id="cost_center" class="form-control mt-2" required>
                                     </select>
                                 </div>
                                 <label for="" class="col-sm-4 col-form-lable">Remarks :</label>
-                                <div class="col-sm-6 mb-2">
+                                <div class="col-sm-6">
                                     <input type="text" name="remarks" id="remarks" class="form-control mt-2"
                                         placeholder="Masukkan Keterangan" required>
                                 </div>
@@ -175,7 +191,7 @@
                             <div class="card">
                                 <div class="card-footer">
                                     <div class="col col-sm-12">
-                                        <button type="submit" onclick="return AddGoodIssueForm();"
+                                        <button type="submit" onclick="return AddGoodReceiptForm();"
                                             class="btn btn-success float-right" id="btnSubmit"><i
                                                 class="fa fa-check"></i>
                                             Add</button>
@@ -194,10 +210,8 @@
             </div>
         </section>
     </div>
-
+    {{-- <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script> --}}
     <script>
-        let temPoData = [];
-
         window.addEventListener("load", function() {
             const poSelect = $("#no_po");
             // console.log(poSelect.length);
@@ -363,7 +377,6 @@
                 });
             }
         });
-
         document.addEventListener("DOMContentLoaded", function() {
             const input = document.getElementById("scannerInput");
             input.focus();
@@ -379,9 +392,7 @@
                     }
                 }
             });
-
         });
-
         let html5QrCode;
 
         function startCamera() {
@@ -459,7 +470,7 @@
             const fileInput = fileInputWrapper.querySelector("input[type='file']");
 
             fileInput.disabled = true;
-            fetch("/good-issued", {
+            fetch("/good-receipt", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -538,7 +549,7 @@
             });
         }
 
-        function AddGoodIssueForm() {
+        function AddGoodReceiptForm() {
             event.preventDefault();
             const btn = document.getElementById("btnSubmit");
             btn.disabled = true;
@@ -550,7 +561,7 @@
                 remarks: document.getElementById("remarks")?.value || ""
             };
             const errorMsg = {
-                reason: "Alasan Goods Issue",
+                reason: "Alasan Goods Receipt",
                 // no_surat_jalan: "No Surat Jalan",
                 // no_inventory_tf: "No Inventory Transfer",
                 // type_inv_transaction: "Type Inventory Transaction",
@@ -566,9 +577,9 @@
                 return false;
             }
 
-            let form = document.getElementById("goodIssueForm");
+            let form = document.getElementById("goodReceiptForm");
             let formData = new FormData(form);
-            fetch("/save_gi", {
+            fetch("/save_gr", {
                     method: "POST",
                     headers: {
                         "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value

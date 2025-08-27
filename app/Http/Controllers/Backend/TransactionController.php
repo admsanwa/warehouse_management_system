@@ -683,55 +683,6 @@ class TransactionController extends Controller
         return view("backend.transaction.receiptfromprod", compact("getIos", "getPos", "number"));
     }
 
-    public function scan_and_receipt(Request $request)
-    {
-        $barcode    = request()->input("prod_no");
-        $prodOrder  = ProductionModel::where("prod_no", $barcode)->first();
-        if (!$prodOrder) {
-            return response()->json([
-                "success" => false,
-                "message" => "Produk tidak ditemukan untuk barcode: " . $barcode . ". Pastikan produk sesuai dan Scan kembali!"
-            ]);
-        }
-        if (!session()->has('first_scan')) {
-            session(['first_scan' => $prodOrder->prod_no]);
-        }
-        $storeScan = session('first_scan');
-        if ($prodOrder->prod_no !== $storeScan) {
-            return response()->json([
-                'status'    => 'fail',
-                'message'   => 'Hanya bisa satu sekali Scan dengan sesuai Product Nomor',
-            ]);
-        }
-
-        $po     = ProductionModel::select("doc_num")->where("status", "Released")->where("prod_no", $barcode)->distinct()->get();
-        $user   = Auth::user()->username;
-
-        // save db
-        $rfp                = new RFPModel();
-        $rfp->number        = trim($request->input("number"));
-        $rfp->io            = "-";
-        $rfp->so            = "-";
-        $rfp->prod_order    = 0;
-        $rfp->prod_no       = $prodOrder->prod_no;
-        $rfp->prod_desc     = $prodOrder->prod_desc;
-        $rfp->qty           = 0;
-        $rfp->project_code  = "-";
-        $rfp->whse          = "-";
-        $rfp->scanned_by    = $user;
-        $rfp->is_temp       = true;
-        $rfp->save();
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                "success"   => true,
-                "po"        => $po,
-                "prod_no"   => $prodOrder->prod_no,
-                "message"   => "Produk berhasil di scan!"
-            ]);
-        }
-    }
-
     public function getScannedRfp($number)
     {
         $scannedBarcodes = RFPModel::where("number", $number)->latest()->get();
@@ -852,7 +803,6 @@ class TransactionController extends Controller
             'gi_reasons',
             'inv_trans_reasons'
         ));
-        return view('api.transaction.goodissue', compact('po', 'docEntry', 'gi_reasons',        'inv_trans_reasons'));
     }
 
     public function good_issued_old(Request $request)
@@ -1200,6 +1150,29 @@ class TransactionController extends Controller
     // good receipt
     public function good_receipt(Request $request)
     {
+        $po       = $request->get('po');
+        $docEntry = $request->get('docEntry');
+
+        $gr_reasons = SapReason::where('type', 'receipt')
+            ->orderBy('reason_code')
+            ->pluck('reason_desc', 'reason_code')
+            ->toArray();
+
+        $inv_trans_reasons = SapReason::where('type', 'inv-trans')
+            ->orderBy('reason_code')
+            ->pluck('reason_desc', 'reason_code')
+            ->toArray();
+
+        return view("api.transaction.goodreceipt", compact(
+            'po',
+            'docEntry',
+            'gr_reasons',
+            'inv_trans_reasons'
+        ));
+    }
+
+    public function good_receipt_old(Request $request)
+    {
         $temp               = ItemsMaklonModel::orderByDesc('id')->where('is_temp', true)->first();
         $latestItemsMaklon  = ItemsMaklonModel::where('gr', '!=', 0)->whereNotNull('gr')->orderByDesc('id')->first();
         if (!$temp) {
@@ -1213,6 +1186,182 @@ class TransactionController extends Controller
     }
 
     public function scan_and_greceipt(Request $request)
+    {
+        $validated = $request->validate([
+            'item_code' => 'required|string',
+            'po'        => 'nullable|string',
+            'docEntry'  => 'nullable|string',
+        ]);
+
+        $warehouse = "BK001";
+        $barcode   = $validated['item_code'];
+
+        $items = $this->sap->getStockItems([
+            'ItemCode' => $barcode,
+            'WhsCode'  => $warehouse,
+            'Limit'    => 1,
+            'Page'     => 1
+        ]);
+
+        if (!Arr::get($items, 'success')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal terhubung dengan SAP, coba lagi beberapa saat'
+            ]);
+        }
+
+        if (empty(Arr::get($items, 'total'))) {
+            return response()->json([
+                'success' => false,
+                'message' => "Produk tidak ditemukan untuk barcode: {$barcode}. Scan ulang!"
+            ]);
+        }
+
+        // Build PO params
+        $poData = [];
+        $get_po = [];
+        if (!empty($validated['docEntry']) && !empty($validated['po'])) {
+            $poParam = [
+                "page"      => 1,
+                "limit"     => 1,
+                "DocStatus" => "Open"
+            ];
+            $poParam['DocEntry'] = $validated['docEntry'];
+            $poParam['DocNum'] = $validated['po'];
+            $get_po = $this->sap->getPurchaseOrders($poParam);
+
+            if (!Arr::get($get_po, 'success') || empty(Arr::get($get_po, 'data'))) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Nomor PO tidak ditemukan untuk barcode: {$barcode}"
+                ]);
+            }
+            $poData = Arr::get($get_po, 'data.0', []);
+        }
+
+        $item   = Arr::get($items, 'data.0', []);
+        $warehouseStock = collect(Arr::get($item, 'warehouses', []))
+            ->firstWhere('WhsCode', $warehouse);
+
+        return response()->json([
+            'success'        => true,
+            'itemCode'       => Arr::get($item, 'ItemCode'),
+            'ItemName'       => Arr::get($item, 'ItemName'),
+            'warehouseStock' => $warehouseStock,
+            'items'          => $items['data'],
+            'poData'         => $poData,
+            'message'        => 'Item berhasil di scan!'
+        ]);
+    }
+
+
+    public function save_good_receipt(Request $request)
+    {
+        $post_gi = null;
+        $postData  = [];
+
+        try {
+            $validated = $request->validate([
+                'no_po'        => 'nullable',
+                'remarks'      => 'required|string',
+                'no_surat_jalan'      => 'required|string',
+                'no_inventory_tf'      => 'required|string',
+                'type_inv_transaction'      => 'required|string',
+                'internal_no'      => 'nullable|string',
+                'ref_surat_jalan'      => 'nullable|string',
+                'no_gi'      => 'nullable|string',
+                'no_io'      => 'nullable|string',
+                'no_so'      => 'nullable|string',
+                'project'      => 'nullable|string',
+                'warehouse'      => 'nullable|string',
+                'cost_center'      => 'nullable|string',
+                'reason'      => 'required|string',
+                'stocks'                       => 'required|array|min:1',
+                'stocks.*.ItemCode'            => 'required|string',
+                'stocks.*.Dscription'          => 'nullable|string',
+                'stocks.*.qty'                 => 'required|numeric|min:1',
+                'stocks.*.UnitMsr'             => 'nullable|string',
+            ]);
+
+            $ocr = $validated['cost_center'] ?? '';
+            $warehouse = $validated['warehouse'] ?? '';
+            $project = $validated['project'] ?? '';
+
+            // Header untuk API
+            $postData = [
+                'DocDate'     => date("Y/m/d"),
+                'Comment'    => $validated['remarks'],
+                "Ext" => [
+                    "U_MEB_Alasan_GRceipt" => $validated['reason'],
+                    "U_MEB_Default_Whse" =>   $warehouse,
+                    "U_MEB_Internal_No" =>   $validated['internal_no'],
+                    "U_MEB_No_GI" =>   $validated['no_gi'],
+                    "U_MEB_No_IO" =>   $validated['no_io'],
+                    "U_MEB_No_SO" =>   $validated['no_so'],
+                    "U_MEB_Project_Code" =>   $project,
+                    "U_SI_No_Surat_Jalan" => $validated['no_surat_jalan'],
+                    "Ref2" => $validated['ref_surat_jalan'],
+                    "U_SI_IT" => $validated['no_inventory_tf'],
+                    "U_MEB_Type_Inv_Trans" => $validated['type_inv_transaction'],
+                    "U_MEB_PONo_Maklon" => $validated['no_po'] ?? null,
+                    "U_MEB_DIST_RULE" =>  $ocr
+                ],
+                'Lines'       => []
+            ];
+
+            $lines        = [];
+
+            foreach ($validated['stocks'] as $row) {
+                // untuk API SAP
+                $lines[] = [
+                    'ItemCode'    => $row['ItemCode'],
+                    'Dscription'  => $row['Dscription'] ?? null,
+                    'Quantity'    => $row['qty'],
+                    'WhsCode'    =>  $warehouse,
+                    'Ext' => [
+                        'OcrCode' => $ocr,
+                        'Project' => $project
+                    ]
+                ];
+
+                // untuk DB
+                // $insertedData[] = [
+                // ];
+            }
+            $postData['Lines'] = $lines;
+            // Call API SAP
+            $post_gi = $this->sap->postGoodReceipt($postData);
+            if (empty($post_gi['success'])) {
+                throw new \Exception($post_gi['message'] ?? 'SAP Good Receipt failed without message');
+            }
+
+
+            return response()->json([
+                'success'  => true,
+                'message'  => 'Telah berhasil Good Receipt item yang sudah di scan',
+                'request'  => $postData,
+                'response' => $post_gi ?? [],
+            ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors'  => $e->errors(),
+                'request' => $postData,
+                'response' => $post_gi ?? [],
+            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'request' => $postData,
+                'response' => $post_gi ?? [],
+            ], 500);
+        }
+    }
+
+    public function scan_and_greceipt_old(Request $request)
     {
         $barcode    = $request->input("item_code");
         $gr         = $request->input("gr");
