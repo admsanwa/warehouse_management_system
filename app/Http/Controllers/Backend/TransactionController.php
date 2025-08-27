@@ -949,7 +949,7 @@ class TransactionController extends Controller
                     'Quantity'    => $row['qty'] ?? '',
                     'WhsCode'    =>  $warehouse ?? '',
                     'Ext' => [
-                        'AcctCode'    => "212400",
+                        // 'AcctCode'    => "212400",
                         'OcrCode' => $ocr ?? '',
                         'Project' => $project ?? ''
                     ]
