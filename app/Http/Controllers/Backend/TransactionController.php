@@ -899,7 +899,7 @@ class TransactionController extends Controller
                 'remarks'      => 'required|string',
                 'no_surat_jalan'      => 'nullable|string',
                 'no_inventory_tf'      => 'nullable|string',
-                'type_inv_transaction'      => 'required|string',
+                'type_inv_transaction'      => 'nullable|string',
                 'internal_no'      => 'nullable|string',
                 'no_io'      => 'nullable|string',
                 'no_so'      => 'nullable|string',
