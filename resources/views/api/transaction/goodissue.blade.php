@@ -225,7 +225,7 @@
                             let searchData = {
                                 q: params.term,
                                 limit: 10,
-                                code: 'Maklon',
+                                // code: 'Maklon',
                                 status: 'Open',
                             }
                             return searchData;
@@ -578,7 +578,7 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        showToast("✅ Berhasil" + data.message, "success");
+                        showToast("✅ Berhasil " + data.message, "success");
                         btn.disabled = false;
                         setTimeout(() => {
                             // window.location.reload();

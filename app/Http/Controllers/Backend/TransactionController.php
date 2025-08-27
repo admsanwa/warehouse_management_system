@@ -969,7 +969,7 @@ class TransactionController extends Controller
 
             return response()->json([
                 'success'  => true,
-                'message'  => 'Telah berhasil menambahkan item yang sudah di scan',
+                'message'  => 'Good Issue Telah Berhasil Disimpan',
                 'request'  => $postData,
                 'response' => $post_gi ?? [],
             ], 200);
@@ -1264,9 +1264,9 @@ class TransactionController extends Controller
             $validated = $request->validate([
                 'no_po'        => 'nullable',
                 'remarks'      => 'required|string',
-                'no_surat_jalan'      => 'required|string',
-                'no_inventory_tf'      => 'required|string',
-                'type_inv_transaction'      => 'required|string',
+                'no_surat_jalan'      => 'nullable|string',
+                'no_inventory_tf'      => 'nullable|string',
+                'type_inv_transaction'      => 'nullable|string',
                 'internal_no'      => 'nullable|string',
                 'ref_surat_jalan'      => 'nullable|string',
                 'no_gi'      => 'nullable|string',
@@ -1290,19 +1290,19 @@ class TransactionController extends Controller
             // Header untuk API
             $postData = [
                 'DocDate'     => date("Y/m/d"),
-                'Comment'    => $validated['remarks'],
+                'Comment'    => $validated['remarks'] ?? '',
                 "Ext" => [
-                    "U_MEB_Alasan_GRceipt" => $validated['reason'],
-                    "U_MEB_Default_Whse" =>   $warehouse,
-                    "U_MEB_Internal_No" =>   $validated['internal_no'],
-                    "U_MEB_No_GI" =>   $validated['no_gi'],
-                    "U_MEB_No_IO" =>   $validated['no_io'],
-                    "U_MEB_No_SO" =>   $validated['no_so'],
-                    "U_MEB_Project_Code" =>   $project,
-                    "U_SI_No_Surat_Jalan" => $validated['no_surat_jalan'],
-                    "Ref2" => $validated['ref_surat_jalan'],
-                    "U_SI_IT" => $validated['no_inventory_tf'],
-                    "U_MEB_Type_Inv_Trans" => $validated['type_inv_transaction'],
+                    "U_MEB_Alasan_GRceipt" => $validated['reason'] ?? '',
+                    "U_MEB_Default_Whse" =>   $warehouse ?? '',
+                    "U_MEB_Internal_No" =>   $validated['internal_no'] ?? '',
+                    "U_MEB_No_GI" =>   $validated['no_gi'] ?? '',
+                    "U_MEB_No_IO" =>   $validated['no_io'] ?? '',
+                    "U_MEB_No_SO" =>   $validated['no_so'] ?? '',
+                    "U_MEB_Project_Code" =>   $project ?? '',
+                    "U_SI_No_Surat_Jalan" => $validated['no_surat_jalan'] ?? '',
+                    "Ref2" => $validated['ref_surat_jalan'] ?? '',
+                    "U_SI_IT" => $validated['no_inventory_tf'] ?? '',
+                    "U_MEB_Type_Inv_Trans" => $validated['type_inv_transaction'] ?? '',
                     "U_MEB_PONo_Maklon" => $validated['no_po'] ?? null,
                     "U_MEB_DIST_RULE" =>  $ocr
                 ],
@@ -1314,9 +1314,9 @@ class TransactionController extends Controller
             foreach ($validated['stocks'] as $row) {
                 // untuk API SAP
                 $lines[] = [
-                    'ItemCode'    => $row['ItemCode'],
+                    'ItemCode'    => $row['ItemCode'] ?? '',
                     'Dscription'  => $row['Dscription'] ?? null,
-                    'Quantity'    => $row['qty'],
+                    'Quantity'    => $row['qty'] ?? '',
                     'WhsCode'    =>  $warehouse,
                     'Ext' => [
                         'OcrCode' => $ocr,
