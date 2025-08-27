@@ -13,7 +13,6 @@
                 </div>
             </div>
         </div>
-
         <section class="content">
             <input id="scannerInput" type="text" autofocus style="opacity: 0; position: absolute;">
             <div class="container-fluid">
@@ -25,104 +24,167 @@
                     <div class="card-header">
                         <h3 class="card-title">Good Issue</h3>
                     </div>
-                    <form action="{{ url('admin/transaction/goodissued') }}" method="post" enctype="multipart/form-data">
-                        @csrf
-                        <div class="card-body">
-                            <div class="form-group row">
-                                <label class="col-sm-4 col-form-lable">Scan Barcode :</label>
-                                <div class="col-sm-8">
-                                    <span class="badge bg-info text-dark mb-2">
-                                        <i class="fas fa-info-circle"> Untuk Scan Item/Barang keluar ke Vendor</i>
-                                    </span>
-                                    <div class="mb-2">
-                                        <button type="button" class="btn btn-sm btn-outline-danger mr-1"
-                                            onclick="startCamera()">Use Camera</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary"
-                                            onclick="showFileInput()">Upload Image</button>
-                                    </div>
-                                    <div id="reader" style="width: 300px; display:none;"></div>
-                                    <div id="fileInput" style="display: none;">
-                                        <input type="file" accept="image/*" onchange="scanImage(this)"
-                                            class="form-control">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-4 col-form-lable">Item Code :</label>
-                                <div class="col-sm-6">
-                                    <input type="text" name="item_code" id="item_code" class="form-control mt-2" readonly
-                                        required>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-4 col-form-lable">Item Description :</label>
-                                <div class="col-sm-6">
-                                    <input type="text" name="item_desc" id="item_desc" class="form-control mt-2" readonly
-                                        required>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-4 col-form-lable">On Hand :</label>
-                                <div class="col-sm-6">
-                                    <input type="number" name="on_hand" id="on_hand" class="form-control mt-2" readonly
-                                        required>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Recently Scanned</h3>
-                    </div>
-
                     <div class="card-body">
                         <div class="form-group row">
-                            <label for="" class="col-sm-4 col-form-lable">PO Maklon : </label>
-                            <div class="col-sm-6">
-                                <input type="hidden" name="docEntry" id="docEntry" value="{{ $docEntry ?? '' }}" />
-                                @if (!empty($po))
-                                    <input type="number" name="no_po" id="no_po" value="{{ $po }}"
-                                        class="form-control mt-2" readonly required>
-                                @else
-                                    <select name="no_po" id="no_po" class="form-control mt-2" required>
-                                        <option value="">Select Nomor PO</option>
-                                    </select>
-                                @endif
+                            <label class="col-sm-4 col-form-lable">Scan Barcode :</label>
+                            <div class="col-sm-8">
+                                <span class="badge bg-info text-dark mb-2">
+                                    <i class="fas fa-info-circle"> Untuk Scan Item/Barang keluar ke Vendor</i>
+                                </span>
+                                <div class="mb-2">
+                                    <button type="button" class="btn btn-sm btn-outline-danger mr-1"
+                                        onclick="startCamera()">Use Camera</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                                        onclick="showFileInput()">Upload Image</button>
+                                </div>
+                                <div id="reader" style="width: 300px; display:none;"></div>
+                                <div id="fileInput" style="display: none;">
+                                    <input type="file" accept="image/*" onchange="scanImage(this)" class="form-control">
+                                </div>
                             </div>
-                            <label for="" class="col-sm-4 col-form-lable">Alasan Goods Issue :</label>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-lable">Item Code :</label>
                             <div class="col-sm-6">
-                                <input type="text" name="reason" id="reason" class="form-control mt-2"
-                                    placeholder="Masukkan Alasan Goods Issue" required>
+                                <input type="text" name="item_code" id="item_code" class="form-control mt-2" readonly
+                                    required>
                             </div>
-                            <label for="" class="col-sm-4 col-form-lable">No Surat Jalan :</label>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-lable">Item Description :</label>
                             <div class="col-sm-6">
-                                <input type="text" name="no_surat_jalan" id="no_surat_jalan" class="form-control mt-2"
-                                    placeholder="Masukkan No Surat Jalan" required>
+                                <input type="text" name="item_desc" id="item_desc" class="form-control mt-2" readonly
+                                    required>
                             </div>
-                            <label for="" class="col-sm-4 col-form-lable">No Inventory Transfer :</label>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-lable">On Hand :</label>
                             <div class="col-sm-6">
-                                <input type="number" name="no_inventory_tf" id="no_inventory_tf"
-                                    class="form-control mt-2" placeholder="Masukkan No Inventory Transfer" required>
-                            </div>
-                            <label for="" class="col-sm-4 col-form-lable">Type Inventory Transaction :</label>
-                            <div class="col-sm-6">
-                                <select name="type_inv_transaction" id="type_inv_transaction" class="form-control mt-2">
-                                    <option value="">Select Type Inventory Transaction</option>
-                                    <option value="for Stock">for Stock</option>
-                                    <option value="for Order">for Order</option>
-                                </select>
-                            </div>
-                            <label for="" class="col-sm-4 col-form-lable">Remarks :</label>
-                            <div class="col-sm-6">
-                                <input type="text" name="remarks" id="remarks" class="form-control mt-2"
-                                    placeholder="Masukkan Keterangan" required>
+                                <input type="number" name="on_hand" id="on_hand" class="form-control mt-2" readonly
+                                    required>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="p-0" id="scannedBarcodes"></div>
+                <form id="goodIssueForm">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Recently Scanned</h3>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <label for="" class="col-sm-4 col-form-lable">PO Maklon : </label>
+                                <div class="col-sm-6 mb-2">
+                                    @if (!empty($po))
+                                        <input type="number" name="no_po" id="no_po" value="{{ $po }}"
+                                            class="form-control mt-2" readonly>
+                                    @else
+                                        <select name="no_po" id="no_po" class="form-control mt-2">
+                                        </select>
+                                    @endif
+                                    <input type="hidden" name="docEntry" id="docEntry" value="{{ $docEntry ?? '' }}" />
+                                </div>
+                                <label for="" class="col-sm-4 col-form-lable">Warehouse:</label>
+                                <div class="col-sm-6 mb-2">
+                                    <select name="warehouse" id="warehouse" class="form-control mt-2" required>
+                                        <option value="" disabled selected>Pilih Warehouse</option>
+                                    </select>
+                                </div>
+                                <label for="" class="col-sm-4 col-form-lable">Alasan Goods Issue :</label>
+                                <div class="col-sm-6 mb-2">
+                                    <select name="reason" id="reason" class="form-control mt-2" required>
+                                        <option value="" disabled selected>Pilih Alasan</option>
+                                        @foreach ($gi_reasons as $key => $item)
+                                            <option value="{{ $key }}">{{ $key }} - {{ $item }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <label for="" class="col-sm-4 col-form-lable">No Surat Jalan :</label>
+                                <div class="col-sm-6 mb-2">
+                                    <input type="text" name="no_surat_jalan" id="no_surat_jalan"
+                                        class="form-control mt-2" placeholder="Masukkan No Surat Jalan" required>
+                                </div>
+                                <label for="" class="col-sm-4 col-form-lable">Internal No :</label>
+                                <div class="col-sm-6 mb-2">
+                                    <input type="text" name="internal_no" id="internal_no" class="form-control mt-2"
+                                        placeholder="Masukkan Internal No" required>
+                                </div>
+                                <label for="" class="col-sm-4 col-form-lable">No IO :</label>
+                                <div class="col-sm-6 mb-2">
+                                    <input type="text" name="no_io" id="no_io" class="form-control mt-2"
+                                        placeholder="Masukkan Nomor IO" required>
+                                </div>
+                                <label for="" class="col-sm-4 col-form-lable">No SO :</label>
+                                <div class="col-sm-6 mb-2">
+                                    <input type="text" name="no_so" id="no_so" class="form-control mt-2"
+                                        placeholder="Masukkan Nomor SO" required>
+                                </div>
+                                <label for="" class="col-sm-4 col-form-lable">No Inventory Transfer :</label>
+                                <div class="col-sm-6 mb-2">
+                                    <input type="number" name="no_inventory_tf" id="no_inventory_tf"
+                                        class="form-control mt-2" placeholder="Masukkan No Inventory Transfer" required>
+                                </div>
+                                <label for="" class="col-sm-4 col-form-lable">Type Inventory Transaction :</label>
+                                <div class="col-sm-6 mb-2">
+                                    <select name="type_inv_transaction" id="type_inv_transaction"
+                                        class="form-control mt-2" required>
+                                        <option value="" disabled selected>Pilih Inventory Transfer</option>
+                                        @foreach ($inv_trans_reasons as $key => $item)
+                                            <option value="{{ $key }}">{{ $key }} - {{ $item }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <label for="" class="col-sm-4 col-form-lable">Project</label>
+                                <div class="col-sm-6 mb-2">
+                                    <select name="project" id="project" class="form-control mt-2" required>
+                                    </select>
+                                </div>
+                                <label for="" class="col-sm-4 col-form-lable">OCR / Distribution Rules</label>
+                                <div class="col-sm-6 mb-2">
+                                    <select name="cost_center" id="cost_center" class="form-control mt-2" required>
+                                    </select>
+                                </div>
+                                <label for="" class="col-sm-4 col-form-lable">Remarks :</label>
+                                <div class="col-sm-6 mb-2">
+                                    <input type="text" name="remarks" id="remarks" class="form-control mt-2"
+                                        placeholder="Masukkan Keterangan" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-2" id="scannedBarcodes">
+                        @csrf
+                        <div class="table-responsive">
+                            <table class="table table-striped table-borderd table-sm nowrap">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Item Code</th>
+                                        <th>Item Desc</th>
+                                        <th>Qty</th>
+                                        <th>Uom</th>
+                                        <th>Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="itemRows">
+                                </tbody>
+                            </table>
+                            <div class="card">
+                                <div class="card-footer">
+                                    <div class="col col-sm-12">
+                                        <button type="submit" onclick="return AddGoodIssueForm();"
+                                            class="btn btn-success float-right" id="btnSubmit"><i
+                                                class="fa fa-check"></i>
+                                            Add</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
                 <div class="card">
                     <div class="card-footer">
                         <button onclick="history.back()" class="btn btn-default"><i class="fa fa-arrow-left"></i>
@@ -134,10 +196,176 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            loadScannedBarcodes();
-            const input = document.getElementById("scannerInput");
+        let temPoData = [];
 
+        window.addEventListener("load", function() {
+            const poSelect = $("#no_po");
+            // console.log(poSelect.length);
+            if (poSelect.is("select")) {
+                poSelect.select2({
+                    placeholder: "Pilih No. PO Maklon",
+                    allowClear: true,
+                    width: "100%",
+                    language: {
+                        inputTooShort: function() {
+                            return "Ketik untuk mencari...";
+                        },
+                        noResults: function() {
+                            return "Tidak ada data ditemukan";
+                        },
+                        searching: function() {
+                            return "Sedang mencari...";
+                        }
+                    },
+                    ajax: {
+                        url: "/purchaseOrderSearch",
+                        dataType: "json",
+                        delay: 250,
+                        data: function(params) {
+                            let searchData = {
+                                q: params.term,
+                                limit: 10,
+                                code: 'Maklon',
+                                status: 'Open',
+                            }
+                            return searchData;
+                        },
+                        processResults: function(data) {
+                            console.log("Response dari server:", data); // cek di console
+                            return {
+                                results: (data.results || []).map(item => ({
+                                    id: item.id,
+                                    text: item.text
+                                }))
+                            };
+                        }
+                    }
+                });
+            }
+            const whSelect = $("#warehouse");
+            if (whSelect.length) {
+                whSelect.select2({
+                    placeholder: "Pilih Kode Warehouse",
+                    allowClear: true,
+                    width: "100%",
+                    language: {
+                        inputTooShort: function() {
+                            return "Ketik untuk mencari...";
+                        },
+                        noResults: function() {
+                            return "Tidak ada data ditemukan";
+                        },
+                        searching: function() {
+                            return "Sedang mencari...";
+                        }
+                    },
+                    ajax: {
+                        url: "/warehouseSearch",
+                        dataType: "json",
+                        delay: 250,
+                        data: function(params) {
+                            let searchData = {
+                                q: params.term,
+                                limit: 10,
+                            }
+                            return searchData;
+                        },
+                        processResults: function(data) {
+                            console.log("Response dari server:", data); // cek di console
+                            return {
+                                results: (data.results || []).map(item => ({
+                                    id: item.id,
+                                    text: item.text
+                                }))
+                            };
+                        }
+                    }
+                });
+            }
+            const ocrSelect = $("#cost_center");
+            if (ocrSelect.length) {
+                ocrSelect.select2({
+                    placeholder: "Pilih Ocr Code",
+                    allowClear: true,
+                    width: "100%",
+                    language: {
+                        inputTooShort: function() {
+                            return "Ketik untuk mencari...";
+                        },
+                        noResults: function() {
+                            return "Tidak ada data ditemukan";
+                        },
+                        searching: function() {
+                            return "Sedang mencari...";
+                        }
+                    },
+                    ajax: {
+                        url: "/costCenterSearch",
+                        dataType: "json",
+                        delay: 250,
+                        data: function(params) {
+                            let searchData = {
+                                q: params.term,
+                                limit: 10,
+                            }
+                            return searchData;
+                        },
+                        processResults: function(data) {
+                            console.log("Response dari server:", data); // cek di console
+                            return {
+                                results: (data.results || []).map(item => ({
+                                    id: item.id,
+                                    text: item.text
+                                }))
+                            };
+                        }
+                    }
+                });
+            }
+            const projectSelect = $("#project");
+            if (projectSelect.length) {
+                projectSelect.select2({
+                    placeholder: "Pilih Project",
+                    allowClear: true,
+                    width: "100%",
+                    language: {
+                        inputTooShort: function() {
+                            return "Ketik untuk mencari...";
+                        },
+                        noResults: function() {
+                            return "Tidak ada data ditemukan";
+                        },
+                        searching: function() {
+                            return "Sedang mencari...";
+                        }
+                    },
+                    ajax: {
+                        url: "/projectSearch",
+                        dataType: "json",
+                        delay: 250,
+                        data: function(params) {
+                            let searchData = {
+                                q: params.term,
+                                limit: 10,
+                            }
+                            return searchData;
+                        },
+                        processResults: function(data) {
+                            console.log("Response dari server:", data); // cek di console
+                            return {
+                                results: (data.results || []).map(item => ({
+                                    id: item.id,
+                                    text: item.text
+                                }))
+                            };
+                        }
+                    }
+                });
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const input = document.getElementById("scannerInput");
             input.focus();
             input.addEventListener("keypress", function(e) {
                 if (e.key === "Enter") {
@@ -151,6 +379,7 @@
                     }
                 }
             });
+
         });
 
         let html5QrCode;
@@ -214,6 +443,8 @@
             html5Qr.scanFile(file, true)
                 .then(decodedText => {
                     document.getElementById('item_code').value = decodedText;
+                    document.getElementById('item_desc').value = "";
+                    document.getElementById('on_hand').value = "";
                     sendScannedCode(decodedText);
                 })
                 .catch(err => {
@@ -222,9 +453,12 @@
         }
 
         function sendScannedCode(code) {
-            // console.log("code", code);
-            const gissue = document.getElementById("gi").value;
-            // console.log("gissue", gissue);
+            const docEntry = document.getElementById("docEntry").value;
+            const noPo = document.getElementById("no_po").value;
+            const fileInputWrapper = document.getElementById("fileInput");
+            const fileInput = fileInputWrapper.querySelector("input[type='file']");
+
+            fileInput.disabled = true;
             fetch("/good-issued", {
                     method: "POST",
                     headers: {
@@ -234,108 +468,147 @@
                     },
                     body: JSON.stringify({
                         item_code: code,
-                        gi: gissue
+                        docEntry: docEntry,
+                        po: noPo
                     })
                 })
                 .then(res => res.json())
                 .then(data => {
                     console.log("data", data);
-                    const pomSelect = document.getElementById("pom");
-                    pomSelect.innerHTML = '<option value="">Select Nomer Purchase Order Maklon</option>';
-                    document.getElementById("on_hand").value = data.on_hand;
-                    document.getElementById("item_desc").value = data.name;
+                    // const pomSelect = document.getElementById("pom");
+                    document.getElementById("item_code").value = data.itemCode;
+                    document.getElementById("item_desc").value = data.ItemName;
+                    document.getElementById("on_hand").value = data.warehouseStock.OnHand;
 
+                    loadScannedBarcodes(data.items);
+                    showToast("✅ Success Scan: " + data.ItemName, 'success');
 
-                    data.pos.forEach(pom => {
-                        const option = document.createElement("option");
-                        option.value = pom;
-                        option.textContent = pom;
-                        pomSelect.appendChild(option);
-                    });
-
-                    // console.log("po", data.no_po, "io", data.io_no, "prod", data.doc_num);
-                    loadScannedBarcodes();
-                    showToast("✅ Success Scan: " + data.name, 'success');
                 })
                 .finally(() => {
+                    fileInput.disabled = false;
                     document.getElementById("scannerInput").focus();
                 })
                 .catch(error => {
+                    fileInput.disabled = false;
                     console.error("Fetch error: ", error);
                     document.getElementById("scannerInput").focus();
                 })
         }
 
-        function loadScannedBarcodes() {
-            let xhr = new XMLHttpRequest();
-            let container = document.getElementById("scannedBarcodes");
-            let gi = document.getElementById("gi").value;
-
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    container.innerHTML = xhr.responseText;
-                    document.getElementById("scannerInput").focus();
-                    document.getElementById("fileInput").style.display = "none";
-                    const fileInput = document.querySelector('#fileInput input[type="file"]');
-                    if (fileInput) {
-                        fileInput.value = "";
-                    }
-                }
+        function loadScannedBarcodes(items) {
+            console.log("Items", items);
+            const fileInput = document.querySelector('#fileInput input[type="file"]');
+            if (fileInput) {
+                fileInput.value = "";
             }
 
-            xhr.open("GET", "/scanned-barcodes-gi/" + gi, true)
-            xhr.send();
+            const tBody = document.getElementById("itemRows");
+            const itemCode = document.getElementById("item_code").value;
+            items.forEach((stocks) => {
+                const idx = tBody.rows.length;
+
+                const description = (stocks.Dscription ?? "") +
+                    (stocks.FreeTxt ? " - " + stocks.FreeTxt : "");
+
+                const row = `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>
+                            ${stocks.ItemCode}
+                            <input type="hidden" name="stocks[${idx}][ItemCode]" value="${stocks.ItemCode}">
+                        </td>
+                        <td>
+                            ${stocks.ItemName}
+                            <input type="hidden" name="stocks[${idx}][Dscription]" value="${stocks.ItemName}">
+                        </td>
+                        <td>
+                            <input type="number" name="stocks[${idx}][qty]" class="form-control" style="min-width:80px !important;" value="0">
+                        <td>
+                            ${stocks.InvntryUom ?? ""}
+                            <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${stocks.InvntryUom ?? ""}">
+                        </td>
+                        <td>
+                            <button type="button" onclick="deleteItem(this)" class="btn btn-danger btn-sm">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    `;
+                tBody.insertAdjacentHTML("beforeend", row);
+            });
         }
 
         function AddGoodIssueForm() {
-            const po = document.getElementById("pom").value;
-            const gi = document.getElementById("gi").value;
-            const reason = document.getElementById("reason").value;
-            const no_surat_jalan = document.getElementById("no_surat_jalan").value;
-            const no_inventory_tf = document.getElementById("no_inventory_tf").value;
-            const type_inv_transaction = document.getElementById("type_inv_transaction").value;
-            const remarks = document.getElementById("remarks").value;
-            // console.log("io", io, "po", po, "gi", gi);
+            event.preventDefault();
+            const btn = document.getElementById("btnSubmit");
+            btn.disabled = true;
+            // const requiredFields = {
+            //     reason: document.getElementById("reason")?.value || "",
+            //     no_surat_jalan: document.getElementById("no_surat_jalan")?.value || "",
+            //     no_inventory_tf: document.getElementById("no_inventory_tf")?.value || "",
+            //     type_inv_transaction: document.getElementById("type_inv_transaction")?.value || "",
+            //     remarks: document.getElementById("remarks")?.value || ""
+            // };
+            // const errorMsg = {
+            //     reason: "Alasan Goods Issue",
+            //     no_surat_jalan: "No Surat Jalan",
+            //     no_inventory_tf: "No Inventory Transfer",
+            //     type_inv_transaction: "Type Inventory Transaction",
+            //     remarks: "Remarks"
+            // };
 
-            if (!po || !gi) {
-                alert("Pastikan Nomer Purchase Order atau Nomer IO di isi sebelum submit.");
-                return false; // Prevent form submission
-            }
+            // const emptyFields = Object.keys(requiredFields).filter(key => !requiredFields[key]);
 
-            document.getElementById("po_hidden").value = po;
-            document.getElementById("gi_hidden").value = gi;
-            document.getElementById("reason_hidden").value = reason;
-            document.getElementById("no_surat_jalan_hidden").value = no_surat_jalan;
-            document.getElementById("no_inventory_tf_hidden").value = no_inventory_tf;
-            document.getElementById("type_inv_transaction_hidden").value = type_inv_transaction;
-            document.getElementById("remarks_hidden").value = remarks;
-            return true; // Allow form submission
-        }
+            // if (emptyFields.length > 0) {
+            //     const fieldNames = emptyFields.map(key => `- ${errorMsg[key]}`).join("\n");
+            //     alert("Pastikan field berikut diisi sebelum submit:\n\n" + fieldNames);
+            //    btn.disabled = true;
+            //     return false;
+            // }
 
-        function deleteItem(id) {
-            if (!confirm("Yakin ingin menghapus item ini?")) return;
-
-            fetch("/admin/transaction/gidelone/" + id, {
+            let form = document.getElementById("goodIssueForm");
+            let formData = new FormData(form);
+            fetch("/save_gi", {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": document.querySelector("meta[name='csrf-token']").getAttribute("content"),
+                        "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value
                     },
+                    body: formData
                 })
-                .then((response) => {
-                    if (!response.ok) throw new Error("Gagal menghapus item");
-                    return response.json();
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast("✅ Berhasil" + data.message, "success");
+                        btn.disabled = false;
+                        setTimeout(() => {
+                            // window.location.reload();
+                        }, 1000)
+                    } else {
+                        if (data.errors) {
+                            let errorMessages = Object.values(data.errors).flat().join("\n");
+                            showToast("❌ Gagal simpan:\n" + errorMessages, 'error');
+                        } else {
+                            showToast("❌ Gagal simpan: " + data.message, 'error');
+                        }
+
+                        btn.disabled = false;
+                    }
                 })
-                .then((data) => {
-                    console.log("Deleted:", data);
-                    loadScannedBarcodes();
-                    showToast("✅ Item berhasil dihapus", "success");
-                })
-                .catch((err) => {
-                    console.error(err);
-                    loadScannedBarcodes();
-                    showToast("❌ Error: gagal menghapus data!")
+                .catch(err => {
+                    console.error("Error:", err);
+                    alert("Terjadi error saat simpan data!");
+                    btn.disabled = false;
                 });
+
+            return false;
+        }
+
+        function deleteItem(button) {
+            if (!confirm("Yakin ingin menghapus item ini?")) return;
+            const row = button.closest("tr");
+            if (row) {
+                row.remove();
+            }
         }
 
         function showToast(message, type = 'success') {

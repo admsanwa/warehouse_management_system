@@ -213,4 +213,96 @@ class ItemsController extends Controller
 
         return back()->with('success', "Items Imported Succesfully");
     }
+
+        public function warehouse_search(Request $request)
+    {
+        $param = [
+            "page" => (int) $request->get('page', 1),
+            "limit" => (int) $request->get('limit', 10),
+            "WhsCode" => $request->get('q'),
+            'page'       => 1,
+        ];
+
+        $get = $this->sap->getWarehouses($param);
+
+        if (empty($get) || $get['success'] !== true) {
+            return response()->json([
+                'results' => []
+            ]);
+        }
+
+        $wh = collect($get['data'] ?? [])->map(function ($val) {
+            return [
+                'id'   => $val['WhsCode'],
+                'text' => $val['WhsCode'] . " - " . $val['WhsName'],
+            ];
+        });
+
+        return response()->json([
+            'results' => $wh,
+            'api_response' => $get
+        ]);
+    }
+
+        public function cost_center_search(Request $request)
+    {
+        $param = [
+            "page" => (int) $request->get('page', 1),
+            "limit" => (int) $request->get('limit', 10),
+            "OcrCode" => $request->get('q'),
+            'page'       => 1,
+        ];
+
+        $get = $this->sap->getCostCenters($param);
+
+        if (empty($get) || $get['success'] !== true) {
+            return response()->json([
+                'results' => []
+            ]);
+        }
+
+        $wh = collect($get['data'] ?? [])->map(function ($val) {
+            return [
+                'id'   => $val['OcrCode'],
+                'text' => $val['OcrCode'] . " - " . $val['OcrName'],
+            ];
+        });
+
+        return response()->json([
+            'results' => $wh,
+            'api_response' => $get
+        ]);
+    }
+
+        public function project_search(Request $request)
+    {
+        $param = [
+            "page" => (int) $request->get('page', 1),
+            "limit" => (int) $request->get('limit', 10),
+            "PrjCode" => $request->get('q'),
+            'Locked'       =>"N",
+            'page'       => 1,
+        ];
+
+        $get = $this->sap->getProjects($param);
+
+        if (empty($get) || $get['success'] !== true) {
+            return response()->json([
+                'results' => []
+            ]);
+        }
+
+        $wh = collect($get['data'] ?? [])->map(function ($val) {
+            return [
+                'id'   => $val['PrjCode'],
+                'text' => $val['PrjCode'] . " - " . $val['PrjName'],
+            ];
+        });
+
+        return response()->json([
+            'results' => $wh,
+            'api_response' => $get
+        ]);
+    }
+
 }

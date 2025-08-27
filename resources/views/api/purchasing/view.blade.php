@@ -83,8 +83,8 @@
                         </div>
                         <div class="card">
                             <div class="card-body">
-                                <div class="table table-responsive">
-                                    <table class="table table-stripped">
+                                <div class="table-responsive">
+                                    <table class="table table-stripped nowrap">
                                         @if (count($lines) > 0)
                                             <thead>
                                                 <tr>

@@ -62,7 +62,7 @@ class PurchasingController extends Controller
     {
         $param = [
             "page" => (int) $request->get('page', 1),
-            "limit" => (int) $request->get('limit', 10),
+            "limit" => (int) $request->get('limit', 1),
             "DocNum" =>  $request->query('docNum'),
             "DocEntry" => $request->query('docEntry'),
         ];
@@ -83,6 +83,39 @@ class PurchasingController extends Controller
             'lines' => $lines,
         ]);
     }
+
+    public function po_search(Request $request)
+    {
+        $param = [
+            "page" => (int) $request->get('page', 1),
+            "limit" => (int) $request->get('limit', 10),
+            "DocStatus" => $request->get('status'),
+            "ItemCode" => $request->get('code'),
+            "DocNum" => $request->get('q'),
+            'page'       => 1,
+        ];
+
+        $orders = $this->sap->getPurchaseOrders($param);
+
+        if (empty($orders) || $orders['success'] !== true) {
+            return response()->json([
+                'results' => []
+            ]);
+        }
+
+        $poData = collect($orders['data'] ?? [])->map(function ($item) {
+            return [
+                'id'   => $item['DocNum'],
+                'text' => $item['DocNum'] . " - " . $item['CardName'],
+            ];
+        });
+
+        return response()->json([
+            'results' => $poData,
+            'api_response' => $orders
+        ]);
+    }
+
     public function series_search(Request $request)
     {
         $searchQuery = $request->get('q');

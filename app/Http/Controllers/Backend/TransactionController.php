@@ -22,6 +22,7 @@ use phpDocumentor\Reflection\Types\Null_;
 use App\Services\SapService;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use App\Models\SapReasonModel as SapReason;
 
 class TransactionController extends Controller
 {
@@ -142,7 +143,7 @@ class TransactionController extends Controller
             'itemCode'       => Arr::get($item, 'ItemCode'),
             'ItemName'       => Arr::get($item, 'ItemName'),
             'warehouseStock' => $warehouseStock,
-            'items'          => $items,
+            // 'items'          => $items,
             'poData'         => $poData,
             'message'        => 'Item berhasil di scan!'
         ]);
@@ -835,7 +836,23 @@ class TransactionController extends Controller
         $po       = $request->get('po');
         $docEntry = $request->get('docEntry');
 
-        return view('api.transaction.goodissue', compact('po', 'docEntry'));
+        $gi_reasons = SapReason::where('type', 'issue')
+            ->orderBy('reason_code')
+            ->pluck('reason_desc', 'reason_code')
+            ->toArray();
+
+        $inv_trans_reasons = SapReason::where('type', 'inv-trans')
+            ->orderBy('reason_code')
+            ->pluck('reason_desc', 'reason_code')
+            ->toArray();
+
+        return view('api.transaction.goodissue', compact(
+            'po',
+            'docEntry',
+            'gi_reasons',
+            'inv_trans_reasons'
+        ));
+        return view('api.transaction.goodissue', compact('po', 'docEntry', 'gi_reasons',        'inv_trans_reasons'));
     }
 
     public function good_issued_old(Request $request)
@@ -854,43 +871,175 @@ class TransactionController extends Controller
 
     public function scan_and_out(Request $request)
     {
-        $barcode    = $request->input("item_code");
-        $gi         = $request->input("gi");
-        $items      = ItemsModel::where("code", $barcode)->first();
-        $user       = Auth::user()->username;
-        if (!$items) {
+        $validated = $request->validate([
+            'item_code' => 'required|string',
+            'po'        => 'nullable|string',
+            'docEntry'  => 'nullable|string',
+        ]);
+
+        $warehouse = "BK001";
+        $barcode   = $validated['item_code'];
+
+        $items = $this->sap->getStockItems([
+            'ItemCode' => $barcode,
+            'WhsCode'  => $warehouse,
+            'Limit'    => 1,
+            'Page'     => 1
+        ]);
+
+        if (!Arr::get($items, 'success')) {
             return response()->json([
                 'success' => false,
-                'message' => "Produk tidak ditemukan untuk barcode: " . $barcode . ". Pastikan produk sesuai dan scan kembali"
+                'message' => 'Gagal terhubung dengan SAP, coba lagi beberapa saat'
             ]);
         }
-        $on_hand        = ItemsMaklonModel::where("code", $barcode)->orderByDesc("id")->value("in_stock") ?? 0;
-        $purchaseOrders = PurchasingModel::with("po_details")->whereHas("po_details", function ($q) {
-            $q->where('item_code', 'LIKE', '%Maklon%');
-        })->where("status", "Open")->where("status", "!=", "GR")->pluck("no_po");
 
-        // save db
-        // $goodissue = new ItemsMaklonModel();
-        // $goodissue->gi          = $gi;
-        // $goodissue->gr          = 0;
-        // $goodissue->po          = 0;
-        // $goodissue->code        = $items->code;
-        // $goodissue->name        = $items->name;
-        // $goodissue->uom         = $items->uom;
-        // $goodissue->in_stock    = 0;
-        // $goodissue->qty         = 0;
-        // $goodissue->stock_min   = 0;
-        // $goodissue->scanned_by  = $user;
-        // $goodissue->is_temp     = true;
-        // $goodissue->save();
+        if (empty(Arr::get($items, 'total'))) {
+            return response()->json([
+                'success' => false,
+                'message' => "Produk tidak ditemukan untuk barcode: {$barcode}. Scan ulang!"
+            ]);
+        }
+
+        // Build PO params
+        $poData = [];
+        $get_po = [];
+        if (!empty($validated['docEntry']) && !empty($validated['po'])) {
+            $poParam = [
+                "page"      => 1,
+                "limit"     => 1,
+                "DocStatus" => "Open"
+            ];
+            $poParam['DocEntry'] = $validated['docEntry'];
+            $poParam['DocNum'] = $validated['po'];
+            $get_po = $this->sap->getPurchaseOrders($poParam);
+
+            if (!Arr::get($get_po, 'success') || empty(Arr::get($get_po, 'data'))) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Nomor PO tidak ditemukan untuk barcode: {$barcode}"
+                ]);
+            }
+            $poData = Arr::get($get_po, 'data.0', []);
+        }
+
+        $item   = Arr::get($items, 'data.0', []);
+        $warehouseStock = collect(Arr::get($item, 'warehouses', []))
+            ->firstWhere('WhsCode', $warehouse);
 
         return response()->json([
-            "success"   => true,
-            "name"      => $items->name,
-            "message"   => "Item berhasil di scan!",
-            "on_hand"   => $on_hand,
-            "pos"       => $purchaseOrders ?? 0,
+            'success'        => true,
+            'itemCode'       => Arr::get($item, 'ItemCode'),
+            'ItemName'       => Arr::get($item, 'ItemName'),
+            'warehouseStock' => $warehouseStock,
+            'items'          => $items['data'],
+            'poData'         => $poData,
+            'message'        => 'Item berhasil di scan!'
         ]);
+    }
+
+    public function save_good_issue(Request $request)
+    {
+        $post_gi = null;
+        $postData  = [];
+
+        try {
+            $validated = $request->validate([
+                'no_po'        => 'nullable',
+                'remarks'      => 'required|string',
+                'no_surat_jalan'      => 'required|string',
+                'no_inventory_tf'      => 'required|string',
+                'type_inv_transaction'      => 'required|string',
+                'internal_no'      => 'nullable|string',
+                'no_io'      => 'nullable|string',
+                'no_so'      => 'nullable|string',
+                'project'      => 'nullable|string',
+                'warehouse'      => 'nullable|string',
+                'cost_center'      => 'nullable|string',
+                'reason'      => 'required|string',
+                'stocks'                       => 'required|array|min:1',
+                'stocks.*.ItemCode'            => 'required|string',
+                'stocks.*.Dscription'          => 'nullable|string',
+                'stocks.*.qty'                 => 'required|numeric|min:1',
+                'stocks.*.UnitMsr'             => 'nullable|string',
+            ]);
+
+            $ocr = $validated['cost_center'] ?? '';
+            $warehouse = $validated['warehouse'] ?? '';
+            $project = $validated['project'] ?? '';
+
+            // Header untuk API
+            $postData = [
+                // "Series" => 694,
+                'DocDate'     => date("Y/m/d"),
+                'Comment'    => $validated['remarks'],
+                "Ext" => [
+                    "U_MEB_Alasan_GIssues" => $validated['reason'],
+                    "U_MEB_Default_Whse" =>   $warehouse,
+                    "U_MEB_Internal_No" =>   $validated['internal_no'],
+                    "U_MEB_No_IO" =>   $validated['no_io'],
+                    "U_MEB_No_SO" =>   $validated['no_so'],
+                    "U_MEB_Project_Code" =>   $project,
+                    "U_SI_No_Surat_Jalan" => $validated['no_surat_jalan'],
+                    "U_SI_IT" => $validated['no_inventory_tf'],
+                    "U_MEB_Type_Inv_Trans" => $validated['type_inv_transaction'],
+                    "U_MEB_PONo_Maklon" => $validated['no_po'] ?? null,
+                    "U_MEB_DIST_RULE" =>  $ocr
+                ],
+                'Lines'       => []
+            ];
+
+            $lines        = [];
+
+            foreach ($validated['stocks'] as $row) {
+                // untuk API SAP
+                $lines[] = [
+                    'ItemCode'    => $row['ItemCode'],
+                    'Dscription'  => $row['Dscription'] ?? null,
+                    'Quantity'    => $row['qty'],
+                    'WhsCode'    =>  $warehouse,
+                    'Ext' => [
+                        // 'AcctCode'    => "212400",
+                        'OcrCode' => $ocr,
+                        'Project' => $project
+                    ]
+                ];
+
+                // untuk DB
+                // $insertedData[] = [
+                // ];
+            }
+            $postData['Lines'] = $lines;
+            // Call API SAP
+            $post_gi = $this->sap->postGoodIssue($postData);
+            if (empty($post_gi['success'])) {
+                throw new \Exception($post_gi['message'] ?? 'SAP Good Issue failed without message');
+            }
+
+
+            return response()->json([
+                'success'  => true,
+                'message'  => 'Telah berhasil menambahkan item yang sudah di scan',
+                'request'  => $postData,
+                'response' => $post_gi ?? [],
+            ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors'  => $e->errors(),
+                'request' => $postData,
+                'response' => $post_gi ?? [],
+            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'request' => $postData,
+                'response' => $post_gi ?? [],
+            ], 500);
+        }
     }
 
     public function scan_and_out_old(Request $request)

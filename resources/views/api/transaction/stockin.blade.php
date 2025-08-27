@@ -130,41 +130,41 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="px-2" id="scannedBarcodes">
-                            @csrf
-                            <div class="table-responsive">
-                                <table class="table table-striped table-borderd table-sm nowrap">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Item Code</th>
-                                            <th>Item Desc</th>
-                                            <th>Open Qty</th>
-                                            <th>Qty</th>
-                                            <th>Uom</th>
-                                            {{-- <th>Delete</th> --}}
-                                        </tr>
-                                    </thead>
-                                    <tbody id="itemRows">
-                                    </tbody>
-                                </table>
-                                <div class="card">
-                                    <div class="card-footer">
-                                        <div class="col col-sm-12">
-                                            <button type="submit" onclick="return AddStockupForm();"
-                                                class="btn btn-success float-right" id="btnSubmitStock"><i
-                                                    class="fa fa-check"></i>
-                                                Add</button>
-                                        </div>
+                    </div>
+                    <div class="px-2" id="scannedBarcodes">
+                        @csrf
+                        <div class="table-responsive">
+                            <table class="table table-striped table-borderd table-sm nowrap">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Item Code</th>
+                                        <th>Item Desc</th>
+                                        <th>Open Qty</th>
+                                        <th>Qty</th>
+                                        <th>Uom</th>
+                                        {{-- <th>Delete</th> --}}
+                                    </tr>
+                                </thead>
+                                <tbody id="itemRows">
+                                </tbody>
+                            </table>
+                            <div class="card">
+                                <div class="card-footer">
+                                    <div class="col col-sm-12">
+                                        <button type="submit" onclick="return AddStockupForm();"
+                                            class="btn btn-success float-right" id="btnSubmitStock"><i
+                                                class="fa fa-check"></i>
+                                            Add</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="card">
-                            <div class="card-footer">
-                                <button onclick="history.back()" class="btn btn-default"><i class="fa fa-arrow-left"></i>
-                                    Back</button>
-                            </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-footer">
+                            <button onclick="history.back()" class="btn btn-default"><i class="fa fa-arrow-left"></i>
+                                Back</button>
                         </div>
                     </div>
                 </form>
@@ -372,14 +372,16 @@
         }
 
         function clearFormData() {
-            document.getElementById("cardName").value = "";
-            document.getElementById("cardCode").value = "";
-            document.getElementById("docDate").value = "";
-            document.getElementById("numAtCard").value = "";
-            document.getElementById("U_MEB_No_SO").value = "";
-            document.getElementById("U_MEB_NO_IO").value = "";
-            document.getElementById("itemRows").innerHTML = "";
-            document.getElementById("grpoHistoriesTbody").innerHTML = "";
+            // document.getElementById('item_code').value = "";
+            // document.getElementById('item_desc').value = "";
+            // document.getElementById("cardName").value = "";
+            // document.getElementById("cardCode").value = "";
+            // document.getElementById("docDate").value = "";
+            // document.getElementById("numAtCard").value = "";
+            // document.getElementById("U_MEB_No_SO").value = "";
+            // document.getElementById("U_MEB_NO_IO").value = "";
+            // document.getElementById("itemRows").innerHTML = "";
+            // document.getElementById("grpoHistoriesTbody").innerHTML = "";
         }
 
         function appendDataOnPo(data) {

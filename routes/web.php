@@ -79,7 +79,7 @@ Route::group(['middleware' => 'admin'], function () {
     // Purchasing
     Route::get('admin/purchasing_old', [PurchasingController::class, 'old_index']);
     Route::get('admin/purchasing/view_old/{id}', [PurchasingController::class, 'old_view']);
-    Route::get('/purchasing/seriesSearch', [PurchasingController::class, 'series_search']);
+
 
     Route::get('admin/purchasing', [PurchasingController::class, 'index']);
     Route::get('admin/purchasing/view', [PurchasingController::class, 'view']);
@@ -152,6 +152,7 @@ Route::group(['middleware' => 'admin'], function () {
     Route::post("admin/transaction/giup", [TransactionController::class, "gi_update"]);
     Route::get("/scanned-barcodes-gi/{gi}", [TransactionController::class, "get_scanned_gi"]);
     Route::get("admin/transaction/goodissued", [TransactionController::class, 'good_issued']);
+    Route::post("/save_gi", [TransactionController::class, 'save_good_issue']);
     Route::post("/good-issued", [TransactionController::class, "scan_and_out"]);
     Route::post("admin/transaction/gidelone/{id}", [TransactionController::class, "gi_delone"]);
     Route::get("admin/transaction/gidetail/{gi}", [TransactionController::class, "gi_detail"]);
@@ -180,6 +181,14 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get("admin/delivery/list", [DeliveryController::class, "index"]);
     Route::post("admin/delivery/estimate/{prod_no}", [DeliveryController::class, "estimate"]);
     Route::get("admin/delivery/history", [DeliveryController::class, "history"]);
+
+    // get data api
+        Route::get('/purchasing/seriesSearch', [PurchasingController::class, 'series_search']);
+    Route::get('/purchaseOrderSearch', [PurchasingController::class, 'po_search']);
+    Route::get('/warehouseSearch', [ItemsController::class, 'warehouse_search']);
+    Route::get('/costCenterSearch', [ItemsController::class, 'cost_center_search']);
+    Route::get('/projectSearch', [ItemsController::class, 'project_search']);
+
 });
 
 Route::get('logout', [AuthController::class, 'logout']);

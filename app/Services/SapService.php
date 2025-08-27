@@ -23,7 +23,7 @@ class SapService
         ])->get("{$this->baseUrl}/api/inbound/purchase-orders", $param);
 
         if ($response->failed()) {
-            throw new \Exception('Failed to fetch Purchase Orders: ' . $response->body());
+            throw new \Exception('Failed to fetch: ' . $response->body());
         }
 
         return $response->json();
@@ -50,7 +50,7 @@ class SapService
         ])->get("{$this->baseUrl}/api/inbound/production-orders", $param);
 
         if ($response->failed()) {
-            throw new \Exception('Failed to fetch Purchase Orders: ' . $response->body());
+            throw new \Exception('Failed to fetch: ' . $response->body());
         }
 
         return $response->json();
@@ -64,7 +64,35 @@ class SapService
         ])->get("{$this->baseUrl}/api/inbound/series", $param);
 
         if ($response->failed()) {
-            throw new \Exception('Failed to fetch Purchase Orders: ' . $response->body());
+            throw new \Exception('Failed to fetch: ' . $response->body());
+        }
+
+        return $response->json();
+    }
+
+    public function getWarehouses($param)
+    {
+        $response = Http::withHeaders([
+            'Accept'     => 'application/json',
+            'X-API-Key'  => $this->apiKey,
+        ])->get("{$this->baseUrl}/api/inbound/warehouses", $param);
+
+        if ($response->failed()) {
+            throw new \Exception('Failed to fetch: ' . $response->body());
+        }
+
+        return $response->json();
+    }
+
+    public function getCostCenters($param)
+    {
+        $response = Http::withHeaders([
+            'Accept'     => 'application/json',
+            'X-API-Key'  => $this->apiKey,
+        ])->get("{$this->baseUrl}/api/inbound/cost-centers", $param);
+
+        if ($response->failed()) {
+            throw new \Exception('Failed to fetch: ' . $response->body());
         }
 
         return $response->json();
@@ -78,7 +106,21 @@ class SapService
         ])->get("{$this->baseUrl}/api/inbound/items", $param);
 
         if ($response->failed()) {
-            throw new \Exception('Failed to fetch Purchase Orders: ' . $response->body());
+            throw new \Exception('Failed to fetch: ' . $response->body());
+        }
+
+        return $response->json();
+    }
+
+    public function getProjects($param)
+    {
+        $response = Http::withHeaders([
+            'Accept'     => 'application/json',
+            'X-API-Key'  => $this->apiKey,
+        ])->get("{$this->baseUrl}/api/inbound/projects", $param);
+
+        if ($response->failed()) {
+            throw new \Exception('Failed to fetch: ' . $response->body());
         }
 
         return $response->json();
@@ -94,6 +136,24 @@ class SapService
         if ($response->failed()) {
             \Log::error('GRPO API Error', [
                 'url'      => "{$this->baseUrl}/api/outbound/grpo",
+                'status'   => $response->status(),
+                'response' => $response->body(),
+                'payload'  => $param,
+            ]);
+        }
+        return $response->json();
+    }
+
+    public function postGoodIssue($param)
+    {
+        $response = Http::withHeaders([
+            'Accept'     => 'application/json',
+            'X-API-Key'  => $this->apiKey,
+        ])->post("{$this->baseUrl}/api/outbound/good-issue", $param);
+
+        if ($response->failed()) {
+            \Log::error('GRPO API Error', [
+                'url'      => "{$this->baseUrl}/api/outbound/good-issue",
                 'status'   => $response->status(),
                 'response' => $response->body(),
                 'payload'  => $param,
