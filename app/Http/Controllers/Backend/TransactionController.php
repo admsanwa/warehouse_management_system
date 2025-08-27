@@ -922,19 +922,19 @@ class TransactionController extends Controller
             $postData = [
                 // "Series" => 694,
                 'DocDate'     => date("Y/m/d"),
-                'Comment'    => $validated['remarks'],
+                'Comment'    => $validated['remarks'] ?? '',
                 "Ext" => [
                     "U_MEB_Alasan_GIssues" => $validated['reason'],
                     "U_MEB_Default_Whse" =>   $warehouse,
-                    "U_MEB_Internal_No" =>   $validated['internal_no'],
-                    "U_MEB_No_IO" =>   $validated['no_io'],
-                    "U_MEB_No_SO" =>   $validated['no_so'],
-                    "U_MEB_Project_Code" =>   $project,
-                    "U_SI_No_Surat_Jalan" => $validated['no_surat_jalan'],
-                    "U_SI_IT" => $validated['no_inventory_tf'],
-                    "U_MEB_Type_Inv_Trans" => $validated['type_inv_transaction'],
+                    "U_MEB_Internal_No" =>   $validated['internal_no'] ?? '',
+                    "U_MEB_No_IO" =>   $validated['no_io'] ?? '',
+                    "U_MEB_No_SO" =>   $validated['no_so'] ?? '',
+                    "U_MEB_Project_Code" =>   $project ?? '',
+                    "U_SI_No_Surat_Jalan" => $validated['no_surat_jalan'] ?? '',
+                    "U_SI_IT" => $validated['no_inventory_tf'] ?? '',
+                    "U_MEB_Type_Inv_Trans" => $validated['type_inv_transaction'] ?? '',
                     "U_MEB_PONo_Maklon" => $validated['no_po'] ?? null,
-                    "U_MEB_DIST_RULE" =>  $ocr
+                    "U_MEB_DIST_RULE" =>  $ocr ?? ''
                 ],
                 'Lines'       => []
             ];
@@ -944,14 +944,14 @@ class TransactionController extends Controller
             foreach ($validated['stocks'] as $row) {
                 // untuk API SAP
                 $lines[] = [
-                    'ItemCode'    => $row['ItemCode'],
+                    'ItemCode'    => $row['ItemCode'] ?? '',
                     'Dscription'  => $row['Dscription'] ?? null,
-                    'Quantity'    => $row['qty'],
-                    'WhsCode'    =>  $warehouse,
+                    'Quantity'    => $row['qty'] ?? '',
+                    'WhsCode'    =>  $warehouse ?? '',
                     'Ext' => [
                         // 'AcctCode'    => "212400",
-                        'OcrCode' => $ocr,
-                        'Project' => $project
+                        'OcrCode' => $ocr ?? '',
+                        'Project' => $project ?? ''
                     ]
                 ];
 
