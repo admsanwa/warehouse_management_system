@@ -572,25 +572,7 @@ class TransactionController extends Controller
                 'message' => "Produk tidak ditemukan untuk barcode: {$barcode}. Scan ulang!"
             ]);
         }
-        // $get_prod = [];
-        // $prodData = [];
-        // if ($validated['docEntry'] && $validated['prod_order']) {
-        //     $get_prod = $this->sap->getProductionOrders([
-        //         "page"      => 1,
-        //         "limit"     => 1,
-        //         "DocEntry"  => $validated['docEntry'],
-        //         "DocNum"  => $validated['prod_order'],
-        //         "Status" => "Released"
-        //     ]);
 
-        //     if (!Arr::get($get_prod, 'success') || empty(Arr::get($get_prod, 'data'))) {
-        //         return response()->json([
-        //             'success' => false,
-        //             'message' => "Nomor PO tidak ditemukan untuk barcode: {$barcode}"
-        //         ]);
-        //     }
-        //     $prodData = Arr::get($get_prod, 'data.0', []);
-        // }
         return response()->json([
             'success'        => true,
             'itemCode'       => Arr::get($item, 'ItemCode'),

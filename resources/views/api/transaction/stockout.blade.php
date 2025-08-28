@@ -25,48 +25,47 @@
                     <div class="card-header">
                         <h3 class="card-title">Stock Out</h3>
                     </div>
-                        <div class="card-body">
-                            <div class="form-group row">
-                                <label class="col-sm-4 col-form-lable">Scan Barcode :</label>
-                                <div class="col-sm-8">
-                                    <span class="badge bg-info text-dark mb-2">
-                                        <i class="fas fa-info-circle"> Untuk Scan Item/Barang keluar dari Warehouse</i>
-                                    </span>
-                                    <div class="mb-2">
-                                        <button type="button" class="btn btn-sm btn-outline-danger mr-1"
-                                            onclick="startCamera()">Use Camera</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary"
-                                            onclick="showFileInput()">Upload Image</button>
-                                    </div>
-                                    <div id="reader" style="width: 300px; display:none;"></div>
-                                    <div id="fileInput" style="display: none;">
-                                        <input type="file" accept="image/*" onchange="scanImage(this)"
-                                            class="form-control">
-                                    </div>
+                    <div class="card-body">
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-lable">Scan Barcode :</label>
+                            <div class="col-sm-8">
+                                <span class="badge bg-info text-dark mb-2">
+                                    <i class="fas fa-info-circle"> Untuk Scan Item/Barang keluar dari Warehouse</i>
+                                </span>
+                                <div class="mb-2">
+                                    <button type="button" class="btn btn-sm btn-outline-danger mr-1"
+                                        onclick="startCamera()">Use Camera</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                                        onclick="showFileInput()">Upload Image</button>
                                 </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-4 col-form-lable">Item Code :</label>
-                                <div class="col-sm-6">
-                                    <input type="text" name="item_code" id="item_code" class="form-control mt-2" readonly
-                                        required>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-4 col-form-lable">Item Description :</label>
-                                <div class="col-sm-6">
-                                    <input type="text" name="item_desc" id="item_desc" class="form-control mt-2" readonly
-                                        required>
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-4 col-form-lable">On Hand :</label>
-                                <div class="col-sm-6">
-                                    <input type="number" name="on_hand" id="on_hand" class="form-control mt-2" readonly
-                                        required>
+                                <div id="reader" style="width: 300px; display:none;"></div>
+                                <div id="fileInput" style="display: none;">
+                                    <input type="file" accept="image/*" onchange="scanImage(this)" class="form-control">
                                 </div>
                             </div>
                         </div>
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-lable">Item Code :</label>
+                            <div class="col-sm-6">
+                                <input type="text" name="item_code" id="item_code" class="form-control mt-2" readonly
+                                    required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-lable">Item Description :</label>
+                            <div class="col-sm-6">
+                                <input type="text" name="item_desc" id="item_desc" class="form-control mt-2" readonly
+                                    required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-lable">On Hand :</label>
+                            <div class="col-sm-6">
+                                <input type="number" name="on_hand" id="on_hand" class="form-control mt-2" readonly
+                                    required>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <form id="prodIssueForm">
@@ -109,26 +108,35 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <label for="" class="col-sm-4 col-form-lable">No IO :</label>
+                                <label for="no_io" class="col-sm-4 col-form-label">No IO :</label>
                                 <div class="col-sm-6 mb-2">
                                     <input type="text" name="no_io" id="no_io" class="form-control mt-2"
-                                        placeholder="Masukkan Nomor IO" required>
+                                        placeholder="No IO akan terisi otomatis" readonly>
+                                    <small class="text-muted">Nomor IO otomatis terisi dari production order</small>
                                 </div>
+
                                 <label for="" class="col-sm-4 col-form-lable">No SO :</label>
                                 <div class="col-sm-6 mb-2">
                                     <input type="text" name="no_so" id="no_so" class="form-control mt-2"
-                                        placeholder="Masukkan Nomor SO" required>
+                                        placeholder="Nomor SO akan terisi otomatis" readonly>
+                                    <small class="text-muted">Nomor SO otomatis terisi dari production order</small>
                                 </div>
-                                <label for="" class="col-sm-4 col-form-lable">Project Code :</label>
+
+                                <label for="project" class="col-sm-4 col-form-label">Project Code :</label>
                                 <div class="col-sm-6 mb-2">
                                     <input type="text" name="project" id="project" class="form-control mt-2"
-                                        placeholder="Masukkan Project Code" required>
+                                        placeholder="Project Code akan terisi otomatis" readonly>
+                                    <small class="text-muted">Project Code otomatis terisi dari production order</small>
                                 </div>
-                                <label for="" class="col-sm-4 col-form-lable">OCR / Distribution Rules :</label>
+                                <label for="cost_center" class="col-sm-4 col-form-label">OCR / Distribution Rules
+                                    :</label>
                                 <div class="col-sm-6 mb-2">
                                     <input type="text" name="cost_center" id="cost_center" class="form-control mt-2"
-                                        placeholder="Masukkan Project Code" required>
+                                        placeholder="Distribution Rules akan terisi otomatis" readonly>
+                                    <small class="text-muted">OCR / Distribution Rules otomatis terisi dari production
+                                        order</small>
                                 </div>
+
                                 <label for="" class="col-sm-4 col-form-lable">Remarks :</label>
                                 <div class="col-sm-6">
                                     <textarea type="text" name="remarks" id="remarks" class="form-control mt-2" placeholder="Masukkan Keterangan"></textarea>
@@ -145,6 +153,8 @@
                                         <th>No</th>
                                         <th>Item Code</th>
                                         <th>Item Desc</th>
+                                        <th>Planned Qty</th>
+                                        <th>Issued Qty</th>
                                         <th>Qty</th>
                                         <th>Uom</th>
                                         <th>Delete</th>
@@ -194,7 +204,7 @@
                     const selectedDocEntry = selectedData.entry;
                     const found = temPoData.find(item => item.DocNum == selectedDocNum && item.DocEntry ===
                         selectedDocEntry);
-                        selectedPo = found;
+                    selectedPo = found;
                     if (found) {
                         console.log("✅ Data ditemukan:", found);
                         $("#docEntry").val(found.DocEntry || "");
@@ -407,7 +417,7 @@
             const fileInput = fileInputWrapper.querySelector("input[type='file']");
 
             fileInput.disabled = true;
-            fetch("/good-issued", {//ganti ke /stockout-issued
+            fetch("/stockout-issued", { //ganti ke 
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -458,10 +468,19 @@
             }
             console.log("Items", selectedPo['Lines']);
             console.log("Item", itemCode);
- 
+
             selectedPo['Lines'].forEach((stocks) => {
                 const idx = tBody.rows.length;
+                const isIssuedQtyDone = stocks.IssuedQty >= stocks.PlannedQty;
+                if (isIssuedQtyDone) {
+                    alert(`Issue qty sudah mencukupi untuk barcode: ${itemCode}`);
+                    return;
+                }
                 if (stocks.ItemCode == itemCode) {
+                    let inputQty = isIssuedQtyDone ?
+                        'Qty yang di-issue sudah sesuai dengan plan' :
+                        `<input type="number" name="stocks[${idx}][qty]" class="form-control" style="min-width:80px !important;" value="0">`;
+
                     const row = `
                     <tr>
                         <td>${idx + 1}</td>
@@ -474,10 +493,16 @@
                             <input type="hidden" name="stocks[${idx}][BaseLine]" value="${stocks.LineNum}">
                         </td>
                         <td>
-                            <input type="number" name="stocks[${idx}][qty]" class="form-control" style="min-width:80px !important;" value="0">
+                            ${stocks.PlannedQty}
+                        </td>
                         <td>
-                            ${stocks.InvntryUom ?? ""}
-                            <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${stocks.InvntryUom ?? ""}">
+                            ${stocks.IssuedQty}
+                        </td>
+                        <td>
+                            ${inputQty}
+                        <td>
+                            ${stocks.InvntryUoM ?? ""}
+                            <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${stocks.InvntryUoM ?? ""}">
                         </td>
                         <td>
                             <button type="button" onclick="deleteItem(this)" class="btn btn-danger btn-sm">
