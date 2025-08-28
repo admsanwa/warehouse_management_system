@@ -38,10 +38,9 @@
                                         <div class="form-group col-md-2">
                                             <label for="stockNotes">Status Notes</label>
                                             <select name="stockNotes" id="stockNotes" class="form-control">
-                                                <option value="" disabled>-- Choose Status --</option>
                                                 @foreach ($stockStatus as $value => $label)
                                                     <option value="{{ $value }}"
-                                                        {{ Request()->stockNotes == $value ? 'selected' : '' }}>
+                                                        {{ (string) request()->stockNotes === (string) $value ? 'selected' : '' }}>
                                                         {{ $label }}
                                                     </option>
                                                 @endforeach
@@ -89,35 +88,23 @@
                                                         'WhsCode',
                                                         $defaultWh,
                                                     );
-                                                    $showRow = false;
-                                                    $checkStockNotes =
-                                                        $warehouseStock['OnHand'] < $warehouseStock['MinStock'];
-
-                                                    $showRow = false;
-                                                    if ($stockNotes == 0) {
-                                                        // Semua -> tampilkan semua data
-                                                        $showRow = true;
-                                                    } elseif ($stockNotes == 1 && $checkStockNotes) {
-                                                        // Stock harus dibeli
-                                                        $showRow = true;
-                                                    } elseif ($stockNotes == 2 && !$checkStockNotes) {
-                                                        // Stock tidak harus dibeli
-                                                        $showRow = true;
-                                                    }
+                                                    $filter = (string) request()->stockNotes;
                                                 @endphp
-                                                @if ($showRow)
-                                                    <tr>
-                                                        <td>{{ $loop->iteration }}</td>
-                                                        <td>{{ $warehouseStock['WhsCode'] ?? 'N/A' }}</td>
-                                                        <td>{{ $stock['ItemCode'] ?? 'N/A' }}</td>
-                                                        <td>{{ $stock['ItemName'] ?? 'N/A' }}</td>
-                                                        <td>{{ $warehouseStock['OnHand'] ?? 'N/A' }}</td>
-                                                        <td>{{ $warehouseStock['MinStock'] ?? 'N/A' }}</td>
-                                                        <td>{{ $warehouseStock['Available'] ?? 'N/A' }}</td>
-                                                        <td>{{ $checkStockNotes ? 'Stock harus dibeli' : '' }}</td>
-                                                        <td>{{ $stock['InvntryUom'] ?? 'N/A' }}</td>
-                                                    </tr>
-                                                @endif
+                                                {{-- @if ($filter === '' || ($filter === '1' && (string) $warehouseStock['Status'] === '1') || ($filter === '0' && (string) $warehouseStock['Status'] === '0')) --}}
+                                                <tr>
+                                                    <td>{{ $loop->iteration }}</td>
+                                                    <td>{{ $warehouseStock['WhsCode'] ?? 'N/A' }}</td>
+                                                    <td>{{ $stock['ItemCode'] ?? 'N/A' }}</td>
+                                                    <td>{{ $stock['ItemName'] ?? 'N/A' }}</td>
+                                                    <td>{{ $warehouseStock['OnHand'] ?? 'N/A' }}</td>
+                                                    <td>{{ $warehouseStock['MinStock'] ?? 'N/A' }}</td>
+                                                    <td>{{ $warehouseStock['Available'] ?? 'N/A' }}</td>
+                                                    <td>
+                                                        {{ $warehouseStock['Status'] === 1 ? 'Stock harus dibeli' : '' }}
+                                                    </td>
+                                                    <td>{{ $stock['InvntryUom'] ?? 'N/A' }}</td>
+                                                </tr>
+                                                {{-- @endif --}}
                                             @endforeach
                                         </tbody>
 

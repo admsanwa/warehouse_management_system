@@ -65,6 +65,11 @@
                                                 @endforeach
                                             </select>
                                         </div>
+                                        <div class="form-group col-md-2">
+                                            <label for="series">Series</label>
+                                            <select name="series" class="form-control" id="seriesSelect">
+                                            </select>
+                                        </div>
                                         <div class="form-group col-md-3">
                                             <button type="submit" class="btn btn-primary" style="margin-top: 20px"><i
                                                     class="fa fa-search"></i> Search</button>
@@ -174,4 +179,48 @@
             </div>
         </section>
     </div>
+    <script>
+        window.addEventListener("load", function() {
+            const selectSeries = $("#seriesSelect");
+            selectSeries.select2({
+                placeholder: "Ketik kode series...",
+                allowClear: true,
+                width: "100%",
+                language: {
+                    inputTooShort: function() {
+                        return "Ketik kode series untuk mencari...";
+                    },
+                    noResults: function() {
+                        return "Tidak ada data ditemukan";
+                    },
+                    searching: function() {
+                        return "Sedang mencari...";
+                    },
+                },
+                ajax: {
+                    url: "/purchasing/seriesSearch",
+                    dataType: "json",
+                    delay: 250,
+                    data: function(params) {
+                        if (!params) {
+                            return;
+                        }
+                        return {
+                            q: params.term,
+                            ObjectCode: '202'
+                        };
+                    },
+                    processResults: function(data) {
+                        console.log("Response dari server:", data); // cek di console
+                        return {
+                            results: (data.results || []).map(item => ({
+                                id: item.id,
+                                text: item.text
+                            }))
+                        };
+                    }
+                }
+            });
+        });
+    </script>
 @endsection

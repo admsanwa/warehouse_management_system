@@ -241,12 +241,14 @@ class TransactionController extends Controller
                 'U_MEB_NO_IO'  => 'nullable|string',
                 'U_MEB_No_SO'  => 'nullable|string',
                 'U_MEB_Ket_Pur' => 'nullable|string',
-                'stocks'                       => 'required|array|min:1',
+                'stocks'                       => 'required|array',
                 'stocks.*.BaseEntry'           => 'nullable',
                 'stocks.*.LineNum'             => 'required',
-                'stocks.*.ItemCode'            => 'required|string',
+                'stocks.*.ItemCode'            => 'nullable|string',
                 'stocks.*.Dscription'          => 'nullable|string',
-                'stocks.*.qty'                 => 'required|numeric|min:1',
+                'stocks.*.PlanQty'                 => 'nullable|numeric',
+                'stocks.*.OpenQty'                 => 'nullable|numeric',
+                'stocks.*.qty'                 => 'required|numeric',
                 'stocks.*.PriceBefDi'          => 'nullable|numeric',
                 'stocks.*.DiscPrcnt'           => 'nullable|numeric',
                 'stocks.*.VatGroup'            => 'nullable|string',
@@ -273,6 +275,28 @@ class TransactionController extends Controller
             $user         = Auth::id();
 
             foreach ($validated['stocks'] as $row) {
+                $entryQty = (float) $row['qty'];       // Qty baru yang diinput
+                $planQty = (float) $row['PlanQty'];    // Qty rencana
+                $openQty = (float) $row['OpenQty'];    // Qty sisa yang belum terpenuhi
+
+                // Qty yang sudah pernah diajukan sebelumnya
+                $totalSubmittedQty = $planQty - $openQty;
+
+                // Total qty jika ditambah dengan input baru
+                $totalEntryAndSubmittedQty = $totalSubmittedQty + $entryQty;
+
+                // Hitung toleransi 10%
+                $toleranceValue = $planQty * 0.1;
+                $planToleranceQty = $planQty + $toleranceValue;
+
+                // Validasi
+                if ($totalEntryAndSubmittedQty > $planToleranceQty) {
+                    throw new \Exception(
+                        "Qty melebihi batas toleransi 10%. " .
+                            "Plan: {$planQty}, Maks: {$planToleranceQty}, Sudah + Input: {$totalEntryAndSubmittedQty}"
+                    );
+                }
+
                 // untuk API SAP
                 $lines[] = [
                     'BaseEntry'   => $row['BaseEntry'] ?? null,
@@ -302,7 +326,7 @@ class TransactionController extends Controller
                     'line_num'     => $row['LineNum'] ?? null,
                     'item_code'    => $row['ItemCode'] ?? null,
                     'item_desc'    => $row['Dscription'] ?? null,
-                    'qty'    => $row['qty'] ?? null,
+                    'qty'    => $entryQty,
                     'uom'    => $row['UnitMsr'] ?? null,
                     'whse'    => 'BK001',
                     'note'    => '-',
@@ -313,7 +337,7 @@ class TransactionController extends Controller
             }
             $postData['Lines'] = $lines;
 
-            DB::beginTransaction();
+            // DB::beginTransaction();
 
             // Call API SAP
             $post_grpo = $this->sap->postGrpo($postData);
@@ -322,11 +346,11 @@ class TransactionController extends Controller
             }
 
             // Insert ke DB
-            if (!empty($insertedData)) {
-                GrpoModel::insert($insertedData);
-            }
+            // if (!empty($insertedData)) {
+            //     GrpoModel::insert($insertedData);
+            // }
 
-            DB::commit();
+            // DB::commit();
 
             return response()->json([
                 'success'  => true,
@@ -343,7 +367,7 @@ class TransactionController extends Controller
                 'response' => $post_grpo ?? [],
             ], 422);
         } catch (\Exception $e) {
-            DB::rollBack();
+            // DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
@@ -627,7 +651,7 @@ class TransactionController extends Controller
 
         return view("backend.transaction.partials.scanned-out", compact('scannedBarcodes'));
     }
-// POST Issue For Production
+    // POST Issue For Production
     public function save_production_issue(Request $request)
     {
         $post_gi = null;
@@ -1510,7 +1534,7 @@ class TransactionController extends Controller
             if (!Arr::get($get_po, 'success') || empty(Arr::get($get_po, 'data'))) {
                 return response()->json([
                     'success' => false,
-                    'message' => "Nomor PO tidak ditemukan untuk barcode: {$barcode}"
+                    'message' => "Nomor PO untuk barcode {$barcode} tidak ditemukan. Silakan periksa kembali status Nomor PO."
                 ]);
             }
             $poData = Arr::get($get_po, 'data.0', []);

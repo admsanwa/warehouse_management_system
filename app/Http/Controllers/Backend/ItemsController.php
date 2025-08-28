@@ -135,6 +135,7 @@ class ItemsController extends Controller
             "ItemName" => $request->get('item_desc'),
             "page" => (int) $request->get('page', 1),
             "limit" => (int) $request->get('limit', 10),
+            'Status' => (int) $request->get('stockNotes')
         ];
         $getRecord      = $this->sap->getStockItems($param);
 
@@ -152,9 +153,9 @@ class ItemsController extends Controller
             'stockNotes' => $request->get('stockNotes', 2),
             'defaultWh' => $param['WhsCode'],
             'stockStatus' => [
-                0 => 'Semua',
+                '' => 'Semua',
+                0 => 'Stock tidak harus dibeli',
                 1 => 'Stock harus dibeli',
-                2 => 'Stock tidak harus dibeli',
             ]
         ]);
     }
@@ -214,7 +215,7 @@ class ItemsController extends Controller
         return back()->with('success', "Items Imported Succesfully");
     }
 
-        public function warehouse_search(Request $request)
+    public function warehouse_search(Request $request)
     {
         $param = [
             "page" => (int) $request->get('page', 1),
@@ -244,7 +245,7 @@ class ItemsController extends Controller
         ]);
     }
 
-        public function cost_center_search(Request $request)
+    public function cost_center_search(Request $request)
     {
         $param = [
             "page" => (int) $request->get('page', 1),
@@ -274,13 +275,13 @@ class ItemsController extends Controller
         ]);
     }
 
-        public function project_search(Request $request)
+    public function project_search(Request $request)
     {
         $param = [
             "page" => (int) $request->get('page', 1),
             "limit" => (int) $request->get('limit', 10),
             "PrjCode" => $request->get('q'),
-            'Locked'       =>"N",
+            'Locked'       => "N",
             'page'       => 1,
         ];
 
@@ -304,5 +305,4 @@ class ItemsController extends Controller
             'api_response' => $get
         ]);
     }
-
 }

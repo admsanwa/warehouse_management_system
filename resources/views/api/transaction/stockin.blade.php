@@ -140,6 +140,7 @@
                                         <th>No</th>
                                         <th>Item Code</th>
                                         <th>Item Desc</th>
+                                        <th>Plan Qty</th>
                                         <th>Open Qty</th>
                                         <th>Qty</th>
                                         <th>Uom</th>
@@ -168,7 +169,7 @@
                         </div>
                     </div>
                 </form>
-                <div class="card">
+                {{-- <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">History GRPO</h3>
                     </div>
@@ -191,7 +192,7 @@
                             </table>
                         </div>
                     </div>
-                </div>
+                </div> --}}
             </div>
         </section>
     </div>
@@ -217,7 +218,6 @@
             });
             const poSelect = document.getElementById('no_po');
             poSelect.addEventListener("change", function() {
-                clearFormData();
                 const tBody = document.getElementById("itemRows");
                 tBody.innerHTML = "";
                 const selectedDocNum = this.value;
@@ -225,7 +225,7 @@
                 const selectedPO = tempPoData.find(po => po.DocNum === selectedDocNum);
                 // console.log("Selected PO: ", selectedPO);
                 appendDataOnPo(selectedPO);
-                loadGrpoHistories(selectedPO);
+                // loadGrpoHistories(selectedPO);
             });
         });
         let html5QrCode;
@@ -299,7 +299,6 @@
             const docEntry = document.getElementById("docEntry").value;
             const noPo = document.getElementById("no_po").value;
             const fileInputWrapper = document.getElementById("fileInput");
-            clearFormData();
             const fileInput = fileInputWrapper.querySelector("input[type='file']");
             fileInput.disabled = true;
             fetch("/stockin-add", {
@@ -323,7 +322,7 @@
                         // console.log("data", data);
                         document.getElementById("id").value = data.id;
                         document.getElementById("item_desc").value = data.ItemName;
-                        document.getElementById("on_hand").value = data.warehouseStock.OnHand;
+                        document.getElementById("on_hand").value = formatDecimalsSAP(data.warehouseStock.OnHand);
                         const poData = data.poData;
                         if (!poData) {
                             showToast("❌ Error: Nomor PO tidak ditemukan untuk barcode ini", 'error');
@@ -371,18 +370,7 @@
                 })
         }
 
-        function clearFormData() {
-            // document.getElementById('item_code').value = "";
-            // document.getElementById('item_desc').value = "";
-            // document.getElementById("cardName").value = "";
-            // document.getElementById("cardCode").value = "";
-            // document.getElementById("docDate").value = "";
-            // document.getElementById("numAtCard").value = "";
-            // document.getElementById("U_MEB_No_SO").value = "";
-            // document.getElementById("U_MEB_NO_IO").value = "";
-            // document.getElementById("itemRows").innerHTML = "";
-            // document.getElementById("grpoHistoriesTbody").innerHTML = "";
-        }
+
 
         function appendDataOnPo(data) {
             document.getElementById("docEntry").value = data.DocEntry;
@@ -395,7 +383,7 @@
             document.getElementById("U_MEB_Ket_Pur").value = data.U_MEB_Ket_Pur;
             // console.log(data);
             loadScannedBarcodes(data.Lines);
-            loadGrpoHistories(data);
+            // loadGrpoHistories(data);
         }
 
         function loadScannedBarcodes(items) {
@@ -412,7 +400,10 @@
 
                     const description = (stocks.Dscription ?? "") +
                         (stocks.FreeTxt ? " - " + stocks.FreeTxt : "");
-
+                    if (stocks.OpenQty <= 0) {
+                        alert("Tidak bisa menambahkan barcode ini karena sudah selesai.");
+                        return false; // hentikan eksekusi lebih aman
+                    }
                     const row = `
                     <tr>
                         <td>${idx + 1}</td>
@@ -426,9 +417,12 @@
                             ${description}
                             <input type="hidden" name="stocks[${idx}][Dscription]" value="${stocks.Dscription ?? ""}">
                         </td>
-                        <td>-</td>
+                        <td> ${formatDecimalsSAP(stocks.Quantity)}</td>
+                        <td> ${formatDecimalsSAP(stocks.OpenQty)}</td>
                         <td>
-                            <input type="number" name="stocks[${idx}][qty]" class="form-control" style="min-width:80px !important;" value="0">
+                            <input type="hidden" name="stocks[${idx}][PlanQty]" value="${stocks.Quantity}">
+                            <input type="hidden" name="stocks[${idx}][OpenQty]" value="${stocks.OpenQty}">
+                            <input type="number" name="stocks[${idx}][qty]" class="form-control format-sap" step="0.01" style="min-width:80px !important;" value="0">
                             <input type="hidden" name="stocks[${idx}][PriceBefDi]" value="${stocks.PriceBefDi}">
                             <input type="hidden" name="stocks[${idx}][DiscPrcnt]" value="${stocks.DiscPrcnt}">
                             <input type="hidden" name="stocks[${idx}][VatGroup]" value="${stocks.VatGroup}">
@@ -490,7 +484,7 @@
                         showToast("✅ Berhasil" + data.message, "success");
                         btn.disabled = false;
                         setTimeout(() => {
-                            // window.location.reload();
+                            window.location.reload();
                         }, 1000)
                     } else {
                         if (data.errors) {
@@ -532,7 +526,7 @@
                         <td>${item.no_po ?? "-"}</td>
                         <td>${item.item_code ?? "-"}</td>
                         <td>${item.item_desc ?? "-"}</td>
-                        <td>${item.qty ?? 0}</td>
+                        <td>${formatDecimalsSAP(item.qty)}</td>
                         <td>${item.uom ?? "-"}</td>
                         <td>${item.created_at ?formatTimestamp(item.created_at): "-"}</td>
                     </tr>
@@ -579,6 +573,29 @@
                 year: "numeric",
                 hour: "2-digit",
                 minute: "2-digit"
+            });
+        }
+
+        function formatDecimalsSAP(value) {
+            if (value === null || value === '') {
+                return '';
+            }
+
+            let num = parseFloat(value);
+            if (isNaN(num)) {
+                return '';
+            }
+
+            if (num % 1 === 0) {
+                return num.toLocaleString('id-ID', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                });
+            }
+
+            return num.toLocaleString('id-ID', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
             });
         }
     </script>

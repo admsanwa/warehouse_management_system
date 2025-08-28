@@ -26,10 +26,23 @@
                             </div>
                             <div class="card-body">
                                 <div class="form-group row">
-                                    <label for="" class="col-sm-2 col-form-lable">Nomor PO</label>
-                                    <div class="col-sm-4">: {{ $po['DocNum'] ?? '-' }}</div>
+                                    <label class="col-sm-2 col-form-label">Series</label>
+                                    <div class="col-sm-4">
+                                        :
+                                        @if (!empty($series) && isset($series['ObjectCode'], $series['SeriesName']))
+                                            {{ $series['ObjectCode'] . ' - ' . $series['SeriesName'] }}
+                                        @else
+                                            <span class="text-danger">⚠️ Series tidak ditemukan: {{ $po['Series'] }}</span>
+                                        @endif
+                                    </div>
                                     <label for="" class="col-sm-2 col-form-lable">IO</label>
                                     <div class="col-sm-4">: {{ $po['U_MEB_NO_IO '] ?? '-' }}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">Nomor PO</label>
+                                    <div class="col-sm-4">: {{ $po['DocNum'] ?? '-' }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">Nomor PO Maklon</label>
+                                    <div class="col-sm-4">: {{ $po['U_MEB_PONo_Maklon '] ?? '-' }}</div>
                                 </div>
                                 <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">Vendor Code</label>
@@ -92,8 +105,10 @@
                                                     <th>Item Code</th>
                                                     <th>Item Type</th>
                                                     <th>Item Desc</th>
-                                                    <th>Qty</th>
+                                                    <th>Plan Qty</th>
+                                                    <th>Open Qty</th>
                                                     <th>Uom</th>
+                                                    <th>Status</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -103,8 +118,10 @@
                                                         <td>{{ $line['ItemCode'] ?? '-' }}</td>
                                                         <td>{{ $line['Dscription'] ?? '-' }}</td>
                                                         <td>{{ $line['FreeTxt'] ?? '-' }}</td>
-                                                        <td>{{ $line['Quantity'] }}</td>
+                                                        <td>{{ formatDecimalsSAP($line['Quantity']) }}</td>
+                                                        <td>{{ formatDecimalsSAP($line['OpenQty']) }}</td>
                                                         <td>{{ $line['UnitMsr'] ?? '-' }}</td>
+                                                        <td>{{ $line['LineStatus'] ?? '-' }}</td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>
@@ -129,24 +146,20 @@
                                             class="btn btn-outline-success">
                                             <i class="fa fa-arrow-right"></i> Open GI
                                         </a>
-                                    @elseif (strpos($itemCode, 'RM') === 0)
-                                        <a href="{{ url('admin/transaction/stockin/' . $po['DocNum']) }}"
-                                            class="btn btn-outline-success">
-                                            <i class="fa fa-arrow-right"></i> Open GRPO
-                                        </a>
-                                    @elseif (strpos($itemCode, 'SF') === 0)
                                         <a href="{{ url('admin/transaction/goodreceipt') }}"
                                             class="btn btn-outline-success">
                                             <i class="fa fa-arrow-right"></i> Open GR
                                         </a>
-                                    @else
-                                        <a href="{{ url('admin/transaction/stockin/' . $po['DocNum']) }}"
+                                    @elseif (strpos($itemCode, 'RM') === 0)
+                                        <a href="{{ url('admin/transaction/stockin?po=' . $po['DocNum'] . '&docEntry=' . $po['DocEntry']) }}"
                                             class="btn btn-outline-success">
                                             <i class="fa fa-arrow-right"></i> Open GRPO
                                         </a>
+                                    @else
+                                        {{ $po['DocStatus'] }}
                                     @endif
                                 @else
-                                    Closed
+                                    {{ $po['DocStatus'] }}
                                 @endif
                             </div>
                         </div>

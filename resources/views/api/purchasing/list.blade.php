@@ -99,9 +99,9 @@
                                                 <th>No</th>
                                                 <th>No PO</th>
                                                 <th>Vendor</th>
-                                                <th>Remain</th>
+                                                {{-- <th>Remain</th> --}}
                                                 <th>Posting Date</th>
-                                                {{-- <th>Delivery Due Date</th> --}}
+                                                <th>Delivery Due Date</th>
                                                 <th>Status</th>
                                                 <th>Details</th>
                                             </tr>
@@ -112,40 +112,34 @@
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $order['DocNum'] }}</td>
                                                     <td>{{ $order['CardName'] }}</td>
-                                                    <td>-</td>
+                                                    {{-- <td>-</td> --}}
                                                     {{-- <td>{{ date('Y-m-d', strtotime($order['DocDate'])) }}</td> --}}
                                                     <td>{{ $order['DocDate'] }}</td>
-                                                    {{-- <td>{{ date('Y-m-d', strtotime($order['DocDueDate'])) }}</td> --}}
+                                                    <td>{{ $order['DocDueDate'] }}</td>
                                                     <td>
                                                         @php
                                                             $itemCode = $order['Lines'][0]['ItemCode'] ?? '';
                                                         @endphp
                                                         @if ($order['DocStatus'] == 'Open' && $itemCode)
-                                                            @if (stripos($itemCode, 'Maklon') !== false)
+                                                            @if (str_contains($itemCode, 'Maklon'))
                                                                 <a href="{{ url('admin/transaction/goodissued?po=' . $order['DocNum'] . '&docEntry=' . $order['DocEntry']) }}"
                                                                     class="btn btn-outline-success">
                                                                     <i class="fa fa-arrow-right"></i> Open GI
                                                                 </a>
-                                                            @elseif (strpos($itemCode, 'RM') === 0)
+                                                                <a href="{{ url('admin/transaction/goodreceipt?po=' . $order['DocNum'] . '&docEntry=' . $order['DocEntry']) }}"
+                                                                    class="btn btn-outline-success">
+                                                                    <i class="fa fa-arrow-right"></i> Open GR
+                                                                </a>
+                                                            @elseif (str_starts_with($itemCode, 'RM'))
                                                                 <a href="{{ url('admin/transaction/stockin?po=' . $order['DocNum'] . '&docEntry=' . $order['DocEntry']) }}"
                                                                     class="btn btn-outline-success">
                                                                     <i class="fa fa-arrow-right"></i> Open GRPO
                                                                 </a>
-                                                            @elseif (strpos($itemCode, 'SF') === 0)
-                                                                <a href="{{ url('admin/transaction/goodreceipt') }}"
-                                                                    class="btn btn-outline-success">
-                                                                    <i class="fa fa-arrow-right"></i> Open GR
-                                                                </a>
                                                             @else
-                                                                <a href="{{ url('admin/transaction/stockin/' . $order['DocNum']) }}"
-                                                                    class="btn btn-outline-success">
-                                                                    <i class="fa fa-arrow-right"></i> Open GRPO
-                                                                </a>
+                                                                Open
                                                             @endif
-                                                        @elseif($order['DocStatus'] == 'Open')
-                                                            Open
                                                         @else
-                                                            Close
+                                                            {{ $order['DocStatus'] }}
                                                         @endif
                                                     </td>
                                                     <td>
@@ -209,19 +203,19 @@
         window.addEventListener("load", function() {
             const selectSeries = $("#seriesSelect");
             selectSeries.select2({
-                placeholder: "Pilih series...",
+                placeholder: "Ketik kode series...",
                 allowClear: true,
                 width: "100%",
                 language: {
                     inputTooShort: function() {
-                        return "Ketik untuk mencari...";
+                        return "Ketik kode series untuk mencari...";
                     },
                     noResults: function() {
                         return "Tidak ada data ditemukan";
                     },
                     searching: function() {
                         return "Sedang mencari...";
-                    }
+                    },
                 },
                 ajax: {
                     url: "/purchasing/seriesSearch",
@@ -232,7 +226,8 @@
                             return;
                         }
                         return {
-                            q: params.term
+                            q: params.term,
+                            ObjectCode: '22'
                         };
                     },
                     processResults: function(data) {
@@ -240,7 +235,7 @@
                         return {
                             results: (data.results || []).map(item => ({
                                 id: item.id,
-                                text: `${item.id} - ${item.text}`
+                                text: item.text
                             }))
                         };
                     }

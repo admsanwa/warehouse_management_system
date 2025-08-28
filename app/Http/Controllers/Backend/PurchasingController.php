@@ -31,7 +31,8 @@ class PurchasingController extends Controller
             "DocStatus" => $request->get('docStatus', 'Open'),
             "DocNum" => $request->get('docNum'),
             "DocDueDate" => $request->get('docDueDate'),
-            "CardName" =>  $request->get('cardName')
+            "CardName" =>  $request->get('cardName'),
+            "Series" =>  $request->get('series')
         ];
         if ($request->get('docDate')) {
             $param['DocDate'] = date("Y/m/d", strtotime($request->get('docDate')));
@@ -62,7 +63,7 @@ class PurchasingController extends Controller
     {
         $param = [
             "page" => (int) $request->get('page', 1),
-            "limit" => (int) $request->get('limit', 1),
+            "limit" => 1,
             "DocNum" =>  $request->query('docNum'),
             "DocEntry" => $request->query('docEntry'),
         ];
@@ -78,9 +79,13 @@ class PurchasingController extends Controller
         $po = Arr::get($orders, 'data.0', []);
         $lines = Arr::get($po, 'Lines', []);
 
+        $get_series = $this->sap->getSeries(['page' => 1, 'limit' => 1, 'Series' => (int) $po['Series']]);
+        $series =   Arr::get($get_series, 'data.0', []);
+        // dd($get_series);
         return view('api.purchasing.view', [
             'po'    => $po,
             'lines' => $lines,
+            'series' => $series
         ]);
     }
 
@@ -123,7 +128,8 @@ class PurchasingController extends Controller
         $param = [
             'page'       => 1,
             'limit'      => 100,
-            'Locked'     => 'N', // biasanya artinya "Not Locked" / masih aktif
+            'Locked'     => 'N', // Terbuka
+            'ObjectCode' => $request->get('ObjectCode'),
             'SeriesName' => $searchQuery,
         ];
 
@@ -137,8 +143,8 @@ class PurchasingController extends Controller
 
         $series = collect($getSeries['data'] ?? [])->map(function ($item) {
             return [
-                'id'   => $item['Series'] ?? $item['id'],
-                'text' => $item['SeriesName'] ?? $item['name'],
+                'id'   => $item['Series'],
+                'text' => $item['SeriesName'],
             ];
         });
 
