@@ -87,8 +87,8 @@ class TransactionController extends Controller
         $items = $this->sap->getStockItems([
             'ItemCode' => $barcode,
             'WhsCode'  => $warehouse,
-            'Limit'    => 1,
-            'Page'     => 1
+            'limit'    => 1,
+            'page'     => 1
         ]);
 
         if (!Arr::get($items, 'success')) {
@@ -173,7 +173,6 @@ class TransactionController extends Controller
             'data'    => $grpo_histories
         ]);
     }
-
 
 
     public function scan_and_store_old(Request $request)
@@ -482,8 +481,32 @@ class TransactionController extends Controller
         return view("backend.transaction.stockdet", compact('getRecord', 'getData'));
     }
 
-    // stockout
-    public function stock_out()
+    // stockout - Issue For Production
+    public function stock_out(Request $request)
+    {
+        $po       = $request->get('docNum');
+        $docEntry = $request->get('docEntry');
+        $getProd = [];
+        $prod = [];
+        $gi_reasons = SapReason::where('type', 'issue')
+            ->orderBy('reason_code')
+            ->pluck('reason_desc', 'reason_code')
+            ->toArray();
+
+        $inv_trans_reasons = SapReason::where('type', 'inv-trans')
+            ->orderBy('reason_code')
+            ->pluck('reason_desc', 'reason_code')
+            ->toArray();
+
+        return view('api.transaction.stockout', compact(
+            'po',
+            'docEntry',
+            'gi_reasons',
+            'inv_trans_reasons'
+        ));
+    }
+
+    public function stock_out_old()
     {
         $temp           = StockModel::where('is_temp', true)->orderByDesc('id')->first();
         $latestStockOut = StockModel::whereNotNull('isp')->orderByDesc('id')->first();
@@ -518,6 +541,68 @@ class TransactionController extends Controller
     }
 
     public function scan_and_issued(Request $request)
+    {
+        $validated = $request->validate([
+            'item_code' => 'required|string',
+            'prod_order'        => 'nullable|string',
+            'docEntry'  => 'nullable|string',
+        ]);
+
+        $warehouse = "BK001";
+        $barcode   = $validated['item_code'];
+        $items = $this->sap->getStockItems([
+            'ItemCode' => $barcode,
+            'WhsCode'  => $warehouse,
+            'limit'    => 1,
+            'page'     => 1
+        ]);
+
+        if (!Arr::get($items, 'success')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal terhubung dengan SAP, coba lagi beberapa saat'
+            ]);
+        }
+        $item   = Arr::get($items, 'data.0', []);
+        $warehouseStock = collect(Arr::get($item, 'warehouses', []))
+            ->firstWhere('WhsCode', $warehouse);
+        if (empty(Arr::get($items, 'total'))) {
+            return response()->json([
+                'success' => false,
+                'message' => "Produk tidak ditemukan untuk barcode: {$barcode}. Scan ulang!"
+            ]);
+        }
+        // $get_prod = [];
+        // $prodData = [];
+        // if ($validated['docEntry'] && $validated['prod_order']) {
+        //     $get_prod = $this->sap->getProductionOrders([
+        //         "page"      => 1,
+        //         "limit"     => 1,
+        //         "DocEntry"  => $validated['docEntry'],
+        //         "DocNum"  => $validated['prod_order'],
+        //         "Status" => "Released"
+        //     ]);
+
+        //     if (!Arr::get($get_prod, 'success') || empty(Arr::get($get_prod, 'data'))) {
+        //         return response()->json([
+        //             'success' => false,
+        //             'message' => "Nomor PO tidak ditemukan untuk barcode: {$barcode}"
+        //         ]);
+        //     }
+        //     $prodData = Arr::get($get_prod, 'data.0', []);
+        // }
+        return response()->json([
+            'success'        => true,
+            'itemCode'       => Arr::get($item, 'ItemCode'),
+            'ItemName'       => Arr::get($item, 'ItemName'),
+            'warehouseStock' => $warehouseStock,
+            // 'items'          => $items,
+            // 'prodData'         => $prodData,
+            'message'        => 'Item berhasil di scan!'
+        ]);
+    }
+
+    public function scan_and_issued_old(Request $request)
     {
         $barcode    = $request->input("item_code");
         $Prodorder  = $request->input("prod_order") ? $request->input("prod_order") : 1;
@@ -569,6 +654,99 @@ class TransactionController extends Controller
         $scannedBarcodes = StockModel::where('isp', $isp)->where('is_temp', true)->where('scanned_by', $user)->get();
 
         return view("backend.transaction.partials.scanned-out", compact('scannedBarcodes'));
+    }
+// POST Issue For Production
+    public function save_production_issue(Request $request)
+    {
+        $post_gi = null;
+        $postData  = [];
+
+        try {
+            $validated = $request->validate([
+                'prod_order'        => 'nullable',
+                'remarks'      => 'required|string',
+                'reason'      => 'required|string',
+                'docEntry'      => 'required|string',
+                'no_io'      => 'nullable|string',
+                'no_so'      => 'nullable|string',
+                'project'      => 'nullable|string',
+                'warehouse'      => 'nullable|string',
+                'reason'      => 'required|string',
+                'cost_center'      => 'nullable|string',
+                'prod_type'      => 'nullable|string',
+                'stocks'                       => 'required|array|min:1',
+                'stocks.*.BaseEntry'            => 'required|string',
+                'stocks.*.BaseLine'          => 'nullable|string',
+                'stocks.*.qty'                 => 'required|numeric|min:1',
+                'stocks.*.UnitMsr'             => 'nullable|string',
+            ]);
+
+            $warehouse = $validated['warehouse'] ?? '';
+            $project = $validated['project'] ?? '';
+
+            // Header untuk API
+            $postData = [
+                // "Series" => 694,
+                'DocDate'     => date("Y/m/d"),
+                'Comment'    => $validated['remarks'] ?? '',
+                'ProductionType'    => $validated['prod_type'] ?? '',
+                "Ext" => [
+                    "U_MEB_Alasan_GIssues" => $validated['reason'],
+                    "U_MEB_Default_Whse" =>   $warehouse,
+                    "U_MEB_No_IO" =>   $validated['no_io'] ?? '',
+                    "U_MEB_No_SO" =>   $validated['no_so'] ?? '',
+                    "U_MEB_Project_Code" =>   $project ?? '',
+                    "U_MEB_DIST_RULE" =>  $validated['cost_center'] ?? ''
+                ],
+                'Lines'       => []
+            ];
+
+            $lines        = [];
+
+            foreach ($validated['stocks'] as $row) {
+                // untuk API SAP
+                $lines[] = [
+                    'BaseEntry'    => $row['BaseEntry'] ?? '',
+                    'BaseLine'  => $row['BaseLine'] ?? null,
+                    'Quantity'    => $row['qty'] ?? '',
+                    'WhsCode'    =>  $warehouse ?? '',
+                ];
+
+                // untuk DB
+                // $insertedData[] = [
+                // ];
+            }
+            $postData['Lines'] = $lines;
+            // Call API SAP
+            $post_gi = $this->sap->postProdIssue($postData);
+            if (empty($post_gi['success'])) {
+                throw new \Exception($post_gi['message'] ?? 'SAP Good Issue failed without message');
+            }
+
+
+            return response()->json([
+                'success'  => true,
+                'message'  => 'Issue For Production Telah Berhasil Disimpan',
+                'request'  => $postData,
+                'response' => $post_gi ?? [],
+            ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors'  => $e->errors(),
+                'request' => $postData,
+                'response' => $post_gi ?? [],
+            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'request' => $postData,
+                'response' => $post_gi ?? [],
+            ], 500);
+        }
     }
 
     public function stockout_up(Request $request)
@@ -833,8 +1011,8 @@ class TransactionController extends Controller
         $items = $this->sap->getStockItems([
             'ItemCode' => $barcode,
             'WhsCode'  => $warehouse,
-            'Limit'    => 1,
-            'Page'     => 1
+            'limit'    => 1,
+            'page'     => 1
         ]);
 
         if (!Arr::get($items, 'success')) {
@@ -851,28 +1029,6 @@ class TransactionController extends Controller
             ]);
         }
 
-        // Build PO params
-        $poData = [];
-        $get_po = [];
-        if (!empty($validated['docEntry']) && !empty($validated['po'])) {
-            $poParam = [
-                "page"      => 1,
-                "limit"     => 1,
-                "DocStatus" => "Open"
-            ];
-            $poParam['DocEntry'] = $validated['docEntry'];
-            $poParam['DocNum'] = $validated['po'];
-            $get_po = $this->sap->getPurchaseOrders($poParam);
-
-            if (!Arr::get($get_po, 'success') || empty(Arr::get($get_po, 'data'))) {
-                return response()->json([
-                    'success' => false,
-                    'message' => "Nomor PO tidak ditemukan untuk barcode: {$barcode}"
-                ]);
-            }
-            $poData = Arr::get($get_po, 'data.0', []);
-        }
-
         $item   = Arr::get($items, 'data.0', []);
         $warehouseStock = collect(Arr::get($item, 'warehouses', []))
             ->firstWhere('WhsCode', $warehouse);
@@ -883,7 +1039,6 @@ class TransactionController extends Controller
             'ItemName'       => Arr::get($item, 'ItemName'),
             'warehouseStock' => $warehouseStock,
             'items'          => $items['data'],
-            'poData'         => $poData,
             'message'        => 'Item berhasil di scan!'
         ]);
     }
@@ -1199,8 +1354,8 @@ class TransactionController extends Controller
         $items = $this->sap->getStockItems([
             'ItemCode' => $barcode,
             'WhsCode'  => $warehouse,
-            'Limit'    => 1,
-            'Page'     => 1
+            'limit'    => 1,
+            'page'     => 1
         ]);
 
         if (!Arr::get($items, 'success')) {

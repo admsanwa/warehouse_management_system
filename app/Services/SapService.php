@@ -179,4 +179,23 @@ class SapService
         }
         return $response->json();
     }
+
+    
+    public function postProdIssue($param)
+    {
+        $response = Http::withHeaders([
+            'Accept'     => 'application/json',
+            'X-API-Key'  => $this->apiKey,
+        ])->post("{$this->baseUrl}/api/outbound/issue-production", $param);
+
+        if ($response->failed()) {
+            \Log::error('GRPO API Error', [
+                'url'      => "{$this->baseUrl}/api/outbound/good-issue",
+                'status'   => $response->status(),
+                'response' => $response->body(),
+                'payload'  => $param,
+            ]);
+        }
+        return $response->json();
+    }
 }

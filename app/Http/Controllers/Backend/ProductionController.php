@@ -58,6 +58,37 @@ class ProductionController extends Controller
         ]);
     }
 
+    public function prod_search(Request $request)
+    {
+        $param = [
+            "limit" => (int) $request->get('limit', 5),
+            "Status" => $request->get('status', 'Released'),
+            "DocNum" => $request->get('q'),
+            "DocEntry" => $request->get('docentry') ?? '',
+            'page'       => 1,
+        ];
+
+        $orders = $this->sap->getProductionOrders($param);
+
+        if (empty($orders) || $orders['success'] !== true) {
+            return response()->json([
+                'results' => []
+            ]);
+        }
+        $poData = collect($orders['data'] ?? [])->map(function ($item) {
+            return [
+                'id'   => $item['DocNum'],
+                'entry'   => $item['DocEntry'],
+                'text' => $item['DocNum'] . " - " . $item['ItemCode'],
+            ];
+        });
+
+        return response()->json([
+            'results' => $poData,
+            'prods' => $orders['data'],
+        ]);
+    }
+
     public function view(Request $request)
     {
         $param = [

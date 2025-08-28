@@ -103,7 +103,7 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <label for="" class="col-sm-4 col-form-lable">Project :</label>
+                                <label for="" class="col-sm-4 col-form-lable">Project Code:</label>
                                 <div class="col-sm-6 mb-2">
                                     <select name="project" id="project" class="form-control mt-2" required>
                                     </select>

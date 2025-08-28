@@ -111,7 +111,7 @@
                                                     <td>{{ $production['DueDate'] }}</td>
                                                     <td>
                                                         @if ($production['Status'] == 'Released')
-                                                            <a href="{{ url('admin/transaction/stockout', $production['DocNum']) }}"
+                                                            <a href="{{ url('admin/transaction/stockout?docNum=' . $production['DocNum'] . '&docEntry=' . $production['DocEntry']) }}"
                                                                 class="btn btn-sm btn-outline-success"><i
                                                                     class="fa fa-arrow-right"></i> Released</a>
                                                         @else

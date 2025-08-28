@@ -136,7 +136,7 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get("admin/transaction/stockout/{prod_order}", [TransactionController::class, 'stockout_po']);
     Route::post("/stockout-issued", [TransactionController::class, "scan_and_issued"]);
     Route::get("/scanned-barcodes-out/{isp}", [TransactionController::class, "getScanOut"]);
-    Route::post("admin/transaction/stockoutup", [TransactionController::class, "stockout_up"]);
+    Route::post("/save_prod_issue", [TransactionController::class, "save_production_issue"]);
     Route::get("admin/transaction/stockoutdet/{isp}", [TransactionController::class, "stockout_det"]);
     Route::get("admin/transaction/stockoutdel/{isp}", [TransactionController::class, "stockout_del"]);
     Route::post("admin/transaction/stockoutdelone/{id}", [TransactionController::class, "stockout_delone"]);
@@ -186,6 +186,7 @@ Route::group(['middleware' => 'admin'], function () {
     // get data api
     Route::get('/purchasing/seriesSearch', [PurchasingController::class, 'series_search']);
     Route::get('/purchaseOrderSearch', [PurchasingController::class, 'po_search']);
+    Route::get('/productionOrderSearch', [ProductionController::class, 'prod_search']);
     Route::get('/warehouseSearch', [ItemsController::class, 'warehouse_search']);
     Route::get('/costCenterSearch', [ItemsController::class, 'cost_center_search']);
     Route::get('/projectSearch', [ItemsController::class, 'project_search']);
