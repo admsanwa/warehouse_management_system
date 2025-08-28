@@ -486,14 +486,7 @@ class TransactionController extends Controller
     {
         $po       = $request->get('docNum');
         $docEntry = $request->get('docEntry');
-        $getProd = [];
-        $prod = [];
         $gi_reasons = SapReason::where('type', 'issue')
-            ->orderBy('reason_code')
-            ->pluck('reason_desc', 'reason_code')
-            ->toArray();
-
-        $inv_trans_reasons = SapReason::where('type', 'inv-trans')
             ->orderBy('reason_code')
             ->pluck('reason_desc', 'reason_code')
             ->toArray();
@@ -502,7 +495,6 @@ class TransactionController extends Controller
             'po',
             'docEntry',
             'gi_reasons',
-            'inv_trans_reasons'
         ));
     }
 
@@ -544,8 +536,6 @@ class TransactionController extends Controller
     {
         $validated = $request->validate([
             'item_code' => 'required|string',
-            'prod_order'        => 'nullable|string',
-            'docEntry'  => 'nullable|string',
         ]);
 
         $warehouse = "BK001";
@@ -702,7 +692,7 @@ class TransactionController extends Controller
             // Call API SAP
             $post_gi = $this->sap->postProdIssue($postData);
             if (empty($post_gi['success'])) {
-                throw new \Exception($post_gi['message'] ?? 'SAP Good Issue failed without message');
+                throw new \Exception($post_gi['message'] ?? 'SAP Issue For Production failed without message');
             }
 
 
@@ -827,7 +817,157 @@ class TransactionController extends Controller
     }
 
     // Receipt From Prod
-    public function receipt_from_prod()
+    public function receipt_from_prod(Request $request)
+    {
+        $po       = $request->get('docNum');
+        $docEntry = $request->get('docEntry');
+        $gr_reason = SapReason::where('type', 'receipt')
+            ->orderBy('reason_code')
+            ->pluck('reason_desc', 'reason_code')
+            ->toArray();
+
+        return view('api.transaction.receiptfromprod', compact(
+            'po',
+            'docEntry',
+            'gr_reason',
+        ));
+    }
+
+    public function scan_and_receipt(Request $request)
+    {
+        $validated = $request->validate([
+            'item_code' => 'required|string',
+        ]);
+
+        $warehouse = "BK001";
+        $barcode   = $validated['item_code'];
+        $items = $this->sap->getStockItems([
+            'ItemCode' => $barcode,
+            'WhsCode'  => $warehouse,
+            'limit'    => 1,
+            'page'     => 1
+        ]);
+
+        if (!Arr::get($items, 'success')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal terhubung dengan SAP, coba lagi beberapa saat'
+            ]);
+        }
+        $item   = Arr::get($items, 'data.0', []);
+        $warehouseStock = collect(Arr::get($item, 'warehouses', []))
+            ->firstWhere('WhsCode', $warehouse);
+        if (empty(Arr::get($items, 'total'))) {
+            return response()->json([
+                'success' => false,
+                'message' => "Produk tidak ditemukan untuk barcode: {$barcode}. Scan ulang!"
+            ]);
+        }
+
+        return response()->json([
+            'success'        => true,
+            'itemCode'       => Arr::get($item, 'ItemCode'),
+            'ItemName'       => Arr::get($item, 'ItemName'),
+            'warehouseStock' => $warehouseStock,
+            // 'items'          => $items,
+            // 'prodData'         => $prodData,
+            'message'        => 'Item berhasil di scan!'
+        ]);
+    }
+
+    public function save_prod_receipt(Request $request)
+    {
+        $post_gi = null;
+        $postData  = [];
+
+        try {
+            $validated = $request->validate([
+                'prod_order'        => 'nullable',
+                'remarks'      => 'required|string',
+                'reason'      => 'required|string',
+                'docEntry'      => 'required|string',
+                'no_io'      => 'nullable|string',
+                'no_so'      => 'nullable|string',
+                'project'      => 'nullable|string',
+                'warehouse'      => 'nullable|string',
+                'reason'      => 'required|string',
+                // 'cost_center'      => 'nullable|string',
+                'prod_type'      => 'nullable|string',
+                'stocks'                       => 'required|array|min:1',
+                'stocks.*.BaseEntry'            => 'required|string',
+                'stocks.*.BaseLine'          => 'nullable|string',
+                'stocks.*.qty'                 => 'required|numeric|min:1',
+                'stocks.*.UnitMsr'             => 'nullable|string',
+            ]);
+
+            $warehouse = $validated['warehouse'] ?? '';
+            $project = $validated['project'] ?? '';
+
+            // Header untuk API
+            $postData = [
+                // "Series" => ,
+                'DocDate'     => date("Y/m/d"),
+                'Comment'    => $validated['remarks'] ?? '',
+                'ProductionType'    => $validated['prod_type'] ?? '',
+                "Ext" => [
+                    "U_MEB_Alasan_GRceipt" => $validated['reason'],
+                    "U_MEB_Default_Whse" =>   $warehouse,
+                    "U_MEB_No_IO" =>   $validated['no_io'] ?? '',
+                    "U_MEB_No_SO" =>   $validated['no_so'] ?? '',
+                    "U_MEB_Project_Code" =>   $project ?? '',
+                    // "U_MEB_DIST_RULE" =>  $validated['cost_center'] ?? ''
+                ],
+                'Lines'       => []
+            ];
+
+            $lines        = [];
+            foreach ($validated['stocks'] as $row) {
+                // untuk API SAP
+                $lines[] = [
+                    'BaseEntry'    => $row['BaseEntry'] ?? '',
+                    'BaseLine'  => $row['BaseLine'] ?? null,
+                    'Quantity'    => $row['qty'] ?? '',
+                    'WhsCode'    =>  $warehouse ?? '',
+                ];
+
+                // untuk DB
+                // $insertedData[] = [
+                // ];
+            }
+            $postData['Lines'] = $lines;
+            // Call API SAP
+            $post_gi = $this->sap->postProdReceipt($postData);
+            if (empty($post_gi['success'])) {
+                throw new \Exception($post_gi['message'] ?? 'SAP Receipt For Production failed without message');
+            }
+
+
+            return response()->json([
+                'success'  => true,
+                'message'  => 'Receipt For Production Telah Berhasil Disimpan',
+                'request'  => $postData,
+                'response' => $post_gi ?? [],
+            ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors'  => $e->errors(),
+                'request' => $postData,
+                'response' => $post_gi ?? [],
+            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'request' => $postData,
+                'response' => $post_gi ?? [],
+            ], 500);
+        }
+    }
+
+    public function receipt_from_prod_old()
     {
         session()->forget('first_scan');
         $temp   = RFPModel::orderByDesc('id')->where('is_temp', true)->first();

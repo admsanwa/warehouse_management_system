@@ -23,14 +23,14 @@
                         <span id="feedbackMessage"></span>
                     </div>
                     <div class="card-header">
-                        <h3 class="card-title">Stock Out</h3>
+                        <h3 class="card-title">Receipt from Production</h3>
                     </div>
                     <div class="card-body">
                         <div class="form-group row">
                             <label class="col-sm-4 col-form-lable">Scan Barcode :</label>
                             <div class="col-sm-8">
                                 <span class="badge bg-info text-dark mb-2">
-                                    <i class="fas fa-info-circle"> Untuk Scan Item/Barang keluar dari Warehouse</i>
+                                    <i class="fas fa-info-circle"> Untuk Scan Item/Barang masuk ke Warehouse</i>
                                 </span>
                                 <div class="mb-2">
                                     <button type="button" class="btn btn-sm btn-outline-danger mr-1"
@@ -68,7 +68,7 @@
                     </div>
                 </div>
 
-                <form id="prodIssueForm">
+                <form id="prodReceiptForm">
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title">Recently Scanned</h3>
@@ -98,11 +98,11 @@
                                         <option value="" disabled selected>Pilih Warehouse</option>
                                     </select>
                                 </div>
-                                <label for="" class="col-sm-4 col-form-lable">Alasan Goods Issue :</label>
+                                <label for="" class="col-sm-4 col-form-lable">Alasan Goods Receipt :</label>
                                 <div class="col-sm-6 mb-2">
                                     <select name="reason" id="reason" class="form-control mt-2" required>
                                         <option value="" disabled selected>Pilih Alasan</option>
-                                        @foreach ($gi_reasons as $key => $item)
+                                        @foreach ($gr_reason as $key => $item)
                                             <option value="{{ $key }}">{{ $key }} - {{ $item }}
                                             </option>
                                         @endforeach
@@ -136,7 +136,6 @@
                                     <small class="text-muted">OCR / Distribution Rules otomatis terisi dari production
                                         order</small>
                                 </div>
-
                                 <label for="" class="col-sm-4 col-form-lable">Remarks :</label>
                                 <div class="col-sm-6">
                                     <textarea type="text" name="remarks" id="remarks" class="form-control mt-2" placeholder="Masukkan Keterangan"></textarea>
@@ -166,7 +165,7 @@
                             <div class="card">
                                 <div class="card-footer">
                                     <div class="col col-sm-12">
-                                        <button type="submit" onclick="return AddStockupForm();"
+                                        <button type="submit" onclick="return AddProdReceiptForm();"
                                             class="btn btn-success float-right" id="btnSubmit"><i
                                                 class="fa fa-check"></i>
                                             Add</button>
@@ -176,7 +175,6 @@
                         </div>
                     </div>
                 </form>
-
                 <div class="card">
                     <div class="card-footer">
                         <button onclick="history.back()" class="btn btn-default"><i class="fa fa-arrow-left"></i>
@@ -193,7 +191,7 @@
         window.addEventListener("load", function() {
             const poSelect = $("#prod_order");
 
-            if (poSelect.is("select")) {
+            if (poSelect.length) {
                 const docNum = poSelect.data("docnum");
                 const docEntry = poSelect.data("docentry");
                 poSelect.on("change", function(e) {
@@ -417,7 +415,7 @@
             const fileInput = fileInputWrapper.querySelector("input[type='file']");
 
             fileInput.disabled = true;
-            fetch("/stockout-issued", { //ganti ke 
+            fetch("/rfp-add", { //ganti ke 
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -473,13 +471,9 @@
                 const idx = tBody.rows.length;
                 const isIssuedQtyDone = stocks.IssuedQty >= stocks.PlannedQty;
                 if (stocks.ItemCode == itemCode) {
-                    if (isIssuedQtyDone) {
-                        alert(`Issue qty sudah mencukupi untuk barcode: ${itemCode}`);
-                       return true; 
-                    }
                     let inputQty = isIssuedQtyDone ?
                         'Qty yang di-issue sudah sesuai dengan plan' :
-                        `<input type="number" name="stocks[${idx}][qty]" class="form-control" style="min-width:80px !important;" value="0">`;
+                        ``;
 
                     const row = `
                     <tr>
@@ -499,7 +493,7 @@
                             ${stocks.IssuedQty}
                         </td>
                         <td>
-                            ${inputQty}
+                         <input type="number" name="stocks[${idx}][qty]" class="form-control" style="min-width:80px !important;" value="0">
                         <td>
                             ${stocks.InvntryUoM ?? ""}
                             <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${stocks.InvntryUoM ?? ""}">
@@ -516,7 +510,7 @@
             });
         }
 
-        function AddStockupForm() {
+        function AddProdReceiptForm() {
             event.preventDefault();
             const btn = document.getElementById("btnSubmit");
             btn.disabled = true;
@@ -540,9 +534,9 @@
                 return false;
             }
 
-            let form = document.getElementById("prodIssueForm");
+            let form = document.getElementById("prodReceiptForm");
             let formData = new FormData(form);
-            fetch("/save_prod_issue", {
+            fetch("/save_prod_receipt", {
                     method: "POST",
                     headers: {
                         "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value
@@ -599,18 +593,6 @@
                 box.classList.remove('show');
                 document.getElementById("scannerInput").focus();
             }, 3000);
-        }
-
-        function appendProdData(data) {
-            document.getElementById("docEntry").value = data.DocEntry;
-            document.getElementById("no_io").value = data.U_MEB_No_IO;
-            document.getElementById("no_so").value = data.U_MEB_No_SO;
-            document.getElementById("project").value = data.Project;
-            document.getElementById("docDate").value = data.DocDate;
-            return;
-            // console.log(data);
-            // loadScannedBarcodes(data.Lines);
-            // loadGrpoHistories(data);
         }
     </script>
 @endsection

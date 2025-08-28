@@ -143,6 +143,7 @@ Route::group(['middleware' => 'admin'], function () {
     // receipt from prod
     Route::get("admin/transaction/rfp", [TransactionController::class, "receipt_from_prod"]);
     Route::post("/rfp-add", [TransactionController::class, "scan_and_receipt"]);
+    Route::post("/save_prod_receipt", [TransactionController::class, "save_prod_receipt"]);
     Route::get("/scanned-barcodes-rfp/{number}", [TransactionController::class, "getScannedRfp"]);
     Route::post("admin/transaction/rfpup", [TransactionController::class, "rfp_update"]);
     Route::post("admin/transaction/rfpdelone/{id}", [TransactionController::class, "rfp_delone"]);

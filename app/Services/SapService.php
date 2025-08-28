@@ -152,7 +152,7 @@ class SapService
         ])->post("{$this->baseUrl}/api/outbound/good-issue", $param);
 
         if ($response->failed()) {
-            \Log::error('GRPO API Error', [
+            \Log::error('GI API Error', [
                 'url'      => "{$this->baseUrl}/api/outbound/good-issue",
                 'status'   => $response->status(),
                 'response' => $response->body(),
@@ -170,7 +170,7 @@ class SapService
         ])->post("{$this->baseUrl}/api/outbound/good-receipt", $param);
 
         if ($response->failed()) {
-            \Log::error('GRPO API Error', [
+            \Log::error('GR API Error', [
                 'url'      => "{$this->baseUrl}/api/outbound/good-receipt",
                 'status'   => $response->status(),
                 'response' => $response->body(),
@@ -189,8 +189,26 @@ class SapService
         ])->post("{$this->baseUrl}/api/outbound/issue-production", $param);
 
         if ($response->failed()) {
-            \Log::error('GRPO API Error', [
-                'url'      => "{$this->baseUrl}/api/outbound/good-issue",
+            \Log::error('Production Issue API Error', [
+                'url'      => "{$this->baseUrl}/api/outbound/issue-production",
+                'status'   => $response->status(),
+                'response' => $response->body(),
+                'payload'  => $param,
+            ]);
+        }
+        return $response->json();
+    }
+    
+    public function postProdReceipt($param)
+    {
+        $response = Http::withHeaders([
+            'Accept'     => 'application/json',
+            'X-API-Key'  => $this->apiKey,
+        ])->post("{$this->baseUrl}/api/outbound/receipt-production", $param);
+
+        if ($response->failed()) {
+            \Log::error('Production Receipt API Error', [
+                'url'      => "{$this->baseUrl}/api/outbound/receipt-production",
                 'status'   => $response->status(),
                 'response' => $response->body(),
                 'payload'  => $param,
