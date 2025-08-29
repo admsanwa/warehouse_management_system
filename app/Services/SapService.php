@@ -20,7 +20,7 @@ class SapService
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
-        ])->get("{$this->baseUrl}/api/inbound/purchase-orders", $param);
+        ])->get("{$this->baseUrl}/api/inbound/purchase-orders", $param)->timeout(60);;
 
         if ($response->failed()) {
             throw new \Exception('Failed to fetch: ' . $response->body());
@@ -34,7 +34,7 @@ class SapService
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
-        ])->get("{$this->baseUrl}/api/inbound/stock", $param);
+        ])->get("{$this->baseUrl}/api/inbound/stock", $param)->timeout(60);;
 
         if ($response->failed()) {
             throw new \Exception('Failed to fetch data: ' . $response->body());
@@ -47,7 +47,7 @@ class SapService
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
-        ])->get("{$this->baseUrl}/api/inbound/production-orders", $param);
+        ])->get("{$this->baseUrl}/api/inbound/production-orders", $param)->timeout(60);;
 
         if ($response->failed()) {
             throw new \Exception('Failed to fetch: ' . $response->body());
@@ -61,7 +61,7 @@ class SapService
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
-        ])->get("{$this->baseUrl}/api/inbound/series", $param);
+        ])->get("{$this->baseUrl}/api/inbound/series", $param)->timeout(60);;
 
         if ($response->failed()) {
             throw new \Exception('Failed to fetch: ' . $response->body());
@@ -75,7 +75,7 @@ class SapService
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
-        ])->get("{$this->baseUrl}/api/inbound/warehouses", $param);
+        ])->get("{$this->baseUrl}/api/inbound/warehouses", $param)->timeout(60);;
 
         if ($response->failed()) {
             throw new \Exception('Failed to fetch: ' . $response->body());
@@ -89,7 +89,7 @@ class SapService
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
-        ])->get("{$this->baseUrl}/api/inbound/cost-centers", $param);
+        ])->get("{$this->baseUrl}/api/inbound/cost-centers", $param)->timeout(60);;
 
         if ($response->failed()) {
             throw new \Exception('Failed to fetch: ' . $response->body());
@@ -103,7 +103,7 @@ class SapService
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
-        ])->get("{$this->baseUrl}/api/inbound/items", $param);
+        ])->get("{$this->baseUrl}/api/inbound/items", $param)->timeout(60);;
 
         if ($response->failed()) {
             throw new \Exception('Failed to fetch: ' . $response->body());
@@ -117,7 +117,7 @@ class SapService
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
-        ])->get("{$this->baseUrl}/api/inbound/projects", $param);
+        ])->get("{$this->baseUrl}/api/inbound/projects", $param)->timeout(60);;
 
         if ($response->failed()) {
             throw new \Exception('Failed to fetch: ' . $response->body());
@@ -131,7 +131,7 @@ class SapService
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
-        ])->post("{$this->baseUrl}/api/outbound/grpo", $param);
+        ])->post("{$this->baseUrl}/api/outbound/grpo", $param)->timeout(60);;
 
         if ($response->failed()) {
             \Log::error('GRPO API Error', [
@@ -149,7 +149,7 @@ class SapService
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
-        ])->post("{$this->baseUrl}/api/outbound/good-issue", $param);
+        ])->post("{$this->baseUrl}/api/outbound/good-issue", $param)->timeout(60);;
 
         if ($response->failed()) {
             \Log::error('GI API Error', [
@@ -167,7 +167,7 @@ class SapService
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
-        ])->post("{$this->baseUrl}/api/outbound/good-receipt", $param);
+        ])->post("{$this->baseUrl}/api/outbound/good-receipt", $param)->timeout(60);;
 
         if ($response->failed()) {
             \Log::error('GR API Error', [
@@ -186,7 +186,7 @@ class SapService
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
-        ])->post("{$this->baseUrl}/api/outbound/issue-production", $param);
+        ])->post("{$this->baseUrl}/api/outbound/issue-production", $param)->timeout(60);;
 
         if ($response->failed()) {
             \Log::error('Production Issue API Error', [
@@ -204,7 +204,7 @@ class SapService
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
-        ])->post("{$this->baseUrl}/api/outbound/receipt-production", $param);
+        ])->post("{$this->baseUrl}/api/outbound/receipt-production", $param)->timeout(60);;
 
         if ($response->failed()) {
             \Log::error('Production Receipt API Error', [
