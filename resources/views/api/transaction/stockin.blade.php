@@ -144,7 +144,7 @@
                                         <th>Open Qty</th>
                                         <th>Qty</th>
                                         <th>Uom</th>
-                                        {{-- <th>Delete</th> --}}
+                                        <th>Delete</th>
                                     </tr>
                                 </thead>
                                 <tbody id="itemRows">
@@ -422,7 +422,7 @@
                         <td>
                             <input type="hidden" name="stocks[${idx}][PlanQty]" value="${stocks.Quantity}">
                             <input type="hidden" name="stocks[${idx}][OpenQty]" value="${stocks.OpenQty}">
-                            <input type="number" name="stocks[${idx}][qty]" class="form-control format-sap" step="0.01" style="min-width:80px !important;" value="0">
+                            <input type="text" name="stocks[${idx}][qty]" class="form-control format-sap" step="0.01" style="min-width:80px !important;" value="0">
                             <input type="hidden" name="stocks[${idx}][PriceBefDi]" value="${stocks.PriceBefDi}">
                             <input type="hidden" name="stocks[${idx}][DiscPrcnt]" value="${stocks.DiscPrcnt}">
                             <input type="hidden" name="stocks[${idx}][VatGroup]" value="${stocks.VatGroup}">
@@ -442,6 +442,19 @@
                     </tr>
                     `;
                     tBody.insertAdjacentHTML("beforeend", row);
+                    const newInput = tBody.querySelector(`input[name="stocks[${idx}][qty]"]`);
+                    if (newInput) {
+                        Inputmask({
+                            alias: "numeric",
+                            groupSeparator: ".",
+                            radixPoint: ",",
+                            autoGroup: true,
+                            digits: 2,
+                            digitsOptional: true,
+                            rightAlign: false,
+                            removeMaskOnSubmit: true
+                        }).mask(newInput);
+                    }
                 }
             });
         }

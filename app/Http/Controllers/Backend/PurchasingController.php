@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use App\Services\SapService;
 use Illuminate\Support\Arr;
+use Auth;
 
 class PurchasingController extends Controller
 {
@@ -27,7 +28,7 @@ class PurchasingController extends Controller
     {
         $param = [
             "page" => (int) $request->get('page', 1),
-            "limit" => (int) $request->get('limit', 10),
+            "limit" => (int) $request->get('limit', 5),
             "DocStatus" => $request->get('docStatus', 'Open'),
             "DocNum" => $request->get('docNum'),
             "DocDueDate" => $request->get('docDueDate'),
@@ -85,7 +86,8 @@ class PurchasingController extends Controller
         return view('api.purchasing.view', [
             'po'    => $po,
             'lines' => $lines,
-            'series' => $series
+            'series' => $series,
+            'user' => Auth::user()
         ]);
     }
 
