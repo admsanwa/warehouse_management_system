@@ -58,7 +58,6 @@
                                         <thead>
                                             <tr>
                                                 <th>No</th>
-                                                <th>No Receipt</th>
                                                 <th>IO</th>
                                                 <th>Production Order</th>
                                                 <th>Production Nomor</th>
@@ -70,7 +69,6 @@
                                              @forelse ($getRecord as $fg)
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
-                                                    <td>{{ $fg->number}}</td>
                                                     <td>{{ $fg->io}}</td>
                                                     <td>{{ $fg->prod_order }}</td>
                                                     <td>{{ $fg->prod_no}} </td>

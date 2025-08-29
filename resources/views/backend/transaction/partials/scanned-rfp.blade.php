@@ -26,7 +26,7 @@
                             <td>{{ $rfp->production->prod_no }}</td>                            
                             <td>{{ $rfp->production->prod_desc }}</td>
                             <td>
-                                <input type="number" name="rfp[{{ $index }}][qty]" class="form-control" value="0">
+                                <input type="number" name="rfp[{{ $index }}][qty]" class="form-control-sm" style="max-width: 60px" value="0">
                             </td>
                             <td>{{ $rfp->items->uom ?? "-" }}</td>
                             <td>

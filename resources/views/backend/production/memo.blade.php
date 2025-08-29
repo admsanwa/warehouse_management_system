@@ -44,7 +44,7 @@
                                         <label for="" class="col-sm-3 col-form-lable">Hal :</label>
                                         <div class="col-sm-6">
                                             <select name="description" id="description" class="form-control">
-                                                <option value="">Select Description Here</option>
+                                                <option value="">Pilih hal disini</option>
                                                 <option value="Stock Produksi">Stock Produksi</option>
                                                 <option value="Kirim barang ke maklon">Kirim barang ke maklon</option>
                                                 <option value="Pengiriman material/komponen">Pengiriman material/komponen</option>

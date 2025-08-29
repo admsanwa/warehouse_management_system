@@ -49,6 +49,8 @@
                                     <div class="col-sm-2">: {{ $getRecord->reason}}</div>
                                 </div>
                                 <div class="form-group row">
+                                    <label for="" class="col-sm-2 col-form-lable">No Series</label>
+                                    <div class="col-sm-2">: {{ $getRecord->no_series }}</div>
                                     <label for="" class="col-sm-2 col-form-lable">Remarks</label>
                                     <div class="col-sm-6">: {{ $getRecord->remarks }}</div>
                                 </div>

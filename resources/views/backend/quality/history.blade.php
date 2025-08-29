@@ -48,6 +48,8 @@
                                                 <option value="1" {{ Request('result') == 1 ? 'selected' : ''}}>OK</option>
                                                 <option value="2" {{ Request('result') == 2 ? 'selected' : ''}}>NG</option>
                                                 <option value="3" {{ Request('result') == 3 ? 'selected' : ''}}>Need Approval</option>
+                                                <option value="5" {{ request('result') == 5 ? 'selected' : ''}}>Painting by Inhouse</option>
+                                                <option value="6" {{ request('result') == 6 ? 'selected' : ''}}>Painting by Makoon</option>
                                             </select>
                                         </div>
                                         <div class="form-group col-md-2">
@@ -74,6 +76,7 @@
                                                 <th>Description</th>
                                                 <th>IO</th>
                                                 <th>QC</th>
+                                                <th>Result By</th>
                                                 <th>Date</th>
                                                 <th>Remarks</th>
                                             </tr>
@@ -92,12 +95,22 @@
                                                     <td>{{ $quality->production->prod_desc ?? "-"}}</td>
                                                     <td>{{ $quality->io }}</td>
                                                     <td>
-                                                        @if ($quality->result !== null)
-                                                            {{ $quality->result === 1 ? "OK" : ($quality->result === 2 ? "NG" : ($quality->result === 3 ? "Need Approval" : "-"))}}
-                                                        @else
-                                                           -
-                                                        @endif
+                                                         @php
+                                                            $statusMap = [
+                                                                1 => 'OK',
+                                                                2 => 'NG',
+                                                                3 => 'Need Approval',
+                                                                4 => 'Need Paint',
+                                                                5 => 'Painting by Inhouse',
+                                                                6 => 'Painting by Makloon'
+                                                            ];
+                                                        @endphp
+
+                                                        {{ $quality->result !== null 
+                                                            ? ($statusMap[$quality->result] ?? '-') 
+                                                            : '-' }}
                                                     </td>
+                                                    <td>{{ $quality->result_by }}</td>
                                                     <td>{{ \Carbon\Carbon::parse($quality->updated_at)->format('Y-m-d') }}</td>
                                                     <td>{{ $quality->remark }}</td>
                                                 </tr>

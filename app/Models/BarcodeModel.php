@@ -21,4 +21,9 @@ class BarcodeModel extends Model
 
         return $return;
     }
+
+    public function latestStock()
+    {
+        return $this->hasOne(StockModel::class, "item_code", "code")->latest("id");
+    }
 }

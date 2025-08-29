@@ -3,8 +3,6 @@
     <input type="hidden" name="po" id="po_hidden">
     <input type="hidden" name="gr" id="gr_hidden">
     <input type="hidden" name="reason" id="reason_hidden">
-    <input type="hidden" name="project_code" id="project_hidden">
-    <input type="hidden" name="whse" id="whse_hidden">
     <input type="hidden" name="no_surat_jalan" id="no_surat_jalan_hidden">
     <input type="hidden" name="no_inventory_tf" id="no_inventory_tf_hidden">
     <input type="hidden" name="type_inv_transaction" id="type_inv_transaction_hidden">
@@ -36,7 +34,7 @@
                             </td>                            
                             <td>{{ $goodreceipt->name }}</td>
                             <td>
-                                <input type="number" name="goodreceipt[{{ $index }}][qty]" class="form-control" value="0">
+                                <input type="number" name="goodreceipt[{{ $index }}][qty]" class="form-control-sm" style="max-width: 60px" value="0">
                             </td>
                             <td>{{ $goodreceipt->uom }}</td>
                             <td>

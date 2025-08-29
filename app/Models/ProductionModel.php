@@ -28,8 +28,14 @@ class ProductionModel extends Model
         if (!empty(Request::get('doc_num'))) {
             $return = $return->where('doc_num', 'LIKE', '%' . Request::get('doc_num') . '%');
         }
+        if (!empty(Request::get('no_series'))) {
+            $return = $return->where('no_series', 'LIKE', '%' . Request::get('no_series') . '%');
+        }
+        if (!empty(Request::get('status'))) {
+            $return = $return->where('status', 'LIKE', '%' . Request::get('status') . '%');
+        }
 
-        $return = $return->orderBy('id', 'desc')->paginate(10);
+        $return = $return->orderBy('id', 'desc');
         return $return;
     }
 

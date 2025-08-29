@@ -277,10 +277,10 @@
         const number = document.getElementById("number").value;
         const reason = document.getElementById("reason").value;
         const remarks = document.getElementById("remarks").value;
-        console.log("po", po);
+        // console.log("po", po);
 
-        if (!po ) {
-            alert("Pastikan mengisi nomer Production Order di isi sebelum submit.");
+        if (!po || !number ) {
+            alert("Pastikan semua masukkan di isi sebelum submit.");
             return false; // Prevent form submission
         }
 

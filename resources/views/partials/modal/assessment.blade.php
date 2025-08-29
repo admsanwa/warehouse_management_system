@@ -12,10 +12,16 @@
                     <label for="check_{{ $quality->id }}">Quality Check</label>
                     <select name="check" id="check_{{ $quality->id }}" class="form-control" required>
                         <option value="">Select Assessment Quality</option>
-                        <option value="1">OK</option>
-                        <option value="2">NG</option>
-                        @if ($user->nik != "06067" )
-                            <option value="3">Need Approval</option>
+                        @if ($user->department === "Production" )
+                            <option value="5">Painting by Inhouse</option>
+                            <option value="6">Painting by Makloon</option>
+                        @else
+                            <option value="1">OK</option>
+                            <option value="2">NG</option>
+                            @if ($user->department != "Production" || $user->nik != "06067")
+                                <option value="3">Need Approval</option>
+                                <option value="4">Need Paint</option>
+                            @endif
                         @endif
                     </select>
                     <input type="text" name="remark" id="remark_{{ $quality->id }}" class="form-control mt-2" placeholder=" Enter Remarks here" required>

@@ -193,6 +193,9 @@
                                                                 class="btn btn-success mb-2">
                                                                 <i class="fa fa-arrow-right"></i> Print
                                                             </a>
+                                                            <a href="{{ url('admin/items/printppic') }}"
+                                                                class="btn btn-success mb-2"><i
+                                                                    class="fa fa-arrow-right"></i> PPIC Format</a>
                                                         </div>
                                                     </td>
                                                 </tr>

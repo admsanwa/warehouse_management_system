@@ -34,7 +34,7 @@
                                             <label for="">IO</label>
                                             <input type="text" name="io" id="io" class="form-control" placeholder="Enter IO">
                                         </div>
-                                        <div class="form-group col-md-2">
+                                        <div class="form-group col-md-3">
                                             <button type="submit" class="btn btn-success" style="margin-top: 30px;"><i class="fa fa-search"></i> Search</button>
                                             <a href="{{ url("admin/quality/barcode")}}" class="btn btn-warning" style="margin-top: 30px;"><i class="fa fa-eraser"></i> Reset</a>
                                         </div>
@@ -144,10 +144,11 @@
                                                         <td></td>
                                                         <td>
                                                             <div class="d-flex flex-wrap">
-                                                                <a href="{{ url('admin/production/deleteall')}}" class="btn btn-danger mr-2 mb-2"><i class="fa fa-trash"></i> All</a>
-                                                                <a href="{{ url('admin/production/print')}}" class="btn btn-success mb-2">
-                                                                    <i class="fa fa-arrow-right"></i> Print
+                                                                <a href="{{ url('admin/production/deleteall') }}" class="btn btn-danger mr-2 mb-2"><i class="fa fa-trash"></i> All</a>
+                                                                <a href="{{ url('admin/production/print') }}" class="btn btn-success mb-2">
+                                                                    <i class="fa fa-arrow-right"></i> Print 
                                                                 </a>
+                                                                <a href="{{ url('admin/production/printppic') }}" class="btn btn-success mb-2">PPIC Format</a>
                                                             </div>
                                                         </td>
                                                     </tr>

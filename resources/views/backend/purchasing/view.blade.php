@@ -76,8 +76,12 @@
                                 <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">Status</label>
                                     <div class="col-sm-4">: {{ $getRecord->status == "Open" ? 'Open' : 'Closed' }}</div>
+                                    <label for="" class="col-sm-2 col-form-lable">No Series</label>
+                                    <div class="col-sm-4">: {{ $getRecord->no_series ?? "-" }}</div>
+                                </div>
+                                <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">Note</label>
-                                    <div class="col-sm-4">: {{ $getRecord->note ?? "-" }}</div>
+                                    <div class="col-sm-8">: {{ $getRecord->note ?? "-" }}</div>
                                 </div>
                             </div>
                         </div>
@@ -120,14 +124,16 @@
                             </div>
                             <div class="card-footer">
                                 <a href="{{ url('admin/purchasing') }}" class="btn btn-default">Back</a>
-                                @if ($getRecord->status == "Open" && stripos($pos->item_code, "Maklon") !== false)
-                                    <a href="{{ url("admin/transaction/goodissued")}}" class="btn btn-success">Good Issue</a>
-                                @elseif ($getRecord->status == "GR")
-                                    <a href="{{ url("admin/transaction/goodreceipt") }}" class="btn btn-success">Good Receipt</a>
-                                @elseif ($getRecord->status == "Open")
-                                    <a href="{{ url("admin/transaction/stockin/" . $getPO)}}" class="btn btn-success">Scan Barcode</a>
-                                @else
-                                    Closed
+                                 @if ($user->department == "Production and Warehouse" && $user->level != "Manager" && $user->level != "Supervisor" && $user->level != "14356")
+                                    @if ($purchasing->status == "Open" && stripos($purchasing->po_details->item_code, "Maklon") !== false)
+                                    <a href="{{ url("admin/transaction/goodissued")}}" class="btn btn-outline-success"><i class="fa fa-arrow-right"></i> Open GI</a>
+                                    @elseif($purchasing->status == "Open")
+                                        <a href="{{ url("admin/transaction/stockin/" . $purchasing->no_po)}}" class="btn btn-outline-success"><i class="fa fa-arrow-right"></i> Open GRPO</a>
+                                    @elseif($purchasing->status == "GR")
+                                        <a href="{{ url("admin/transaction/goodreceipt")}}" class="btn btn-outline-success"><i class="fa fa-arrow-right"></i> Open GR</a>
+                                    @else
+                                        Closed
+                                    @endif
                                 @endif
                             </div>
                         </div>

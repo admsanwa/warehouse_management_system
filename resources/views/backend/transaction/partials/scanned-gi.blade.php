@@ -32,7 +32,7 @@
                             </td>                            
                             <td>{{ $goodissue->name }}</td>
                             <td>
-                                <input type="number" name="goodissue[{{ $index }}][qty]" class="form-control" value="0">
+                                <input type="number" name="goodissue[{{ $index }}][qty]" class="form-control-sm" value="0" style="max-width: 60px;">
                             </td>
                             <td>{{ $goodissue->uom }}</td>
                             <td>

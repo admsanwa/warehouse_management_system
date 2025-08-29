@@ -63,6 +63,18 @@ class ItemsController extends Controller
         return view('backend.items.print', compact('addedBarcodes'));
     }
 
+    public function print_ppic(Request $request)
+    {
+        $user = Auth::user()->username;
+        $addedBarcodes = BarcodeModel::where("username", $user)->get();
+
+        if (empty($addedBarcodes)) {
+            return redirect()->back()->with('error', 'Tidak ada barcodes yang dipilih untuk print');
+        }
+
+        return view('backend.items.printppic', compact('addedBarcodes'));
+    }
+
     public function post(Request $request)
     {
         $user   = Auth::user()->username;

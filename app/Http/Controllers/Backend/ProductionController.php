@@ -238,7 +238,9 @@ class ProductionController extends Controller
         ]);
 
         DB::transaction(function () use ($request, $validated) {
+            $user = Auth::user();
             $memo = \App\Models\MemoModel::create([
+                'created_by'    => $user->fullname,
                 'no'            => $validated['no'],
                 'date'          => $validated['date'],
                 'description'   => $request->description,

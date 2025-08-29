@@ -16,7 +16,8 @@ class QualityController extends Controller
 {
     public function index(Request $request)
     {
-        $getRecord = ProductionModel::with('qualityTwo')
+
+        $query = ProductionModel::with('qualityTwo')
             ->addSelect([
                 'latest_quality_id' => QualityModel::select('id')
                     ->whereColumn('quality.io', 'production_order.io_no')
@@ -24,8 +25,15 @@ class QualityController extends Controller
                     ->limit(1)
             ])
             ->orderByDesc('latest_quality_id')
-            ->filter($request) // <-- using the scope
-            ->paginate(10);
+            ->filter($request);
+
+        if (auth()->user()->department === 'Production') {
+            $query->whereHas('qualityTwo', function ($q) {
+                $q->where('result', 4);
+            });
+        }
+
+        $getRecord = $query->paginate(10);
 
         $getRecord->getCollection()->transform(function ($record) {
             $orderQty   = ProductionOrderDetailsModel::where("doc_num", $record->doc_num)->sum("qty");
@@ -63,7 +71,16 @@ class QualityController extends Controller
         ]);
 
         $io     = ProductionModel::where("prod_no", $prod_no)->value("io_no");
-        $check  = $request->check == 1 ? "OK" : "NG";
+        $statusMap = [
+            1 => "OK",
+            2 => "NG",
+            3 => "Need Approval",
+            4 => "Need Paint",
+            5 => "Painting by Inhouse",
+            6 => "Painting by Makloon"
+        ];
+
+        $check  = $request->check !== null ? ($statusMap[$request->check] ?? "-") : "-";
         $user   = Auth::user()->username;
 
         $quality = new QualityModel();
@@ -79,6 +96,7 @@ class QualityController extends Controller
     public function history(Request $request)
     {
         $getRecord = QualityModel::getRecord($request);
-        return view("backend.quality.history", compact("getRecord"));
+        $user      = Auth::user();
+        return view("backend.quality.history", compact("getRecord", "user"));
     }
 }

@@ -12,6 +12,7 @@ class IFPModel extends Model
     protected $table = "ifp";
 
     protected $fillable = [
+        'no_series',
         'no_po',
         'io',
         'so',

@@ -96,14 +96,26 @@
                                                     </td>
                                                     <td>{{ $purchasing->posting_date }}</td>
                                                     <td>
-                                                        @if ($purchasing->status == "Open" && stripos($purchasing->po_details->item_code, "Maklon") !== false)
+                                                        @if ($user->department == "Production and Warehouse" && $user->level != "Manager" && $user->level != "Supervisor" && $user->level != "14356")
+                                                            @if ($purchasing->status == "Open" && stripos($purchasing->po_details->item_code, "Maklon") !== false)
                                                             <a href="{{ url("admin/transaction/goodissued")}}" class="btn btn-outline-success"><i class="fa fa-arrow-right"></i> Open GI</a>
-                                                        @elseif($purchasing->status == "Open")
-                                                            <a href="{{ url("admin/transaction/stockin/" . $purchasing->no_po)}}" class="btn btn-outline-success"><i class="fa fa-arrow-right"></i> Open GRPO</a>
-                                                        @elseif($purchasing->status == "GR")
-                                                            <a href="{{ url("admin/transaction/goodreceipt")}}" class="btn btn-outline-success"><i class="fa fa-arrow-right"></i> Open GR</a>
+                                                            @elseif($purchasing->status == "Open")
+                                                                <a href="{{ url("admin/transaction/stockin/" . $purchasing->no_po)}}" class="btn btn-outline-success"><i class="fa fa-arrow-right"></i> Open GRPO</a>
+                                                            @elseif($purchasing->status == "GR")
+                                                                <a href="{{ url("admin/transaction/goodreceipt")}}" class="btn btn-outline-success"><i class="fa fa-arrow-right"></i> Open GR</a>
+                                                            @else
+                                                                Closed
+                                                            @endif
                                                         @else
-                                                            Closed
+                                                            @if ($purchasing->status == "Open" && stripos($purchasing->po_details->item_code, "Maklon") !== false)
+                                                                Open GI
+                                                            @elseif($purchasing->status == "Open")
+                                                                Open GRPO
+                                                            @elseif($purchasing->status == "GR")
+                                                                Open GR
+                                                            @else
+                                                                Closed
+                                                            @endif
                                                         @endif
                                                     </td>
                                                     <td>

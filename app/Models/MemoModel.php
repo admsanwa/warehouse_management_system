@@ -12,7 +12,7 @@ class MemoModel extends Model
     use HasFactory;
 
     protected $table = "memo";
-    protected $fillable = ['no', 'description', 'date', 'project', 'io', 'due_date'];
+    protected $fillable = ['created_by', 'no', 'description', 'date', 'project', 'io', 'due_date'];
 
     static public function getRecord()
     {

@@ -25,8 +25,8 @@ class PurchasingModel extends Model
         if (!empty(Request::get('vendor'))) {
             $return = $return->where('vendor', 'LIKE', '%' . Request::get('vendor') . '%');
         }
-        if (!empty(Request::get('contact_person'))) {
-            $return = $return->where('contact_person', 'LIKE', '%' . Request::get('contact_person') . '%');
+        if (!empty(Request::get('no_series'))) {
+            $return = $return->where('no_series', 'LIKE', '%' . Request::get('no_series') . '%');
         }
         if (!empty(Request::get('posting_date'))) {
             $return = $return->where('posting_date', 'LIKE', '%' . Request::get('posting_date') . 'posting_date');

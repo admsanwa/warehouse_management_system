@@ -23,7 +23,7 @@ class DashboardController extends Controller
     public function dashboard(Request $request)
     {
         // get value
-        $getQuality     = QualityModel::whereNotNull("result")->get()->unique('io');
+        $getQuality     = QualityModel::whereNot("result", 3)->get()->unique('io');
         $getDelivery    = DeliveryModel::whereNotNull("status")->get()->unique('io');
         $getProd        = ProductionModel::where("status", "Released")->get();
 
@@ -71,25 +71,42 @@ class DashboardController extends Controller
 
         // notif modal
         $user           = Auth::user();
-        $hasPending     = BonModel::whereDoesntHave("signBon", function ($q) {
-            $q->where('sign', 1);
+        $hasPending     = BonModel::whereDoesntHave("signBon", function ($q) use ($user) {
+            $q->where('sign', 1)->where('nik', $user->nik);
         })->exists();
         $hasPendingMemo = MemoModel::whereDoesntHave("sign", function ($q) {
             $q->where('sign', 1);
         })->exists();
-        $hasQcPending      = QualityModel::where("result", 3)->get();
+        $hasQcPending   = QualityModel::where('result', 3)
+            ->whereIn('id', function ($query) {
+                $query->selectRaw('MAX(id)')
+                    ->from('quality')
+                    ->groupBy('io');
+            })
+            ->exists();
 
-        if ($user->nik === "06067" && $hasPending || $user->nik === "08517" && $hasPending || $user->nik === "250071" && $hasPending) {
+        $hasQcPendingProd   = QualityModel::where('result', 4)
+            ->whereIn('id', function ($query) {
+                $query->selectRaw('MAX(id)')
+                    ->from('quality')
+                    ->groupBy('io');
+            })
+            ->exists();
+
+        if (in_array($user->nik, ["06067", "08517", "250071"]) && $hasPending) {
             session()->flash('bonPending', true);
         }
         if ($user->nik === "06067" && $hasPendingMemo) {
             session()->flash('memoPending', true);
         }
-        if ($user->nik === "06067" && $hasQcPending) {
+        if (in_array($user->nik, ["06067"]) && $hasQcPending) {
             session()->flash('qcPending', true);
         }
+        if ($user->nik === "12345" && $hasQcPendingProd) {
+            session()->flash('qcPendingProd', true);
+        }
 
-        return view('backend.dashboard.list', compact('needBuy', 'afterCheck', 'deliveryStatus', 'prodRelease', 'purchaseOrder', 'goodIssued', 'goodReceipt', 'rfp'));
+        return view('backend.dashboard.list', compact('needBuy', 'afterCheck', 'deliveryStatus', 'prodRelease', 'purchaseOrder', 'goodIssued', 'goodReceipt', 'rfp', 'user'));
     }
 
     public function clearBonNotif()
@@ -107,6 +124,7 @@ class DashboardController extends Controller
     public function clearQcNotif()
     {
         session()->forget('qcPending');
+        session()->forget('qcPendingProd');
         return redirect('admin/quality/list');
     }
 
@@ -132,6 +150,7 @@ class DashboardController extends Controller
 
     public function after_check(Request $request)
     {
+
         $getRecord = ProductionModel::with('qualityTwo')
             ->whereHas('qualityTwo', function ($q) {
                 $q->whereNotNull('result');
@@ -140,18 +159,19 @@ class DashboardController extends Controller
             ->orderBy('id', 'desc')
             ->get()
             ->unique('io_no');
+        $user = Auth::user();
 
-        return view("backend.dashboard.aftercheck", compact('getRecord'));
+        return view("backend.dashboard.aftercheck", compact('getRecord', 'user'));
     }
 
     public function deliv_status(Request $request)
     {
         $getRecord = ProductionModel::with(['delivery', 'quality'])
-            ->where('status', "Closed")
+            ->where('status', 'Closed')
             ->whereHas('quality', function ($q) {
                 $q->where('result', 1);
             })
-            ->whereHas("delivery", function ($q) {
+            ->whereHas('delivery', function ($q) {
                 $q->whereNotNull('status');
             })
             ->filter($request)
@@ -164,8 +184,10 @@ class DashboardController extends Controller
 
     public function prod_release(Request $request)
     {
-        $getData    = ProductionModel::withCount("stocks")->where('status', "Released")->orderBy("id", "desc")->paginate(10);
+        $getData    = ProductionModel::getRecord($request)->withCount("stocks")->where('status', 'Released')->orderBy("id", "desc")->paginate(10);
         $getRecord  = ProductionOrderDetailsModel::with("stocks")->get()->unique("doc_num")->values();
+        $getSeries  = ProductionModel::getRecord($request)->get();
+        $user       = Auth::user();
 
         $productionSummary = [];
         foreach ($getRecord as $record) {
@@ -178,12 +200,13 @@ class DashboardController extends Controller
                 "remain" => $productionQty - $stockOutQty
             ];
         }
-        return view('backend.production.list', compact('getData', 'productionSummary'));
+        return view('backend.dashboard.prodrelease', compact('getData', 'productionSummary', 'getSeries', 'user'));
     }
 
     public function grpo(Request $request)
     {
         $getRecord      = PurchasingModel::with("po_details")->get()->values();
+        $user           = Auth::user();
         // $getRecord      = PurchaseOrderDetailsModel::with("stocks")->get()->unique("nopo")->values();
         $getPagination = PurchasingModel::where('status', 'Open')
             ->whereHas('po_details', function ($query) {
@@ -203,7 +226,7 @@ class DashboardController extends Controller
             ];
         }
 
-        return view("backend.dashboard.goodreceiptpo", compact('getRecord', 'getPagination', 'purchasingSummary'));
+        return view("backend.dashboard.goodreceiptpo", compact('getRecord', 'getPagination', 'purchasingSummary', 'user'));
     }
 
     public function good_issued(Request $request)
@@ -234,6 +257,7 @@ class DashboardController extends Controller
     public function good_receipt(Request $request)
     {
         $getRecord      = PurchasingModel::with("po_details")->get()->values();
+        $user           = Auth::user();
         // $getRecord      = PurchaseOrderDetailsModel::with("stocks")->get()->unique("nopo")->values();
         $getPagination = PurchasingModel::where('status', 'GR')
             ->whereHas('po_details', function ($query) {
@@ -253,7 +277,7 @@ class DashboardController extends Controller
             ];
         }
 
-        return view("backend.dashboard.goodreceiptpo", compact('getRecord', 'getPagination', 'purchasingSummary'));
+        return view("backend.dashboard.goodreceiptpo", compact('getRecord', 'getPagination', 'purchasingSummary', 'user'));
     }
 
     public function receipt_from_prod(Request $request)

@@ -39,9 +39,15 @@
                                         <div class="form-group col-md-2">
                                             <label for="">Result QC</label>
                                             <select name="result" id="result" class="form-control">
-                                                <option value="">Select Result</option>
-                                                <option value="1" {{ request('result') == 1 ? 'selected' : ''}}>OK</option>
-                                                <option value="2" {{ request('result') == 2 ? 'selected' : ''}}>NG</option>
+                                                <option value="">Select Result</option>                       
+                                                @if ($user->department != "Production" )
+                                                    <option value="1" {{ request('result') == 1 ? 'selected' : ''}}>OK</option>
+                                                    <option value="2" {{ request('result') == 2 ? 'selected' : ''}}>NG</option>
+                                                    <option value="3" {{ request('result') == 3 ? 'selected' : ''}}>Need Approval</option>
+                                                    <option value="4" {{ request('result') == 4 ? 'selected' : ''}}>Need Paint</option>
+                                                @endif
+                                                <option value="5" {{ request('result') == 5 ? 'selected' : ''}}>Painting by Inhouse</option>
+                                                <option value="6" {{ request('result') == 6 ? 'selected' : ''}}>Painting by Makoon</option>
                                             </select>
                                         </div>
                                         <div class="form-group col-md-2">
@@ -76,14 +82,14 @@
                                         <tbody>
                                             @forelse ($getRecord as $quality)
                                                 <tr class="
-                                                    @if($quality->qualityTwo && $quality->qualityTwo->result === 3)
-                                                        table-primary
-                                                    @else
-                                                        ''
-                                                    @endif
-                                                ">
+                                                        @if($quality->qualityTwo && $quality->qualityTwo->result === 3 || $quality->qualityTwo->result === 4)
+                                                            table-primary
+                                                        @else
+                                                            ''
+                                                        @endif 
+                                                    ">
                                                     <td>
-                                                        @if($quality->qualityTwo && $quality->qualityTwo->result === 3)
+                                                        @if($quality->qualityTwo && $quality->qualityTwo->result === 3 || $quality->qualityTwo->result === 4)
                                                             <i class="fa fa-circle text-primary ms-2"
                                                             style="font-size:10px; margin-right:10px;"
                                                             title="Need Approval"></i>
@@ -99,11 +105,20 @@
                                                     <td>{{ $quality->prod_desc ?? "-"}}</td>
                                                     <td>{{ $quality->io_no }}</td>
                                                     <td>
-                                                        @if ($quality->qualityTwo && $quality->qualityTwo->result !== null)
-                                                            {{ $quality->qualityTwo->result === 1 ? "OK" : ($quality->qualityTwo->result === 2 ? "NG" : ($quality->qualityTwo->result === 3 ? "Need Approval" : "-" ))}}
-                                                        @else
-                                                           -
-                                                        @endif
+                                                       @php
+                                                            $statusMap = [
+                                                                1 => 'OK',
+                                                                2 => 'NG',
+                                                                3 => 'Need Approval',
+                                                                4 => 'Need Paint',
+                                                                5 => 'Painting by Inhouse',
+                                                                6 => 'Painting by Makloon'
+                                                            ];
+                                                        @endphp
+
+                                                        {{ $quality->qualityTwo && $quality->qualityTwo->result !== null 
+                                                            ? ($statusMap[$quality->qualityTwo->result] ?? '-') 
+                                                            : '-' }}
                                                     </td>
                                                     <td>
                                                         @if ( $quality->qualityTwo && $quality->qualityTwo->result_by === "delvi" )

@@ -28,7 +28,7 @@
                             </td>                            
                             <td>{{ $stocks->item->name }}</td>
                             <td>
-                                <input type="number" name="stocks[{{ $index }}][qty]" class="form-control" value="0" step="0.0001">
+                                <input type="number" name="stocks[{{ $index }}][qty]" class="form-control-sm" style="max-width: 60px" value="0" step="0.0001">
                             </td>
                             <td>{{ $stocks->item->uom ?? "-"}}</td>
                             <td>
