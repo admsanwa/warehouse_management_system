@@ -52,7 +52,9 @@ class PurchasingController extends Controller
         $getRecord  = PurchasingModel::find($id);
         $getPO      = PurchasingModel::where("id", $id)->value("no_po");
         $getData    = PurchaseOrderDetailsModel::where("nopo", $getPO)->get();
-        return view("backend.purchasing.view", compact('getRecord', 'getData', 'getPO'));
+        $user       = Auth::user();
+
+        return view("backend.purchasing.view", compact('getRecord', 'getData', 'getPO', 'user'));
     }
 
     public function upload_form()

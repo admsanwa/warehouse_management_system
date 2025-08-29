@@ -108,9 +108,14 @@
                                 </div>
                             </div>
                             <div class="card-footer">
-                                @if ($getRecord->status == "Released")
-                                    <a href="{{ url("admin/transaction/stockout", $pos->doc_num)}}" class="btn btn-success"><i class="fa fa-arrow-right"></i> Released</a>
+                                @if (($user->department == 'Production and Warehouse' && $user->level == 'Manager' || $user->department == 'Production and Warehouse' && $user->level == 
+                                'Supervisor') || $user->department == 'Procurement, Installation and Delivery' && $user->level == 'Manager' || $user->department == 'PPIC')
+                                @else
+                                    @if ($getRecord->status == "Released")
+                                        <a href="{{ url("admin/transaction/stockout", $pos->doc_num)}}" class="btn btn-success"><i class="fa fa-arrow-right"></i> Released</a>
+                                    @endif
                                 @endif
+                                
                                 <button onclick="history.back()" class="btn btn-default">Back</button>
                             </div>
                         </div>

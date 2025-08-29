@@ -48,9 +48,10 @@ class ProductionController extends Controller
         $getRecord   = ProductionModel::find($id);
         $getDocnum   = ProductionModel::where("id", $id)->value("doc_num");
         $getData     = ProductionOrderDetailsModel::where("doc_num", $getDocnum)->get();
+        $user        = Auth::user();
 
         // dd($getData);
-        return view('backend.production.view', compact("getRecord", "getData"));
+        return view('backend.production.view', compact("getRecord", "getData", "user"));
     }
 
     public function upload_form()
@@ -146,7 +147,9 @@ class ProductionController extends Controller
         ]);
 
         DB::transaction(function () use ($request, $validated) {
+            $user = Auth::user();
             $memo = \App\Models\MemoModel::create([
+                'created_by'    => $user->fullname,
                 'no'            => $validated['no'],
                 'date'          => $validated['date'],
                 'description'   => $request->description,

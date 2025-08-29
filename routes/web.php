@@ -68,6 +68,7 @@ Route::group(['middleware' => 'admin'], function () {
     // ItemsController
     Route::get('admin/items/barcode', [ItemsController::class, 'index']);
     Route::get('admin/items/print', [ItemsController::class, 'print']);
+    Route::get('admin/items/printppic', [ItemsController::class, 'print_ppic']);
     Route::post('admin/items/add', [ItemsController::class, 'post']);
     Route::get('admin/items/delete/{id}', [ItemsController::class, 'delete']);
     Route::get('admin/items/deleteall', [ItemsController::class, 'deleteall']);

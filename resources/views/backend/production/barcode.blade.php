@@ -144,10 +144,11 @@
                                                         <td></td>
                                                         <td>
                                                             <div class="d-flex flex-wrap">
-                                                                <a href="{{ url('admin/production/deleteall')}}" class="btn btn-danger mr-2 mb-2"><i class="fa fa-trash"></i> All</a>
-                                                                <a href="{{ url('admin/production/print')}}" class="btn btn-success mb-2">
-                                                                    <i class="fa fa-arrow-right"></i> Print
+                                                                <a href="{{ url('admin/production/deleteall') }}" class="btn btn-danger mr-2 mb-2"><i class="fa fa-trash"></i> All</a>
+                                                                <a href="{{ url('admin/production/print') }}" class="btn btn-success mb-2">
+                                                                    <i class="fa fa-arrow-right"></i> Print 
                                                                 </a>
+                                                                <a href="{{ url('admin/production/printppic') }}" class="btn btn-success mb-2">PPIC Format</a>
                                                             </div>
                                                         </td>
                                                     </tr>

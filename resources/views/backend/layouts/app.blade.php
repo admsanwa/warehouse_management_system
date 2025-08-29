@@ -40,7 +40,7 @@
 
     @yield('content')
 
-    @if(session('bonPending') || session('memoPending'))
+    @if(session('bonPending') || session('memoPending') || session('qcPending') || session('qcPendingProd'))
     <!-- Modal Notifikasi -->
     <div class="modal fade" id="bonPendingModal" tabindex="-1" role="dialog" aria-labelledby="bonPendingModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
@@ -69,7 +69,7 @@
                     <td><a href="{{ url('admin/production/clear-memo-notif') }}" style="background-color:#dfffde"><i class="fa fa-eye"></i> Click Show Memo</a></td>
                   </tr>
                 @endif
-                @if(session('qcPending'))
+                @if(session('qcPending') || session('qcPendingProd'))
                   <tr>
                     <td>QC</td>
                     <td><a href="{{ url('admin/production/clear-qc-notif') }}" style="background-color:#dfffde"><i class="fa fa-eye"></i> Click Show QC</a></td>

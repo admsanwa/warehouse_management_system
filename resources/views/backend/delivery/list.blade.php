@@ -52,7 +52,7 @@
                                         </div> 
                                         <div class="form-group col-md-3">
                                             <button type="submit" class="btn btn-success" style="margin-top: 30px"><i class="fa fa-search"></i> Search</button>
-                                            <a href="{{ url("admin/delivery") }}" class="btn btn-warning" style="margin-top: 30px"><i class="fa fa-eraser"></i> Reset</a>
+                                            <a href="{{ url("admin/delivery/list") }}" class="btn btn-warning" style="margin-top: 30px"><i class="fa fa-eraser"></i> Reset</a>
                                         </div>
                                     </div>    
                                 </div>    

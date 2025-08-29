@@ -142,15 +142,21 @@
                                                         <td>
                                                             <div class="d-flex flex-wrap">
                                                                 <a href="{{ url('admin/items/deleteall')}}" class="btn btn-danger mr-2 mb-2"><i class="fa fa-trash"></i> All</a>
-                                                                <a href="{{ url('admin/items/print')}}" class="btn btn-success mb-2">
-                                                                    <i class="fa fa-arrow-right"></i> Print
-                                                                </a>
+                                                                <a href="{{ url('admin/items/print')}}" class="btn btn-success mr-2 mb-2"><i class="fa fa-arrow-right"></i> Print</a>
+                                                                <a href="{{ url('admin/items/printppic') }}" class="btn btn-success mb-2"><i class="fa fa-arrow-right"></i> PPIC Format</a>
                                                             </div>
                                                         </td>
                                                     </tr>
                                             </tbody>   
                                         @endif
                                     </table>
+                            </div>
+                            <div class="card-footer">
+                                <div class="d-flex justify-content-end px-2 py-2">
+                                    <div style="overflow-x: auto; max-width:100%">
+                                        {!! $addedBarcodes->onEachSide(1)->appends(request()->except('page'))->links() !!}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                 </section>
