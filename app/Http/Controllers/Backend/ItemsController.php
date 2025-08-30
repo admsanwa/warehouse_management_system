@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\BarcodeModel;
 use App\Models\ItemsModel;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -20,18 +21,6 @@ class ItemsController extends Controller
         $addedBarcodes  = BarcodeModel::where('username', $user)->latest()->paginate(10);
 
         return view("backend.items.barcode", compact('getRecord', 'addedBarcodes'));
-    }
-
-    public function print(Request $request)
-    {
-        $user = Auth::user()->username;
-        $addedBarcodes = BarcodeModel::where("username", $user)->get();
-
-        if (empty($addedBarcodes)) {
-            return redirect()->back()->with('error', 'Tidak ada barcodes yang dipilih untuk print');
-        }
-
-        return view('backend.items.print', compact('addedBarcodes'));
     }
 
     public function print_ppic(Request $request)
@@ -163,5 +152,20 @@ class ItemsController extends Controller
         }
 
         return back()->with('success', "Items Imported Succesfully");
+    }
+
+    public function printBarcodeWithPdf(Request $request)
+    {
+        $user = Auth::user()->username;
+        $addedBarcodes = BarcodeModel::where("username", $user)->get();
+
+        if ($addedBarcodes->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada barcodes yang dipilih untuk print');
+        }
+
+        $pdf = Pdf::loadView('backend.items.pdf', compact('addedBarcodes'))
+            ->setPaper([0, 0, 283.5, 113.4]); // 100mm x 40mm
+
+        return $pdf->stream('barcodes.pdf');
     }
 }

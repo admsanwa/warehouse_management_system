@@ -67,7 +67,6 @@ Route::group(['middleware' => 'admin'], function () {
 
     // ItemsController
     Route::get('admin/items/barcode', [ItemsController::class, 'index']);
-    Route::get('admin/items/print', [ItemsController::class, 'print']);
     Route::get('admin/items/printppic', [ItemsController::class, 'print_ppic']);
     Route::post('admin/items/add', [ItemsController::class, 'post']);
     Route::get('admin/items/delete/{id}', [ItemsController::class, 'delete']);
@@ -76,6 +75,7 @@ Route::group(['middleware' => 'admin'], function () {
     Route::post('admin/items/additem', [ItemsController::class, 'post_item']);
     Route::get('admin/items/list', [ItemsController::class, 'list']);
     Route::get('admin/items/upload', [ItemsController::class, 'upload']);
+    Route::get('/print/barcodes/pdf', [ItemsController::class, 'printBarcodeWithPdf']);
 
     // Purchasing
     Route::get('admin/purchasing', [PurchasingController::class, 'index']);
@@ -107,6 +107,7 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('admin/production/upload', [ProductionController::class, 'upload_form']);
     Route::post('admin/production/upload', [ProductionController::class, 'upload']);
     Route::get('admin/production/{prod_no}', [ProductionController::class, 'view_prod']);
+    Route::get('/print/barcodes/prod', [ProductionController::class, 'printBarcodeWithPdf']);
 
     // qc
     Route::get("admin/quality/list", [QualityController::class, "index"]);

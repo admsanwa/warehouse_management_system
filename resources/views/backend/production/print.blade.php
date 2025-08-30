@@ -14,7 +14,7 @@
         flex-direction: row;
         align-items: center;
         justify-content: flex-start;
-        padding-left: 0.2cm;
+        padding-right: 0cm;
         padding-top: 0.9cm;
         overflow: hidden;
     }
@@ -78,6 +78,7 @@
         @page {
                 size: landscape; /* Jika printer thermal mendukung */
                 margin: 0px !important; /* Ubah margin atas dari 11px → 20px */
+
             }
 
             body {

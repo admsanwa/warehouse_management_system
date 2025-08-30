@@ -142,7 +142,7 @@
                                                         <td>
                                                             <div class="d-flex flex-wrap">
                                                                 <a href="{{ url('admin/items/deleteall')}}" class="btn btn-danger mr-2 mb-2"><i class="fa fa-trash"></i> All</a>
-                                                                <a href="{{ url('admin/items/print')}}" class="btn btn-success mr-2 mb-2"><i class="fa fa-arrow-right"></i> Print</a>
+                                                                <a href="{{ url('/print/barcodes/pdf') }}"  class="btn btn-success mr-2 mb-2"> <i class="fa fa-file-pdf"></i> Print (PDF)
                                                                 <a href="{{ url('admin/items/printppic') }}" class="btn btn-success mb-2"><i class="fa fa-arrow-right"></i> PPIC Format</a>
                                                             </div>
                                                         </td>
