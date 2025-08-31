@@ -24,6 +24,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\MailBonApproval;
 use App\Notifications\MailMemoApproval;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class ProductionController extends Controller
 {
@@ -408,6 +410,21 @@ class ProductionController extends Controller
         // dd($addedBarcodes);
 
         return view("backend.production.print", compact("addedBarcodes"));
+    }
+
+    public function printBarcodeWithPdf(Request $request)
+    {
+        $user = Auth::user()->username;
+        $addedBarcodes = BarcodeProductionModel::where("username", $user)->get();
+
+        if ($addedBarcodes->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada barcodes yang dipilih untuk print');
+        }
+
+        $pdf = Pdf::loadView('backend.production.pdf', compact('addedBarcodes'))
+            ->setPaper([0, 0, 283.5, 113.4]); // 100mm x 40mm
+
+        return $pdf->stream('barcodes.pdf',);
     }
 
     public function delete($id)

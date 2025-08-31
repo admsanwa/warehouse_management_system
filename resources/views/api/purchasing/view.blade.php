@@ -30,7 +30,7 @@
                                     <div class="col-sm-4">
                                         :
                                         @if (!empty($series) && isset($series['ObjectCode'], $series['SeriesName']))
-                                            {{ $series['ObjectCode'] . ' - ' . $series['SeriesName'] }}
+                                            {{ $series['SeriesName'] }}
                                         @else
                                             <span class="text-danger">⚠️ Series tidak ditemukan: {{ $po['Series'] }}</span>
                                         @endif

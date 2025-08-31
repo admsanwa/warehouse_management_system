@@ -184,9 +184,9 @@
                                                             <a href="{{ url('admin/items/deleteall') }}"
                                                                 class="btn btn-danger mr-2 mb-2"><i class="fa fa-trash"></i>
                                                                 All</a>
-                                                            <a href="{{ url('admin/items/print') }}"
+                                                            <a href="{{ url('/print/barcodes/pdf') }}"
                                                                 class="btn btn-success mb-2">
-                                                                <i class="fa fa-arrow-right"></i> Print
+                                                                <i class="fa fa-fie-pdf"></i> Print (PDF)
                                                                 <a href="{{ url('admin/items/printppic') }}"
                                                                     class="btn btn-success mb-2"><i
                                                                         class="fa fa-arrow-right"></i> PPIC Format</a>

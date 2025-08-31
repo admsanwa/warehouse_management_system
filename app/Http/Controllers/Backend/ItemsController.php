@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use App\Services\SapService;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ItemsController extends Controller
 {
@@ -316,5 +317,19 @@ class ItemsController extends Controller
             'results' => $wh,
             'api_response' => $get
         ]);
+    }
+    public function printBarcodeWithPdf(Request $request)
+    {
+        $user = Auth::user()->username;
+        $addedBarcodes = BarcodeModel::where("username", $user)->get();
+
+        if ($addedBarcodes->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada barcodes yang dipilih untuk print');
+        }
+
+        $pdf = Pdf::loadView('backend.items.pdf', compact('addedBarcodes'))
+            ->setPaper([0, 0, 283.5, 113.4]); // 100mm x 40mm
+
+        return $pdf->stream('barcodes.pdf');
     }
 }

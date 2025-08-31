@@ -275,7 +275,7 @@ class TransactionController extends Controller
             $user         = Auth::id();
 
             foreach ($validated['stocks'] as $row) {
-                $entryQty = (float) $row['qty'];       // Qty baru yang diinput
+                $entryQty = (float) str_replace(',', '.', str_replace('.', '', $row['qty']));                // Qty baru yang diinput
                 $planQty = (float) $row['PlanQty'];    // Qty rencana
                 $openQty = (float) $row['OpenQty'];    // Qty sisa yang belum terpenuhi
 
@@ -314,26 +314,26 @@ class TransactionController extends Controller
                 ];
 
                 // untuk DB
-                $insertedData[] = [
-                    'no_po'        => $validated['no_po'],
-                    'vendor_code'  => $validated['cardCode'],
-                    'vendor'  => $validated['cardName'],
-                    'vendor_ref_no' => $validated['numAtCard'],
-                    'io'           => $validated['U_MEB_NO_IO'],
-                    'so'           => $validated['U_MEB_No_SO'],
-                    'internal_no'  => $row['U_MEB_Ket_Pur'] ?? null,
-                    'base_entry'   => $row['BaseEntry'] ?? null,
-                    'line_num'     => $row['LineNum'] ?? null,
-                    'item_code'    => $row['ItemCode'] ?? null,
-                    'item_desc'    => $row['Dscription'] ?? null,
-                    'qty'    => $row['qty'],
-                    'uom'    => $row['UnitMsr'] ?? null,
-                    'whse'    => 'BK001',
-                    'note'    => '-',
-                    'user_id'      => $user,
-                    'created_at'   => now(),
-                    'updated_at'   => now()
-                ];
+                // $insertedData[] = [
+                //     'no_po'        => $validated['no_po'],
+                //     'vendor_code'  => $validated['cardCode'],
+                //     'vendor'  => $validated['cardName'],
+                //     'vendor_ref_no' => $validated['numAtCard'],
+                //     'io'           => $validated['U_MEB_NO_IO'],
+                //     'so'           => $validated['U_MEB_No_SO'],
+                //     'internal_no'  => $row['U_MEB_Ket_Pur'] ?? null,
+                //     'base_entry'   => $row['BaseEntry'] ?? null,
+                //     'line_num'     => $row['LineNum'] ?? null,
+                //     'item_code'    => $row['ItemCode'] ?? null,
+                //     'item_desc'    => $row['Dscription'] ?? null,
+                //     'qty' => $entryQty,
+                //     'uom'    => $row['UnitMsr'] ?? null,
+                //     'whse'    => 'BK001',
+                //     'note'    => '-',
+                //     'user_id'      => $user,
+                //     'created_at'   => now(),
+                //     'updated_at'   => now()
+                // ];
             }
             $postData['Lines'] = $lines;
 

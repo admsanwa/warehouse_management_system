@@ -189,10 +189,13 @@
                                                                 class="btn btn-danger mr-2 mb-2"><i
                                                                     class="fa fa-trash"></i>
                                                                 All</a>
-                                                            <a href="{{ url('admin/production/print') }}"
+                                                            {{-- <a href="{{ url('admin/production/print') }}"
                                                                 class="btn btn-success mb-2">
                                                                 <i class="fa fa-arrow-right"></i> Print
-                                                            </a>
+                                                            </a> --}}
+                                                            <a href="{{ url('/print/barcodes/prod') }}"
+                                                                class="btn btn-success mr-2 mb-2"> <i
+                                                                    class="fa fa-file-pdf"></i> Print (PDF)</a>
                                                             <a href="{{ url('admin/items/printppic') }}"
                                                                 class="btn btn-success mb-2"><i
                                                                     class="fa fa-arrow-right"></i> PPIC Format</a>

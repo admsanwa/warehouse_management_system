@@ -200,6 +200,9 @@
     <!-- Include barcode scanner JS -->
     <script>
         let tempPoData = [];
+        window.addEventListener("load", function() {
+            formatInputDecimals(document.getElementById("on_hand"));
+        })
         document.addEventListener("DOMContentLoaded", function() {
             const input = document.getElementById("scannerInput");
             input.focus();
@@ -322,7 +325,7 @@
                         // console.log("data", data);
                         document.getElementById("id").value = data.id;
                         document.getElementById("item_desc").value = data.ItemName;
-                        document.getElementById("on_hand").value = formatDecimalsSAP(data.warehouseStock.OnHand);
+                        document.getElementById("on_hand").value = data.warehouseStock.OnHand;
                         const poData = data.poData;
                         if (!poData) {
                             showToast("❌ Error: Nomor PO tidak ditemukan untuk barcode ini", 'error');
@@ -444,16 +447,7 @@
                     tBody.insertAdjacentHTML("beforeend", row);
                     const newInput = tBody.querySelector(`input[name="stocks[${idx}][qty]"]`);
                     if (newInput) {
-                        Inputmask({
-                            alias: "numeric",
-                            groupSeparator: ".",
-                            radixPoint: ",",
-                            autoGroup: true,
-                            digits: 2,
-                            digitsOptional: true,
-                            rightAlign: false,
-                            removeMaskOnSubmit: true
-                        }).mask(newInput);
+                        formatInputDecimals(newInput);
                     }
                 }
             });
@@ -610,6 +604,19 @@
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
+        }
+
+        function formatInputDecimals(target) {
+            Inputmask({
+                alias: "numeric",
+                groupSeparator: ".",
+                radixPoint: ",",
+                autoGroup: true,
+                digits: 3,
+                digitsOptional: true,
+                rightAlign: false,
+                removeMaskOnSubmit: true
+            }).mask(target);
         }
     </script>
 @endsection
