@@ -26,47 +26,63 @@
                             </div>
                             <div class="card-body">
                                 <div class="form-group row">
-                                    <label for="" class="col-sm-2 col-form-lable">Status</label>
-                                    <div class="col-sm-4">: {{ $getRecord['Status'] }}</div>
-                                    <label for="" class="col-sm-2 col-form-lable">IO No</label>
+                                    <label class="col-sm-2 col-form-label">Series</label>
+                                    <div class="col-sm-4">
+                                        :
+                                        @if (!empty($series) && isset($series['ObjectCode'], $series['SeriesName']))
+                                            {{ $series['SeriesName'] }}
+                                        @else
+                                            <span class="text-danger">⚠️ Series tidak ditemukan: {{ $po['Series'] }}</span>
+                                        @endif
+                                    </div>
+                                    <label class="col-sm-2 col-form-label">IO No</label>
                                     <div class="col-sm-4">: {{ $getRecord['U_MEB_NO_IO'] }}</div>
                                 </div>
+
                                 <div class="form-group row">
-                                    <label for="" class="col-sm-2 col-form-lable">Doc Number</label>
+                                    <label class="col-sm-2 col-form-label">Doc Number</label>
                                     <div class="col-sm-4">: {{ $getRecord['DocNum'] }}</div>
-                                    <label for="" class="col-sm-2 col-form-lable">Product Type</label>
+                                    <label class="col-sm-2 col-form-label">Product Type</label>
                                     <div class="col-sm-4">: {{ $getRecord['U_MEB_PROD_TYPE'] }}</div>
                                 </div>
+
                                 <div class="form-group row">
-                                    <label for="" class="col-sm-2 col-form-lable">Product No</label>
+                                    <label class="col-sm-2 col-form-label">Product No</label>
                                     <div class="col-sm-4">: {{ $getRecord['ItemCode'] }}</div>
-                                    <label for="" class="col-sm-2 col-form-lable">Project Code</label>
+                                    <label class="col-sm-2 col-form-label">Project Code</label>
                                     <div class="col-sm-4">: {{ $getRecord['U_MEB_Project_Code'] }}</div>
                                 </div>
+
                                 <div class="form-group row">
-                                    <label for="" class="col-sm-2 col-form-lable">Product Desc</label>
+                                    <label class="col-sm-2 col-form-label">Product Desc</label>
                                     <div class="col-sm-4">: {{ $getRecord['ItemName'] }}</div>
-                                    <label for="" class="col-sm-2 col-form-lable">Contract</label>
+                                    <label class="col-sm-2 col-form-label">Contract</label>
                                     <div class="col-sm-4">: {{ $getRecord['U_MEB_Contract'] }}</div>
                                 </div>
+
                                 <div class="form-group row">
-                                    <label for="" class="col-sm-2 col-form-lable">Sales Order</label>
+                                    <label class="col-sm-2 col-form-label">Sales Order</label>
                                     <div class="col-sm-4">: {{ $getRecord['OriginNum'] }}</div>
-                                    <label for="" class="col-sm-2 col-form-lable">Contract Adendum</label>
+                                    <label class="col-sm-2 col-form-label">Contract Adendum</label>
                                     <div class="col-sm-4">: {{ $getRecord['U_MEB_ProjectDetail'] }}</div>
                                 </div>
+
                                 <div class="form-group row">
-                                    <label for="" class="col-sm-2 col-form-lable">Distr. Rule</label>
+                                    <label class="col-sm-2 col-form-label">Distr. Rule</label>
                                     <div class="col-sm-4">: {{ $getRecord['OcrCode'] }}</div>
-                                    <label for="" class="col-sm-2 col-form-lable">No Internal</label>
+                                    <label class="col-sm-2 col-form-label">No Internal</label>
                                     <div class="col-sm-4">: {{ $getRecord['U_MEB_Internal_Prod'] }}</div>
                                 </div>
+
                                 <div class="form-group row">
-                                    <label for="" class="col-sm-2 col-form-lable">Due Date</label>
+                                    <label class="col-sm-2 col-form-label">Due Date</label>
                                     <div class="col-sm-4">: {{ $getRecord['DueDate'] }}</div>
+                                    <label class="col-sm-2 col-form-label">Status</label>
+                                    <div class="col-sm-4">: {{ $getRecord['Status'] }}</div>
                                 </div>
+
                                 <div class="form-group row">
-                                    <label for="" class="col-sm-2 col-form-lable">Remarks</label>
+                                    <label class="col-sm-2 col-form-label">Remarks</label>
                                     <div class="col-sm-10">: {{ $getRecord['Comments'] }}</div>
                                 </div>
                             </div>
@@ -82,7 +98,8 @@
                                                     <th>No</th>
                                                     <th>Item Code</th>
                                                     <th>Item Type</th>
-                                                    <th>Qty</th>
+                                                    <th>Plan Qty</th>
+                                                    <th>Issued Qty</th>
                                                     <th>Uom</th>
                                                 </tr>
                                             </thead>
@@ -92,7 +109,8 @@
                                                         <td>{{ $loop->iteration }}</td>
                                                         <td>{{ $line['ItemCode'] ?? '-' }}</td>
                                                         <td>{{ $line['ItemName'] ?? '-' }}</td>
-                                                        <td>{{ $line['PlannedQty'] }}</td>
+                                                        <td>{{ formatDecimalsSAP($line['PlannedQty']) }}</td>
+                                                        <td>{{ formatDecimalsSAP($line['IssuedQty']) }}</td>
                                                         <td>{{ $line['InvntryUoM'] ?? '-' }}</td>
                                                     </tr>
                                                 @endforeach

@@ -116,9 +116,12 @@ class ProductionController extends Controller
         $prod = Arr::get($prods, 'data.0', []);
         $lines = Arr::get($prod, 'Lines', []);
 
+        $get_series = $this->sap->getSeries(['page' => 1, 'limit' => 1, 'Series' => (int) $prod['Series']]);
+        $series =   Arr::get($get_series, 'data.0', []);
         return view('api.production.view', [
             'getRecord'    => $prod,
             'lines' => $lines,
+            'series' => $series
         ]);
     }
 

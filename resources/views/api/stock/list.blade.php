@@ -81,9 +81,10 @@
                                                     <td>{{ $warehouseStock['WhsCode'] ?? 'N/A' }}</td>
                                                     <td>{{ $stock['ItemCode'] ?? 'N/A' }}</td>
                                                     <td>{{ $stock['ItemName'] ?? 'N/A' }}</td>
-                                                    <td>{{ $warehouseStock['OnHand'] ?? 'N/A' }}</td>
-                                                    <td>{{ $warehouseStock['MinStock'] ?? 'N/A' }}</td>
-                                                    <td>{{ $warehouseStock['Available'] ?? 'N/A' }}</td>
+                                                    <td>{{ formatDecimalsSAP($warehouseStock['OnHand']) ?? 'N/A' }}</td>
+                                                    <td>{{ formatDecimalsSAP($warehouseStock['MinStock']) ?? 'N/A' }}</td>
+                                                    <td>{{ formatDecimalsSAP($warehouseStock['Available']) ?? 'N/A' }}
+                                                    </td>
                                                     <td>{{ $stock['InvntryUom'] ?? 'N/A' }}</td>
                                                 </tr>
                                             @endforeach
