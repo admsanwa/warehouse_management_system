@@ -450,7 +450,7 @@ class ProductionController extends Controller
         $user   = Auth::user();
         $number = BonModel::generateNumber();
         $items  = ItemsModel::all();
-        return view('backend.production.bon', compact('number', 'user', 'items', 'emails'));
+        return view('backend.production.bon', compact('number', 'user', 'items'));
     }
 
     public function create_bon(Request $request)
