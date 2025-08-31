@@ -195,3 +195,16 @@ Route::group(['middleware' => 'admin'], function () {
 });
 
 Route::get('logout', [AuthController::class, 'logout']);
+
+use App\Notifications\MailMemoApproval;
+
+Route::get('/send-test-mail', function () {
+    Notification::route('mail', 'danyxdevelop@gmail.com')
+        ->notify(new MailMemoApproval(
+            "Dany",
+            "BON-12345",
+            url('/memo/12345/approve')
+        ));
+
+    return 'Mail sent!';
+});

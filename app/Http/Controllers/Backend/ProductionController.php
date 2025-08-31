@@ -20,6 +20,10 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Services\SapService;
 use Illuminate\Support\Arr;
+use App\Models\User;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\MailBonApproval;
+use App\Notifications\MailMemoApproval;
 
 class ProductionController extends Controller
 {
@@ -262,7 +266,13 @@ class ProductionController extends Controller
             }
         });
         // dd($request->all());
-
+        $users_email = User::where('department', 'Procurement, Installation and Delivery')
+            ->where('level', 'Manager')
+            ->get();
+        Notification::send($users_email, new MailMemoApproval(
+            $validated['no'],
+            url('admin/production/listmemo')
+        ));
         return redirect()->back()->with('success', "Successfully create memo {$request->description}");
     }
 
@@ -307,6 +317,7 @@ class ProductionController extends Controller
     {
         $no     = $request->input("no_memo");
         $user   = Auth::user();
+        // $purchasing_users = User::where("department", "Purchasing")->get();
 
         $sign               = new SignModel();
         $sign->no_memo      = $no;
@@ -315,6 +326,10 @@ class ProductionController extends Controller
         $sign->sign         = 1;
         $sign->save();
 
+        // Notification::send($purchasing_users, new MailMemoApproval(
+        //     $no,
+        //     url('admin/production/listmemo')
+        // ));
         return response()->json([
             'success' => true,
             'message' => "Successfully approve to production"
@@ -418,7 +433,7 @@ class ProductionController extends Controller
         $user   = Auth::user();
         $number = BonModel::generateNumber();
         $items  = ItemsModel::all();
-        return view('backend.production.bon', compact('number', 'user', 'items'));
+        return view('backend.production.bon', compact('number', 'user', 'items', 'emails'));
     }
 
     public function create_bon(Request $request)
@@ -465,6 +480,13 @@ class ProductionController extends Controller
                 ]);
             }
         });
+        $users_email = User::where('department', 'Procurement, Installation and Delivery')
+            ->where('level', 'Manager')
+            ->get();
+        Notification::send($users_email, new MailBonApproval(
+            $validated['no'],
+            url('admin/production/listbon')
+        ));
         // dd($request->all());
 
         return redirect()->back()->with('success', "Successfully create bon {$request->no}");
@@ -511,6 +533,7 @@ class ProductionController extends Controller
     {
         $no   = $request->input("no_bon");
         $user = Auth::user();
+        $purchasing_users = User::where("department", "Purchasing")->get();
 
         $sign               = new SignBonModel();
         $sign->no_bon       = $no;
@@ -518,6 +541,12 @@ class ProductionController extends Controller
         $sign->department   = $user->department;
         $sign->sign         = 1;
         $sign->save();
+
+
+        Notification::send($purchasing_users, new MailBonApproval(
+            $no,
+            url('admin/production/listbon')
+        ));
 
         return response()->json([
             'success' => true,

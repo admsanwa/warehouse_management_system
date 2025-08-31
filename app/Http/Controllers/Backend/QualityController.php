@@ -11,6 +11,9 @@ use App\Models\StockModel;
 use Auth;
 use DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\MailQcResult;
+use App\Models\User;
 
 class QualityController extends Controller
 {
@@ -89,6 +92,17 @@ class QualityController extends Controller
         $quality->remark    = $request->remark;
         $quality->result_by = $user;
         $quality->save();
+
+        $users_email = User::where('department', 'Procurement, Installation and Delivery')
+            ->where('level', 'Manager')
+            ->get();
+        Notification::send($users_email, new MailQcResult(
+            $io,
+            $check,
+            $request->remark ?? '',
+            url('admin/quality/list')
+        ));
+
 
         return redirect()->back()->with("success", "Telah berhasil menilai product: {$prod_no} menjadi {$check}");
     }
