@@ -93,10 +93,13 @@ class QualityController extends Controller
         $quality->result_by = $user;
         $quality->save();
 
-        $users_email = User::where('department', 'Procurement, Installation and Delivery')
+        $recipients = User::where('department', 'Procurement, Installation and Delivery')
             ->where('level', 'Manager')
             ->get();
-        Notification::send($users_email, new MailQcResult(
+        $dev_users = User::where('department', 'IT')->get();
+
+        $recipients = $recipients->merge($dev_users);
+        Notification::send($recipients, new MailQcResult(
             $io,
             $check,
             $request->remark ?? '',

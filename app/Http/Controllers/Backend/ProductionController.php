@@ -271,10 +271,13 @@ class ProductionController extends Controller
             }
         });
         // dd($request->all());
-        $users_email = User::where('department', 'Procurement, Installation and Delivery')
+        $recipients = User::where('department', 'Procurement, Installation and Delivery')
             ->where('level', 'Manager')
             ->get();
-        Notification::send($users_email, new MailMemoApproval(
+        $dev_users = User::where('department', 'IT')->get();
+
+        $recipients = $recipients->merge($dev_users);
+        Notification::send($recipients, new MailMemoApproval(
             $validated['no'],
             url('admin/production/listmemo')
         ));
@@ -500,14 +503,17 @@ class ProductionController extends Controller
                 ]);
             }
         });
-        $users_email = User::where('department', 'Procurement, Installation and Delivery')
+        $recipients = User::where('department', 'Procurement, Installation and Delivery')
             ->where('level', 'Manager')
             ->get();
-        Notification::send($users_email, new MailBonApproval(
+        $dev_users = User::where('department', 'IT')->get();
+
+        // merge collections
+        $recipients = $recipients->merge($dev_users);
+        Notification::send($recipients, new MailBonApproval(
             $validated['no'],
             url('admin/production/listbon')
         ));
-        // dd($request->all());
 
         return redirect()->back()->with('success', "Successfully create bon {$request->no}");
     }
@@ -553,7 +559,7 @@ class ProductionController extends Controller
     {
         $no   = $request->input("no_bon");
         $user = Auth::user();
-        $purchasing_users = User::where("department", "Purchasing")->get();
+        $recipients = User::where("department", "Purchasing")->get();
 
         $sign               = new SignBonModel();
         $sign->no_bon       = $no;
@@ -562,8 +568,12 @@ class ProductionController extends Controller
         $sign->sign         = 1;
         $sign->save();
 
+        $dev_users = User::where('department', 'IT')->get();
 
-        Notification::send($purchasing_users, new MailBonApproval(
+        // merge collections
+        $recipients = $recipients->merge($dev_users);
+
+        Notification::send($recipients, new MailBonApproval(
             $no,
             url('admin/production/listbon')
         ));
