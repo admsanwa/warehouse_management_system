@@ -1,0 +1,57 @@
+function formatDecimalsSAP(value) {
+    if (value === null || value === "") {
+        return "";
+    }
+
+    let strVal = String(value).trim();
+    let num = parseFloat(strVal);
+    if (isNaN(num)) {
+        return "";
+    }
+
+    let decimals = 0;
+    if (strVal.includes(".")) {
+        decimals = strVal.split(".")[1].length;
+    }
+
+    return num.toLocaleString("id-ID", {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+    });
+}
+
+function formatInputDecimals(target) {
+    Inputmask({
+        alias: "numeric",
+        groupSeparator: ".",
+        radixPoint: ",",
+        autoGroup: true,
+        digits: 3,
+        digitsOptional: true,
+        rightAlign: false,
+        removeMaskOnSubmit: true,
+    }).mask(target);
+}
+function formatTimestamp(dateString) {
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    return date.toLocaleString("id-ID", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+}
+
+function showLoadingOverlay(message = "Mohon tunggu...") {
+    const overlay = document.getElementById("loading-overlay");
+    overlay.style.display = "flex";
+    overlay.querySelector("p").textContent = message;
+    document.body.style.overflow = "hidden";
+}
+
+function hideLoadingOverlay() {
+    document.getElementById("loading-overlay").style.display = "none";
+    document.body.style.overflow = "";
+}

@@ -36,6 +36,13 @@
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="overlay flex-column justify-content-center align-items-center">
+        <i class="fas fa-spinner fa-spin fa-3x text-primary"></i>
+        <p class="mt-3 text-muted">Please wait...</p>
+    </div>
+
+
     <div class="wrapper">
 
         @include('backend.layouts.sidebar')
@@ -145,6 +152,7 @@
     {{-- <script src="{{ url('backend/dist/js/demo.js')}}"></script> --}}
     <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
     <script src="{{ url('backend/dist/js/pages/dashboard.js') }}"></script>
+    <script src="{{ url('backend/js/components.js') }}"></script>
     {{-- scan barcode --}}
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>

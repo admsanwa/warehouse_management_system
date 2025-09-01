@@ -248,7 +248,7 @@ class ItemsController extends Controller
         $wh = collect($get['data'] ?? [])->map(function ($val) {
             return [
                 'id'   => $val['WhsCode'],
-                'text' => $val['WhsCode'] . " - " . $val['WhsName'],
+                'text' => $val['WhsCode'],
             ];
         });
 
@@ -278,7 +278,7 @@ class ItemsController extends Controller
         $wh = collect($get['data'] ?? [])->map(function ($val) {
             return [
                 'id'   => $val['OcrCode'],
-                'text' => $val['OcrCode'] . " - " . $val['OcrName'],
+                'text' => $val['OcrName'],
             ];
         });
 
@@ -309,7 +309,7 @@ class ItemsController extends Controller
         $wh = collect($get['data'] ?? [])->map(function ($val) {
             return [
                 'id'   => $val['PrjCode'],
-                'text' => $val['PrjCode'] . " - " . $val['PrjName'],
+                'text' => $val['PrjName'],
             ];
         });
 

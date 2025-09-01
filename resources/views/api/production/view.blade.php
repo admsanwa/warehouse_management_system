@@ -127,8 +127,11 @@
                             </div>
                             <div class="card-footer">
                                 @if ($getRecord['Status'] == 'Released')
-                                    <a href="{{ url('admin/transaction/stockout', $getRecord['DocNum']) }}"
-                                        class="btn btn-success"><i class="fa fa-arrow-right"></i> Released</a>
+                                    <a href="{{ url('admin/transaction/stockout?docNum=' . $getRecord['DocNum'] . '&docEntry=' . $getRecord['DocEntry']) }}"
+                                        class="btn btn-sm btn-outline-success"><i class="fa fa-arrow-right"></i>
+                                        Released</a>
+                                @else
+                                    {{ $getRecord['Status'] }}
                                 @endif
                                 <button onclick="history.back()" class="btn btn-default">Back</button>
                             </div>

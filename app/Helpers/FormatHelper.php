@@ -16,12 +16,13 @@ if (!function_exists('formatDecimalsSAP')) {
             return '';
         }
 
-        // Kalau bulat (misal 49.00 → 49)
-        if (fmod($value, 1) == 0) {
-            return number_format($value, 0, ',', '.');
-        }
+        $stringVal = (string)$value;
 
-        // Kalau pecahan, tampilkan 2 desimal
-        return number_format($value, 2, ',', '.');
+        if (strpos($stringVal, '.') !== false) {
+            $decimals = strlen($stringVal) - strpos($stringVal, '.') - 1;
+        } else {
+            $decimals = 0;
+        }
+        return number_format($value, $decimals, ',', '.');
     }
 }

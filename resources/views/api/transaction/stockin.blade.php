@@ -58,7 +58,7 @@
                                 </div>
                                 <label for="" class="col-sm-4 col-form-lable">On Hand :</label>
                                 <div class="col-sm-6">
-                                    <input type="number" name="on_hand" id="on_hand" class="form-control mt-2" readonly>
+                                    <input type="text" name="on_hand" id="on_hand" class="form-control mt-2" readonly>
                                 </div>
                             </div>
                         </div>
@@ -304,6 +304,7 @@
             const fileInputWrapper = document.getElementById("fileInput");
             const fileInput = fileInputWrapper.querySelector("input[type='file']");
             fileInput.disabled = true;
+            showLoadingOverlay("Scanning Barcode...");
             fetch("/stockin-add", {
                     method: "POST",
                     headers: {
@@ -334,13 +335,10 @@
                         }
                         // console.log("posData: ", poData.length);
                         if (poSelect instanceof HTMLSelectElement && Array.isArray(poData) && poData.length > 0) {
-                            // simpan ke temporary data untuk select handling
                             tempPoData = poData;
-
-                            // reset isi select
+                            poSelect.innerHTML = "";
                             poSelect.innerHTML = '<option value="" selected disabled>-- Pilih Nomor PO --</option>';
 
-                            // isi dari data
                             poData.forEach(po => {
                                 if (po.DocNum && po.DocNum.trim() !== "") {
                                     const option = document.createElement('option');
@@ -354,10 +352,11 @@
                             appendDataOnPo(poData);
                         }
 
-
+                        hideLoadingOverlay();
                         showToast("✅ Success Scan: " + data.ItemName, 'success');
                     } else {
                         // console.log("grpo", data.grpo);
+                        hideLoadingOverlay();
                         showToast("❌ Error: " + data.message, 'error');
                         document.getElementById("scannerInput").focus();
                     }
@@ -367,6 +366,7 @@
                     document.getElementById("scannerInput").focus();
                 })
                 .catch(error => {
+                    hideLoadingOverlay();
                     if (fileInput) fileInput.disabled = false;
                     console.error("Fetch error: ", error);
                     document.getElementById("scannerInput").focus();
@@ -478,6 +478,7 @@
 
             let form = document.getElementById("stockupForm");
             let formData = new FormData(form);
+            showLoadingOverlay("Loading GRPO...");
             fetch("/admin/transaction/stockup", {
                     method: "POST",
                     headers: {
@@ -488,24 +489,26 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
+                        hideLoadingOverlay();
                         showToast("✅ Berhasil" + data.message, "success");
                         btn.disabled = false;
                         setTimeout(() => {
                             window.location.reload();
                         }, 1000)
                     } else {
+                        hideLoadingOverlay();
                         if (data.errors) {
                             let errorMessages = Object.values(data.errors).flat().join("\n");
                             showToast("❌ Gagal simpan:\n" + errorMessages, 'error');
                         } else {
                             showToast("❌ Gagal simpan: " + data.message, 'error');
                         }
-
                         btn.disabled = false;
                     }
                 })
                 .catch(err => {
                     console.error("Error:", err);
+                    hideLoadingOverlay();
                     alert("Terjadi error saat simpan data!");
                     btn.disabled = false;
                 });
@@ -569,54 +572,6 @@
                 box.classList.remove('show');
                 document.getElementById("scannerInput").focus();
             }, 3000);
-        }
-
-        function formatTimestamp(dateString) {
-            if (!dateString) return "-";
-            const date = new Date(dateString);
-            return date.toLocaleString("id-ID", {
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit"
-            });
-        }
-
-        function formatDecimalsSAP(value) {
-            if (value === null || value === '') {
-                return '';
-            }
-
-            let num = parseFloat(value);
-            if (isNaN(num)) {
-                return '';
-            }
-
-            if (num % 1 === 0) {
-                return num.toLocaleString('id-ID', {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0
-                });
-            }
-
-            return num.toLocaleString('id-ID', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
-        }
-
-        function formatInputDecimals(target) {
-            Inputmask({
-                alias: "numeric",
-                groupSeparator: ".",
-                radixPoint: ",",
-                autoGroup: true,
-                digits: 3,
-                digitsOptional: true,
-                rightAlign: false,
-                removeMaskOnSubmit: true
-            }).mask(target);
         }
     </script>
 @endsection

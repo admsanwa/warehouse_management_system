@@ -61,7 +61,7 @@
                         <div class="form-group row">
                             <label class="col-sm-4 col-form-lable">On Hand :</label>
                             <div class="col-sm-6">
-                                <input type="number" name="on_hand" id="on_hand" class="form-control mt-2" readonly
+                                <input type="text" name="on_hand" id="on_hand" class="form-control mt-2" readonly
                                     required>
                             </div>
                         </div>
@@ -214,6 +214,7 @@
     <script>
         window.addEventListener("load", function() {
             const poSelect = $("#no_po");
+            formatInputDecimals(document.getElementById("on_hand"));
             // console.log(poSelect.length);
             if (poSelect.is("select")) {
                 poSelect.select2({
@@ -470,6 +471,7 @@
             const fileInput = fileInputWrapper.querySelector("input[type='file']");
 
             fileInput.disabled = true;
+            showLoadingOverlay("Scanning Barcode...");
             fetch("/good-receipt", {
                     method: "POST",
                     headers: {
@@ -486,22 +488,32 @@
                 .then(res => res.json())
                 .then(data => {
                     console.log("data", data);
-                    // const pomSelect = document.getElementById("pom");
-                    document.getElementById("item_code").value = data.itemCode;
-                    document.getElementById("item_desc").value = data.ItemName;
-                    document.getElementById("on_hand").value = data.warehouseStock.OnHand;
+                    if (data.success) {
+                        // const pomSelect = document.getElementById("pom");
+                        document.getElementById("item_code").value = data.itemCode;
+                        document.getElementById("item_desc").value = data.ItemName;
+                        document.getElementById("on_hand").value = data.warehouseStock.OnHand;
 
-                    loadScannedBarcodes(data.items);
-                    showToast("✅ Success Scan: " + data.ItemName, 'success');
+                        loadScannedBarcodes(data.items);
+                        hideLoadingOverlay();
+                        showToast("✅ Success Scan: " + data.ItemName, 'success');
+                    } else {
+                        hideLoadingOverlay();
+                        showToast("❌ Error: " + data.message, 'error');
+                        document.getElementById("scannerInput").focus();
+                    }
 
                 })
                 .finally(() => {
+                    hideLoadingOverlay();
                     fileInput.disabled = false;
                     document.getElementById("scannerInput").focus();
                 })
                 .catch(error => {
                     fileInput.disabled = false;
                     console.error("Fetch error: ", error);
+                    hideLoadingOverlay();
+                    showToast("❌ Gagal Scan Item Code, Koneksi terganggu silakan coba lagi");
                     document.getElementById("scannerInput").focus();
                 })
         }
@@ -533,7 +545,7 @@
                             <input type="hidden" name="stocks[${idx}][Dscription]" value="${stocks.ItemName}">
                         </td>
                         <td>
-                            <input type="number" name="stocks[${idx}][qty]" class="form-control" style="min-width:80px !important;" value="0">
+                            <input type="text" name="stocks[${idx}][qty]" class="form-control" style="min-width:80px !important;" value="0">
                         <td>
                             ${stocks.InvntryUom ?? ""}
                             <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${stocks.InvntryUom ?? ""}">
@@ -546,6 +558,10 @@
                     </tr>
                     `;
                 tBody.insertAdjacentHTML("beforeend", row);
+                const newInput = tBody.querySelector(`input[name="stocks[${idx}][qty]"]`);
+                if (newInput) {
+                    formatInputDecimals(newInput);
+                }
             });
         }
 
@@ -579,6 +595,7 @@
 
             let form = document.getElementById("goodReceiptForm");
             let formData = new FormData(form);
+            showLoadingOverlay("Loading Good Receipt...");
             fetch("/save_gr", {
                     method: "POST",
                     headers: {
@@ -589,13 +606,15 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
+                        hideLoadingOverlay();
                         showToast("✅ Berhasil " + data.message, "success");
                         btn.disabled = false;
                         setTimeout(() => {
-                            // window.location.reload();
-                        }, 1000)
+                            window.location.reload();
+                        }, 800)
                     } else {
                         if (data.errors) {
+                            hideLoadingOverlay();
                             let errorMessages = Object.values(data.errors).flat().join("\n");
                             showToast("❌ Gagal simpan:\n" + errorMessages, 'error');
                         } else {
@@ -606,6 +625,7 @@
                     }
                 })
                 .catch(err => {
+                    hideLoadingOverlay();
                     console.error("Error:", err);
                     alert("Terjadi error saat simpan data!");
                     btn.disabled = false;

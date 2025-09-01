@@ -355,7 +355,7 @@ class TransactionController extends Controller
             return response()->json([
                 'success'  => true,
                 'message'  => 'Telah berhasil menambahkan item yang sudah di scan',
-                'request'  => $postData,
+                'request'  => $postData ?? [],
                 'response' => $post_grpo ?? [],
             ], 200);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -673,7 +673,7 @@ class TransactionController extends Controller
                 'stocks'                       => 'required|array|min:1',
                 'stocks.*.BaseEntry'            => 'required|string',
                 'stocks.*.BaseLine'          => 'nullable|string',
-                'stocks.*.qty'                 => 'required|numeric|min:1',
+                'stocks.*.qty'                 => 'required|string',
                 'stocks.*.UnitMsr'             => 'nullable|string',
             ]);
 
@@ -701,11 +701,12 @@ class TransactionController extends Controller
 
             foreach ($validated['stocks'] as $row) {
                 // untuk API SAP
+                $entryQty = (float) str_replace(',', '.', str_replace('.', '', $row['qty']));                // Qty baru yang diinput
                 $lines[] = [
                     'BaseEntry'    => $row['BaseEntry'] ?? '',
                     'BaseLine'  => $row['BaseLine'] ?? null,
-                    'Quantity'    => $row['qty'] ?? '',
-                    'WhsCode'    =>  $warehouse ?? '',
+                    'Quantity'    => $entryQty,
+                    'WhsCode'    =>  $warehouse,
                 ];
 
                 // untuk DB
@@ -920,7 +921,7 @@ class TransactionController extends Controller
                 'stocks'                       => 'required|array|min:1',
                 'stocks.*.BaseEntry'            => 'required|string',
                 'stocks.*.BaseLine'          => 'nullable|string',
-                'stocks.*.qty'                 => 'required|numeric|min:1',
+                'stocks.*.qty'                 => 'required|string',
                 'stocks.*.UnitMsr'             => 'nullable|string',
             ]);
 
@@ -946,11 +947,12 @@ class TransactionController extends Controller
 
             $lines        = [];
             foreach ($validated['stocks'] as $row) {
+                $entryQty = (float) str_replace(',', '.', str_replace('.', '', $row['qty']));                // Qty baru yang diinput
                 // untuk API SAP
                 $lines[] = [
                     'BaseEntry'    => $row['BaseEntry'] ?? '',
                     'BaseLine'  => $row['BaseLine'] ?? null,
-                    'Quantity'    => $row['qty'] ?? '',
+                    'Quantity'    =>    $entryQty,
                     'WhsCode'    =>  $warehouse ?? '',
                 ];
 
@@ -1211,7 +1213,7 @@ class TransactionController extends Controller
                 'stocks'                       => 'required|array|min:1',
                 'stocks.*.ItemCode'            => 'required|string',
                 'stocks.*.Dscription'          => 'nullable|string',
-                'stocks.*.qty'                 => 'required|numeric|min:1',
+                'stocks.*.qty'                 => 'required|string',
                 'stocks.*.UnitMsr'             => 'nullable|string',
             ]);
 
@@ -1221,7 +1223,6 @@ class TransactionController extends Controller
 
             // Header untuk API
             $postData = [
-                // "Series" => 694,
                 'DocDate'     => date("Y/m/d"),
                 'Comment'    => $validated['remarks'] ?? '',
                 "Ext" => [
@@ -1243,11 +1244,13 @@ class TransactionController extends Controller
             $lines        = [];
 
             foreach ($validated['stocks'] as $row) {
+                $entryQty = (float) str_replace(',', '.', str_replace('.', '', $row['qty']));                // Qty baru yang diinput
+
                 // untuk API SAP
                 $lines[] = [
                     'ItemCode'    => $row['ItemCode'] ?? '',
                     'Dscription'  => $row['Dscription'] ?? null,
-                    'Quantity'    => $row['qty'] ?? '',
+                    'Quantity'    => $entryQty,
                     'WhsCode'    =>  $warehouse ?? '',
                     'Ext' => [
                         // 'AcctCode'    => "212400",
@@ -1580,7 +1583,7 @@ class TransactionController extends Controller
                 'stocks'                       => 'required|array|min:1',
                 'stocks.*.ItemCode'            => 'required|string',
                 'stocks.*.Dscription'          => 'nullable|string',
-                'stocks.*.qty'                 => 'required|numeric|min:1',
+                'stocks.*.qty'                 => 'required|string',
                 'stocks.*.UnitMsr'             => 'nullable|string',
             ]);
 
@@ -1614,10 +1617,11 @@ class TransactionController extends Controller
 
             foreach ($validated['stocks'] as $row) {
                 // untuk API SAP
+                $entryQty = (float) str_replace(',', '.', str_replace('.', '', $row['qty']));                // Qty baru yang diinput
                 $lines[] = [
                     'ItemCode'    => $row['ItemCode'] ?? '',
                     'Dscription'  => $row['Dscription'] ?? null,
-                    'Quantity'    => $row['qty'] ?? '',
+                    'Quantity'    => $entryQty,
                     'WhsCode'    =>  $warehouse,
                     'Ext' => [
                         'OcrCode' => $ocr,

@@ -61,7 +61,7 @@
                         <div class="form-group row">
                             <label class="col-sm-4 col-form-lable">On Hand :</label>
                             <div class="col-sm-6">
-                                <input type="number" name="on_hand" id="on_hand" class="form-control mt-2" readonly
+                                <input type="text" name="on_hand" id="on_hand" class="form-control mt-2" readonly
                                     required>
                             </div>
                         </div>
@@ -192,6 +192,7 @@
         let selectedPo = [];
         window.addEventListener("load", function() {
             const poSelect = $("#prod_order");
+            formatInputDecimals(document.getElementById("on_hand"));
 
             if (poSelect.is("select")) {
                 const docNum = poSelect.data("docnum");
@@ -232,15 +233,18 @@
                         dataType: "json",
                         delay: 250,
                         data: function(params) {
+                            const item_code = document.getElementById("item_code").value;
                             if (docNum && docEntry) {
                                 return {
                                     q: docNum,
                                     docEntry: docEntry,
+                                    // ItemCode: item_code ?? '',
                                     limit: 1, // karena spesifik
                                 };
                             }
                             return {
                                 q: params.term,
+                                ItemCode: item_code ?? '',
                                 limit: 10,
                             };
                         },
@@ -415,7 +419,7 @@
         function sendScannedCode(code) {
             const fileInputWrapper = document.getElementById("fileInput");
             const fileInput = fileInputWrapper.querySelector("input[type='file']");
-
+            showLoadingOverlay("Scanning Barcode...");
             fileInput.disabled = true;
             fetch("/stockout-issued", { //ganti ke 
                     method: "POST",
@@ -430,6 +434,12 @@
                 })
                 .then(res => res.json())
                 .then(data => {
+                    hideLoadingOverlay();
+                    if (!data.success) {
+                        showToast("❌ Error: " + data.message, 'error');
+                        return false;
+                    }
+
                     // console.log("data", data);
                     // const pomSelect = document.getElementById("pom");
                     document.getElementById("item_code").value = data.itemCode;
@@ -444,8 +454,10 @@
                     document.getElementById("scannerInput").focus();
                 })
                 .catch(error => {
+                    hideLoadingOverlay();
                     fileInput.disabled = false;
                     console.error("Fetch error: ", error);
+                    showToast("❌ Gagal Scan Item Code, Koneksi terganggu silakan coba lagi");
                     document.getElementById("scannerInput").focus();
                 })
         }
@@ -468,20 +480,31 @@
             }
             console.log("Items", selectedPo['Lines']);
             console.log("Item", itemCode);
+            const lines = selectedPo['Lines'] || [];
+            console.log("🔍 Semua ItemCode dalam PO:", lines.map(l => l.ItemCode));
 
-            selectedPo['Lines'].forEach((stocks) => {
-                const idx = tBody.rows.length;
-                const isIssuedQtyDone = stocks.IssuedQty >= stocks.PlannedQty;
-                if (stocks.ItemCode == itemCode) {
-                    if (isIssuedQtyDone) {
-                        alert(`Issue qty sudah mencukupi untuk barcode: ${itemCode}`);
-                       return true; 
-                    }
-                    let inputQty = isIssuedQtyDone ?
-                        'Qty yang di-issue sudah sesuai dengan plan' :
-                        `<input type="number" name="stocks[${idx}][qty]" class="form-control" style="min-width:80px !important;" value="0">`;
+            const stocks = lines.find(item => item.ItemCode === itemCode);
 
-                    const row = `
+            if (!stocks) {
+                console.warn(`❌ Item '${itemCode}' tidak ditemukan di dalam Lines`);
+                showToast(
+                    `❌ Gagal Menambahkan\nItem Code ${itemCode} Tidak Ditemukan untuk Production Order`,
+                    "error"
+                );
+                return false;
+            }
+
+            const idx = tBody.rows.length;
+            const isIssuedQtyDone = stocks.IssuedQty >= stocks.PlannedQty;
+            if (isIssuedQtyDone) {
+                alert(`Issue qty sudah mencukupi untuk barcode: ${itemCode}`);
+                return true;
+            }
+            let inputQty = isIssuedQtyDone ?
+                'Qty yang di-issue sudah sesuai dengan plan' :
+                `<input type="text" name="stocks[${idx}][qty]" class="form-control" style="min-width:80px !important;" value="0">`;
+
+            const row = `
                     <tr>
                         <td>${idx + 1}</td>
                         <td>
@@ -493,10 +516,10 @@
                             <input type="hidden" name="stocks[${idx}][BaseLine]" value="${stocks.LineNum}">
                         </td>
                         <td>
-                            ${stocks.PlannedQty}
+                            ${formatDecimalsSAP(stocks.PlannedQty)}
                         </td>
                         <td>
-                            ${stocks.IssuedQty}
+                            ${formatDecimalsSAP(stocks.IssuedQty)}
                         </td>
                         <td>
                             ${inputQty}
@@ -511,9 +534,11 @@
                         </td>
                     </tr>
                     `;
-                    tBody.insertAdjacentHTML("beforeend", row);
-                }
-            });
+            tBody.insertAdjacentHTML("beforeend", row);
+            const newInput = tBody.querySelector(`input[name="stocks[${idx}][qty]"]`);
+            if (newInput) {
+                formatInputDecimals(newInput);
+            }
         }
 
         function AddStockupForm() {
@@ -542,6 +567,7 @@
 
             let form = document.getElementById("prodIssueForm");
             let formData = new FormData(form);
+            showLoadingOverlay("Loading Issue For Production...");
             fetch("/save_prod_issue", {
                     method: "POST",
                     headers: {
@@ -552,12 +578,14 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
+                        hideLoadingOverlay();
                         showToast("✅ Berhasil " + data.message, "success");
                         btn.disabled = false;
                         setTimeout(() => {
-                            // window.location.reload();
+                            window.location.reload();
                         }, 1000)
                     } else {
+                        hideLoadingOverlay();
                         if (data.errors) {
                             let errorMessages = Object.values(data.errors).flat().join("\n");
                             showToast("❌ Gagal simpan:\n" + errorMessages, 'error');
@@ -569,6 +597,7 @@
                     }
                 })
                 .catch(err => {
+                    hideLoadingOverlay();
                     console.error("Error:", err);
                     alert("Terjadi error saat simpan data!");
                     btn.disabled = false;
