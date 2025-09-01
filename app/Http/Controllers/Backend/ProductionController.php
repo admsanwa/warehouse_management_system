@@ -428,7 +428,7 @@ class ProductionController extends Controller
         }
 
         $pdf = Pdf::loadView('backend.production.pdf', compact('addedBarcodes'))
-            ->setPaper([0, 0, 283.5, 113.4]); // 100mm x 40mm
+            ->setPaper([0, 0, 283.465, 107.48]); // 100mm x 40mm
 
         return $pdf->stream('barcodes.pdf',);
     }
