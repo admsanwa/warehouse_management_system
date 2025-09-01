@@ -259,7 +259,7 @@ class ProductionController extends Controller
             ]);
 
             foreach ($validated['needs'] as $index => $need) {
-                \App\Models\memoDetailModel::create([
+                \App\Models\MemoDetailModel::create([
                     'memo_id'   => $memo->id,
                     'needs'     => $need,
                     'unit'      => $validated['unit'][$index] ?? '-',
