@@ -24,7 +24,7 @@
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ url('backend/dist/css/adminlte.min.css') }}">
     {{-- Custom CSS --}}
-    <link rel="stylesheet" href="{{ url('backend/css/custom.css') }}">
+    <link rel="stylesheet" href="{{ url('backend/css/custom.css?v=1.0') }}">
     <!-- overlayScrollbars -->
     <link rel="stylesheet" href="{{ url('backend/plugins/overlayScrollbars/css/OverlayScrollbars.min.css') }}">
     <!-- Daterange picker -->
