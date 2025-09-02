@@ -82,7 +82,7 @@ class MemoModel extends Model
 
     public function details()
     {
-        return $this->hasMany(memoDetailModel::class, 'memo_id');
+        return $this->hasMany(MemoDetailModel::class, 'memo_id');
     }
 
     public function createdBy()
