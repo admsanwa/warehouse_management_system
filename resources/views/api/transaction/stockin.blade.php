@@ -86,6 +86,7 @@
                                             sesuai.</small>
                                     </div>
                                 </div>
+                                <input type="hidden" name="docNum" id="docNum" value="{{ $po ?? '' }}" />
                                 <input type="hidden" name="docEntry" id="docEntry" value="{{ $docEntry ?? '' }}" />
                                 <label class="col-sm-4 col-form-label">Vendor:</label>
                                 <div class="col-sm-8">
@@ -216,8 +217,8 @@
                     cleanDataOnPo();
                     return;
                 }
-                const selectedDocNum = selectedData.id;
-                const selectedDocEntry = selectedData.entry;
+                const selectedDocEntry = selectedData.id;
+                const selectedDocNum = selectedData.docnum;
                 selectedPo = tempPoData.find(
                     item => item.DocNum == selectedDocNum && item.DocEntry == selectedDocEntry
                 );
@@ -293,7 +294,7 @@
                             results: (data.results || []).map(item => ({
                                 id: item.id,
                                 text: item.text,
-                                entry: item.entry,
+                                docnum: item.docnum,
                             }))
                         };
                     },
@@ -484,6 +485,7 @@
         }
 
         function appendDataOnPo(data) {
+            document.getElementById("docNum").value = data.DocNum;
             document.getElementById("docEntry").value = data.DocEntry;
             document.getElementById("cardName").value = data.CardName;
             document.getElementById("cardCode").value = data.CardCode;
@@ -604,10 +606,10 @@
             const btn = document.getElementById("btnSubmitStock");
             btn.disabled = true;
 
-            const noPo = document.getElementById("no_po").value;
+            const docNum = document.getElementById("docNum").value;
             const docEntry = document.getElementById("docEntry").value;
             const remark = document.getElementById("remarks").value;
-            if (!noPo || !docEntry || !remark) {
+            if (!docNum || !docEntry || !remark) {
                 showToast("❌ Error: Pastikan Nomer Purchasing Order dan Remark di isi sebelum submit!")
                 btn.disabled = false;
                 return false;

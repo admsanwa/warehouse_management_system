@@ -71,7 +71,8 @@ class ProductionController extends Controller
             "limit" => (int) $request->get('limit', 5),
             "Status" => $request->get('status', 'Released'),
             "DocNum" => $request->get('q'),
-            "DocEntry" => $request->get('docentry') ?? '',
+            "DocEntry" => $request->get('docEntry'),
+            // "ItemCode" =>  $request->get('code'),
             'page'       => 1,
         ];
 
@@ -84,8 +85,8 @@ class ProductionController extends Controller
         }
         $poData = collect($orders['data'] ?? [])->map(function ($item) {
             return [
-                'id'   => $item['DocNum'],
-                'entry'   => $item['DocEntry'],
+                'id'   => $item['DocEntry'],
+                'docnum'   => $item['DocNum'],
                 'text' => $item['DocNum'] . " - " . $item['ItemCode'],
             ];
         });

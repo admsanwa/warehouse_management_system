@@ -198,7 +198,7 @@ class TransactionController extends Controller
 
         try {
             $validated = $request->validate([
-                'no_po'        => 'required',
+                'docNum'        => 'required',
                 'cardName'     => 'required',
                 'cardCode'     => 'required',
                 'docDate'      => 'required|date',
@@ -281,7 +281,7 @@ class TransactionController extends Controller
 
                 // untuk DB
                 // $insertedData[] = [
-                //     'no_po'        => $validated['no_po'],
+                //     'no_po'        => $validated['docNum'],
                 //     'vendor_code'  => $validated['cardCode'],
                 //     'vendor'  => $validated['cardName'],
                 //     'vendor_ref_no' => $validated['numAtCard'],
