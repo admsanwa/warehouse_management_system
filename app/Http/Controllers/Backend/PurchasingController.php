@@ -55,7 +55,6 @@ class PurchasingController extends Controller
             'statuses' => [
                 'Open',
                 'Close',
-                'All'
             ]
         ]);
     }
@@ -113,8 +112,8 @@ class PurchasingController extends Controller
 
         $poData = collect($orders['data'] ?? [])->map(function ($item) {
             return [
-                'id'   => $item['DocNum'],
-                'entry'   => $item['DocEntry'],
+                'id'   => $item['DocEntry'],
+                'docnum'   => $item['DocNum'],
                 'text' => $item['DocNum'] . " - " . $item['CardName'],
             ];
         });
