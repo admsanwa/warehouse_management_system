@@ -211,7 +211,7 @@
 
             poSelect.on("change", function(e) {
                 const selectedData = $(this).select2('data')[0];
-                console.log("Selected:", selectedData);
+                // console.log("Selected:", selectedData);
                 if (!selectedData) {
                     tBody.innerHTML = "";
                     cleanDataOnPo();
@@ -244,7 +244,7 @@
                         return "Tidak ada data ditemukan";
                     },
                     searching: function() {
-                        return "Sedang mencari...";
+                        return "Mohon ditunggu, Sedang mencari...";
                     }
                 },
                 ajax: {
@@ -500,6 +500,7 @@
         }
 
         function cleanDataOnPo() {
+            document.getElementById("docNum").value = "";
             document.getElementById("docEntry").value = "";
             document.getElementById("cardName").value = "";
             document.getElementById("cardCode").value = "";

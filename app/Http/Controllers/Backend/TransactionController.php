@@ -1164,7 +1164,7 @@ class TransactionController extends Controller
 
         try {
             $validated = $request->validate([
-                'no_po'        => 'nullable',
+                'docnum'        => 'nullable',
                 'remarks'      => 'required|string',
                 'no_surat_jalan'      => 'nullable|string',
                 'no_inventory_tf'      => 'nullable|string',
@@ -1201,7 +1201,7 @@ class TransactionController extends Controller
                     "U_SI_No_Surat_Jalan" => $validated['no_surat_jalan'] ?? '',
                     "U_SI_IT" => $validated['no_inventory_tf'] ?? '',
                     "U_MEB_Type_Inv_Trans" => $validated['type_inv_transaction'] ?? '',
-                    "U_MEB_PONo_Maklon" => $validated['no_po'] ?? null,
+                    "U_MEB_PONo_Maklon" => $validated['docnum'] ?? null,
                     "U_MEB_DIST_RULE" =>  $ocr ?? ''
                 ],
                 'Lines'       => []

@@ -54,7 +54,9 @@ class ProductionController extends Controller
             return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
         }
 
-        $totalPages = ceil($getProds['total'] / $param['limit']);
+        // $totalPages = ceil($getProds['total'] / $param['limit']);
+        $currentCount = $getProds['total'] ?? count($getProds['data'] ?? []);
+        $totalPages = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
 
         return view('api.production.list', [
             'getProds'      => $getProds['data'] ?? [],
@@ -71,8 +73,9 @@ class ProductionController extends Controller
             "limit" => (int) $request->get('limit', 5),
             "Status" => $request->get('status', 'Released'),
             "DocNum" => $request->get('q'),
+            "Series" => $request->get('seriesx'),
             "DocEntry" => $request->get('docEntry'),
-            // "ItemCode" =>  $request->get('code'),
+            "ItemCode" =>  $request->get('code'),
             'page'       => 1,
         ];
 

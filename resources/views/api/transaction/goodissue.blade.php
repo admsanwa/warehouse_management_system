@@ -456,7 +456,6 @@
         function sendScannedCode(code) {
             const fileInputWrapper = document.getElementById("fileInput");
             const fileInput = fileInputWrapper.querySelector("input[type='file']");
-
             fileInput.disabled = true;
             showLoadingOverlay("Scanning Barcode...");
             fetch("/good-issued", {
