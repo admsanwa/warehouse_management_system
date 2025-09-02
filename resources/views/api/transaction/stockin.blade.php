@@ -72,22 +72,21 @@
                         <div class="card-body">
                             <div class="form-group row">
                                 <label class="col-sm-4 col-form-label">Nomor PO :</label>
-                                <div class="col-sm-8">
-                                    @if (!empty($po))
-                                        <input type="number" name="no_po" id="no_po" value="{{ $po }}"
-                                            class="form-control mt-2" readonly required>
-                                    @else
-                                        <select name="no_po" id="no_po" class="form-control mt-2" required>
-                                            <option value="">Select Nomor PO</option>
+                                <div class="col-sm-8 row">
+                                    <div class="col-lg-4 col-sm-12 mb-2">
+                                        <select name="series" class="form-control" id="seriesSelect"></select>
+                                    </div>
+                                    <div class="col-lg-8 col-sm-12">
+                                        <select name="no_po" id="no_po" class="form-control"
+                                            data-docnum="{{ $po ?? '' }}" data-docentry="{{ $docEntry ?? '' }}"
+                                            required>
+                                            <option value="">Select No Production Order</option>
                                         </select>
-                                    @endif
-                                    <input type="hidden" name="docEntry" id="docEntry" value="{{ $docEntry ?? '' }}" />
+                                        <small class="text-muted">Memilih series akan mempermudah pencarian data PO yang
+                                            sesuai.</small>
+                                    </div>
                                 </div>
-                                {{-- <label class="col-sm-4 col-form-label">Good Receipt PO :</label>
-                                <div class="col-sm-8">
-                                    <input type="hidden" name="grpo" id="grpo" value="{{ $docEntry ?? '' }}"
-                                        class="form-control mt-2" readonly required>
-                                </div> --}}
+                                <input type="hidden" name="docEntry" id="docEntry" value="{{ $docEntry ?? '' }}" />
                                 <label class="col-sm-4 col-form-label">Vendor:</label>
                                 <div class="col-sm-8">
                                     <input type="text" name="cardName" id="cardName" value=""
@@ -200,8 +199,154 @@
     <!-- Include barcode scanner JS -->
     <script>
         let tempPoData = [];
+        let selectedPo = [];
         window.addEventListener("load", function() {
             formatInputDecimals(document.getElementById("on_hand"));
+            const poSelect = $("#no_po");
+
+            const tBody = document.getElementById('itemRows');
+            const docNum = poSelect.data("docnum");
+            const docEntry = poSelect.data("docentry");
+
+            poSelect.on("change", function(e) {
+                const selectedData = $(this).select2('data')[0];
+                console.log("Selected:", selectedData);
+                if (!selectedData) {
+                    tBody.innerHTML = "";
+                    cleanDataOnPo();
+                    return;
+                }
+                const selectedDocNum = selectedData.id;
+                const selectedDocEntry = selectedData.entry;
+                selectedPo = tempPoData.find(
+                    item => item.DocNum == selectedDocNum && item.DocEntry == selectedDocEntry
+                );
+                if (!selectedPo) {
+                    cleanDataOnPo();
+                    return;
+                }
+                console.log("PO dipilih:", selectedPo);
+                tBody.innerHTML = "";
+                appendDataOnPo(selectedPo);
+                loadScannedBarcodes();
+            });
+            poSelect.select2({
+                placeholder: "Pilih No. PO",
+                allowClear: true,
+                width: "100%",
+                minimumInputLength: 3,
+                language: {
+                    inputTooShort: function() {
+                        return "Ketik 3 karakter atau lebih";
+                    },
+                    noResults: function() {
+                        return "Tidak ada data ditemukan";
+                    },
+                    searching: function() {
+                        return "Sedang mencari...";
+                    }
+                },
+                ajax: {
+                    url: "/purchaseOrderSearch",
+                    dataType: "json",
+                    delay: 600,
+                    data: function(params) {
+                        const item_code = document.getElementById("item_code").value;
+
+                        const seriesData = $("#seriesSelect").select2('data');
+                        const series = seriesData.length > 0 ? seriesData[0].id : null;
+
+                        if (docNum && docEntry) {
+                            return {
+                                q: docNum,
+                                series: series,
+                                docEntry: docEntry,
+                                limit: 1, // karena spesifik
+                            };
+                        }
+                        return {
+                            q: params.term,
+                            limit: 5,
+                            code: item_code,
+                            series: series,
+                            status: "Open",
+                        };
+                    },
+
+                    transport: function(params, success, failure) {
+                        const item_code = document.getElementById("item_code").value;
+
+                        if (!item_code) {
+                            alert("Item code wajib diisi!");
+                            return; // ⛔ stop, request tidak dijalankan
+                        }
+
+                        // lanjut request normal
+                        var $request = $.ajax(params);
+                        $request.then(success);
+                        $request.fail(failure);
+                        return $request;
+                    },
+                    processResults: function(data) {
+                        tempPoData = data.po || [];
+                        return {
+                            results: (data.results || []).map(item => ({
+                                id: item.id,
+                                text: item.text,
+                                entry: item.entry,
+                            }))
+                        };
+                    },
+                    cache: true
+                }
+            });
+            poSelect.on("select2:open", function() {
+                let searchField = document.querySelector(".select2-container .select2-search__field");
+                if (searchField) {
+                    searchField.placeholder = "Ketik disini untuk cari nomor PO";
+                }
+            });
+
+            $("#seriesSelect").select2({
+                placeholder: "Pilih Series",
+                allowClear: true,
+                width: "100%",
+                language: {
+                    inputTooShort: function() {
+                        return "Ketik kode series untuk mencari...";
+                    },
+                    noResults: function() {
+                        return "Tidak ada data ditemukan";
+                    },
+                    searching: function() {
+                        return "Sedang mencari...";
+                    },
+                },
+                ajax: {
+                    url: "/purchasing/seriesSearch",
+                    dataType: "json",
+                    delay: 250,
+                    data: function(params) {
+                        if (!params) {
+                            return;
+                        }
+                        return {
+                            q: params.term,
+                            ObjectCode: '22'
+                        };
+                    },
+                    processResults: function(data) {
+                        console.log("Response dari server:", data); // cek di console
+                        return {
+                            results: (data.results || []).map(item => ({
+                                id: item.id,
+                                text: item.text
+                            }))
+                        };
+                    }
+                }
+            });
+
         })
         document.addEventListener("DOMContentLoaded", function() {
             const input = document.getElementById("scannerInput");
@@ -218,17 +363,6 @@
                         input.value = "";
                     }
                 }
-            });
-            const poSelect = document.getElementById('no_po');
-            poSelect.addEventListener("change", function() {
-                const tBody = document.getElementById("itemRows");
-                tBody.innerHTML = "";
-                const selectedDocNum = this.value;
-                if (!selectedDocNum) return;
-                const selectedPO = tempPoData.find(po => po.DocNum === selectedDocNum);
-                // console.log("Selected PO: ", selectedPO);
-                appendDataOnPo(selectedPO);
-                // loadGrpoHistories(selectedPO);
             });
         });
         let html5QrCode;
@@ -299,11 +433,11 @@
         }
 
         function sendScannedCode(code) {
-            const docEntry = document.getElementById("docEntry").value;
-            const noPo = document.getElementById("no_po").value;
             const fileInputWrapper = document.getElementById("fileInput");
             const fileInput = fileInputWrapper.querySelector("input[type='file']");
             fileInput.disabled = true;
+            document.getElementById("item_desc").value = "";
+            document.getElementById("on_hand").value = "";
             showLoadingOverlay("Scanning Barcode...");
             fetch("/stockin-add", {
                     method: "POST",
@@ -314,8 +448,6 @@
                     },
                     body: JSON.stringify({
                         item_code: code,
-                        po: noPo,
-                        docEntry: docEntry
                     })
                 })
                 .then(res => res.json())
@@ -327,32 +459,10 @@
                         document.getElementById("id").value = data.id;
                         document.getElementById("item_desc").value = data.ItemName;
                         document.getElementById("on_hand").value = data.warehouseStock.OnHand;
-                        const poData = data.poData;
-                        if (!poData) {
-                            showToast("❌ Error: Nomor PO tidak ditemukan untuk barcode ini", 'error');
-                            fileInput.disabled = false;
-                            return;
-                        }
-                        // console.log("posData: ", poData.length);
-                        if (poSelect instanceof HTMLSelectElement && Array.isArray(poData) && poData.length > 0) {
-                            tempPoData = poData;
-                            poSelect.innerHTML = "";
-                            poSelect.innerHTML = '<option value="" selected disabled>-- Pilih Nomor PO --</option>';
 
-                            poData.forEach(po => {
-                                if (po.DocNum && po.DocNum.trim() !== "") {
-                                    const option = document.createElement('option');
-                                    option.value = po.DocNum;
-                                    option.textContent =
-                                        `${po.DocNum} - ${po.CardName ?? ''}`; // lebih informatif
-                                    poSelect.appendChild(option);
-                                }
-                            });
-                        } else {
-                            appendDataOnPo(poData);
-                        }
 
                         hideLoadingOverlay();
+                        loadScannedBarcodes();
                         showToast("✅ Success Scan: " + data.ItemName, 'success');
                     } else {
                         // console.log("grpo", data.grpo);
@@ -373,8 +483,6 @@
                 })
         }
 
-
-
         function appendDataOnPo(data) {
             document.getElementById("docEntry").value = data.DocEntry;
             document.getElementById("cardName").value = data.CardName;
@@ -385,74 +493,103 @@
             document.getElementById("U_MEB_NO_IO").value = data.U_MEB_NO_IO;
             document.getElementById("U_MEB_Ket_Pur").value = data.U_MEB_Ket_Pur;
             // console.log(data);
-            loadScannedBarcodes(data.Lines);
+
             // loadGrpoHistories(data);
         }
 
-        function loadScannedBarcodes(items) {
+        function cleanDataOnPo() {
+            document.getElementById("docEntry").value = "";
+            document.getElementById("cardName").value = "";
+            document.getElementById("cardCode").value = "";
+            document.getElementById("docDate").value = "";
+            document.getElementById("numAtCard").value = "";
+            document.getElementById("U_MEB_No_SO").value = "";
+            document.getElementById("U_MEB_NO_IO").value = "";
+            document.getElementById("U_MEB_Ket_Pur").value = "";
+            return;
+        }
+
+        function loadScannedBarcodes() {
             const fileInput = document.querySelector('#fileInput input[type="file"]');
             if (fileInput) {
                 fileInput.value = "";
             }
 
+            if (!selectedPo || selectedPo.length <= 0) {
+                console.warn("PO yg dipilih kosong");
+                return;
+            }
+
             const tBody = document.getElementById("itemRows");
             const itemCode = document.getElementById("item_code").value;
-            items.forEach((stocks) => {
-                if (stocks.ItemCode == itemCode) {
-                    const idx = tBody.rows.length;
 
-                    const description = (stocks.Dscription ?? "") +
-                        (stocks.FreeTxt ? " - " + stocks.FreeTxt : "");
-                    if (stocks.OpenQty <= 0) {
-                        alert("Tidak bisa menambahkan barcode ini karena sudah selesai.");
-                        return false; // hentikan eksekusi lebih aman
-                    }
-                    const row = `
-                    <tr>
-                        <td>${idx + 1}</td>
-                        <td>
-                            ${stocks.ItemCode}
-                            <input type="hidden" name="stocks[${idx}][LineNum]" value="${stocks.LineNum}">
-                            <input type="hidden" name="stocks[${idx}][BaseEntry]" value="${stocks.DocEntry}">
-                            <input type="hidden" name="stocks[${idx}][ItemCode]" value="${stocks.ItemCode}">
-                        </td>
-                        <td>
-                            ${description}
-                            <input type="hidden" name="stocks[${idx}][Dscription]" value="${stocks.Dscription ?? ""}">
-                        </td>
-                        <td> ${formatDecimalsSAP(stocks.Quantity)}</td>
-                        <td> ${formatDecimalsSAP(stocks.OpenQty)}</td>
-                        <td>
-                            <input type="hidden" name="stocks[${idx}][PlanQty]" value="${stocks.Quantity}">
-                            <input type="hidden" name="stocks[${idx}][OpenQty]" value="${stocks.OpenQty}">
-                            <input type="text" name="stocks[${idx}][qty]" class="form-control format-sap" step="0.01" style="min-width:80px !important;" value="0">
-                            <input type="hidden" name="stocks[${idx}][PriceBefDi]" value="${stocks.PriceBefDi}">
-                            <input type="hidden" name="stocks[${idx}][DiscPrcnt]" value="${stocks.DiscPrcnt}">
-                            <input type="hidden" name="stocks[${idx}][VatGroup]" value="${stocks.VatGroup}">
-                            <input type="hidden" name="stocks[${idx}][AcctCode]" value="${stocks.AcctCode}">
-                            <input type="hidden" name="stocks[${idx}][OcrCode]" value="${stocks.OcrCode}">
-                            <input type="hidden" name="stocks[${idx}][FreeTxt]" value="${stocks.FreeTxt ?? ""}">
-                        </td>
-                        <td>
-                            ${stocks.UnitMsr ?? ""}
-                            <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${stocks.UnitMsr ?? ""}">
-                        </td>
-                        <td>
-                            <button type="button" onclick="deleteItem(this)" class="btn btn-danger btn-sm">
-                                <i class="fa fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    `;
-                    tBody.insertAdjacentHTML("beforeend", row);
-                    const newInput = tBody.querySelector(`input[name="stocks[${idx}][qty]"]`);
-                    if (newInput) {
-                        formatInputDecimals(newInput);
-                    }
-                }
-            });
+            const lines = selectedPo['Lines'] || [];
+            const stocks = lines.find(item => item.ItemCode === itemCode);
+            if (!stocks) {
+                console.warn(`❌ Item '${itemCode}' tidak ditemukan di dalam Lines`);
+                showToast(
+                    `${itemCode} Tidak Ditemukan untuk nomor PO ini.`,
+                    "error"
+                );
+                return false;
+            }
+
+            if (stocks.OpenQty <= 0) {
+                showToast(
+                    "Tidak bisa menambahkan barcode ini karena sudah line status close.",
+                    "error"
+                );
+                return false;
+            }
+
+            const idx = tBody.rows.length;
+            const description = (stocks.Dscription ?? "") +
+                (stocks.FreeTxt ? " - " + stocks.FreeTxt : "");
+
+            const row = `
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td>
+                        ${stocks.ItemCode}
+                        <input type="hidden" name="stocks[${idx}][LineNum]" value="${stocks.LineNum}">
+                        <input type="hidden" name="stocks[${idx}][BaseEntry]" value="${stocks.DocEntry}">
+                        <input type="hidden" name="stocks[${idx}][ItemCode]" value="${stocks.ItemCode}">
+                    </td>
+                    <td>
+                        ${description}
+                        <input type="hidden" name="stocks[${idx}][Dscription]" value="${stocks.Dscription ?? ""}">
+                    </td>
+                    <td> ${formatDecimalsSAP(stocks.Quantity)}</td>
+                    <td> ${formatDecimalsSAP(stocks.OpenQty)}</td>
+                    <td>
+                        <input type="hidden" name="stocks[${idx}][PlanQty]" value="${stocks.Quantity}">
+                        <input type="hidden" name="stocks[${idx}][OpenQty]" value="${stocks.OpenQty}">
+                        <input type="text" name="stocks[${idx}][qty]" class="form-control format-sap" step="0.01" style="min-width:80px !important;" value="0">
+                        <input type="hidden" name="stocks[${idx}][PriceBefDi]" value="${stocks.PriceBefDi}">
+                        <input type="hidden" name="stocks[${idx}][DiscPrcnt]" value="${stocks.DiscPrcnt}">
+                        <input type="hidden" name="stocks[${idx}][VatGroup]" value="${stocks.VatGroup}">
+                        <input type="hidden" name="stocks[${idx}][AcctCode]" value="${stocks.AcctCode}">
+                        <input type="hidden" name="stocks[${idx}][OcrCode]" value="${stocks.OcrCode}">
+                        <input type="hidden" name="stocks[${idx}][FreeTxt]" value="${stocks.FreeTxt ?? ""}">
+                    </td>
+                    <td>
+                        ${stocks.UnitMsr ?? ""}
+                        <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${stocks.UnitMsr ?? ""}">
+                    </td>
+                    <td>
+                        <button type="button" onclick="deleteItem(this)" class="btn btn-danger btn-sm">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                `;
+
+            tBody.insertAdjacentHTML("beforeend", row);
+            const newInput = tBody.querySelector(`input[name="stocks[${idx}][qty]"]`);
+            if (newInput) {
+                formatInputDecimals(newInput);
+            }
         }
-
 
         function deleteItem(button) {
             if (!confirm("Yakin ingin menghapus item ini?")) return;

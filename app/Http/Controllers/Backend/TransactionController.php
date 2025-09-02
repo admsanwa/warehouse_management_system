@@ -77,8 +77,6 @@ class TransactionController extends Controller
     {
         $validated = $request->validate([
             'item_code' => 'required|string',
-            'po'        => 'nullable|string',
-            'docEntry'  => 'nullable|string',
         ]);
 
         $warehouse = "BK001";
@@ -104,47 +102,15 @@ class TransactionController extends Controller
                 'message' => "Produk tidak ditemukan untuk barcode: {$barcode}. Scan ulang!"
             ]);
         }
-
-        // Build PO params
-        $poParam = [
-            "page"      => 1,
-            "limit"     => 100,
-            "ItemCode"  => $barcode,
-            "DocStatus" => "Open"
-        ];
-        if (!empty($validated['docEntry'])) {
-            $poParam['DocEntry'] = $validated['docEntry'];
-        }
-        if (!empty($validated['po'])) {
-            $poParam['DocNum'] = $validated['po'];
-        }
-
-        $get_po = $this->sap->getPurchaseOrders($poParam);
-
-        if (!Arr::get($get_po, 'success') || empty(Arr::get($get_po, 'data'))) {
-            return response()->json([
-                'success' => false,
-                'message' => "Nomor PO tidak ditemukan untuk barcode: {$barcode}"
-            ]);
-        }
-
-        if ($validated['docEntry'] && $validated['po']) {
-            $poData = Arr::get($get_po, 'data.0', []);
-        } else {
-            $poData = Arr::get($get_po, 'data', []);
-        }
         $item   = Arr::get($items, 'data.0', []);
-
         $warehouseStock = collect(Arr::get($item, 'warehouses', []))
             ->firstWhere('WhsCode', $warehouse);
-
         return response()->json([
             'success'        => true,
             'itemCode'       => Arr::get($item, 'ItemCode'),
             'ItemName'       => Arr::get($item, 'ItemName'),
             'warehouseStock' => $warehouseStock,
             // 'items'          => $items,
-            'poData'         => $poData,
             'message'        => 'Item berhasil di scan!'
         ]);
     }

@@ -94,11 +94,12 @@ class PurchasingController extends Controller
     public function po_search(Request $request)
     {
         $param = [
-            "page" => (int) $request->get('page', 1),
-            "limit" => (int) $request->get('limit', 10),
-            "DocStatus" => $request->get('status'),
+            "limit" => (int) $request->get('limit', 5),
+            "DocStatus" => $request->get('status', 'Open'),
             "ItemCode" => $request->get('code'),
             "DocNum" => $request->get('q'),
+            "DocEntry" => $request->get('docentry'),
+            "Series" => $request->get('series'),
             'page'       => 1,
         ];
 
@@ -113,13 +114,14 @@ class PurchasingController extends Controller
         $poData = collect($orders['data'] ?? [])->map(function ($item) {
             return [
                 'id'   => $item['DocNum'],
+                'entry'   => $item['DocEntry'],
                 'text' => $item['DocNum'] . " - " . $item['CardName'],
             ];
         });
 
         return response()->json([
             'results' => $poData,
-            'api_response' => $orders
+            'po' => $orders['data']
         ]);
     }
 
