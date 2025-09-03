@@ -145,7 +145,7 @@
                                 </div>
                                 <label for="" class="col-sm-4 col-form-lable">No Inventory Transfer :</label>
                                 <div class="col-sm-6">
-                                    <input type="number" name="no_inventory_tf" id="no_inventory_tf"
+                                    <input type="text" name="no_inventory_tf" id="no_inventory_tf"
                                         class="form-control mt-2" placeholder="Masukkan No Inventory Transfer" required>
                                 </div>
                                 <label for="" class="col-sm-4 col-form-lable">Type Inventory Transaction :</label>
