@@ -61,6 +61,22 @@
                                 </div>
 
                                 <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">Planned Qty</label>
+                                    <div class="col-sm-4">: {{ formatDecimalsSAP($getRecord['PlannedQty']) }}</div>
+                                    <label class="col-sm-2 col-form-label">Complete Qty</label>
+                                    <div class="col-sm-4">: {{ formatDecimalsSAP($getRecord['CmpltQty']) }}</div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">Reject Qty</label>
+                                    <div class="col-sm-4">: {{ formatDecimalsSAP($getRecord['RjctQty']) }}</div>
+                                    <label class="col-sm-2 col-form-label">Total Receipt Qty</label>
+                                    <div class="col-sm-4">:
+                                        {{ formatDecimalsSAP($getRecord['CmpltQty'] + $getRecord['RjctQty']) }}</div>
+                                </div>
+
+
+                                <div class="form-group row">
                                     <label class="col-sm-2 col-form-label">Sales Order</label>
                                     <div class="col-sm-4">: {{ $getRecord['OriginNum'] }}</div>
                                     <label class="col-sm-2 col-form-label">Contract Adendum</label>
