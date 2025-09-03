@@ -77,11 +77,12 @@
                                 <label for="" class="col-sm-4 col-form-lable">PO Maklon : </label>
                                 <div class="col-sm-6 mb-2">
                                     @if (!empty($po))
-                                        <input type="number" name="no_po" id="no_po" value="{{ $po }}"
+                                        <input type="number" name="docnum" id="docnum" value="{{ $po }}"
                                             class="form-control mt-2" readonly>
                                     @else
                                         <select name="no_po" id="no_po" class="form-control mt-2">
                                         </select>
+                                        <input type="hidden" name="docnum" id="docnum" value="{{ $po ?? '' }}" />
                                     @endif
                                     <input type="hidden" name="docEntry" id="docEntry" value="{{ $docEntry ?? '' }}" />
                                 </div>
@@ -203,19 +204,30 @@
             const poSelect = $("#no_po");
             // console.log(poSelect.length);
             if (poSelect.is("select")) {
+                poSelect.on("change", function(e) {
+                    const selectedData = $(this).select2('data')[0];
+                    if (!selectedData) {
+                        document.getElementById("docnum").value = "";
+                        document.getElementById("docEntry").value = "";
+                        return;
+                    }
+                    document.getElementById("docnum").value = selectedData.docnum;
+                    document.getElementById("docEntry").value = selectedData.id;
+                });
                 poSelect.select2({
                     placeholder: "Pilih No. PO Maklon",
                     allowClear: true,
                     width: "100%",
+                    minimumInputLength: 3,
                     language: {
                         inputTooShort: function() {
-                            return "Ketik untuk mencari...";
+                            return "Ketik 3 karakter atau lebih";
                         },
                         noResults: function() {
                             return "Tidak ada data ditemukan";
                         },
                         searching: function() {
-                            return "Sedang mencari...";
+                            return "Mohon ditunggu, Sedang mencari...";
                         }
                     },
                     ajax: {
@@ -225,7 +237,7 @@
                         data: function(params) {
                             let searchData = {
                                 q: params.term,
-                                limit: 10,
+                                limit: 5,
                                 // code: 'Maklon',
                                 status: 'Open',
                             }
@@ -236,7 +248,8 @@
                             return {
                                 results: (data.results || []).map(item => ({
                                     id: item.id,
-                                    text: item.text
+                                    text: item.text,
+                                    docnum: item.docnum,
                                 }))
                             };
                         }
