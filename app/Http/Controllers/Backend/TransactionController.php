@@ -669,7 +669,7 @@ class TransactionController extends Controller
                 $entryQty = (float) str_replace(',', '.', str_replace('.', '', $row['qty']));                // Qty baru yang diinput
                 $lines[] = [
                     'BaseEntry'    => (int) $row['BaseEntry'],
-                    'BaseLine'  => (int) $row['BaseLine'],
+                    'BaseLineNum'  => (int) $row['BaseLine'],
                     'Quantity'    => $entryQty,
                     'WhsCode'    =>  $warehouse,
                 ];
@@ -915,8 +915,8 @@ class TransactionController extends Controller
                 $entryQty = (float) str_replace(',', '.', str_replace('.', '', $row['qty']));                // Qty baru yang diinput
                 // untuk API SAP
                 $lines[] = [
-                    'BaseEntry'    => $row['BaseEntry'] ?? '',
-                    'BaseLine'  => $row['BaseLine'] ?? null,
+                    'BaseEntry'    => (int) $row['BaseEntry'],
+                    'BaseLineNum'  => (int) $row['BaseLine'],
                     'Quantity'    =>    $entryQty,
                     'WhsCode'    =>  $warehouse ?? '',
                 ];
