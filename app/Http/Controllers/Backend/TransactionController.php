@@ -873,7 +873,7 @@ class TransactionController extends Controller
 
         try {
             $validated = $request->validate([
-                'prod_order'        => 'nullable',
+                'docnum'        => 'nullable',
                 'remarks'      => 'required|string',
                 'reason'      => 'required|string',
                 'docEntry'      => 'required|string',

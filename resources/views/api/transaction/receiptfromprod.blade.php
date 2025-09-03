@@ -77,11 +77,18 @@
                         <div class="card-body">
                             <div class="form-group row">
                                 <label class="col-sm-4 col-form-label">Nomor Production Order :</label>
-                                <div class="col-sm-6 mb-2">
-                                    <select name="prod_order" id="prod_order" class="form-control mt-2"
-                                        data-docnum="{{ $po ?? '' }}" data-docentry="{{ $docEntry ?? '' }}" required>
-                                        <option value="">Select No Production Order</option>
-                                    </select>
+                                <div class="col-sm-6 mb-2 row">
+                                    <div class="col-lg-4 col-sm-12 mb-2">
+                                        <select name="series" class="form-control" id="seriesSelect"></select>
+                                    </div>
+                                    <div class="col-lg-8 col-sm-12">
+                                        <select name="prod_order" id="prod_order" class="form-control mt-2"
+                                            data-docnum="{{ $po ?? '' }}" data-docentry="{{ $docEntry ?? '' }}"
+                                            required>
+                                            <option value="">Select No Production Order</option>
+                                        </select>
+                                    </div>
+                                    <input type="hidden" name="docnum" id="docnum" value="{{ $docNum ?? '' }}" />
                                     <input type="hidden" name="docEntry" id="docEntry" value="{{ $docEntry ?? '' }}" />
                                 </div>
                                 <label for="" class="col-sm-4 col-form-lable">Production Type:</label>
@@ -192,95 +199,92 @@
             const poSelect = $("#prod_order");
             formatInputDecimals(document.getElementById("on_hand"));
 
-            if (poSelect.length) {
-                const docNum = poSelect.data("docnum");
-                const docEntry = poSelect.data("docentry");
-                poSelect.on("change", function(e) {
-                    const selectedData = $(this).select2('data')[0];
-                    console.log(selectedData);
-                    if (!selectedData) return;
-                    const selectedDocNum = selectedData.id;
-                    const selectedDocEntry = selectedData.entry;
-                    const found = temPoData.find(item => item.DocNum == selectedDocNum && item.DocEntry ===
-                        selectedDocEntry);
-                    selectedPo = found;
-                    if (found) {
-                        console.log("✅ Data ditemukan:", found);
-                        $("#docEntry").val(found.DocEntry || "");
-                        $("#no_io").val(found.U_MEB_NO_IO || "");
-                        $("#no_so").val(found.OriginNum || "");
-                        $("#project").val(found.Project || "");
-                        $("#cost_center").val(found.OcrCode || "");
-                        loadScannedBarcodes();
-                    } else {
-                        console.log("❌ Data tidak ditemukan untuk DocNum:", selectedDocNum);
-                    }
-                });
+            const tBody = document.getElementById('itemRows');
+            const docNum = poSelect.data("docnum");
+            const docEntry = poSelect.data("docentry");
 
-                poSelect.select2({
-                    placeholder: "Pilih No. Production Number",
-                    allowClear: true,
-                    width: "100%",
-                    language: {
-                        inputTooShort: () => "Ketik untuk mencari...",
-                        noResults: () => "Tidak ada data ditemukan",
-                        searching: () => "Sedang mencari...",
+            poSelect.on("change", function(e) {
+                const selectedData = $(this).select2('data')[0];
+                console.log(selectedData);
+                tBody.innerHTML = "";
+                if (!selectedData) {
+                    clearProdData();
+                    return;
+                }
+                const selectedDocEntry = selectedData.id;
+                const selectedDocNum = selectedData.docnum;
+                const found = temPoData.find(item => item.DocNum == selectedDocNum && item.DocEntry ==
+                    selectedDocEntry);
+                selectedPo = found;
+                if (!selectedPo) {
+                    console.log("❌ Data tidak ditemukan untuk DocNum:", selectedDocNum);
+                    clearProdData();
+                    return;
+                }
+                console.log("Prod dipilih:", selectedPo);
+                appendProdData(found);
+                loadScannedBarcodes();
+            });
+
+            poSelect.select2({
+                placeholder: "Pilih No. Production Number",
+                allowClear: true,
+                width: "100%",
+                minimumInputLength: 3,
+                language: {
+                    inputTooShort: function() {
+                        return "Ketik 3 karakter atau lebih";
                     },
-                    ajax: {
-                        url: "/productionOrderSearch",
-                        dataType: "json",
-                        delay: 250,
-                        data: function(params) {
-                            if (docNum && docEntry) {
-                                return {
-                                    q: docNum,
-                                    docEntry: docEntry,
-                                    limit: 1, // karena spesifik
-                                };
-                            }
+                    noResults: () => "Tidak ada data ditemukan",
+                    searching: () => "Mohon ditunggu, sedang mencari...",
+                },
+                ajax: {
+                    url: "/productionOrderSearch",
+                    dataType: "json",
+                    delay: 600,
+                    data: function(params) {
+                        const item_code = document.getElementById("item_code").value;
+
+                        const seriesData = $("#seriesSelect").select2('data');
+                        const series = seriesData.length > 0 ? seriesData[0].id : null;
+
+                        if (docNum && docEntry) {
                             return {
-                                q: params.term,
-                                limit: 10,
+                                q: docNum,
+                                docEntry: docEntry,
+                                series: series,
+                                limit: 1, // karena spesifik
                             };
-                        },
-                        processResults: function(data) {
-                            // console.log("🔥 Response server:", data);
-                            temPoData = data.prods || [];
-                            return {
-                                results: (data.results || []).map(item => ({
-                                    id: item.id,
-                                    text: item.text,
-                                    entry: item.entry,
-                                }))
-                            };
-                        },
+                        }
+                        return {
+                            q: params.term,
+                            series: series,
+                            limit: 5,
+                        };
+                    },
+                    processResults: function(data) {
+                        // console.log("🔥 Response server:", data);
+                        temPoData = data.prods || [];
+                        return {
+                            results: (data.results || []).map(item => ({
+                                id: item.id,
+                                text: item.text,
+                                docnum: item.docnum,
+                            }))
+                        };
+                    },
 
-                        cache: true
-                    }
-                });
+                    cache: true
+                }
+            });
 
-                // === Prepopulate jika ada docNum & docEntry ===
-                // if (docNum && docEntry) {
-                //     $.ajax({
-                //         url: "/productionOrderSearch",
-                //         data: {
-                //             q: docNum,
-                //             docEntry: docEntry,
-                //             limit: 1
-                //         },
-                //         dataType: "json"
-                //     }).then(function(data) {
-                //         if (data.results && data.results.length > 0) {
-                //             temPoData = data.prods || [];
-                //             const item = data.results[0];
-                //             // bikin option default
-                //             const option = new Option(item.text, item.id, item.raw, true, true);
-                //             poSelect.append(option).trigger("change");
-                //         }
-                //     });
-                // }
+            poSelect.on("select2:open", function() {
+                let searchField = document.querySelector(".select2-container .select2-search__field");
+                if (searchField) {
+                    searchField.placeholder = "Ketik disini untuk cari production order";
+                }
+            });
 
-            }
             const whSelect = $("#warehouse");
             if (whSelect.length) {
                 whSelect.select2({
@@ -321,6 +325,45 @@
                     }
                 });
             }
+            $("#seriesSelect").select2({
+                placeholder: "Pilih Series",
+                allowClear: true,
+                width: "100%",
+                language: {
+                    inputTooShort: function() {
+                        return "Ketik kode series untuk mencari...";
+                    },
+                    noResults: function() {
+                        return "Tidak ada data ditemukan";
+                    },
+                    searching: function() {
+                        return "Sedang mencari...";
+                    },
+                },
+                ajax: {
+                    url: "/purchasing/seriesSearch",
+                    dataType: "json",
+                    delay: 250,
+                    data: function(params) {
+                        if (!params) {
+                            return;
+                        }
+                        return {
+                            q: params.term,
+                            ObjectCode: '202'
+                        };
+                    },
+                    processResults: function(data) {
+                        console.log("Response dari server:", data); // cek di console
+                        return {
+                            results: (data.results || []).map(item => ({
+                                id: item.id,
+                                text: item.text
+                            }))
+                        };
+                    }
+                }
+            });
         });
         document.addEventListener("DOMContentLoaded", function() {
             const input = document.getElementById("scannerInput");
@@ -492,12 +535,11 @@
 
             const idx = tBody.rows.length;
             const isIssuedQtyDone = stocks.IssuedQty >= stocks.PlannedQty;
-            if (isIssuedQtyDone) {
-                alert(`Issue qty sudah mencukupi untuk barcode: ${itemCode}`);
-                return true;
-            }
-            let inputQty = isIssuedQtyDone ?
-                'Qty yang di-issue sudah sesuai dengan plan' :
+            // if (isIssuedQtyDone) {
+            //     alert(`Issue qty sudah mencukupi untuk barcode: ${itemCode}`);
+            //     return true;
+            // }
+            let inputQty =
                 `<input type="text" name="stocks[${idx}][qty]" class="form-control" style="min-width:80px !important;" value="0">`;
 
             const row = `
@@ -547,7 +589,7 @@
                 remarks: document.getElementById("remarks")?.value || ""
             };
             const errorMsg = {
-                reason: "Alasan Goods Issue",
+                reason: "Alasan Goods Receipt",
                 // no_surat_jalan: "No Surat Jalan",
                 remarks: "Remarks"
             };
@@ -623,6 +665,26 @@
                 box.classList.remove('show');
                 document.getElementById("scannerInput").focus();
             }, 3000);
+        }
+
+        function appendProdData(data) {
+            $("#docNum").val(data.DocNum || "");
+            $("#docEntry").val(data.DocEntry || "");
+            $("#no_io").val(data.U_MEB_NO_IO || "");
+            $("#no_so").val(data.OriginNum || "");
+            $("#project").val(data.Project || "");
+            $("#cost_center").val(data.OcrCode || "");
+            return;
+        }
+
+        function clearProdData() {
+            $("#docnum").val();
+            $("#docEntry").val("");
+            $("#no_io").val("");
+            $("#no_so").val("");
+            $("#project").val("");
+            $("#cost_center").val("");
+            return;
         }
     </script>
 @endsection

@@ -73,7 +73,7 @@ class ProductionController extends Controller
             "limit" => (int) $request->get('limit', 5),
             "Status" => $request->get('status', 'Released'),
             "DocNum" => $request->get('q'),
-            "Series" => $request->get('seriesx'),
+            "Series" => $request->get('series'),
             "DocEntry" => $request->get('docEntry'),
             "ItemCode" =>  $request->get('code'),
             'page'       => 1,
