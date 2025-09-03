@@ -86,7 +86,7 @@
                                     @endif
                                     <input type="hidden" name="docEntry" id="docEntry" value="{{ $docEntry ?? '' }}" />
                                 </div>
-                                <label for="" class="col-sm-4 col-form-lable">Warehouse:</label>
+                                <label for="" class="col-sm-4 col-form-lable">Default Warehouse:</label>
                                 <div class="col-sm-6 mb-2">
                                     <select name="warehouse" id="warehouse" class="form-control mt-2" required>
                                         <option value="" disabled selected>Pilih Warehouse</option>
