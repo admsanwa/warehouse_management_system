@@ -623,7 +623,7 @@
                         showToast("✅ Berhasil " + data.message, "success");
                         btn.disabled = false;
                         setTimeout(() => {
-                            window.location.reload();
+                            // window.location.reload();
                         }, 800)
                     } else {
                         if (data.errors) {
