@@ -885,9 +885,7 @@ class TransactionController extends Controller
                 'prod_type'      => 'nullable|string',
                 'stocks'                       => 'required|array|min:1',
                 'stocks.*.BaseEntry'            => 'required|string',
-                'stocks.*.BaseLine'          => 'nullable|string',
                 'stocks.*.qty'                 => 'required|string',
-                'stocks.*.UnitMsr'             => 'nullable|string',
             ]);
 
             $warehouse = $validated['warehouse'] ?? '';
@@ -916,8 +914,7 @@ class TransactionController extends Controller
                 // untuk API SAP
                 $lines[] = [
                     'BaseEntry'    => (int) $row['BaseEntry'],
-                    'BaseLineNum'  => (int) $row['BaseLine'],
-                    'Quantity'    =>    $entryQty,
+                    'Quantity'    =>  (int)  $entryQty,
                     'WhsCode'    =>  $warehouse ?? '',
                 ];
 

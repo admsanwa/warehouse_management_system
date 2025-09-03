@@ -160,7 +160,7 @@
                                         <th>Item Code</th>
                                         <th>Item Desc</th>
                                         <th>Planned Qty</th>
-                                        <th>Issued Qty</th>
+                                        <th>Receipt Qty</th>
                                         <th>Qty</th>
                                         <th>Uom</th>
                                         <th>Delete</th>
@@ -510,69 +510,48 @@
             if (!selectedPo || selectedPo.length <= 0) {
                 return;
             }
+
             const tBody = document.getElementById("itemRows");
             const itemCode = document.getElementById("item_code").value;
             const docEntry = document.getElementById("docEntry").value;
+
             if (!itemCode) {
                 alert("Harap Scan Barcode terlebih dulu!");
                 return;
             }
-            console.log("Items", selectedPo['Lines']);
-            console.log("Item", itemCode);
-            const lines = selectedPo['Lines'] || [];
-            console.log("🔍 Semua ItemCode dalam PO:", lines.map(l => l.ItemCode));
 
-            const stocks = lines.find(item => item.ItemCode === itemCode);
 
-            if (!stocks) {
-                console.warn(`❌ Item '${itemCode}' tidak ditemukan di dalam Lines`);
-                showToast(
-                    `❌ Gagal Menambahkan\nItem Code ${itemCode} Tidak Ditemukan untuk Production Order`,
-                    "error"
-                );
+            const stocks = selectedPo;
+            if (itemCode != stocks.ItemCode) {
+                alert(`Item dengan kode ${itemCode} tidak sesuai dengan nomor PO yang dipilih.`);
                 return false;
             }
-
             const idx = tBody.rows.length;
-            const isIssuedQtyDone = stocks.IssuedQty >= stocks.PlannedQty;
-            // if (isIssuedQtyDone) {
-            //     alert(`Issue qty sudah mencukupi untuk barcode: ${itemCode}`);
-            //     return true;
-            // }
             let inputQty =
                 `<input type="text" name="stocks[${idx}][qty]" class="form-control" style="min-width:80px !important;" value="0">`;
-
+            const totalReceiptQty = (stocks.CmpltQty || 0) + (stocks.RjctQty || 0);
             const row = `
-                    <tr>
-                        <td>${idx + 1}</td>
-                        <td>
-                            ${stocks.ItemCode}
-                            <input type="hidden" name="stocks[${idx}][BaseEntry]" value="${docEntry}">
-                        </td>
-                        <td>
-                            ${stocks.ItemName}
-                            <input type="hidden" name="stocks[${idx}][BaseLine]" value="${stocks.LineNum}">
-                        </td>
-                        <td>
-                            ${formatDecimalsSAP(stocks.PlannedQty)}
-                        </td>
-                        <td>
-                            ${formatDecimalsSAP(stocks.IssuedQty)}
-                        </td>
-                        <td>
-                            ${inputQty}
-                        <td>
-                            ${stocks.InvntryUoM ?? ""}
-                            <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${stocks.InvntryUoM ?? ""}">
-                        </td>
-                        <td>
-                            <button type="button" onclick="deleteItem(this)" class="btn btn-danger btn-sm">
-                                <i class="fa fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    `;
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td>
+                        ${stocks.ItemCode}
+                        <input type="hidden" name="stocks[${idx}][BaseEntry]" value="${docEntry}">
+                    </td>
+                    <td>${stocks.ItemName}</td>
+                    <td>${formatDecimalsSAP(stocks.PlannedQty)}</td>
+                    <td>${formatDecimalsSAP(totalReceiptQty)}</td>
+                    <td>${inputQty}</td>
+                    <td>${stocks.InvntryUoM ?? ""}</td>
+                    <td>
+                        <button type="button" onclick="deleteItem(this)" class="btn btn-danger btn-sm">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+
             tBody.insertAdjacentHTML("beforeend", row);
+
             const newInput = tBody.querySelector(`input[name="stocks[${idx}][qty]"]`);
             if (newInput) {
                 formatInputDecimals(newInput);
@@ -620,7 +599,7 @@
                         showToast("✅ Berhasil " + data.message, "success");
                         btn.disabled = false;
                         setTimeout(() => {
-                            window.location.reload();
+                            // window.location.reload();
                         }, 1000)
                     } else {
                         hideLoadingOverlay();
