@@ -278,7 +278,7 @@ class ItemsController extends Controller
         $wh = collect($get['data'] ?? [])->map(function ($val) {
             return [
                 'id'   => $val['OcrCode'],
-                'text' => $val['OcrName'],
+                'text' => $val['OcrCode'],
             ];
         });
 
