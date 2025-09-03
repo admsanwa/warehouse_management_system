@@ -1488,26 +1488,26 @@ class TransactionController extends Controller
         }
 
         // Build PO params
-        $poData = [];
-        $get_po = [];
-        if (!empty($validated['docEntry']) && !empty($validated['po'])) {
-            $poParam = [
-                "page"      => 1,
-                "limit"     => 1,
-                "DocStatus" => "Open"
-            ];
-            $poParam['DocEntry'] = $validated['docEntry'];
-            $poParam['DocNum'] = $validated['po'];
-            $get_po = $this->sap->getPurchaseOrders($poParam);
+        // $poData = [];
+        // $get_po = [];
+        // if (!empty($validated['docEntry']) && !empty($validated['po'])) {
+        //     $poParam = [
+        //         "page"      => 1,
+        //         "limit"     => 1,
+        //         "DocStatus" => "Open"
+        //     ];
+        //     $poParam['DocEntry'] = $validated['docEntry'];
+        //     $poParam['DocNum'] = $validated['po'];
+        //     $get_po = $this->sap->getPurchaseOrders($poParam);
 
-            if (!Arr::get($get_po, 'success') || empty(Arr::get($get_po, 'data'))) {
-                return response()->json([
-                    'success' => false,
-                    'message' => "Nomor PO untuk barcode {$barcode} tidak ditemukan. Silakan periksa kembali status Nomor PO."
-                ]);
-            }
-            $poData = Arr::get($get_po, 'data.0', []);
-        }
+        //     if (!Arr::get($get_po, 'success') || empty(Arr::get($get_po, 'data'))) {
+        //         return response()->json([
+        //             'success' => false,
+        //             'message' => "Nomor PO untuk barcode {$barcode} tidak ditemukan. Silakan periksa kembali status Nomor PO."
+        //         ]);
+        //     }
+        //     $poData = Arr::get($get_po, 'data.0', []);
+        // }
 
         $item   = Arr::get($items, 'data.0', []);
         $warehouseStock = collect(Arr::get($item, 'warehouses', []))
@@ -1519,7 +1519,7 @@ class TransactionController extends Controller
             'ItemName'       => Arr::get($item, 'ItemName'),
             'warehouseStock' => $warehouseStock,
             'items'          => $items['data'],
-            'poData'         => $poData,
+            // 'poData'         => $poData,
             'message'        => 'Item berhasil di scan!'
         ]);
     }
@@ -1532,7 +1532,7 @@ class TransactionController extends Controller
 
         try {
             $validated = $request->validate([
-                'no_po'        => 'nullable',
+                'docnum'        => 'nullable',
                 'remarks'      => 'required|string',
                 'no_surat_jalan'      => 'nullable|string',
                 'no_inventory_tf'      => 'nullable|string',
@@ -1573,7 +1573,7 @@ class TransactionController extends Controller
                     "Ref2" => $validated['ref_surat_jalan'] ?? '',
                     "U_SI_IT" => $validated['no_inventory_tf'] ?? '',
                     "U_MEB_Type_Inv_Trans" => $validated['type_inv_transaction'] ?? '',
-                    "U_MEB_PONo_Maklon" => $validated['no_po'] ?? null,
+                    "U_MEB_PONo_Maklon" => $validated['docnum'] ?? null,
                     "U_MEB_DIST_RULE" =>  $ocr
                 ],
                 'Lines'       => []
