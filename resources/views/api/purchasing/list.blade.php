@@ -202,6 +202,24 @@
     <script>
         window.addEventListener("load", function() {
             const selectSeries = $("#seriesSelect");
+            let selectedSeries = "{{ request()->series }}";
+            console.log(selectedSeries);
+            if (selectedSeries) {
+                $.ajax({
+                    url: "/purchasing/seriesSearch",
+                    data: {
+                        Series: selectedSeries,
+                        ObjectCode: "22"
+                    },
+                    dataType: "json"
+                }).then(function(data) {
+                    if (data.results && data.results.length > 0) {
+                        let item = data.results[0]; // ambil hasil pertama
+                        let option = new Option(item.text, item.id, true, true);
+                        selectSeries.append(option).trigger("change");
+                    }
+                });
+            }
             selectSeries.select2({
                 placeholder: "Ketik kode series...",
                 allowClear: true,

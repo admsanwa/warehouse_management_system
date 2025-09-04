@@ -31,7 +31,7 @@ class PurchasingController extends Controller
             "limit" => (int) $request->get('limit', 5),
             "DocStatus" => $request->get('docStatus', 'Open'),
             "DocNum" => $request->get('docNum'),
-            "DocDueDate" => $request->get('docDueDate'),
+            "DocDueDate" => formatDateSlash($request->get('DocDueDate')),
             "CardName" =>  $request->get('cardName'),
             "DocDate" => formatDateSlash($request->get('docDate')),
             "Series" =>  $request->get('series')
