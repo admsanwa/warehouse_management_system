@@ -8,6 +8,7 @@ use App\Http\Controllers\Backend\JobsController;
 use App\Http\Controllers\Backend\DashboardController;
 use App\Http\Controllers\Backend\DeliveryController;
 use App\Http\Controllers\Backend\EmployeesController;
+use App\Http\Controllers\Backend\InventorytfController;
 use App\Http\Controllers\Backend\ItemsController;
 use App\Http\Controllers\Backend\ListTransactionsController;
 use App\Http\Controllers\Backend\ProductionController;
@@ -122,6 +123,11 @@ Route::group(['middleware' => 'admin'], function () {
 
     // stock
     Route::get('admin/stock', [StockController::class, 'index']);
+
+    // inventorytf
+    Route::get('admin/inventorytf/create', [InventorytfController::class, 'create']);
+    Route::get('admin/inventorytf/list', [InventorytfController::class, 'list']);
+    Route::get('admin/inventorytf/view', [InventorytfController::class, 'view']);
 
     // transaction
     // stockin

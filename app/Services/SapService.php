@@ -126,6 +126,20 @@ class SapService
         return $response->json();
     }
 
+    public function getInventoryTransfers($param)
+    {
+        $response = Http::withHeaders([
+            'Accept'     => 'application/json',
+            'X-API-Key'  => $this->apiKey,
+        ])->timeout(60)->get("{$this->baseUrl}/api/inbound/inventory-transfers", $param);
+
+        if ($response->failed()) {
+            throw new \Exception('Failed to fetch: ' . $response->body());
+        }
+
+        return $response->json();
+    }
+
     public function postGrpo($param)
     {
         $response = Http::withHeaders([
