@@ -33,11 +33,9 @@ class PurchasingController extends Controller
             "DocNum" => $request->get('docNum'),
             "DocDueDate" => $request->get('docDueDate'),
             "CardName" =>  $request->get('cardName'),
+            "DocDate" => formatDateSlash($request->get('docDate')),
             "Series" =>  $request->get('series')
         ];
-        if ($request->get('docDate')) {
-            $param['DocDate'] = date("Y/m/d", strtotime($request->get('docDate')));
-        }
 
         $orders = $this->sap->getPurchaseOrders($param);
         if (empty($orders) || $orders['success'] !== true) {

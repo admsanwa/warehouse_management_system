@@ -34,7 +34,7 @@
                                         <div class="form-group col-md-2">
                                             <label for="">Posting Date</label>
                                             <input type="date" name="docDate" class="form-control"
-                                                value="{{ Request()->docDate ? date('Y-m-d', strtotime(Request()->docDate)) : '' }}">
+                                                value="{{ Request()->docDate }}">
                                         </div>
                                         {{-- <div class="form-group col-md-2">
                                             <label for="">Delivery Date</label>

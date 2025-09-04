@@ -26,3 +26,11 @@ if (!function_exists('formatDecimalsSAP')) {
         return number_format($value, $decimals, ',', '.');
     }
 }
+
+
+if (! function_exists('formatDateSlash')) {
+    function formatDateSlash($date)
+    {
+        return $date ? date('Y/m/d', strtotime($date)) : null;
+    }
+}
