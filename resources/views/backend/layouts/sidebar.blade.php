@@ -243,6 +243,42 @@
         </nav>
         @endif
 
+        {{-- Inventory Tf --}}
+        @if ($authDept == 'Quality Control' || $authDept == 'IT' || $authDept == 'Procurement, Installation and Delivery' && $authLevel == "Manager" ||
+            $authDept == "Production and Warehouse" || $authDept == 'Production')
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <li class="nav-item {{Request::is("admin/inventorytf/*") ? "menu-open" : "" }}">
+                    <a href="#inventorytfSubMenu" data-toggle="collapse" aria-expanded="{{ Request::is("admin/inventorytf/*") ? 'true' : 'false'}}" class="nav-link">
+                        <i class="nav-icon fa fa-file-import"></i>
+                        <p>
+                            Inventory Transfer
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+
+                    <ul class="collapse list-unstyled {{ Request::is("admin/inventorytf/*") ? "show" : ""}} itemSubMenu" id="inventorytfSubMenu">
+                        @if ($authDept == "Procurement, Installation and Delivery" || $authDept == "IT" || $authDept == "Quality Control" || $authDept == "Production and Warehouse" 
+                        || $authDept == "Production")
+                        <li class="nav-item">
+                            <a href="{{ url("admin/inventorytf/create") }}" class="nav-link @if (Request::is("admin/inventorytf/create")) active @endif">
+                                <p>Create</p>
+                            </a>
+                        </li>
+                        @endif
+                        @if ($authDept == "IT" || $authDept == "Quality Control" || $authDept == "Production and Warehouse")
+                        <li class="nav-item">
+                            <a href="{{ url("admin/inventorytf/list") }}" class="nav-link @if (Request::is("admin/inventorytf/list")) active @endif">
+                                <p>List</p>
+                            </a>
+                        </li>
+                        @endif
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+        @endif
+
         {{-- Transactions --}}
         @if ($authDept == "IT" || ($authDept == "Production and Warehouse" && $authLevel != 'Manager' && $authLevel != 'Supervisor') || $authDept == 'Production')
         <nav class="mt-2">

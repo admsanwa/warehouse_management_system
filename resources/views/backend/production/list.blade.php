@@ -5,11 +5,11 @@
             <div class="container-fluid">
                 <div class="row mb-12">
                     <div class="col col-sm-6">
-                        <h1>Production</h1>
+                        <h1>Production Order</h1>
                     </div>
                     <div class="col col-sm-6">
                         <ol class="breadcrumb justify-content-end">
-                            <a href="{{ url('admin/production/upload')}}" class="btn btn-primary btn-sm"><i class="fa fa-upload"></i> Upload Data</a>
+                            <a href="{{ url('admin/production/upload')}}" class="btn btn-primary btn-sm"><i class="fa fa-upload"></i> Upload</a>
                         </ol>
                     </div>
                 </div>
@@ -23,23 +23,23 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">
-                                    Search Production List
+                                    Search Production Order List
                                 </h3>
                             </div>
                             <form action="" method="get">
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="form-group col-md-2">
-                                            <label for="">IO No</label>
-                                            <input type="text" name="io_no" class="form-control" placeholder="Enter Nomor IO">
+                                            <label for="">Number</label>
+                                            <input type="number" name="number" class="form-control" placeholder="Enter Number Inventory Tf">
                                         </div>
                                         <div class="form-group col-md-2">
-                                            <label for="">Doc Number</label>
-                                            <input type="number" name="doc_num" class="form-control" placeholder="Enter Doc Nomor">
+                                            <label for="">Date</label>
+                                            <input type="date" name="DocDate" class="form-control">
                                         </div>
                                         <div class="form-group col-md-2">
-                                            <label for="">Product No</label>
-                                            <input type="text" name="prod_no" class="form-control" placeholder="Enter Product Nomor">
+                                            <label for="">IO</label>
+                                            <input type="text" name="U_MEB_NO_IO" class="form-control" placeholder="Enter IO Nomor">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Product Desc</label>

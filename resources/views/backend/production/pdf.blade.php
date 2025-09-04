@@ -35,12 +35,12 @@
 
         .qrcode img {
             width: 28mm;
-            height: 28mm;
+            height: 25mm;
         }
 
         .text {
             margin-left: 1mm;
-            width: 58mm;  /* batasi lebar text agar tidak nempel ke kanan */
+            width: 56mm;  /* batasi lebar text agar tidak nempel ke kanan */
             flex-direction: column;
             justify-content: center;
             text-align: center;
