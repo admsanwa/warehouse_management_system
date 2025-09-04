@@ -910,11 +910,11 @@ class TransactionController extends Controller
 
             $lines        = [];
             foreach ($validated['stocks'] as $row) {
-                $entryQty = (float) str_replace(',', '.', str_replace('.', '', $row['qty']));                // Qty baru yang diinput
+                $entryQty = (float) str_replace(',', '.', str_replace('.', '', $row['qty']));
                 // untuk API SAP
                 $lines[] = [
                     'BaseEntry'    => (int) $row['BaseEntry'],
-                    'Quantity'    =>  (int)  $entryQty,
+                    'Quantity'    => $entryQty,
                     'WhsCode'    =>  $warehouse ?? '',
                 ];
 
