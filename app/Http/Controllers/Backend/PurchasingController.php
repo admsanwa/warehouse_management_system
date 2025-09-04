@@ -134,6 +134,7 @@ class PurchasingController extends Controller
             'Locked'     => 'N', // Terbuka
             'ObjectCode' => $request->get('ObjectCode'),
             'SeriesName' => $searchQuery,
+            'Series' => $request->get('Series'),
         ];
 
         $getSeries = $this->sap->getSeries($param);
