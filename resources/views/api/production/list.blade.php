@@ -32,7 +32,7 @@
                                     <div class="row">
                                         <div class="form-group col-md-2">
                                             <label for="">Date</label>
-                                            <input type="date" name="DocDate" class="form-control">
+                                            <input type="date" name="date" class="form-control">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">IO No</label>
