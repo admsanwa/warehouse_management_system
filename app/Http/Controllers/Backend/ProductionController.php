@@ -41,6 +41,7 @@ class ProductionController extends Controller
         $param = [
             "page" => (int) $request->get('page', 1),
             "limit" => (int) $request->get('limit', 50),
+            "DueDate" => $request->get('date'),
             "DocNum" => $request->get('doc_num'),
             "U_MEB_NO_IO" => $request->get('io_no'),
             "ItemCode" =>  $request->get('prod_no'),

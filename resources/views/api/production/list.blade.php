@@ -31,6 +31,10 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="form-group col-md-2">
+                                            <label for="">Date</label>
+                                            <input type="date" name="DocDate" class="form-control">
+                                        </div>
+                                        <div class="form-group col-md-2">
                                             <label for="">IO No</label>
                                             <input type="text" name="io_no" class="form-control"
                                                 placeholder="Enter Nomor IO" value="{{ Request()->io_no }}">
