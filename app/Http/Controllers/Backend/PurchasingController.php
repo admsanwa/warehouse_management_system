@@ -42,7 +42,9 @@ class PurchasingController extends Controller
             return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
         }
 
-        $totalPages = ceil($orders['total'] / $param['limit']);
+        $currentCount = $orders['total'] ?? count($orders['data'] ?? []);
+        $totalPages = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
+
 
         return view('api.purchasing.list', [
             'orders'      => $orders['data'] ?? [],

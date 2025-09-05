@@ -32,7 +32,9 @@ class ItemsController extends Controller
         $user           = Auth::user()->username;
         $getItems      = $this->sap->getItems($param);
         $addedBarcodes  = BarcodeModel::where('username', $user)->latest()->take(5)->get();
-        $totalPages = ceil($getItems['total'] / $param['limit']);
+
+        $currentCount = $getItems['total'] ?? count($getItems['data'] ?? []);
+        $totalPages = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
 
         return view("api.items.barcode", [
             'items'      => $getItems['data'] ?? [],
@@ -144,11 +146,11 @@ class ItemsController extends Controller
     {
         $param = [
             'ItemCode' => $request->get('item_code'),
-            "WhsCode" =>  'BK001',
+            // "WhsCode" =>  'BK001',
             "ItemName" => $request->get('item_desc'),
             "page" => (int) $request->get('page', 1),
             "limit" => (int) $request->get('limit', 10),
-            'Status' => (int) $request->get('stockNotes')
+            // 'Status' => (int) $request->get('stockNotes')
         ];
         $getRecord      = $this->sap->getStockItems($param);
 
@@ -156,15 +158,16 @@ class ItemsController extends Controller
             return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
         }
 
-        $totalPages = ceil($getRecord['total'] / $param['limit']);
+        $currentCount = $getRecord['total'] ?? count($getRecord['data'] ?? []);
+        $totalPages = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
         return view("api.items.list", [
             'getRecord'      => $getRecord['data'] ?? [],
             'page'        => $getRecord['page'],
             'limit'       => $getRecord['limit'],
             'total'       => $getRecord['total'],
             'totalPages'  => $totalPages,
-            'stockNotes' => $request->get('stockNotes', 2),
-            'defaultWh' => $param['WhsCode'],
+            'stockNotes' => $request->get('stockNotes', ''),
+            'defaultWh' => 'BK001',
             'stockStatus' => [
                 '' => 'Semua',
                 0 => 'Stock tidak harus dibeli',

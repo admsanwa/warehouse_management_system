@@ -20,7 +20,7 @@ class StockController extends Controller
     {
         $param = [
             'ItemCode' => $request->get('item_code'),
-            "WhsCode" =>  'BK001',
+            // "WhsCode" =>  'BK001',
             "ItemName" => $request->get('item_desc'),
             "page" => (int) $request->get('page', 1),
             "limit" => (int) $request->get('limit', 10),
@@ -31,7 +31,8 @@ class StockController extends Controller
             return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
         }
 
-        $totalPages = ceil($getRecord['total'] / $param['limit']);
+        $currentCount = $getProds['total'] ?? count($getProds['data'] ?? []);
+        $totalPages = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
         return view("api.stock.list", [
             'getRecord'      => $getRecord['data'] ?? [],
             'page'        => $getRecord['page'],

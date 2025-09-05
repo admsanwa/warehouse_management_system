@@ -366,8 +366,10 @@ class ProductionController extends Controller
         }
         $user          = Auth::user()->username;
         $addedBarcodes = BarcodeProductionModel::where('username', $user)->latest()->take(5)->get();
-        $totalPages = ceil($getProds['total'] / $param['limit']);
-        // dd($getProd);
+        // $totalPages = ceil($getProds['total'] / $param['limit']);
+        $currentCount = $getProds['total'] ?? count($getProds['data'] ?? []);
+        $totalPages = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
+
         return view("api.production.barcode",  [
             'prods'      => $getProds['data'] ?? [],
             'page'        => $getProds['page'],

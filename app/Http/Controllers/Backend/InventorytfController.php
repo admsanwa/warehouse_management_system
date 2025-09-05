@@ -33,7 +33,9 @@ class InventorytfController extends Controller
         if (empty($getInvtf) || $getInvtf['success'] !== true) {
             return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
         }
-        $totalPages = ceil($getInvtf['total'] / $param['limit']);
+        $currentCount = $getInvtf['total'] ?? count($getInvtf['data'] ?? []);
+        $totalPages = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
+
         return view('api.inventorytf.list', [
             'getInvtf'      => $getInvtf['data'],
             'page'        => $getInvtf['page'],

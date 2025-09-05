@@ -108,7 +108,6 @@
                                                 {{-- @endif --}}
                                             @endforeach
                                         </tbody>
-
                                     </table>
                                 </div>
                             </div>
@@ -121,24 +120,30 @@
                                         Showing page <b class="text-primary">{{ $page }}</b> of
                                         {{ $totalPages }} (Total {{ $total }} records)
                                     </span>
+
                                     <div class="btn-group">
+                                        {{-- First + Previous --}}
                                         @if ($page > 1)
-                                            <a href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['page' => 1, 'limit' => $limit])) }}"
-                                                class="btn btn-outline-primary btn-sm" aria-label="First Page">First</a>
+                                            {{-- <a href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['page' => 1, 'limit' => $limit])) }}"
+                                                class="btn btn-outline-primary btn-sm" aria-label="First Page">First</a> --}}
 
                                             <a href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['page' => $page - 1, 'limit' => $limit])) }}"
                                                 class="btn btn-outline-primary btn-sm"
                                                 aria-label="Previous Page">Previous</a>
                                         @endif
+
+                                        {{-- Current Page --}}
                                         <span class="btn btn-primary btn-sm disabled">
                                             {{ $page }}
                                         </span>
+
+                                        {{-- Next + Last --}}
                                         @if ($page < $totalPages)
                                             <a href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['page' => $page + 1, 'limit' => $limit])) }}"
                                                 class="btn btn-outline-primary btn-sm" aria-label="Next Page">Next</a>
-
+                                            {{-- 
                                             <a href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['page' => $totalPages, 'limit' => $limit])) }}"
-                                                class="btn btn-outline-primary btn-sm" aria-label="Last Page">Last</a>
+                                                class="btn btn-outline-primary btn-sm" aria-label="Last Page">Last</a> --}}
                                         @endif
                                     </div>
                                 </div>

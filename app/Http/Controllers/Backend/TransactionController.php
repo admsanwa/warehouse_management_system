@@ -84,7 +84,7 @@ class TransactionController extends Controller
 
         $items = $this->sap->getStockItems([
             'ItemCode' => $barcode,
-            'WhsCode'  => $warehouse,
+            // 'WhsCode'  => $warehouse,
             'limit'    => 1,
             'page'     => 1
         ]);
@@ -532,7 +532,7 @@ class TransactionController extends Controller
         $barcode   = $validated['item_code'];
         $items = $this->sap->getStockItems([
             'ItemCode' => $barcode,
-            'WhsCode'  => $warehouse,
+            // 'WhsCode'  => $warehouse,
             'limit'    => 1,
             'page'     => 1
         ]);
@@ -833,7 +833,7 @@ class TransactionController extends Controller
         $barcode   = $validated['item_code'];
         $items = $this->sap->getStockItems([
             'ItemCode' => $barcode,
-            'WhsCode'  => $warehouse,
+            // 'WhsCode'  => $warehouse,
             'limit'    => 1,
             'page'     => 1
         ]);
@@ -1120,7 +1120,7 @@ class TransactionController extends Controller
 
         $items = $this->sap->getStockItems([
             'ItemCode' => $barcode,
-            'WhsCode'  => $warehouse,
+            // 'WhsCode'  => $warehouse,
             'limit'    => 1,
             'page'     => 1
         ]);
@@ -1464,7 +1464,7 @@ class TransactionController extends Controller
 
         $items = $this->sap->getStockItems([
             'ItemCode' => $barcode,
-            'WhsCode'  => $warehouse,
+            // 'WhsCode'  => $warehouse,
             'limit'    => 1,
             'page'     => 1
         ]);
