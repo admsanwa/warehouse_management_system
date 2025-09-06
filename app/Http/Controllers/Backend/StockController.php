@@ -40,7 +40,7 @@ class StockController extends Controller
             'total'       => $getRecord['total'],
             'totalPages'  => $totalPages,
             'stockNotes' => $request->get('stockNotes', 2),
-            'defaultWh' => $param['WhsCode'],
+            'defaultWh' => 'BK001',
         ]);
     }
 
