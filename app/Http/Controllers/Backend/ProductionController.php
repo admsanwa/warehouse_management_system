@@ -23,6 +23,8 @@ use Illuminate\Support\Arr;
 use App\Models\User;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\MailBonApproval;
+use App\Notifications\MailBonFinal;
+use App\Notifications\MailMemoFinal;
 use App\Notifications\MailMemoApproval;
 use Barryvdh\DomPDF\Facade\Pdf;
 
@@ -330,7 +332,7 @@ class ProductionController extends Controller
     {
         $no     = $request->input("no_memo");
         $user   = Auth::user();
-        // $purchasing_users = User::where("department", "Purchasing")->get();
+        $recipients = User::where("department", "Production and Warehouse")->get();
 
         $sign               = new SignModel();
         $sign->no_memo      = $no;
@@ -339,10 +341,14 @@ class ProductionController extends Controller
         $sign->sign         = 1;
         $sign->save();
 
-        // Notification::send($purchasing_users, new MailMemoApproval(
-        //     $no,
-        //     url('admin/production/listmemo')
-        // ));
+        $dev_users = User::where('department', 'IT')->get();
+        // merge collections
+        $recipients = $recipients->merge($dev_users);
+
+        Notification::send($recipients, new MailMemoFinal(
+            $no,
+            url('admin/production/listmemo')
+        ));
         return response()->json([
             'success' => true,
             'message' => "Successfully approve to production"
@@ -580,7 +586,7 @@ class ProductionController extends Controller
         // merge collections
         $recipients = $recipients->merge($dev_users);
 
-        Notification::send($recipients, new MailBonApproval(
+        Notification::send($recipients, new MailBonFinal(
             $no,
             url('admin/production/listbon')
         ));
