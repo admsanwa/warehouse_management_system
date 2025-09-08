@@ -45,6 +45,7 @@ class ItemsController extends Controller
             'addedBarcodes'  => $addedBarcodes,
         ]);
     }
+
     public function index_old(Request $request)
     {
         $user           = Auth::user()->username;

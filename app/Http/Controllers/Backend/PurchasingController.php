@@ -28,7 +28,7 @@ class PurchasingController extends Controller
     {
         $param = [
             "page" => (int) $request->get('page', 1),
-            "limit" => (int) $request->get('limit', 5),
+            "limit" => (int) $request->get('limit', 50),
             "DocStatus" => $request->get('docStatus', 'Open'),
             "DocNum" => $request->get('docNum'),
             "DocDueDate" => formatDateSlash($request->get('DocDueDate')),

@@ -32,8 +32,8 @@
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Item Desc</label>
-                                            <input type="text" name="item" class="form-control"
-                                                value="{{ Request()->item }}" placeholder="Enter Item Name">
+                                            <input type="text" name="item_desc" class="form-control"
+                                                value="{{ Request()->item_desc }}" placeholder="Enter Item Name">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="stockNotes">Status Notes</label>
@@ -71,7 +71,7 @@
                                         <thead>
                                             <tr>
                                                 <th>No</th>
-                                                <th>Warehouse</th>
+                                                {{-- <th>Warehouse</th> --}}
                                                 <th>Item Code</th>
                                                 <th>Item Desc</th>
                                                 <th>Stock SAP</th>
@@ -93,7 +93,7 @@
                                                 {{-- @if ($filter === '' || ($filter === '1' && (string) $warehouseStock['Status'] === '1') || ($filter === '0' && (string) $warehouseStock['Status'] === '0')) --}}
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
-                                                    <td>{{ $warehouseStock['WhsCode'] ?? 'N/A' }}</td>
+                                                    {{-- <td>{{ $warehouseStock['WhsCode'] ?? 'N/A' }}</td> --}}
                                                     <td>{{ $stock['ItemCode'] ?? 'N/A' }}</td>
                                                     <td>{{ $stock['ItemName'] ?? 'N/A' }}</td>
                                                     <td>{{ formatDecimalsSAP($warehouseStock['OnHand']) ?? 'N/A' }}</td>

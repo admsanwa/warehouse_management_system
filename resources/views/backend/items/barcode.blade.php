@@ -35,8 +35,8 @@
                                         </div>
                                         <div class="form-group col-md-3">
                                             <label for="">Item Desc</label>
-                                            <input type="text" name="name" value="{{ Request()->name }}"
-                                                class="form-control" placeholder="Enter Item Name">
+                                            <input type="text" name="item_desc" value="{{ Request()->item_desc }}"
+                                                class="form-control" placeholder="Enter Item Desc">
                                         </div>
 
                                         <div class="form-group col-md-2">
