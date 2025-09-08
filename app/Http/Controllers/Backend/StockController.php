@@ -20,7 +20,6 @@ class StockController extends Controller
     {
         $param = [
             'ItemCode' => $request->get('item_code'),
-            // "WhsCode" =>  'BK001',
             "ItemName" => $request->get('item_desc'),
             "page" => (int) $request->get('page', 1),
             "limit" => (int) $request->get('limit', 10),
@@ -39,8 +38,8 @@ class StockController extends Controller
             'limit'       => $getRecord['limit'],
             'total'       => $getRecord['total'],
             'totalPages'  => $totalPages,
-            'stockNotes' => $request->get('stockNotes', 2),
-            'defaultWh' => 'BK001',
+            'stockNotes' => $request->get('stockNotes', ''),
+            'defaultWh' => $request->get('warehouse', 'BK001'),
         ]);
     }
 

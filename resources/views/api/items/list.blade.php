@@ -37,7 +37,7 @@
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="stockNotes">Status Notes</label>
-                                            <select name="stockNotes" id="stockNotes" class="form-control">
+                                            <select name="stockNotes" id="stockNotes" class="form-control" disabled>
                                                 @foreach ($stockStatus as $value => $label)
                                                     <option value="{{ $value }}"
                                                         {{ (string) request()->stockNotes === (string) $value ? 'selected' : '' }}>
@@ -46,7 +46,11 @@
                                                 @endforeach
                                             </select>
                                         </div>
-
+                                        <div class="form-group col-md-2">
+                                            <label for="warehouse">Warehouse</label>
+                                            <select name="warehouse" id="warehouse" class="form-control">
+                                            </select>
+                                        </div>
                                         <div class="form-group col-md-3">
                                             <button type="submit" class="btn btn-primary" style="margin-top: 30px"><i
                                                     class="fa fa-search"></i> Search</button>
@@ -71,7 +75,7 @@
                                         <thead>
                                             <tr>
                                                 <th>No</th>
-                                                {{-- <th>Warehouse</th> --}}
+                                                <th>Warehouse</th>
                                                 <th>Item Code</th>
                                                 <th>Item Desc</th>
                                                 <th>Stock SAP</th>
@@ -93,7 +97,7 @@
                                                 {{-- @if ($filter === '' || ($filter === '1' && (string) $warehouseStock['Status'] === '1') || ($filter === '0' && (string) $warehouseStock['Status'] === '0')) --}}
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
-                                                    {{-- <td>{{ $warehouseStock['WhsCode'] ?? 'N/A' }}</td> --}}
+                                                    <td>{{ $warehouseStock['WhsCode'] ?? 'N/A' }}</td>
                                                     <td>{{ $stock['ItemCode'] ?? 'N/A' }}</td>
                                                     <td>{{ $stock['ItemName'] ?? 'N/A' }}</td>
                                                     <td>{{ formatDecimalsSAP($warehouseStock['OnHand']) ?? 'N/A' }}</td>
@@ -154,4 +158,52 @@
             </div>
         </section>
     </div>
+    <script>
+        window.addEventListener("load", function() {
+
+            const whSelect = $("#warehouse");
+            if (whSelect.length) {
+                let selectedSeries = "{{ request()->warehouse ?? 'BK001' }}";
+                let option = new Option(selectedSeries, selectedSeries, true, true);
+                whSelect.append(option).trigger("change");
+                whSelect.select2({
+                    placeholder: "Pilih Kode Warehouse",
+                    allowClear: true,
+                    width: "100%",
+                    language: {
+                        inputTooShort: function() {
+                            return "Ketik untuk mencari...";
+                        },
+                        noResults: function() {
+                            return "Tidak ada data ditemukan";
+                        },
+                        searching: function() {
+                            return "Sedang mencari...";
+                        }
+                    },
+                    ajax: {
+                        url: "/warehouseSearch",
+                        dataType: "json",
+                        delay: 250,
+                        data: function(params) {
+                            let searchData = {
+                                q: params.term,
+                                limit: 10,
+                            }
+                            return searchData;
+                        },
+                        processResults: function(data) {
+                            console.log("Response dari server:", data); // cek di console
+                            return {
+                                results: (data.results || []).map(item => ({
+                                    id: item.id,
+                                    text: item.text
+                                }))
+                            };
+                        }
+                    }
+                });
+            }
+        });
+    </script>
 @endsection

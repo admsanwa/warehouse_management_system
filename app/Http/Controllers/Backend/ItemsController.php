@@ -147,7 +147,6 @@ class ItemsController extends Controller
     {
         $param = [
             'ItemCode' => $request->get('item_code'),
-            // "WhsCode" =>  'BK001',
             "ItemName" => $request->get('item_desc'),
             "page" => (int) $request->get('page', 1),
             "limit" => (int) $request->get('limit', 10),
@@ -168,7 +167,7 @@ class ItemsController extends Controller
             'total'       => $getRecord['total'],
             'totalPages'  => $totalPages,
             'stockNotes' => $request->get('stockNotes', ''),
-            'defaultWh' => 'BK001',
+            'defaultWh' => $request->get('warehouse', 'BK001'),
             'stockStatus' => [
                 '' => 'Semua',
                 0 => 'Stock tidak harus dibeli',
