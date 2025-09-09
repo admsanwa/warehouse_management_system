@@ -60,17 +60,17 @@
                                     <label for="" class="col-sm-2 col-form-lable">Vendor Ref No</label>
                                     <div class="col-sm-4">: {{ $po['NumAtCard'] ?? '-' }}</div>
                                     <label for="" class="col-sm-2 col-form-lable">Approved By</label>
-                                    <div class="col-sm-4">: {{ $po['U_MEB_Approved_by'] ?? '-' }}</div>
+                                    <div class="col-sm-4">: {{ $approve_by }}</div>
                                 </div>
                                 <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">Contact Person</label>
                                     <div class="col-sm-4">: {{ $po['CntctCode'] ?? '-' }}</div>
                                     <label for="" class="col-sm-2 col-form-lable">Knowing By</label>
-                                    <div class="col-sm-4">: {{ $po['U_MEB_Knowing_by'] ?? '-' }}</div>
+                                    <div class="col-sm-4">: {{ $knowing_by }}</div>
                                 </div>
                                 <div class="form-group row">
                                     <label for="" class="col-sm-2 col-form-lable">Buyer</label>
-                                    <div class="col-sm-4">: {{ $po['Buyer'] ?? '-' }}</div>
+                                    <div class="col-sm-4">: {{ $buyer }}</div>
                                     <label for="" class="col-sm-2 col-form-lable">Contract</label>
                                     <div class="col-sm-4">: {{ $po['U_MEB_TTD'] ?? '-' }}</div>
                                 </div>

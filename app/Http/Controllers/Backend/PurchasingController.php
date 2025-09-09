@@ -8,6 +8,9 @@ use App\Models\ItemsMaklonModel;
 use App\Models\PurchaseOrderDetailsModel;
 use App\Models\PurchasingModel;
 use App\Models\StockModel;
+use App\Models\UmebApproveModel;
+use App\Models\UmebKnowingModel;
+use App\Models\BuyerModel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
@@ -79,13 +82,26 @@ class PurchasingController extends Controller
         $po = Arr::get($orders, 'data.0', []);
         $lines = Arr::get($po, 'Lines', []);
 
+        //dapatkan nama series dari api
         $get_series = $this->sap->getSeries(['page' => 1, 'limit' => 1, 'Series' => (int) $po['Series']]);
         $series =   Arr::get($get_series, 'data.0', []);
-        // dd($get_series);
+        $buyer = BuyerModel::where('code', $po['SlpCode'])->first();
+
+        if ($buyer) {
+            $buyerName = $buyer->code . '-' . $buyer->name;
+        } else {
+            $buyerName = 'Unknown Buyer Code: ' . $po['SlpCode'];
+        }
+        $approveName = UmebApproveModel::where('id', $po['U_MEB_Approved_by'])->value('name') ?? 'Unknown Approver';
+        $knowingName = UmebKnowingModel::where('id', $po['U_MEB_Knowing_by'])->value('name') ?? 'Unknown Knowing Person';
+
         return view('api.purchasing.view', [
             'po'    => $po,
             'lines' => $lines,
             'series' => $series,
+            'buyer'   => $buyerName,
+            'approve_by' => $approveName,
+            'knowing_by' => $knowingName,
             'user' => Auth::user()
         ]);
     }
