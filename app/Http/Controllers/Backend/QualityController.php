@@ -13,6 +13,7 @@ use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\MailQcResult;
+use App\Notifications\MailQcApproval;
 use App\Models\User;
 
 class QualityController extends Controller
@@ -84,31 +85,70 @@ class QualityController extends Controller
         ];
 
         $check  = $request->check !== null ? ($statusMap[$request->check] ?? "-") : "-";
-        $user   = Auth::user()->username;
+        $user   = Auth::user();
 
+        // Cek apakah user manager Procurement, Installation and Delivery
+        $isProcManager = $user->department === 'Procurement, Installation and Delivery'
+            && $user->level === 'Manager';
+
+        $dev_users = User::where('department', 'IT')->get();
+
+        if ($isProcManager) {
+            $lastApproval = QualityModel::where("io", $io)
+                ->where("result", 3) // 3 = Need Approval
+                ->latest()
+                ->first();
+
+            if ($lastApproval) {
+                // Update ke hasil terbaru
+                $lastApproval->result    = $request->check;
+                $lastApproval->remark    = $request->remark;
+                $lastApproval->result_by = $user->username;
+                $lastApproval->save();
+
+                $recipients = User::where('department', 'Quality Control')
+                    ->where('level', 'Operator')
+                    ->get();
+
+                $recipients = $recipients->merge($dev_users);
+
+                Notification::send($recipients, new MailQcApproval(
+                    $io,
+                    $check,
+                    $request->remark ?? '',
+                    url('admin/quality/list')
+                ));
+                return redirect()->back()->with("success", "Approval telah diperbarui menjadi {$check}");
+            }
+        }
+
+        // Ini jika bukan approval tapi cek baru
         $quality = new QualityModel();
         $quality->io        = $io;
         $quality->result    = $request->check;
         $quality->remark    = $request->remark;
-        $quality->result_by = $user;
+        $quality->result_by = $user->username;
         $quality->save();
 
-        $recipients = User::where('department', 'Procurement, Installation and Delivery')
-            ->where('level', 'Manager')
-            ->get();
-        $dev_users = User::where('department', 'IT')->get();
+        // Jika status Need Approval kirim email ke manager Procurement, Installation and Delivery
+        if ((int) $request->check === 3) {
+            $recipients = User::where('department', 'Procurement, Installation and Delivery')
+                ->where('level', 'Manager')
+                ->get();
 
-        $recipients = $recipients->merge($dev_users);
-        Notification::send($recipients, new MailQcResult(
-            $io,
-            $check,
-            $request->remark ?? '',
-            url('admin/quality/list')
-        ));
+            $recipients = $recipients->merge($dev_users);
 
+            Notification::send($recipients, new MailQcResult(
+                $io,
+                $check,
+                $request->remark ?? '',
+                url('admin/quality/list')
+            ));
+        }
 
         return redirect()->back()->with("success", "Telah berhasil menilai product: {$prod_no} menjadi {$check}");
     }
+
 
     public function history(Request $request)
     {
