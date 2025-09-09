@@ -231,38 +231,60 @@ class ItemsController extends Controller
         return back()->with('success', "Items Imported Succesfully");
     }
 
-    public function onhand_search(Request $request)
-    {
-        $param = [
-            "page" => (int) $request->get('page', 1),
-            "limit" => (int) $request->get('limit', 10),
-            "ItemCode" => $request->get('q'),
-            "ItemName" => $request->get('q'),
-            'page'       => 1,
-        ];
+public function onhand_search(Request $request)
+{
+    $q = $request->get('q');
+    $page = (int) $request->get('page', 1);
+    $limit = (int) $request->get('limit', 10);
 
-        $get = $this->sap->getStockItems($param);
+    $results = collect();
 
-        if (empty($get) || $get['success'] !== true) {
-            return response()->json([
-                'results' => []
-            ]);
-        }
+    // 1. Cari berdasarkan ItemCode
+    $paramCode = [
+        "page" => $page,
+        "limit" => $limit,
+        "ItemCode" => $q,
+    ];
+    $getCode = $this->sap->getStockItems($paramCode);
 
-        $wh = collect($get['data'] ?? [])->map(function ($val) {
-            return [
-                'id'   => $val['ItemCode'],
-                'text' => $val['ItemCode'] . " - ". $val['ItemName'],
-                'uom' => $val['InvntryUom'],
-                'item_desc' => $val['ItemName'],
-            ];
-        });
-
-        return response()->json([
-            'results' => $wh,
-            'api_response' => $get
-        ]);
+    if (!empty($getCode) && $getCode['success'] === true) {
+        $results = $results->merge($getCode['data']);
     }
+
+    // 2. Cari berdasarkan ItemName
+    $paramName = [
+        "page" => $page,
+        "limit" => $limit,
+        "ItemName" => $q,
+    ];
+    $getName = $this->sap->getStockItems($paramName);
+
+    if (!empty($getName) && $getName['success'] === true) {
+        $results = $results->merge($getName['data']);
+    }
+
+    // 3. Hapus duplikat berdasarkan ItemCode
+    $results = $results->unique('ItemCode')->values();
+
+    // 4. Mapping hasil ke format select2
+    $wh = $results->map(function ($val) {
+        return [
+            'id'        => $val['ItemCode'],
+            'text'      => $val['ItemCode'] . " - " . $val['ItemName'],
+            'uom'       => $val['InvntryUom'],
+            'item_desc' => $val['ItemName'],
+        ];
+    });
+
+    return response()->json([
+        'results' => $wh,
+        'api_response' => [
+            'code' => $getCode,
+            'name' => $getName,
+        ]
+    ]);
+}
+
 
     public function warehouse_search(Request $request)
     {
