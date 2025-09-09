@@ -169,30 +169,6 @@
                         </div>
                     </div>
                 </form>
-                {{-- <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">History GRPO</h3>
-                    </div>
-                    <div class="card-body px-2">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-borderd table-sm nowrap">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>No PO</th>
-                                        <th>Item Code</th>
-                                        <th>Item Desc</th>
-                                        <th>Qty</th>
-                                        <th>Uom</th>
-                                        <th>Tanggal Dibuat</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="grpoHistoriesTbody">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div> --}}
             </div>
         </section>
     </div>
@@ -231,6 +207,7 @@
                 appendDataOnPo(selectedPo);
                 loadScannedBarcodes();
             });
+
             poSelect.select2({
                 placeholder: "Pilih No. PO",
                 allowClear: true,
@@ -261,7 +238,7 @@
                             return {
                                 q: docNum,
                                 series: series,
-                                docEntry: docEntry,
+                                docentry: docEntry,
                                 limit: 1, // karena spesifik
                             };
                         }
@@ -277,10 +254,10 @@
                     transport: function(params, success, failure) {
                         const item_code = document.getElementById("item_code").value;
 
-                        if (!item_code) {
-                            alert("Item code wajib diisi!");
-                            return; // ⛔ stop, request tidak dijalankan
-                        }
+                        // if (!item_code) {
+                        //     alert("Item code wajib diisi!");
+                        //     return;
+                        // }
 
                         // lanjut request normal
                         var $request = $.ajax(params);

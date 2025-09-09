@@ -46,7 +46,7 @@
                                             <input type="text" name="U_MEB_NO_IO" class="form-control"
                                                 placeholder="Enter IO Nomor" value="{{ Request()->io_no }}">
                                         </div> --}}
-                                        <div class="form-group col-md-2">
+                                        {{-- <div class="form-group col-md-2">
                                             <label for="">Status</label>
                                             <select name="status" id="status" class="form-control">
                                                 @foreach (['O' => 'Open', 'C' => 'Close'] as $value => $label)
@@ -56,7 +56,7 @@
                                                     </option>
                                                 @endforeach
                                             </select>
-                                        </div>
+                                        </div> --}}
                                         <div class="form-group col-md-2">
                                             <label for="">Series</label>
                                             <select name="series" id="seriesSelect" class="form-control">
