@@ -468,8 +468,7 @@ class ProductionController extends Controller
     {
         $user   = Auth::user();
         $number = BonModel::generateNumber();
-        $items  = ItemsModel::all();
-        return view('backend.production.bon', compact('number', 'user', 'items'));
+        return view('backend.production.bon', compact('number', 'user'));
     }
 
     public function create_bon(Request $request)
@@ -484,10 +483,12 @@ class ProductionController extends Controller
             'make_to'       => 'nullable|string',
             'item_code'     => 'required|array',
             'item_code.*'   => 'required|string',
+            'item_desc'     => 'nullable|array',
+            'item_desc.*'   => 'nullable|string',
             'qty'           => 'required|array',
             'qty.*'         => 'required|numeric',
-            'uom'           => 'required|array',
-            'uom.*'         => 'required|string',
+            'uom'           => 'nullable|array',
+            'uom.*'         => 'nullable|string',
             'remark'        => 'nullable|array',
             'remark.*'      => 'nullable|string'
         ]);
@@ -505,11 +506,11 @@ class ProductionController extends Controller
             ]);
 
             foreach ($validated['item_code'] as $index => $item) {
-                $items = ItemsModel::where('code', $item)->first();
+                // $items = ItemsModel::where('code', $item)->first();
                 BonDetailsModel::create([
                     'bon_id'    => $bon->id,
-                    'item_code' => $items->code ?? '-',
-                    'item_name' => $items->name ?? $item,
+                    'item_code' => $validated['item_code'][$index],
+                    'item_name' => $validated['item_desc'][$index] ?? '-',
                     'qty'       => $validated['qty'][$index] ?? 0,
                     'uom'       => $validated['uom'][$index] ?? '-',
                     'remark'    => $validated['remark'][$index] ?? '-',

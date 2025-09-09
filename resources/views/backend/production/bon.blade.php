@@ -81,87 +81,90 @@
                                         </div>
                                     </div>
                                     <div id="unitContainer">
-                                        <div class="unit-block">
-                                            <div class="form-group row">
-                                                <label class="col-sm-3 col-form-label">Nama Barang :</label>
-                                                <div class="col-sm-2">
-                                                    <select name="item_code[]" class="select2" style="width: 100%">
-                                                        <option value="">Select Option Items</option>
-                                                        @foreach ($items as $item)
-                                                            <option value="{{ $item->code }}">
-                                                                {{ $item->code . ' - ' . $item->name }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <p>Qty :</p>
-                                                <div class="col-sm-1">
-                                                    <input type="number" name="qty[]" class="form-control"
-                                                        placeholder="Masukkan Qty">
-                                                </div>
-                                                <p>Uom :</p>
-                                                <div class="col-sm-1">
-                                                    <input type="text" name="uom[]" class="form-control"
-                                                        placeholder="Masukkan Uom" list="uomList">
-                                                    <datalist id="uomList">
-                                                        <option value="Pcs">
-                                                        <option value="Unit">
-                                                        <option value="Lbr">
-                                                        <option value="Btg">
-                                                        <option value="Set">
-                                                    </datalist>
-                                                </div>
-                                                <p>Keterangan :</p>
-                                                <div class="col-sm-2">
-                                                    <input type="text" name="remark[]" class="form-control"
-                                                        placeholder="Masukkan Keterangan">
-                                                </div>
-                                                <div class="col-sm-1 mt-1">
-                                                    <button type="button" class="btn btn-success btn-add-unit"><i
-                                                            class="fa fa-plus-circle"></i></button>
-                                                    <button type="button" class="btn btn-danger btn-remove-unit"
-                                                        style="display: none;"><i class="fa fa-minus-circle"></i></button>
-                                                </div>
-                                            </div>
-                                        </div>
+<div class="unit-block mb-3 p-3 border rounded bg-light">
+    <div class="form-row align-items-end">
+        <!-- Nama Barang -->
+        <div class="form-group col-md-4">
+            <label for="item_code">Nama Barang</label>
+            <select name="item_code[]" class="select2 form-control" style="width: 100%"></select>
+            <input type="hidden" name="item_desc[]" class="form-control" placeholder="Masukkan Uom" readonly>
+
+        </div>
+
+        <!-- UOM -->
+        <div class="form-group col-md-2">
+            <label for="uom">UOM</label>
+            <input type="text" name="uom[]" class="form-control" placeholder="Masukkan Uom" readonly>
+        </div>
+
+        <!-- Qty -->
+        <div class="form-group col-md-2">
+            <label for="qty">Qty</label>
+            <input type="number" name="qty[]" class="form-control" placeholder="Masukkan Qty">
+        </div>
+
+        <!-- Keterangan -->
+        <div class="form-group col-md-3">
+            <label for="remark">Keterangan</label>
+            <input type="text" name="remark[]" class="form-control" placeholder="Masukkan Keterangan">
+        </div>
+
+        <!-- Action buttons -->
+        <div class="form-group col-md-1 text-center">
+            <button type="button" class="btn btn-success btn-add-unit mb-1">
+                <i class="fa fa-plus-circle"></i>
+            </button>
+            <button type="button" class="btn btn-danger btn-remove-unit" style="display: none;">
+                <i class="fa fa-minus-circle"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
                                     </div>
                                     {{-- Hidden clean template --}}
-                                    <template id="unitTemplate">
-                                        <div class="unit-block">
-                                            <div class="form-group row">
-                                                <label class="col-sm-3 col-form-label">Nama Barang :</label>
-                                                <div class="col-sm-2">
-                                                    <select name="item_code[]" class="select2" style="width: 100%">
-                                                        <option value="">Select Option Items</option>
-                                                        @foreach ($items as $item)
-                                                            <option value="{{ $item->code }}">
-                                                                {{ $item->code . ' - ' . $item->name }}</option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                                <p>Qty :</p>
-                                                <div class="col-sm-1">
-                                                    <input type="number" name="qty[]" class="form-control"
-                                                        placeholder="Masukkan Qty">
-                                                </div>
-                                                <p>Uom :</p>
-                                                <div class="col-sm-1">
-                                                    <input type="text" name="uom[]" class="form-control"
-                                                        placeholder="Masukkan Uom" list="uomList">
-                                                </div>
-                                                <p>Keterangan :</p>
-                                                <div class="col-sm-2">
-                                                    <input type="text" name="remark[]" class="form-control"
-                                                        placeholder="Masukkan Keterangan">
-                                                </div>
-                                                <div class="col-sm-1 mt-1">
-                                                    <button type="button" class="btn btn-success btn-add-unit"><i
-                                                            class="fa fa-plus-circle"></i></button>
-                                                    <button type="button" class="btn btn-danger btn-remove-unit"><i
-                                                            class="fa fa-minus-circle"></i></button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </template>
+<template id="unitTemplate">
+    <div class="unit-block mb-3 p-3 border rounded bg-light">
+        <div class="form-row align-items-end">
+            <!-- Nama Barang -->
+            <div class="form-group col-md-4">
+                <label>Nama Barang</label>
+                <select name="item_code[]" class="select2 form-control" style="width: 100%">
+                </select>
+                <input type="hidden" name="item_desc[]" class="form-control" placeholder="Masukkan Uom" readonly>
+            </div>
+
+            <!-- Qty -->
+            <div class="form-group col-md-2">
+                <label>Qty</label>
+                <input type="number" name="qty[]" class="form-control" placeholder="Masukkan Qty">
+            </div>
+
+            <!-- UOM -->
+            <div class="form-group col-md-2">
+                <label>Uom</label>
+                <input type="text" name="uom[]" class="form-control" placeholder="Masukkan Uom" readonly>
+            </div>
+
+            <!-- Keterangan -->
+            <div class="form-group col-md-3">
+                <label>Keterangan</label>
+                <input type="text" name="remark[]" class="form-control" placeholder="Masukkan Keterangan">
+            </div>
+
+            <!-- Action buttons -->
+            <div class="form-group col-md-1 text-center">
+                <button type="button" class="btn btn-success btn-add-unit mb-1">
+                    <i class="fa fa-plus-circle"></i>
+                </button>
+                <button type="button" class="btn btn-danger btn-remove-unit">
+                    <i class="fa fa-minus-circle"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</template>
+
                                 </div>
                                 <div class="card-footer">
                                     <button type="submit" class="btn btn-primary"><i
@@ -177,31 +180,65 @@
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
-        $(document).ready(function() {
-            // Initialize Select2 for the first row
-            $('.select2').select2({
-                tags: true, // Allow typing new values
-                placeholder: "Select or type item",
-                allowClear: true
-            });
-
-            $(document).on('click', '.btn-add-unit', function() {
-                // Clone from hidden template
-                let clone = $($('#unitTemplate').html());
-
-                // Append new row
-                $('#unitContainer').append(clone);
-
-                // Initialize Select2 for the new row
-                clone.find('.select2').select2({
-                    tags: true, // Allow typing new values
-                    placeholder: "Select or type item",
-                    allowClear: true
+        $(document).ready(function () {
+            function initSelect2($el) {
+                $el.select2({
+                    placeholder: "Ketik kode barang...",
+                    allowClear: true,
+                    width: "100%",
+                    language: {
+                        inputTooShort: function () {
+                            return "Ketik kode barang untuk mencari...";
+                        },
+                        noResults: function () {
+                            return "Tidak ada data ditemukan";
+                        },
+                        searching: function () {
+                            return "Sedang mencari...";
+                        },
+                    },
+                    ajax: {
+                        url: "/onhandSearch",
+                        dataType: "json",
+                        delay: 250,
+                        data: function (params) {
+                            return {
+                                q: params.term,
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: (data.results || []).map((item) => ({
+                                    id: item.id,
+                                    text: item.text,
+                                    uom: item.uom,
+                                    item_desc: item.item_desc,
+                                })),
+                            };
+                        },
+                    },
                 });
+
+                // Event ketika pilih barang
+                $el.on("select2:select", function (e) {
+                    let data = e.params.data;
+                    let $block = $(this).closest(".unit-block");
+                    $block.find('input[name="uom[]"]').val(data.uom || "");
+                    $block.find('input[name="item_desc[]"]').val(data.item_desc || "");
+                });
+            }
+
+            initSelect2($(".select2"));
+
+            $(document).on("click", ".btn-add-unit", function () {
+                let clone = $($("#unitTemplate").html());
+                $("#unitContainer").append(clone);
+
+                initSelect2(clone.find(".select2"));
             });
 
-            $(document).on('click', '.btn-remove-unit', function() {
-                $(this).closest('.unit-block').remove();
+            $(document).on("click", ".btn-remove-unit", function () {
+                $(this).closest(".unit-block").remove();
             });
         });
     </script>

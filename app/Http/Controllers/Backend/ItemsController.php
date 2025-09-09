@@ -231,6 +231,38 @@ class ItemsController extends Controller
         return back()->with('success', "Items Imported Succesfully");
     }
 
+    public function onhand_search(Request $request)
+    {
+        $param = [
+            "page" => (int) $request->get('page', 1),
+            "limit" => (int) $request->get('limit', 10),
+            "ItemCode" => $request->get('q'),
+            'page'       => 1,
+        ];
+
+        $get = $this->sap->getStockItems($param);
+
+        if (empty($get) || $get['success'] !== true) {
+            return response()->json([
+                'results' => []
+            ]);
+        }
+
+        $wh = collect($get['data'] ?? [])->map(function ($val) {
+            return [
+                'id'   => $val['ItemCode'],
+                'text' => $val['ItemCode'] . " - ". $val['ItemName'],
+                'uom' => $val['InvntryUom'],
+                'item_desc' => $val['ItemName'],
+            ];
+        });
+
+        return response()->json([
+            'results' => $wh,
+            'api_response' => $get
+        ]);
+    }
+
     public function warehouse_search(Request $request)
     {
         $param = [
