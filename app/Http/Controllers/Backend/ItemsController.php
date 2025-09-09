@@ -237,6 +237,7 @@ class ItemsController extends Controller
             "page" => (int) $request->get('page', 1),
             "limit" => (int) $request->get('limit', 10),
             "ItemCode" => $request->get('q'),
+            "ItemName" => $request->get('q'),
             'page'       => 1,
         ];
 
