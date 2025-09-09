@@ -6,14 +6,20 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\StockModel;
 use App\Services\SapService;
+use Auth;
 
 class StockController extends Controller
 {
     protected $sap;
+    protected $default_warehouse;
 
     public function __construct(SapService $sap)
     {
         $this->sap = $sap;
+        $this->middleware(function ($request, $next) {
+            $this->default_warehouse = Auth::user()->warehouse_access;
+            return $next($request);
+        });
     }
 
     public function index(Request $request)
@@ -39,7 +45,7 @@ class StockController extends Controller
             'total'       => $getRecord['total'],
             'totalPages'  => $totalPages,
             'stockNotes' => $request->get('stockNotes', ''),
-            'defaultWh' => $request->get('warehouse', 'BK001'),
+            'defaultWh' => $request->get('warehouse', $this->default_warehouse),
         ]);
     }
 

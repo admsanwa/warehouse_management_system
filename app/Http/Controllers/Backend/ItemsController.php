@@ -16,10 +16,15 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class ItemsController extends Controller
 {
     protected $sap;
+    protected $default_warehouse;
 
     public function __construct(SapService $sap)
     {
         $this->sap = $sap;
+        $this->middleware(function ($request, $next) {
+            $this->default_warehouse = Auth::user()->warehouse_access;
+            return $next($request);
+        });
     }
     public function index(Request $request)
     {
@@ -167,7 +172,7 @@ class ItemsController extends Controller
             'total'       => $getRecord['total'],
             'totalPages'  => $totalPages,
             'stockNotes' => $request->get('stockNotes', ''),
-            'defaultWh' => $request->get('warehouse', 'BK001'),
+            'defaultWh' => $request->get('warehouse', $this->default_warehouse),
             'stockStatus' => [
                 '' => 'Semua',
                 0 => 'Stock tidak harus dibeli',
@@ -231,57 +236,57 @@ class ItemsController extends Controller
         return back()->with('success', "Items Imported Succesfully");
     }
 
-public function onhand_search(Request $request)
-{
-    $q = $request->get('q');
-    $page = (int) $request->get('page', 1);
-    $limit = (int) $request->get('limit', 10);
+    public function onhand_search(Request $request)
+    {
+        $q = $request->get('q');
+        $page = (int) $request->get('page', 1);
+        $limit = (int) $request->get('limit', 10);
 
-    $results = collect();
+        $results = collect();
 
-    // 1. Cari berdasarkan ItemCode
-    $paramCode = [
-        "page" => $page,
-        "limit" => $limit,
-        "ItemCode" => $q,
-    ];
-    $getCode = $this->sap->getStockItems($paramCode);
-
-    if (!empty($getCode) && $getCode['success'] === true) {
-        $results = $results->merge($getCode['data']);
-    }
-
-    // 2. Cari berdasarkan ItemName
-    $paramName = [
-        "page" => $page,
-        "limit" => $limit,
-        "ItemName" => $q,
-    ];
-    $getName = $this->sap->getStockItems($paramName);
-
-    if (!empty($getName) && $getName['success'] === true) {
-        $results = $results->merge($getName['data']);
-    }
-
-    $results = $results->unique('ItemCode')->values();
-
-    $wh = $results->map(function ($val) {
-        return [
-            'id'        => $val['ItemCode'],
-            'text'      => $val['ItemCode'] . " - " . $val['ItemName'],
-            'uom'       => $val['InvntryUom'],
-            'item_desc' => $val['ItemName'],
+        // 1. Cari berdasarkan ItemCode
+        $paramCode = [
+            "page" => $page,
+            "limit" => $limit,
+            "ItemCode" => $q,
         ];
-    });
+        $getCode = $this->sap->getStockItems($paramCode);
 
-    return response()->json([
-        'results' => $wh,
-        'api_response' => [
-            'code' => $getCode,
-            'name' => $getName,
-        ]
-    ]);
-}
+        if (!empty($getCode) && $getCode['success'] === true) {
+            $results = $results->merge($getCode['data']);
+        }
+
+        // 2. Cari berdasarkan ItemName
+        $paramName = [
+            "page" => $page,
+            "limit" => $limit,
+            "ItemName" => $q,
+        ];
+        $getName = $this->sap->getStockItems($paramName);
+
+        if (!empty($getName) && $getName['success'] === true) {
+            $results = $results->merge($getName['data']);
+        }
+
+        $results = $results->unique('ItemCode')->values();
+
+        $wh = $results->map(function ($val) {
+            return [
+                'id'        => $val['ItemCode'],
+                'text'      => $val['ItemCode'] . " - " . $val['ItemName'],
+                'uom'       => $val['InvntryUom'],
+                'item_desc' => $val['ItemName'],
+            ];
+        });
+
+        return response()->json([
+            'results' => $wh,
+            'api_response' => [
+                'code' => $getCode,
+                'name' => $getName,
+            ]
+        ]);
+    }
 
 
     public function warehouse_search(Request $request)

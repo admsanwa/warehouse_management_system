@@ -28,10 +28,15 @@ class TransactionController extends Controller
 {
     // stock in
     protected $sap;
+    protected $default_warehouse;
 
     public function __construct(SapService $sap)
     {
         $this->sap = $sap;
+        $this->middleware(function ($request, $next) {
+            $this->default_warehouse = Auth::user()->warehouse_access;
+            return $next($request);
+        });
     }
     // stock in
     public function stock_in(Request $request)
@@ -79,7 +84,7 @@ class TransactionController extends Controller
             'item_code' => 'required|string',
         ]);
 
-        $warehouse = "BK001";
+        $warehouse =  $this->default_warehouse;
         $barcode   = $validated['item_code'];
 
         $items = $this->sap->getStockItems([
@@ -294,7 +299,7 @@ class TransactionController extends Controller
                 //     'item_desc'    => $row['Dscription'] ?? null,
                 //     'qty' => $entryQty,
                 //     'uom'    => $row['UnitMsr'] ?? null,
-                //     'whse'    => 'BK001',
+                //     'whse'    =>  $this->default_warehouse,
                 //     'note'    => '-',
                 //     'user_id'      => $user,
                 //     'created_at'   => now(),
@@ -384,7 +389,7 @@ class TransactionController extends Controller
                     'io'            => $po->io,
                     'so'            => $po->so,
                     'internal_no'   => $po->internal_no,
-                    'whse'          => "BK001",
+                    'whse'          =>  $this->default_warehouse,
                     'note'          => $po->note,
                     'remarks'       => trim($request->remarks)
                 ]
@@ -528,7 +533,7 @@ class TransactionController extends Controller
             'item_code' => 'required|string',
         ]);
 
-        $warehouse = "BK001";
+        $warehouse =  $this->default_warehouse;
         $barcode   = $validated['item_code'];
         $items = $this->sap->getStockItems([
             'ItemCode' => $barcode,
@@ -747,7 +752,7 @@ class TransactionController extends Controller
                 ['no_po' => trim($request->prod_order)],
                 [
                     'project_code'  => $po->project_code,
-                    'whse'          => "BK001",
+                    'whse'          =>  $this->default_warehouse,
                     'reason'        => trim($request->reason),
                     'io'            => $po->io_no,
                     'so'            => $po->sales_order,
@@ -829,7 +834,7 @@ class TransactionController extends Controller
             'item_code' => 'required|string',
         ]);
 
-        $warehouse = "BK001";
+        $warehouse = $this->default_warehouse;
         $barcode   = $validated['item_code'];
         $items = $this->sap->getStockItems([
             'ItemCode' => $barcode,
@@ -1115,7 +1120,7 @@ class TransactionController extends Controller
             'docEntry'  => 'nullable|string',
         ]);
 
-        $warehouse = "BK001";
+        $warehouse = $this->default_warehouse;
         $barcode   = $validated['item_code'];
 
         $items = $this->sap->getStockItems([
@@ -1459,7 +1464,7 @@ class TransactionController extends Controller
             'docEntry'  => 'nullable|string',
         ]);
 
-        $warehouse = "BK001";
+        $warehouse =  $this->default_warehouse;
         $barcode   = $validated['item_code'];
 
         $items = $this->sap->getStockItems([
