@@ -101,6 +101,7 @@
                                                         <option value="Pcs">
                                                         <option value="Unit">  
                                                         <option value="Lbr">   
+                                                        <option value="Ltr">   
                                                         <option value="Btg">
                                                         <option value="Set"> 
                                                     </datalist>

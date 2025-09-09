@@ -263,10 +263,8 @@ public function onhand_search(Request $request)
         $results = $results->merge($getName['data']);
     }
 
-    // 3. Hapus duplikat berdasarkan ItemCode
     $results = $results->unique('ItemCode')->values();
 
-    // 4. Mapping hasil ke format select2
     $wh = $results->map(function ($val) {
         return [
             'id'        => $val['ItemCode'],
