@@ -26,7 +26,7 @@ class InventorytfController extends Controller
             "limit" => (int) $request->get('limit', 5),
             "DocNum" => $request->get('number'),
             "DocDate" => $request->get('date'),
-            // "DocStatus" =>  $request->get('status', 'O'),
+            "DocStatus" =>  $request->get('status', 'O'),
             "Series" =>  $request->get('series'),
         ];
         $getInvtf = $this->sap->getInventoryTransfers($param);
