@@ -364,6 +364,8 @@
                     }
                 }
             });
+            setDefaultSeries("#seriesSelect", "202");
+
         });
         document.addEventListener("DOMContentLoaded", function() {
             const input = document.getElementById("scannerInput");
@@ -527,15 +529,25 @@
                 return false;
             }
             const idx = tBody.rows.length;
+            const totalReceiptQty = (stocks.CmpltQty || 0) + (stocks.RjctQty || 0);
+            const isReceiptQtyDone = totalReceiptQty >= stocks.PlannedQty;
+            if (isReceiptQtyDone) {
+                showToast(
+                    "Gagal menambahkan. Total Receipt Qty untuk barcode ini sudah terpenuhi",
+                    "error"
+                );
+                return true;
+            }
             let inputQty =
                 `<input type="text" name="stocks[${idx}][qty]" class="form-control" style="min-width:80px !important;" value="0">`;
-            const totalReceiptQty = (stocks.CmpltQty || 0) + (stocks.RjctQty || 0);
             const row = `
                 <tr>
                     <td>${idx + 1}</td>
                     <td>
                         ${stocks.ItemCode}
                         <input type="hidden" name="stocks[${idx}][BaseEntry]" value="${docEntry}">
+                        <input type="hidden" name="stocks[${idx}][PlannedQty]" value="${stocks.PlannedQty}">
+                        <input type="hidden" name="stocks[${idx}][totalReceiptQty]" value="${totalReceiptQty}">
                     </td>
                     <td>${stocks.ItemName}</td>
                     <td>${formatDecimalsSAP(stocks.PlannedQty)}</td>

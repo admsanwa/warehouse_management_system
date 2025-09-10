@@ -45,6 +45,17 @@ class PurchasingController extends Controller
             return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
         }
 
+        // Jika user set filter Series, pastikan data difilter ulang
+        if (!empty($param['Series']) && !empty($orders['data'])) {
+            $orders['data'] = collect($orders['data'])
+                ->where('Series', $param['Series'])
+                ->values()
+                ->all();
+
+            // Rehitung total
+            $orders['total'] = count($orders['data']);
+        }
+
         $currentCount = $orders['total'] ?? count($orders['data'] ?? []);
         $totalPages = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
 
@@ -125,7 +136,16 @@ class PurchasingController extends Controller
                 'results' => []
             ]);
         }
+        // Jika user set filter Series, pastikan data difilter ulang
+        if (!empty($param['Series']) && !empty($orders['data'])) {
+            $orders['data'] = collect($orders['data'])
+                ->where('Series', $param['Series'])
+                ->values()
+                ->all();
 
+            // Rehitung total
+            $orders['total'] = count($orders['data']);
+        }
         $poData = collect($orders['data'] ?? [])->map(function ($item) {
             return [
                 'id'   => $item['DocEntry'],

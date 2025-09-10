@@ -368,6 +368,9 @@
                     }
                 }
             });
+            // Set default series sesuai tahun
+            setDefaultSeries("#seriesSelect", "202");
+
         });
         document.addEventListener("DOMContentLoaded", function() {
             const input = document.getElementById("scannerInput");
@@ -540,7 +543,7 @@
             const isIssuedQtyDone = stocks.IssuedQty >= stocks.PlannedQty;
             if (isIssuedQtyDone) {
                 showToast(
-                    "Tidak bisa menambahkan barcode ini karena Issue qty sudah tercukupi",
+                    "Gagal menambahkan. Jumlah Issue Qty untuk barcode ini sudah terpenuhi",
                     "error"
                 );
                 return true;
@@ -568,6 +571,8 @@
                         </td>
                         <td>
                             ${inputQty}
+                            <input type="hidden" name="stocks[${idx}][PlannedQty]" value="${stocks.PlannedQty ?? ""}">
+                            <input type="hidden" name="stocks[${idx}][IssuedQty]" value="${stocks.IssuedQty ?? ""}">
                         <td>
                             ${stocks.InvntryUoM ?? ""}
                             <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${stocks.InvntryUoM ?? ""}">

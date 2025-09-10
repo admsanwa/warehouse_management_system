@@ -55,3 +55,25 @@ function hideLoadingOverlay() {
     document.getElementById("loading-overlay").style.display = "none";
     document.body.style.overflow = "";
 }
+
+function setDefaultSeries(selector, objectCode) {
+    const year = new Date().getFullYear().toString().slice(-2);
+    const defaultSeriesText = `BKS-${year}`;
+
+    // Cari data series dari server
+    $.ajax({
+        url: "/purchasing/seriesSearch",
+        data: { q: defaultSeriesText, ObjectCode: objectCode },
+        dataType: "json",
+    }).done(function (data) {
+        if (data.results && data.results.length > 0) {
+            let found = data.results.find(
+                (item) => item.text === defaultSeriesText
+            );
+            if (found) {
+                let option = new Option(found.text, found.id, true, true);
+                $(selector).append(option).trigger("change");
+            }
+        }
+    });
+}

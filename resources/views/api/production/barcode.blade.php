@@ -25,7 +25,7 @@
                                         <div class="form-group col-md-2">
                                             <label for="">Product Nomer</label>
                                             <input type="text" name="prod_no" id="prod_no" class="form-control"
-                                                value="{{ Request()->io_no }}" placeholder="Enter Product Nomer">
+                                                value="{{ Request()->prod_no }}" placeholder="Enter Product Nomer">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Product Desc</label>

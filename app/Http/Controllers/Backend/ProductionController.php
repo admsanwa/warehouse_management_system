@@ -57,6 +57,17 @@ class ProductionController extends Controller
             return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
         }
 
+        // Filter ulang kalau ada Series
+        if (!empty($param['Series']) && !empty($getProds['data'])) {
+            $getProds['data'] = collect($getProds['data'])
+                ->where('Series', $param['Series'])
+                ->values()
+                ->all();
+
+            // update total sesuai hasil filter
+            $getProds['total'] = count($getProds['data']);
+        }
+
         // $totalPages = ceil($getProds['total'] / $param['limit']);
         $currentCount = $getProds['total'] ?? count($getProds['data'] ?? []);
         $totalPages = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
@@ -89,6 +100,18 @@ class ProductionController extends Controller
                 'results' => []
             ]);
         }
+
+        // Filter ulang kalau ada Series
+        if (!empty($param['Series']) && !empty($orders['data'])) {
+            $orders['data'] = collect($orders['data'])
+                ->where('Series', $param['Series'])
+                ->values()
+                ->all();
+
+            // update total sesuai hasil filter
+            $orders['total'] = count($orders['data']);
+        }
+
         $poData = collect($orders['data'] ?? [])->map(function ($item) {
             return [
                 'id'   => $item['DocEntry'],

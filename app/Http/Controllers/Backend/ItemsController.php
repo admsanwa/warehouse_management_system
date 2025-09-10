@@ -291,31 +291,46 @@ class ItemsController extends Controller
 
     public function warehouse_search(Request $request)
     {
-        $param = [
-            "page" => (int) $request->get('page', 1),
-            "limit" => (int) $request->get('limit', 10),
-            "WhsCode" => $request->get('q'),
-            'page'       => 1,
+        $q = $request->get('q');
+        $page = (int) $request->get('page', 1);
+        $limit = (int) $request->get('limit', 10);
+        $results = collect();
+        // 1. Cari berdasarkan WhsCode
+        $paramCode = [
+            "page" => $page,
+            "limit" => $limit,
+            "WhsCode" => $q,
         ];
+        $getCode = $this->sap->getWarehouses($paramCode);
 
-        $get = $this->sap->getWarehouses($param);
-
-        if (empty($get) || $get['success'] !== true) {
-            return response()->json([
-                'results' => []
-            ]);
+        if (!empty($getCode) && $getCode['success'] === true) {
+            $results = $results->merge($getCode['data']);
         }
 
-        $wh = collect($get['data'] ?? [])->map(function ($val) {
+        // 2. Cari berdasarkan WhsName
+        $paramName = [
+            "page" => $page,
+            "limit" => $limit,
+            "WhsName" => $q,
+        ];
+        $getName = $this->sap->getWarehouses($paramName);
+
+        if (!empty($getName) && $getName['success'] === true) {
+            $results = $results->merge($getName['data']);
+        }
+
+        $results = $results->unique('WhsCode')->values();
+
+        $wh = $results->map(function ($val) {
             return [
                 'id'   => $val['WhsCode'],
-                'text' => $val['WhsCode'],
+                'text' => $val['WhsCode'] . ' ' . $val['WhsName'],
             ];
         });
 
         return response()->json([
             'results' => $wh,
-            'api_response' => $get
+            'api_response' => $results
         ]);
     }
 

@@ -28,43 +28,49 @@
                             <div class="card-body">
                                 {{-- ✅ Bagian field yang ada datanya --}}
                                 <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">Status</label>
-                                    <div class="col-sm-4">: {{ $invtf['DocStatus'] === 'O' ? 'Open' : 'Close' }}</div>
-
-                                    <label class="col-sm-2 col-form-label">Doc Number / No Inventory Transfer</label>
-                                    <div class="col-sm-4">: {{ $invtf['DocNum'] }}</div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">Posting Date</label>
-                                    <div class="col-sm-4">: {{ $invtf['DocDate'] }}</div>
-
                                     <label class="col-sm-2 col-form-label">Series</label>
                                     <div class="col-sm-4">
                                         :
                                         @if (!empty($series) && isset($series['ObjectCode'], $series['SeriesName']))
-                                            {{ $series['SeriesName'] }}
+                                            {{ $series['SeriesName'] ?? '-' }}
                                         @else
                                             <span class="text-danger">⚠️ Series tidak ditemukan:
                                                 {{ $po['Series'] ?? '' }}</span>
                                         @endif
                                     </div>
+                                    <label class="col-sm-2 col-form-label">Posting Date</label>
+                                    <div class="col-sm-4">: {{ $invtf['DocDate'] ?? '-' }}</div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">Doc Number</label>
+                                    <div class="col-sm-4">: {{ $invtf['DocNum'] ?? '-' }}</div>
+
+                                    <label class="col-sm-2 col-form-label">Status</label>
+                                    <div class="col-sm-4">: {{ $invtf['DocStatus'] === 'O' ? 'Open' : 'Close' }}</div>
                                 </div>
 
                                 <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">IO</label>
-                                    <div class="col-sm-4">: {{ $invtf['U_MEB_NO_IO'] }}</div>
+                                    <label class="col-sm-2 col-form-label">Type Inventory Transaction</label>
+                                    <div class="col-sm-4">: {{ $invtf['U_MEB_Type_Inv_Trans'] ?? '-' }}</div>
 
                                     <label class="col-sm-2 col-form-label">Internal No</label>
                                     <div class="col-sm-4">: {{ $invtf['U_MEB_Internal_No'] ?? '-' }}</div>
                                 </div>
 
                                 <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">IO</label>
+                                    <div class="col-sm-4">: {{ $invtf['U_MEB_NO_IO'] ?? '-' }}</div>
+
+                                    <label class="col-sm-2 col-form-label">SO</label>
+                                    <div class="col-sm-4">: {{ $invtf['U_MEB_NO_SO'] ?? '-' }}</div>
+                                </div>
+
+                                <div class="form-group row">
                                     <label class="col-sm-2 col-form-label">From Warehouse</label>
-                                    <div class="col-sm-4">: {{ $invtf['FromWhsCode'] }}</div>
+                                    <div class="col-sm-4">: {{ $invtf['FromWhsCode'] ?? '-' }}</div>
 
                                     <label class="col-sm-2 col-form-label">To Warehouse</label>
-                                    <div class="col-sm-4">: {{ $invtf['ToWhsCode'] }}</div>
+                                    <div class="col-sm-4">: {{ $invtf['ToWhsCode'] ?? '-' }}</div>
                                 </div>
 
                                 <div class="form-group row">
@@ -76,11 +82,11 @@
 
                                 {{-- ❌ Bagian field yang kosong --}}
                                 <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">Vendor Maklon List</label>
-                                    <div class="col-sm-4">: Tidak Ada</div>
+                                    <label class="col-sm-2 col-form-label">Vendor Maklon</label>
+                                    <div class="col-sm-4">: {{ $invtf['U_MEB_Vendor_Maklon'] ?? '-' }}</div>
 
                                     <label class="col-sm-2 col-form-label">PO Maklon</label>
-                                    <div class="col-sm-4">: Tidak Ada</div>
+                                    <div class="col-sm-4">: {{ $invtf['U_MEB_PONo_Maklon'] ?? '-' }}</div>
                                 </div>
 
                                 <div class="form-group row">
@@ -88,7 +94,7 @@
                                     <div class="col-sm-4">: Tidak Ada</div>
 
                                     <label class="col-sm-2 col-form-label">Default Warehouse</label>
-                                    <div class="col-sm-4">: Tidak Ada</div>
+                                    <div class="col-sm-4">: {{ $invtf['U_MEB_Default_Whse'] ?? '-' }}</div>
                                 </div>
 
                                 <div class="form-group row">
@@ -96,15 +102,7 @@
                                     <div class="col-sm-4">: Tidak Ada</div>
 
                                     <label class="col-sm-2 col-form-label">Default Project Code</label>
-                                    <div class="col-sm-4">: Tidak Ada</div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">Type Inventory Transaction</label>
-                                    <div class="col-sm-4">: Tidak Ada</div>
-
-                                    <label class="col-sm-2 col-form-label">SO</label>
-                                    <div class="col-sm-4">: Tidak Ada</div>
+                                    <div class="col-sm-4">: {{ $invtf['U_MEB_Project_Code'] }}</div>
                                 </div>
 
                                 <div class="form-group row">
@@ -112,20 +110,20 @@
                                     <div class="col-sm-4">: Tidak Ada</div>
 
                                     <label class="col-sm-2 col-form-label">Default Distr Rule</label>
-                                    <div class="col-sm-4">: Tidak Ada</div>
+                                    <div class="col-sm-4">: {{ $invtf['U_MEB_Dist_Rule'] }}</div>
                                 </div>
 
                                 <div class="form-group row">
                                     <label class="col-sm-2 col-form-label">No Surat Jalan</label>
-                                    <div class="col-sm-4">: Tidak Ada</div>
+                                    <div class="col-sm-4">: {{ $invtf['U_SI_No_Surat_Jalan'] }}</div>
 
                                     <label class="col-sm-2 col-form-label">Lokasi</label>
-                                    <div class="col-sm-4">: Tidak Ada</div>
+                                    <div class="col-sm-4">: {{ $invtf['U_SI_Lokasi'] ?? '-' }}</div>
                                 </div>
 
                                 <div class="form-group row">
                                     <label class="col-sm-2 col-form-label">No Produksi</label>
-                                    <div class="col-sm-4">: Tidak Ada</div>
+                                    <div class="col-sm-4">: {{ $invtf['U_SI_No_Produksi'] }}</div>
 
                                     <label class="col-sm-2 col-form-label">Ref 2 (No SJ barang datang)</label>
                                     <div class="col-sm-4">: Tidak Ada</div>
@@ -133,18 +131,18 @@
 
                                 <div class="form-group row">
                                     <label class="col-sm-2 col-form-label">No Production Order</label>
-                                    <div class="col-sm-4">: Tidak Ada</div>
+                                    <div class="col-sm-4">: {{ $invtf['U_MEB_No_Prod_Order'] ?? '-' }}</div>
 
                                     <label class="col-sm-2 col-form-label">Refer No. Good Issue</label>
-                                    <div class="col-sm-4">: Tidak Ada</div>
+                                    <div class="col-sm-4">: {{ $invtf['U_MEB_NO_GI'] ?? '-' }}</div>
                                 </div>
 
                                 <div class="form-group row">
                                     <label class="col-sm-2 col-form-label">Hari & Tanggal Kirim</label>
-                                    <div class="col-sm-4">: Tidak Ada</div>
+                                    <div class="col-sm-4">: {{ $invtf['U_SI_HARI_TGL_KIRIM'] ?? '-' }}</div>
 
                                     <label class="col-sm-2 col-form-label">Komponen Tambahan</label>
-                                    <div class="col-sm-4">: Tidak Ada</div>
+                                    <div class="col-sm-4">: {{ $invtf['U_SI_KMPN_TMBHN'] ?? '-' }}</div>
                                 </div>
                             </div>
                         </div>
@@ -178,11 +176,11 @@
                                                     <td>{{ formatDecimalsSAP($line['OpenQty']) }}</td>
                                                     <td>{{ formatDecimalsSAP($line['Quantity']) }}</td>
                                                     <td>{{ $line['UomName'] ?? '-' }}</td>
-                                                    <td>{{ $line['FromWhsCode'] }}</td>
-                                                    <td>{{ $line['ToWhsCode'] }}</td>
+                                                    <td>{{ $line['FromWhsCode'] ?? '-' }}</td>
+                                                    <td>{{ $line['ToWhsCode'] ?? '-' }}</td>
                                                     <td>Tidak Ada</td>
-                                                    <td>Tidak Ada</td>
-                                                    <td>Tidak Ada</td>
+                                                    <td>{{ $line['U_SI_Jumlah'] ?? '-' }}</td>
+                                                    <td>{{ $line['U_SI_Keterangan'] ?? '-' }}</td>
                                                     <td>Tidak Ada</td>
                                                 </tr>
                                             @endforeach

@@ -324,7 +324,7 @@
                     }
                 }
             });
-
+            setDefaultSeries("#seriesSelect", "22");
         })
         document.addEventListener("DOMContentLoaded", function() {
             const input = document.getElementById("scannerInput");

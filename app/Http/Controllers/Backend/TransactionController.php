@@ -646,6 +646,8 @@ class TransactionController extends Controller
                 'stocks.*.BaseLine'          => 'nullable|string',
                 'stocks.*.qty'                 => 'required|string',
                 'stocks.*.UnitMsr'             => 'nullable|string',
+                'stocks.*.PlannedQty'                 => 'nullable|numeric',
+                'stocks.*.IssuedQty'                 => 'nullable|numeric',
             ]);
 
             $warehouse = $validated['warehouse'] ?? '';
@@ -670,8 +672,19 @@ class TransactionController extends Controller
 
             $lines        = [];
             foreach ($validated['stocks'] as $row) {
-                // untuk API SAP
-                $entryQty = (float) str_replace(',', '.', str_replace('.', '', $row['qty']));                // Qty baru yang diinput
+                $entryQty = (float) str_replace(',', '.', str_replace('.', '', $row['qty']));
+                $planQty = (float) $row['PlannedQty'];
+                $issueQty = (float) $row['IssuedQty'];
+
+                // Qty yang sudah pernah dimasukan sebelumnya
+                $qtyLeft = round($planQty - $issueQty, 2);
+
+                if ($entryQty > $qtyLeft) {
+                    throw new \Exception(
+                        "Qty melebihi Plan QTY. Plan QTY = $planQty. Sudah issued = $issueQty. Sisa qty = $qtyLeft"
+                    );
+                }
+
                 $lines[] = [
                     'BaseEntry'    => (int) $row['BaseEntry'],
                     'BaseLineNum'  => (int) $row['BaseLine'],
@@ -712,6 +725,8 @@ class TransactionController extends Controller
                 'message' => $e->getMessage(),
                 'request' => $postData,
                 'response' => $post_gi ?? [],
+                'entryQty' => $entryQty,
+                'qtyLeft' => $qtyLeft,
             ], 500);
         }
     }
@@ -891,6 +906,8 @@ class TransactionController extends Controller
                 'stocks'                       => 'required|array|min:1',
                 'stocks.*.BaseEntry'            => 'required|string',
                 'stocks.*.qty'                 => 'required|string',
+                'stocks.*.PlannedQty'                 => 'nullable|numeric',
+                'stocks.*.totalReceiptQty'                 => 'nullable|numeric',
             ]);
 
             $warehouse = $validated['warehouse'] ?? '';
@@ -916,7 +933,15 @@ class TransactionController extends Controller
             $lines        = [];
             foreach ($validated['stocks'] as $row) {
                 $entryQty = (float) str_replace(',', '.', str_replace('.', '', $row['qty']));
-                // untuk API SAP
+                $planQty = (float) $row['PlannedQty'];
+                $totalRcptQty = (float) $row['totalReceiptQty'];
+                // Hitung sisa qty yang masih boleh diterima
+                $qtyLeft = round($planQty - $totalRcptQty, 2);
+                if ($entryQty > $qtyLeft) {
+                    throw new \Exception(
+                        "Qty melebihi Plan QTY. Plan QTY = $planQty. Sudah receipt = $totalRcptQty. Sisa qty = $qtyLeft"
+                    );
+                }
                 $lines[] = [
                     'BaseEntry'    => (int) $row['BaseEntry'],
                     'Quantity'    => $entryQty,

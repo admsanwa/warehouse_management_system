@@ -33,6 +33,16 @@ class InventorytfController extends Controller
         if (empty($getInvtf) || $getInvtf['success'] !== true) {
             return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
         }
+
+        // Filter ulang kalau ada Series
+        if (!empty($param['Series']) && !empty($getInvtf['data'])) {
+            $getInvtf['data'] = collect($getInvtf['data'])
+                ->where('Series', $param['Series'])
+                ->values()
+                ->all();
+
+            $getInvtf['total'] = count($getInvtf['data']);
+        }
         $currentCount = $getInvtf['total'] ?? count($getInvtf['data'] ?? []);
         $totalPages = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
 
