@@ -580,6 +580,7 @@
                     </tr>
                     `;
             tBody.insertAdjacentHTML("beforeend", row);
+            reorderTableRows();
             const newInput = tBody.querySelector(`input[name="stocks[${idx}][qty]"]`);
             if (newInput) {
                 formatInputDecimals(newInput);
@@ -656,6 +657,7 @@
             const row = button.closest("tr");
             if (row) {
                 row.remove();
+                reorderTableRows();
             }
         }
 
@@ -693,6 +695,20 @@
             $("#project").val("");
             $("#cost_center").val("");
             return;
+        }
+
+        function reorderTableRows() {
+            const tBody = document.getElementById("itemRows");
+            [...tBody.rows].forEach((row, index) => {
+                row.cells[0].innerText = index + 1;
+
+                const inputs = row.querySelectorAll("input, select, textarea");
+                inputs.forEach(input => {
+                    if (input.name && input.name.includes("stocks[")) {
+                        input.name = input.name.replace(/stocks\[\d+\]/, `stocks[${index}]`);
+                    }
+                });
+            });
         }
     </script>
 @endsection
