@@ -102,7 +102,7 @@
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $inv['DocNum'] }}</td>
                                                     <td>{{ $inv['DocDate'] }}</td>
-                                                    <td>Tidak Ada</td>
+                                                    <td>{{ $inv['U_MEB_NO_IO'] ?? '-' }}</td>
                                                     <td>{{ $inv['FromWhsCode'] }}</td>
                                                     <td>{{ $inv['ToWhsCode'] }}</td>
                                                     <td>{{ $inv['DocStatus'] === 'O' ? 'Open' : 'Close' }}</td>

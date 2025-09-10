@@ -52,6 +52,14 @@
                                 </div>
 
                                 <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label">IO</label>
+                                    <div class="col-sm-4">: {{ $invtf['U_MEB_NO_IO'] }}</div>
+
+                                    <label class="col-sm-2 col-form-label">Internal No</label>
+                                    <div class="col-sm-4">: {{ $invtf['U_MEB_Internal_No'] ?? '-' }}</div>
+                                </div>
+
+                                <div class="form-group row">
                                     <label class="col-sm-2 col-form-label">From Warehouse</label>
                                     <div class="col-sm-4">: {{ $invtf['FromWhsCode'] }}</div>
 
@@ -96,14 +104,6 @@
                                     <div class="col-sm-4">: Tidak Ada</div>
 
                                     <label class="col-sm-2 col-form-label">SO</label>
-                                    <div class="col-sm-4">: Tidak Ada</div>
-                                </div>
-
-                                <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">IO</label>
-                                    <div class="col-sm-4">: Tidak Ada</div>
-
-                                    <label class="col-sm-2 col-form-label">Internal No</label>
                                     <div class="col-sm-4">: Tidak Ada</div>
                                 </div>
 
