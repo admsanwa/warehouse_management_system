@@ -366,32 +366,50 @@ class ItemsController extends Controller
 
     public function project_search(Request $request)
     {
-        $param = [
-            "page" => (int) $request->get('page', 1),
-            "limit" => (int) $request->get('limit', 10),
-            "PrjCode" => $request->get('q'),
-            'Locked'       => "N",
-            'page'       => 1,
+        $q = $request->get('q');
+        $page = (int) $request->get('page', 1);
+        $limit = (int) $request->get('limit', 10);
+        $results = collect();
+
+        // 1. Cari berdasarkan PrjCode
+        $paramCode = [
+            "page" => $page,
+            "limit" => $limit,
+            "PrjCode" => $q,
+            'Locked' => "N",
         ];
+        $getCode = $this->sap->getProjects($paramCode);
 
-        $get = $this->sap->getProjects($param);
-
-        if (empty($get) || $get['success'] !== true) {
-            return response()->json([
-                'results' => []
-            ]);
+        if (!empty($getCode) && $getCode['success'] === true) {
+            $results = $results->merge($getCode['data']);
         }
 
-        $wh = collect($get['data'] ?? [])->map(function ($val) {
+        // 2. Cari berdasarkan PrjName
+        $paramName = [
+            "page" => $page,
+            "limit" => $limit,
+            "PrjName" => $q,
+            'Locked' => "N",
+        ];
+        $getName = $this->sap->getProjects($paramName);
+
+        if (!empty($getName) && $getName['success'] === true) {
+            $results = $results->merge($getName['data']);
+        }
+
+        // Gabungkan hasil dan hapus duplikat berdasarkan 'PrjCode'
+        $results = $results->unique('PrjCode')->values();
+
+        $wh = $results->map(function ($val) {
             return [
-                'id'   => $val['PrjCode'],
-                'text' => $val['PrjName'],
+                'id' => $val['PrjCode'],
+                'text' => $val['PrjCode'] . ' - ' . $val['PrjName'],
             ];
         });
 
         return response()->json([
             'results' => $wh,
-            'api_response' => $get
+            'api_response' => $results
         ]);
     }
     public function printBarcodeWithPdf(Request $request)
