@@ -30,6 +30,16 @@
                                 @csrf
                                 <div class="card-body">
                                     <div class="form-group row">
+                                        <label for="" class="col-sm-3 col-form-lable">Tipe Bon :</label>
+                                        <div class="col-sm-6">
+                                            <select name="type" id="type" class="form-control">
+                                                <option value="">Select tipe bon Lokal/Import</option>
+                                                <option value="Lokal">Lokal</option>
+                                                <option value="Import">Import</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
                                         <label for="" class="col-sm-3 col-form-lable">Nomer :</label>
                                         <div class="col-sm-6">
                                             <input name="no" id="no" value="{{ $number }}"
@@ -81,89 +91,100 @@
                                         </div>
                                     </div>
                                     <div id="unitContainer">
-<div class="unit-block mb-3 p-3 border rounded bg-light">
-    <div class="form-row align-items-end">
-        <!-- Nama Barang -->
-        <div class="form-group col-md-4">
-            <label for="item_code">Nama Barang</label>
-            <select name="item_code[]" class="select2 form-control" style="width: 100%"></select>
-            <input type="hidden" name="item_desc[]" class="form-control" placeholder="Masukkan Uom" readonly>
+                                        <div class="unit-block mb-3 p-3 border rounded bg-light">
+                                            <div class="form-row align-items-end">
+                                                <!-- Nama Barang -->
+                                                <div class="form-group col-md-4">
+                                                    <label for="item_code">Nama Barang</label>
+                                                    <select name="item_code[]" class="select2 form-control"
+                                                        style="width: 100%"></select>
+                                                    <input type="hidden" name="item_desc[]" class="form-control"
+                                                        placeholder="Masukkan Uom" readonly>
 
-        </div>
+                                                </div>
 
-        <!-- UOM -->
-        <div class="form-group col-md-2">
-            <label for="uom">UOM</label>
-            <input type="text" name="uom[]" class="form-control" placeholder="Masukkan Uom" readonly>
-        </div>
+                                                <!-- UOM -->
+                                                <div class="form-group col-md-2">
+                                                    <label for="uom">UOM</label>
+                                                    <input type="text" name="uom[]" class="form-control"
+                                                        placeholder="Masukkan Uom" readonly>
+                                                </div>
 
-        <!-- Qty -->
-        <div class="form-group col-md-2">
-            <label for="qty">Qty</label>
-            <input type="number" name="qty[]" class="form-control" placeholder="Masukkan Qty">
-        </div>
+                                                <!-- Qty -->
+                                                <div class="form-group col-md-2">
+                                                    <label for="qty">Qty</label>
+                                                    <input type="number" name="qty[]" class="form-control"
+                                                        placeholder="Masukkan Qty">
+                                                </div>
 
-        <!-- Keterangan -->
-        <div class="form-group col-md-3">
-            <label for="remark">Keterangan</label>
-            <input type="text" name="remark[]" class="form-control" placeholder="Masukkan Keterangan">
-        </div>
+                                                <!-- Keterangan -->
+                                                <div class="form-group col-md-3">
+                                                    <label for="remark">Keterangan</label>
+                                                    <input type="text" name="remark[]" class="form-control"
+                                                        placeholder="Masukkan Keterangan">
+                                                </div>
 
-        <!-- Action buttons -->
-        <div class="form-group col-md-1 text-center">
-            <button type="button" class="btn btn-success btn-add-unit mb-1">
-                <i class="fa fa-plus-circle"></i>
-            </button>
-            <button type="button" class="btn btn-danger btn-remove-unit" style="display: none;">
-                <i class="fa fa-minus-circle"></i>
-            </button>
-        </div>
-    </div>
-</div>
+                                                <!-- Action buttons -->
+                                                <div class="form-group col-md-1 text-center">
+                                                    <button type="button" class="btn btn-success btn-add-unit mb-1">
+                                                        <i class="fa fa-plus-circle"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-remove-unit"
+                                                        style="display: none;">
+                                                        <i class="fa fa-minus-circle"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
 
                                     </div>
                                     {{-- Hidden clean template --}}
-<template id="unitTemplate">
-    <div class="unit-block mb-3 p-3 border rounded bg-light">
-        <div class="form-row align-items-end">
-            <!-- Nama Barang -->
-            <div class="form-group col-md-4">
-                <label>Nama Barang</label>
-                <select name="item_code[]" class="select2 form-control" style="width: 100%">
-                </select>
-                <input type="hidden" name="item_desc[]" class="form-control" placeholder="Masukkan Uom" readonly>
-            </div>
+                                    <template id="unitTemplate">
+                                        <div class="unit-block mb-3 p-3 border rounded bg-light">
+                                            <div class="form-row align-items-end">
+                                                <!-- Nama Barang -->
+                                                <div class="form-group col-md-4">
+                                                    <label>Nama Barang</label>
+                                                    <select name="item_code[]" class="select2 form-control"
+                                                        style="width: 100%">
+                                                    </select>
+                                                    <input type="hidden" name="item_desc[]" class="form-control"
+                                                        placeholder="Masukkan Uom" readonly>
+                                                </div>
 
-            <!-- Qty -->
-            <div class="form-group col-md-2">
-                <label>Qty</label>
-                <input type="number" name="qty[]" class="form-control" placeholder="Masukkan Qty">
-            </div>
+                                                <!-- Qty -->
+                                                <div class="form-group col-md-2">
+                                                    <label>Qty</label>
+                                                    <input type="number" name="qty[]" class="form-control"
+                                                        placeholder="Masukkan Qty">
+                                                </div>
 
-            <!-- UOM -->
-            <div class="form-group col-md-2">
-                <label>Uom</label>
-                <input type="text" name="uom[]" class="form-control" placeholder="Masukkan Uom" readonly>
-            </div>
+                                                <!-- UOM -->
+                                                <div class="form-group col-md-2">
+                                                    <label>Uom</label>
+                                                    <input type="text" name="uom[]" class="form-control"
+                                                        placeholder="Masukkan Uom" readonly>
+                                                </div>
 
-            <!-- Keterangan -->
-            <div class="form-group col-md-3">
-                <label>Keterangan</label>
-                <input type="text" name="remark[]" class="form-control" placeholder="Masukkan Keterangan">
-            </div>
+                                                <!-- Keterangan -->
+                                                <div class="form-group col-md-3">
+                                                    <label>Keterangan</label>
+                                                    <input type="text" name="remark[]" class="form-control"
+                                                        placeholder="Masukkan Keterangan">
+                                                </div>
 
-            <!-- Action buttons -->
-            <div class="form-group col-md-1 text-center">
-                <button type="button" class="btn btn-success btn-add-unit mb-1">
-                    <i class="fa fa-plus-circle"></i>
-                </button>
-                <button type="button" class="btn btn-danger btn-remove-unit">
-                    <i class="fa fa-minus-circle"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-</template>
+                                                <!-- Action buttons -->
+                                                <div class="form-group col-md-1 text-center">
+                                                    <button type="button" class="btn btn-success btn-add-unit mb-1">
+                                                        <i class="fa fa-plus-circle"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-danger btn-remove-unit">
+                                                        <i class="fa fa-minus-circle"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
 
                                 </div>
                                 <div class="card-footer">
@@ -180,20 +201,20 @@
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             function initSelect2($el) {
                 $el.select2({
                     placeholder: "Ketik kode barang...",
                     allowClear: true,
                     width: "100%",
                     language: {
-                        inputTooShort: function () {
+                        inputTooShort: function() {
                             return "Ketik kode barang untuk mencari...";
                         },
-                        noResults: function () {
+                        noResults: function() {
                             return "Tidak ada data ditemukan";
                         },
-                        searching: function () {
+                        searching: function() {
                             return "Sedang mencari...";
                         },
                     },
@@ -201,12 +222,12 @@
                         url: "/onhandSearch",
                         dataType: "json",
                         delay: 250,
-                        data: function (params) {
+                        data: function(params) {
                             return {
                                 q: params.term,
                             };
                         },
-                        processResults: function (data) {
+                        processResults: function(data) {
                             return {
                                 results: (data.results || []).map((item) => ({
                                     id: item.id,
@@ -220,7 +241,7 @@
                 });
 
                 // Event ketika pilih barang
-                $el.on("select2:select", function (e) {
+                $el.on("select2:select", function(e) {
                     let data = e.params.data;
                     let $block = $(this).closest(".unit-block");
                     $block.find('input[name="uom[]"]').val(data.uom || "");
@@ -230,14 +251,14 @@
 
             initSelect2($(".select2"));
 
-            $(document).on("click", ".btn-add-unit", function () {
+            $(document).on("click", ".btn-add-unit", function() {
                 let clone = $($("#unitTemplate").html());
                 $("#unitContainer").append(clone);
 
                 initSelect2(clone.find(".select2"));
             });
 
-            $(document).on("click", ".btn-remove-unit", function () {
+            $(document).on("click", ".btn-remove-unit", function() {
                 $(this).closest(".unit-block").remove();
             });
         });

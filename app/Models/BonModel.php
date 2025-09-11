@@ -13,7 +13,16 @@ class BonModel extends Model
     use HasFactory;
 
     protected $table = "bon";
-    protected $fillable = ['no', 'section', 'date', 'project', 'io', 'project', 'created_by', 'make_to'];
+    protected $fillable = [
+        'type',
+        'no',
+        'date',
+        'section',
+        'io',
+        'project',
+        'make_to',
+        'created_by'
+    ];
 
     static public function getRecord()
     {

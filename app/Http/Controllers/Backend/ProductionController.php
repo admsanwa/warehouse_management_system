@@ -498,6 +498,7 @@ class ProductionController extends Controller
     {
         // dd($request->all());
         $validated = $request->validate([
+            'type'            => 'required|string',
             'no'            => 'required|string',
             'date'          => 'required|date',
             'section'       => 'required',
@@ -519,6 +520,7 @@ class ProductionController extends Controller
         DB::transaction(function () use ($validated) {
             $user = Auth::user();
             $bon = BonModel::create([
+                'type'            => $validated['type'],
                 'no'            => $validated['no'],
                 'date'          => $validated['date'],
                 'section'       => $validated['section'],
@@ -591,13 +593,12 @@ class ProductionController extends Controller
 
         return view("backend.production.showbon", compact('bon', 'user', 'signApprove', 'signBuyer'));
     }
-
     public function approve_bon(Request $request)
     {
         $no   = $request->input("no_bon");
         $user = Auth::user();
-        $recipients = User::where("department", "Purchasing")->get();
 
+        // Simpan sign
         $sign               = new SignBonModel();
         $sign->no_bon       = $no;
         $sign->nik          = $user->nik;
@@ -605,9 +606,27 @@ class ProductionController extends Controller
         $sign->sign         = 1;
         $sign->save();
 
-        $dev_users = User::where('department', 'IT')->get();
+        $bon = BonModel::where("no", $no)->first();
 
-        // merge collections
+        $recipients = collect();
+
+        if ($bon && $bon->type) {
+            if ($bon->type === "Lokal") {
+                $recipients = collect([new \App\Models\User([
+                    "email" => "purchasing_bks@sanwamas.co.id"
+                ])]);
+            } elseif ($bon->type === "Import") {
+                $recipients = collect([new \App\Models\User([
+                    "email" => "purchasing_staff@sanwamas.co.id"
+                ])]);
+            }
+        }
+
+        if ($recipients->isEmpty()) {
+            $recipients = User::where("department", "Purchasing")->get();
+        }
+
+        $dev_users = User::where('department', 'IT')->get();
         $recipients = $recipients->merge($dev_users);
 
         Notification::send($recipients, new MailBonFinal(

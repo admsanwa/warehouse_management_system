@@ -200,6 +200,7 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('/warehouseSearch', [ItemsController::class, 'warehouse_search']);
     Route::get('/costCenterSearch', [ItemsController::class, 'cost_center_search']);
     Route::get('/projectSearch', [ItemsController::class, 'project_search']);
+    Route::get('/onhandSearch', [ItemsController::class, 'onhand_search']);
 });
 
 Route::get('logout', [AuthController::class, 'logout']);
