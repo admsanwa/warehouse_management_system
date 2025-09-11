@@ -440,8 +440,11 @@
 
 
                         hideLoadingOverlay();
+                        const loadScan = loadScannedBarcodes();
+                        if (loadScan === false) {
+                            return;
+                        }
                         showToast("✅ Success Scan: " + data.ItemName, 'success');
-                        loadScannedBarcodes();
                     } else {
                         // console.log("grpo", data.grpo);
                         hideLoadingOverlay();
@@ -503,6 +506,10 @@
             const tBody = document.getElementById("itemRows");
             const itemCode = document.getElementById("item_code").value;
 
+            if (!itemCode) {
+                alert("Harap Scan Barcode terlebih dulu!");
+                return;
+            }
             const lines = selectedPo['Lines'] || [];
 
             // filter semua line dengan itemCode sama & masih ada OpenQty
@@ -514,12 +521,11 @@
 
             matchingLines = matchingLines.filter(item => !existingLineNums.includes(item.LineNum));
             if (matchingLines.length === 0 || !matchingLines) {
-                console.log("Item Tidak Ada");
+                console.warn("Item Tidak Ada");
                 showToast(`${itemCode} sudah habis atau semua linenum sudah terpakai.`, "error");
                 return false;
             }
 
-            // ambil line teratas yang masih tersedia
             const stock = matchingLines[0];
 
             if (stock.OpenQty <= 0) {
@@ -574,6 +580,7 @@
             if (newInput) {
                 formatInputDecimals(newInput);
             }
+            return;
         }
 
 
