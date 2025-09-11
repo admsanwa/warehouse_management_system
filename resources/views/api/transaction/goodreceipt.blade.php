@@ -624,11 +624,11 @@
                         showToast("✅ Berhasil " + data.message, "success");
                         btn.disabled = false;
                         setTimeout(() => {
-                            // window.location.reload();
+                            window.location.reload();
                         }, 800)
                     } else {
+                        hideLoadingOverlay();
                         if (data.errors) {
-                            hideLoadingOverlay();
                             let errorMessages = Object.values(data.errors).flat().join("\n");
                             showToast("❌ Gagal simpan:\n" + errorMessages, 'error');
                         } else {
