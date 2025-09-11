@@ -475,6 +475,8 @@
             document.getElementById("U_MEB_NO_IO").value = data.U_MEB_NO_IO;
             document.getElementById("U_MEB_Ket_Pur").value = data.U_MEB_Ket_Pur;
             // console.log(data);
+            document.getElementById("remarks").value = "Based On Purchase Order " + data.DocNum;
+
 
             // loadGrpoHistories(data);
         }
@@ -489,6 +491,7 @@
             document.getElementById("U_MEB_No_SO").value = "";
             document.getElementById("U_MEB_NO_IO").value = "";
             document.getElementById("U_MEB_Ket_Pur").value = "";
+            document.getElementById("remarks").value = "";
             return;
         }
 
