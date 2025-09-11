@@ -32,6 +32,7 @@ function formatInputDecimals(target) {
         removeMaskOnSubmit: true,
     }).mask(target);
 }
+
 function formatTimestamp(dateString) {
     if (!dateString) return "-";
     const date = new Date(dateString);

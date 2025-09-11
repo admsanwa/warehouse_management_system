@@ -118,7 +118,7 @@ Route::group(['middleware' => 'admin'], function () {
 
     // qc
     Route::get("admin/quality/list", [QualityController::class, "index"]);
-    Route::post("admin/quality/{prod_no}", [QualityController::class, "result"]);
+    Route::post("admin/quality/{docentry}", [QualityController::class, "result"]);
     Route::get("admin/quality/history", [QualityController::class, "history"]);
 
     // stock
@@ -190,7 +190,7 @@ Route::group(['middleware' => 'admin'], function () {
 
     // delivery
     Route::get("admin/delivery/list", [DeliveryController::class, "index"]);
-    Route::post("admin/delivery/estimate/{prod_no}", [DeliveryController::class, "estimate"]);
+    Route::post("admin/delivery/estimate/{docEntry}", [DeliveryController::class, "estimate"]);
     Route::get("admin/delivery/history", [DeliveryController::class, "history"]);
 
     // get data api
@@ -200,7 +200,6 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('/warehouseSearch', [ItemsController::class, 'warehouse_search']);
     Route::get('/costCenterSearch', [ItemsController::class, 'cost_center_search']);
     Route::get('/projectSearch', [ItemsController::class, 'project_search']);
-    Route::get('/onhandSearch', [ItemsController::class, 'onhand_search']);
 });
 
 Route::get('logout', [AuthController::class, 'logout']);
