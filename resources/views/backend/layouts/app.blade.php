@@ -152,7 +152,7 @@
     {{-- <script src="{{ url('backend/dist/js/demo.js')}}"></script> --}}
     <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
     <script src="{{ url('backend/dist/js/pages/dashboard.js') }}"></script>
-    <script src="{{ url('backend/js/components.js?v=1.0') }}"></script>
+    <script src="{{ url('backend/js/components.js?v=1.2') }}"></script>
     {{-- scan barcode --}}
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
