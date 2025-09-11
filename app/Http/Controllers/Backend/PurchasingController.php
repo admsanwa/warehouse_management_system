@@ -122,7 +122,6 @@ class PurchasingController extends Controller
         $param = [
             "limit" => (int) $request->get('limit', 5),
             "DocStatus" => $request->get('status', 'Open'),
-            "ItemCode" => $request->get('code'),
             "DocNum" => $request->get('q'),
             "DocEntry" => $request->get('docentry'),
             "Series" => $request->get('series'),
