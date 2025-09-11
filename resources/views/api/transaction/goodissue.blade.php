@@ -96,11 +96,19 @@
                                 <div class="col-sm-6 mb-2">
                                     <select name="reason" id="reason" class="form-control mt-2" required>
                                         <option value="" disabled selected>Pilih Alasan</option>
-                                        @foreach ($gi_reasons as $key => $item)
-                                            <option value="{{ $key }}">{{ $key }} - {{ $item }}
+                                        @foreach ($gi_reasons as $item)
+                                            <option value="{{ $item['reason_code'] }}"
+                                                data-acctcode="{{ $item['acct_code'] }}"
+                                                data-islock="{{ $item['acct_lock'] }}">
+                                                {{ $item['reason_code'] }} - {{ $item['reason_desc'] }}
                                             </option>
                                         @endforeach
                                     </select>
+                                </div>
+                                <label for="" class="col-sm-4 col-form-lable">Acct Code :</label>
+                                <div class="col-sm-6 mb-2">
+                                    <input type="text" name="acct_code" id="acct_code" class="form-control mt-2"
+                                        readonly required>
                                 </div>
                                 <label for="" class="col-sm-4 col-form-lable">No Surat Jalan :</label>
                                 <div class="col-sm-6 mb-2">
@@ -376,6 +384,23 @@
                     }
                 });
             }
+
+            $("#reason").on("change", function() {
+                const selected = $(this).find(":selected");
+
+                const acctCode = selected.data("acctcode");
+                const isLock = selected.data("islock");
+
+                $("#acct_code").val(acctCode);
+
+                // atur readonly sesuai islock
+                if (isLock === "Y") {
+                    $("#acct_code").prop("readonly", true);
+                } else {
+                    $("#acct_code").prop("readonly", false);
+                }
+            });
+
         });
 
         document.addEventListener("DOMContentLoaded", function() {

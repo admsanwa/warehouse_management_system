@@ -493,47 +493,13 @@ class TransactionController extends Controller
         ));
     }
 
-    public function stock_out_old()
-    {
-        $temp           = StockModel::where('is_temp', true)->orderByDesc('id')->first();
-        $latestStockOut = StockModel::whereNotNull('isp')->orderByDesc('id')->first();
-        if ($temp) {
-            $isp        = $latestStockOut && $latestStockOut->isp ? $latestStockOut->isp : 1;
-        } else {
-            $isp        = $latestStockOut && $latestStockOut->isp ? ((int)$latestStockOut->isp + 1) : 1;
-        }
-        $getProdorder   = null;
-        $getPos         = null;
-
-        return view('backend.transaction.stockout', compact("getProdorder", "getPos", "isp"));
-    }
-
-    public function stockout_po($prod_order)
-    {
-        $temp           = StockModel::where('is_temp', true)->orderByDesc('id')->first();
-        $latestStockOut = StockModel::whereNotNull('isp')->orderByDesc('id')->first();
-        if ($temp) {
-            $isp        = $latestStockOut && $latestStockOut->isp ? $latestStockOut->isp : 1;
-        } else {
-            $isp        = $latestStockOut && $latestStockOut->isp ? ((int)$latestStockOut->isp + 1) : 1;
-        }
-        // dd([
-        //     'temp' => $temp,
-        //     'latestStockOut' => $latestStockOut,
-        //     'isp' => $isp
-        // ]);
-
-        $getPos = ProductionModel::where("doc_num", $prod_order)->first();
-        return view("backend.transaction.stockout", compact("getPos", "isp"));
-    }
-
     public function scan_and_issued(Request $request)
     {
         $validated = $request->validate([
             'item_code' => 'required|string',
         ]);
-
         $warehouse =  $this->default_warehouse;
+        // $warehouse =  "BK002"; //dari gudang produksi
         $barcode   = $validated['item_code'];
         $items = $this->sap->getStockItems([
             'ItemCode' => $barcode,
@@ -1107,8 +1073,7 @@ class TransactionController extends Controller
 
         $gi_reasons = SapReason::where('type', 'issue')
             ->orderBy('reason_code')
-            ->pluck('reason_desc', 'reason_code')
-            ->toArray();
+            ->get();
 
         $inv_trans_reasons = SapReason::where('type', 'inv-trans')
             ->orderBy('reason_code')
@@ -1119,7 +1084,7 @@ class TransactionController extends Controller
             'po',
             'docEntry',
             'gi_reasons',
-            'inv_trans_reasons'
+            'inv_trans_reasons',
         ));
     }
 
@@ -1201,6 +1166,7 @@ class TransactionController extends Controller
                 'project'      => 'nullable|string',
                 'warehouse'      => 'nullable|string',
                 'cost_center'      => 'nullable|string',
+                'acct_code'      => 'nullable|string',
                 'reason'      => 'required|string',
                 'stocks'                       => 'required|array|min:1',
                 'stocks.*.ItemCode'            => 'required|string',
@@ -1245,7 +1211,7 @@ class TransactionController extends Controller
                     'Quantity'    => $entryQty,
                     'WhsCode'    =>  $warehouse ?? '',
                     'Ext' => [
-                        // 'AcctCode'    => "212400",
+                        'AcctCode'    => $validated['acct_code'],
                         'OcrCode' => $ocr ?? '',
                         'Project' => $project ?? ''
                     ]
@@ -1451,8 +1417,7 @@ class TransactionController extends Controller
 
         $gr_reasons = SapReason::where('type', 'receipt')
             ->orderBy('reason_code')
-            ->pluck('reason_desc', 'reason_code')
-            ->toArray();
+            ->get();
 
         $inv_trans_reasons = SapReason::where('type', 'inv-trans')
             ->orderBy('reason_code')
@@ -1571,6 +1536,7 @@ class TransactionController extends Controller
                 'project'      => 'nullable|string',
                 'warehouse'      => 'nullable|string',
                 'cost_center'      => 'nullable|string',
+                'acct_code'      => 'nullable|string',
                 'reason'      => 'required|string',
                 'stocks'                       => 'required|array|min:1',
                 'stocks.*.ItemCode'            => 'required|string',
@@ -1616,6 +1582,7 @@ class TransactionController extends Controller
                     'Quantity'    => $entryQty,
                     'WhsCode'    =>  $warehouse,
                     'Ext' => [
+                        'AcctCode'    => $validated['acct_code'],
                         'OcrCode' => $ocr,
                         'Project' => $project
                     ]
