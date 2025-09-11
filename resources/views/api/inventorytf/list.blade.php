@@ -41,11 +41,11 @@
                                             <input type="date" name="date" class="form-control"
                                                 value="{{ Request()->date }}">
                                         </div>
-                                        {{-- <div class="form-group col-md-2">
+                                        <div class="form-group col-md-2">
                                             <label for="">IO</label>
                                             <input type="text" name="U_MEB_NO_IO" class="form-control"
                                                 placeholder="Enter IO Nomor" value="{{ Request()->io_no }}">
-                                        </div> --}}
+                                        </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Status</label>
                                             <select name="status" id="status" class="form-control">

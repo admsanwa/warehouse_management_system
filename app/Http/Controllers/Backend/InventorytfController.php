@@ -25,6 +25,7 @@ class InventorytfController extends Controller
             "page" => (int) $request->get('page', 1),
             "limit" => (int) $request->get('limit', 5),
             "DocNum" => $request->get('number'),
+            "U_MEB_NO_IO" => $request->get('U_MEB_NO_IO'),
             "DocDate" => $request->get('date'),
             "DocStatus" =>  $request->get('status', 'O'),
             "Series" =>  $request->get('series'),
