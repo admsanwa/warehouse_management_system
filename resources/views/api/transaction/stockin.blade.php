@@ -514,6 +514,14 @@
 
             matchingLines = matchingLines.filter(item => !existingLineNums.includes(item.LineNum));
 
+            const totalLinesForItem = lines.filter(item => item.ItemCode === itemCode).length;
+            if (totalLinesForItem === 1 && existingLineNums.some(num =>
+                    lines.some(line => line.LineNum === num && line.ItemCode === itemCode)
+                )) {
+                showToast(`${itemCode} hanya punya 1 line, tidak bisa discan lebih dari sekali.`, "error");
+                return false;
+            }
+
             if (matchingLines.length === 0) {
                 showToast(`${itemCode} sudah habis atau semua linenum sudah terpakai.`, "error");
                 return false;
