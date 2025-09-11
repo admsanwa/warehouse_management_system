@@ -440,8 +440,8 @@
 
 
                         hideLoadingOverlay();
-                        loadScannedBarcodes();
                         showToast("✅ Success Scan: " + data.ItemName, 'success');
+                        loadScannedBarcodes();
                     } else {
                         // console.log("grpo", data.grpo);
                         hideLoadingOverlay();
@@ -513,16 +513,8 @@
                 .map(input => parseInt(input.value));
 
             matchingLines = matchingLines.filter(item => !existingLineNums.includes(item.LineNum));
-
-            const totalLinesForItem = lines.filter(item => item.ItemCode === itemCode).length;
-            if (totalLinesForItem === 1 && existingLineNums.some(num =>
-                    lines.some(line => line.LineNum === num && line.ItemCode === itemCode)
-                )) {
-                showToast(`${itemCode} hanya punya 1 line, tidak bisa discan lebih dari sekali.`, "error");
-                return false;
-            }
-
-            if (matchingLines.length === 0) {
+            if (matchingLines.length === 0 || !matchingLines) {
+                console.log("Item Tidak Ada");
                 showToast(`${itemCode} sudah habis atau semua linenum sudah terpakai.`, "error");
                 return false;
             }
@@ -703,7 +695,7 @@
             setTimeout(() => {
                 box.classList.remove('show');
                 document.getElementById("scannerInput").focus();
-            }, 3000);
+            }, 6000);
         }
 
         function reorderTableRows() {
