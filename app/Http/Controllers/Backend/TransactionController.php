@@ -677,7 +677,7 @@ class TransactionController extends Controller
                 $issueQty = (float) $row['IssuedQty'];
 
                 // Qty yang sudah pernah dimasukan sebelumnya
-                $qtyLeft = round($planQty - $issueQty, 2);
+                $qtyLeft = round($planQty - $issueQty, 3);
 
                 if ($entryQty > $qtyLeft) {
                     throw new \Exception(
@@ -936,7 +936,7 @@ class TransactionController extends Controller
                 $planQty = (float) $row['PlannedQty'];
                 $totalRcptQty = (float) $row['totalReceiptQty'];
                 // Hitung sisa qty yang masih boleh diterima
-                $qtyLeft = round($planQty - $totalRcptQty, 2);
+                $qtyLeft = round($planQty - $totalRcptQty, 3);
                 if ($entryQty > $qtyLeft) {
                     throw new \Exception(
                         "Qty melebihi Plan QTY. Plan QTY = $planQty. Sudah receipt = $totalRcptQty. Sisa qty = $qtyLeft"
