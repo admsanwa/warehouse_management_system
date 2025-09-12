@@ -249,6 +249,7 @@ class ItemsController extends Controller
         $paramCode = [
             "page" => $page,
             "limit" => $limit,
+            'WhsCode' => $this->default_warehouse,
             "ItemCode" => $q,
         ];
         $getCode = $this->sap->getStockItems($paramCode);
@@ -261,6 +262,7 @@ class ItemsController extends Controller
         $paramName = [
             "page" => $page,
             "limit" => $limit,
+            'WhsCode' => $this->default_warehouse,
             "ItemName" => $q,
         ];
         $getName = $this->sap->getStockItems($paramName);
