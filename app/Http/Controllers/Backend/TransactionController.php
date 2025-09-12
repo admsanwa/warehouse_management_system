@@ -496,8 +496,8 @@ class TransactionController extends Controller
         $validated = $request->validate([
             'item_code' => 'required|string',
         ]);
-        $warehouse =  $this->default_warehouse;
-        // $warehouse =  "BK002"; //dari gudang produksi
+        // $warehouse =  $this->default_warehouse;
+        $warehouse =  "BK002"; //dari gudang produksi
         $barcode   = $validated['item_code'];
         $items = $this->sap->getStockItems([
             'ItemCode' => $barcode,
@@ -793,15 +793,14 @@ class TransactionController extends Controller
     {
         $po       = $request->get('docNum');
         $docEntry = $request->get('docEntry');
-        $gr_reason = SapReason::where('type', 'receipt')
+        $gr_reasons = SapReason::where('type', 'receipt')
             ->orderBy('reason_code')
-            ->pluck('reason_desc', 'reason_code')
-            ->toArray();
+            ->get();
 
         return view('api.transaction.receiptfromprod', compact(
             'po',
             'docEntry',
-            'gr_reason',
+            'gr_reasons',
         ));
     }
 
@@ -811,7 +810,8 @@ class TransactionController extends Controller
             'item_code' => 'required|string',
         ]);
 
-        $warehouse = $this->default_warehouse;
+        $warehouse = "BK002";
+        // $warehouse = $this->default_warehouse;
         $barcode   = $validated['item_code'];
         $items = $this->sap->getStockItems([
             'ItemCode' => $barcode,
@@ -862,6 +862,7 @@ class TransactionController extends Controller
                 'warehouse'      => 'nullable|string',
                 'reason'      => 'required|string',
                 // 'cost_center'      => 'nullable|string',
+                'acct_code'      => 'nullable|string',
                 'prod_type'      => 'nullable|string',
                 'stocks'                       => 'required|array|min:1',
                 'stocks.*.BaseEntry'            => 'required|string',
@@ -885,7 +886,6 @@ class TransactionController extends Controller
                     "U_MEB_No_IO" =>   $validated['no_io'] ?? '',
                     "U_MEB_No_SO" =>   $validated['no_so'] ?? '',
                     "U_MEB_Project_Code" =>   $project ?? '',
-                    // "U_MEB_DIST_RULE" =>  $validated['cost_center'] ?? ''
                 ],
                 'Lines'       => []
             ];
@@ -905,7 +905,10 @@ class TransactionController extends Controller
                 $lines[] = [
                     'BaseEntry'    => (int) $row['BaseEntry'],
                     'Quantity'    => $entryQty,
-                    'WhsCode'    =>  $warehouse ?? '',
+                    'WhsCode'    =>  $warehouse,
+                    'Ext' => [
+                        'AcctCode'    => $validated['acct_code'],
+                    ]
                 ];
 
                 // untuk DB

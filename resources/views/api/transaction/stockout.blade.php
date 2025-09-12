@@ -58,13 +58,13 @@
                                     required>
                             </div>
                         </div>
-                        {{-- <div class="form-group row">
+                        <div class="form-group row">
                             <label class="col-sm-4 col-form-lable">Warehouse :</label>
                             <div class="col-sm-6">
                                 <input type="text" name="item_wh" id="item_wh" class="form-control mt-2" readonly
                                     required>
                             </div>
-                        </div> --}}
+                        </div>
                         <div class="form-group row">
                             <label class="col-sm-4 col-form-lable">On Hand :</label>
                             <div class="col-sm-6">
@@ -495,9 +495,9 @@
                     // const pomSelect = document.getElementById("pom");
                     document.getElementById("item_code").value = data.itemCode;
                     document.getElementById("item_desc").value = data.ItemName;
-                    // document.getElementById("item_wh").value = data.warehouseStock.WhsCode;
+                    document.getElementById("item_wh").value = data.warehouseStock.WhsCode;
                     document.getElementById("on_hand").value = data.warehouseStock.OnHand;
-                    // setDefaultWarehouse("#warehouse", data.warehouseStock.WhsCode);
+                    setDefaultWarehouse("#warehouse", data.warehouseStock.WhsCode);
 
                     const loadScan = loadScannedBarcodes();
                     if (loadScan === false) {
@@ -652,7 +652,7 @@
                         showToast("✅ Berhasil " + data.message, "success");
                         btn.disabled = false;
                         setTimeout(() => {
-                            window.location.reload();
+                            // window.location.reload();
                         }, 1000)
                     } else {
                         hideLoadingOverlay();

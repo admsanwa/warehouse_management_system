@@ -59,6 +59,13 @@
                             </div>
                         </div>
                         <div class="form-group row">
+                            <label class="col-sm-4 col-form-lable">Warehouse :</label>
+                            <div class="col-sm-6">
+                                <input type="text" name="item_wh" id="item_wh" class="form-control mt-2" readonly
+                                    required>
+                            </div>
+                        </div>
+                        <div class="form-group row">
                             <label class="col-sm-4 col-form-lable">On Hand :</label>
                             <div class="col-sm-6">
                                 <input type="text" name="on_hand" id="on_hand" class="form-control mt-2" readonly
@@ -109,11 +116,19 @@
                                 <div class="col-sm-6 mb-2">
                                     <select name="reason" id="reason" class="form-control mt-2" required>
                                         <option value="" disabled selected>Pilih Alasan</option>
-                                        @foreach ($gr_reason as $key => $item)
-                                            <option value="{{ $key }}">{{ $key }} - {{ $item }}
+                                        @foreach ($gr_reasons as $item)
+                                            <option value="{{ $item['reason_code'] }}"
+                                                data-acctcode="{{ $item['acct_code'] }}"
+                                                data-islock="{{ $item['acct_lock'] }}">
+                                                {{ $item['reason_code'] }} - {{ $item['reason_desc'] }}
                                             </option>
                                         @endforeach
                                     </select>
+                                </div>
+                                <label for="" class="col-sm-4 col-form-lable">Acct Code :</label>
+                                <div class="col-sm-6 mb-2">
+                                    <input type="text" name="acct_code" id="acct_code" class="form-control mt-2"
+                                        placeholder="Masukan Acct Code" required>
                                 </div>
                                 <label for="no_io" class="col-sm-4 col-form-label">No IO :</label>
                                 <div class="col-sm-6 mb-2">
@@ -366,6 +381,22 @@
             });
             setDefaultSeries("#seriesSelect", "202");
 
+            // $("#reason").on("change", function() {
+            //     const selected = $(this).find(":selected");
+
+            //     const acctCode = selected.data("acctcode");
+            //     const isLock = selected.data("islock");
+
+            //     $("#acct_code").val(acctCode);
+
+            //     // atur readonly sesuai islock
+            //     if (isLock === "Y") {
+            //         $("#acct_code").prop("readonly", true);
+            //     } else {
+            //         $("#acct_code").prop("readonly", false);
+            //     }
+            // });
+
         });
         document.addEventListener("DOMContentLoaded", function() {
             const input = document.getElementById("scannerInput");
@@ -485,10 +516,15 @@
                     // const pomSelect = document.getElementById("pom");
                     document.getElementById("item_code").value = data.itemCode;
                     document.getElementById("item_desc").value = data.ItemName;
+                    document.getElementById("item_wh").value = data.warehouseStock.WhsCode;
                     document.getElementById("on_hand").value = data.warehouseStock.OnHand;
-
+                    setDefaultWarehouse("#warehouse", data.warehouseStock.WhsCode);
+                    const loadScan = loadScannedBarcodes();
+                    console.log(loadScan);
+                    if (loadScan === false) {
+                        return;
+                    }
                     showToast("✅ Success Scan: " + data.ItemName, 'success');
-                    loadScannedBarcodes();
                 })
                 .finally(() => {
                     fileInput.disabled = false;
@@ -521,13 +557,16 @@
                 alert("Harap Scan Barcode terlebih dulu!");
                 return;
             }
-
+            console.log("Scan ", itemCode);
 
             const stocks = selectedPo;
+            console.log("PO ", stocks.ItemCode);
+
             if (itemCode != stocks.ItemCode) {
-                alert(`Item dengan kode ${itemCode} tidak sesuai dengan nomor PO yang dipilih.`);
+                showToast(`Item dengan kode ${itemCode} tidak sesuai dengan nomor PO yang dipilih.`, 'error');
                 return false;
             }
+
             const idx = tBody.rows.length;
             const totalReceiptQty = (stocks.CmpltQty || 0) + (stocks.RjctQty || 0);
             const isReceiptQtyDone = totalReceiptQty >= stocks.PlannedQty;
@@ -536,7 +575,7 @@
                     "Gagal menambahkan. Total Receipt Qty untuk barcode ini sudah terpenuhi",
                     "error"
                 );
-                return true;
+                return false;
             }
             let inputQty =
                 `<input type="text" name="stocks[${idx}][qty]" class="form-control" style="min-width:80px !important;" value="0">`;
@@ -568,6 +607,7 @@
             if (newInput) {
                 formatInputDecimals(newInput);
             }
+            return;
         }
 
         function AddProdReceiptForm() {
