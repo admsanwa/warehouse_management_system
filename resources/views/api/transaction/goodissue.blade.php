@@ -108,7 +108,7 @@
                                 <label for="" class="col-sm-4 col-form-lable">Acct Code :</label>
                                 <div class="col-sm-6 mb-2">
                                     <input type="text" name="acct_code" id="acct_code" class="form-control mt-2"
-                                        readonly required>
+                                        placeholder="Masukan Acct Code" required>
                                 </div>
                                 <label for="" class="col-sm-4 col-form-lable">No Surat Jalan :</label>
                                 <div class="col-sm-6 mb-2">
@@ -592,16 +592,12 @@
             btn.disabled = true;
             const requiredFields = {
                 reason: document.getElementById("reason")?.value || "",
-                // no_surat_jalan: document.getElementById("no_surat_jalan")?.value || "",
-                // no_inventory_tf: document.getElementById("no_inventory_tf")?.value || "",
-                // type_inv_transaction: document.getElementById("type_inv_transaction")?.value || "",
+                acct_code: document.getElementById("acct_code")?.value || "",
                 remarks: document.getElementById("remarks")?.value || ""
             };
             const errorMsg = {
                 reason: "Alasan Goods Issue",
-                // no_surat_jalan: "No Surat Jalan",
-                // no_inventory_tf: "No Inventory Transfer",
-                // type_inv_transaction: "Type Inventory Transaction",
+                acct_code: "Acct Code",
                 remarks: "Remarks"
             };
 
