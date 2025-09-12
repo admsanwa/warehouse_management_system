@@ -29,6 +29,7 @@ class StockController extends Controller
             "ItemName" => $request->get('item_desc'),
             "page" => (int) $request->get('page', 1),
             "limit" => (int) $request->get('limit', 10),
+            'WhsCode' => $request->get('warehouse', $this->default_warehouse)
         ];
         $getRecord      = $this->sap->getStockItems($param);
 
@@ -45,7 +46,7 @@ class StockController extends Controller
             'total'       => $getRecord['total'],
             'totalPages'  => $totalPages,
             'stockNotes' => $request->get('stockNotes', ''),
-            'defaultWh' => $request->get('warehouse', $this->default_warehouse),
+            'defaultWh' => $param['WhsCode'],
         ]);
     }
 

@@ -75,20 +75,14 @@
                                         </thead>
                                         <tbody>
                                             @foreach ($getRecord as $stock)
-                                                @php
-                                                    $warehouseStock = collect($stock['warehouses'])->firstWhere(
-                                                        'WhsCode',
-                                                        $defaultWh,
-                                                    );
-                                                @endphp
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
-                                                    <td>{{ $warehouseStock['WhsCode'] ?? 'N/A' }}</td>
+                                                    <td>{{ $stock['WhsCode'] ?? 'N/A' }}</td>
                                                     <td>{{ $stock['ItemCode'] ?? 'N/A' }}</td>
                                                     <td>{{ $stock['ItemName'] ?? 'N/A' }}</td>
-                                                    <td>{{ formatDecimalsSAP($warehouseStock['OnHand']) ?? 'N/A' }}</td>
-                                                    <td>{{ formatDecimalsSAP($warehouseStock['MinStock']) ?? 'N/A' }}</td>
-                                                    <td>{{ formatDecimalsSAP($warehouseStock['Available']) ?? 'N/A' }}
+                                                    <td>{{ formatDecimalsSAP($stock['OnHand']) ?? 'N/A' }}</td>
+                                                    <td>{{ formatDecimalsSAP($stock['MinStock']) ?? 'N/A' }}</td>
+                                                    <td>{{ formatDecimalsSAP($stock['Available']) ?? 'N/A' }}
                                                     </td>
                                                     <td>{{ $stock['InvntryUom'] ?? 'N/A' }}</td>
                                                 </tr>

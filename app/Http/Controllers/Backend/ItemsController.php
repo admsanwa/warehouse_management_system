@@ -155,7 +155,8 @@ class ItemsController extends Controller
             "ItemName" => $request->get('item_desc'),
             "page" => (int) $request->get('page', 1),
             "limit" => (int) $request->get('limit', 10),
-            // 'Status' => (int) $request->get('stockNotes')
+            'Status' => (int) $request->get('stockNotes'),
+            'WhsCode' => $request->get('warehouse', $this->default_warehouse)
         ];
         $getRecord      = $this->sap->getStockItems($param);
 
@@ -172,7 +173,7 @@ class ItemsController extends Controller
             'total'       => $getRecord['total'],
             'totalPages'  => $totalPages,
             'stockNotes' => $request->get('stockNotes', ''),
-            'defaultWh' => $request->get('warehouse', $this->default_warehouse),
+            'defaultWh' => $param['WhsCode'],
             'stockStatus' => [
                 '' => 'Semua',
                 0 => 'Stock tidak harus dibeli',

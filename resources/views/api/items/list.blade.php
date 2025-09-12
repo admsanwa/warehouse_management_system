@@ -37,7 +37,7 @@
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="stockNotes">Status Notes</label>
-                                            <select name="stockNotes" id="stockNotes" class="form-control" disabled>
+                                            <select name="stockNotes" id="stockNotes" class="form-control">
                                                 @foreach ($stockStatus as $value => $label)
                                                     <option value="{{ $value }}"
                                                         {{ (string) request()->stockNotes === (string) $value ? 'selected' : '' }}>
@@ -87,29 +87,20 @@
                                         </thead>
                                         <tbody>
                                             @foreach ($getRecord as $stock)
-                                                @php
-                                                    $warehouseStock = collect($stock['warehouses'])->firstWhere(
-                                                        'WhsCode',
-                                                        $defaultWh,
-                                                    );
-                                                    $filter = (string) request()->stockNotes;
-                                                @endphp
-                                                {{-- @if ($filter === '' || ($filter === '1' && (string) $warehouseStock['Status'] === '1') || ($filter === '0' && (string) $warehouseStock['Status'] === '0')) --}}
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
-                                                    <td>{{ $warehouseStock['WhsCode'] ?? 'N/A' }}</td>
+                                                    <td>{{ $stock['WhsCode'] ?? 'N/A' }}</td>
                                                     <td>{{ $stock['ItemCode'] ?? 'N/A' }}</td>
                                                     <td>{{ $stock['ItemName'] ?? 'N/A' }}</td>
-                                                    <td>{{ formatDecimalsSAP($warehouseStock['OnHand']) ?? 'N/A' }}</td>
-                                                    <td>{{ formatDecimalsSAP($warehouseStock['MinStock']) ?? 'N/A' }}</td>
-                                                    <td>{{ formatDecimalsSAP($warehouseStock['Available']) ?? 'N/A' }}
+                                                    <td>{{ formatDecimalsSAP($stock['OnHand']) ?? 'N/A' }}</td>
+                                                    <td>{{ formatDecimalsSAP($stock['MinStock']) ?? 'N/A' }}</td>
+                                                    <td>{{ formatDecimalsSAP($stock['Available']) ?? 'N/A' }}
                                                     </td>
                                                     <td>
-                                                        {{ $warehouseStock['Status'] === 1 ? 'Stock harus dibeli' : '' }}
+                                                        {{ $stock['Status'] === 1 ? 'Stock harus dibeli' : '' }}
                                                     </td>
                                                     <td>{{ $stock['InvntryUom'] ?? 'N/A' }}</td>
                                                 </tr>
-                                                {{-- @endif --}}
                                             @endforeach
                                         </tbody>
                                     </table>
