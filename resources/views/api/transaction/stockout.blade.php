@@ -58,6 +58,13 @@
                                     required>
                             </div>
                         </div>
+                        {{-- <div class="form-group row">
+                            <label class="col-sm-4 col-form-lable">Warehouse :</label>
+                            <div class="col-sm-6">
+                                <input type="text" name="item_wh" id="item_wh" class="form-control mt-2" readonly
+                                    required>
+                            </div>
+                        </div> --}}
                         <div class="form-group row">
                             <label class="col-sm-4 col-form-lable">On Hand :</label>
                             <div class="col-sm-6">
@@ -370,7 +377,6 @@
             });
             // Set default series sesuai tahun
             setDefaultSeries("#seriesSelect", "202");
-
         });
         document.addEventListener("DOMContentLoaded", function() {
             const input = document.getElementById("scannerInput");
@@ -489,10 +495,16 @@
                     // const pomSelect = document.getElementById("pom");
                     document.getElementById("item_code").value = data.itemCode;
                     document.getElementById("item_desc").value = data.ItemName;
+                    // document.getElementById("item_wh").value = data.warehouseStock.WhsCode;
                     document.getElementById("on_hand").value = data.warehouseStock.OnHand;
+                    // setDefaultWarehouse("#warehouse", data.warehouseStock.WhsCode);
 
+                    const loadScan = loadScannedBarcodes();
+                    if (loadScan === false) {
+                        return;
+                    }
+                    console.log("load Scan", loadScan);
                     showToast("✅ Success Scan: " + data.ItemName, 'success');
-                    loadScannedBarcodes();
                 })
                 .finally(() => {
                     fileInput.disabled = false;
@@ -512,32 +524,38 @@
             if (fileInput) {
                 fileInput.value = "";
             }
-            console.log("selectedPo", selectedPo);
             if (!selectedPo || selectedPo.length <= 0) {
+                console.warn("Prod Order yg dipilih kosong");
                 return;
             }
             const tBody = document.getElementById("itemRows");
             const itemCode = document.getElementById("item_code").value;
             const docEntry = document.getElementById("docEntry").value;
+
             if (!itemCode) {
                 alert("Harap Scan Barcode terlebih dulu!");
                 return;
             }
-            console.log("Items", selectedPo['Lines']);
-            console.log("Item", itemCode);
             const lines = selectedPo['Lines'] || [];
             console.log("🔍 Semua ItemCode dalam PO:", lines.map(l => l.ItemCode));
+            let matchingLines = lines.filter(item =>
+                item.ItemCode === itemCode && item.IssuedQty < item.PlannedQty
+            );
 
-            const stocks = lines.find(item => item.ItemCode === itemCode);
+            // Cek baseline sudah dipakai
+            const existingBaseLine = [...document.querySelectorAll('#itemRows input[name*="[BaseLine]"]')]
+                .map(input => parseInt(input.value));
 
-            if (!stocks) {
-                console.warn(`❌ Item '${itemCode}' tidak ditemukan di dalam Lines`);
-                showToast(
-                    `❌ Gagal Menambahkan\nItem Code ${itemCode} Tidak Ditemukan untuk Production Order`,
-                    "error"
-                );
+            matchingLines = matchingLines.filter(item => !existingBaseLine.includes(item.LineNum));
+
+            // Kalau tidak ada line tersisa
+            if (matchingLines.length === 0) {
+                console.warn("Item Tidak Ada atau sudah semua baseline terpakai");
+                showToast(`${itemCode} tidak ada atau sudah masuk baris item.`, "error");
                 return false;
             }
+
+            const stocks = matchingLines[0];
 
             const idx = tBody.rows.length;
             const isIssuedQtyDone = stocks.IssuedQty >= stocks.PlannedQty;
@@ -546,7 +564,7 @@
                     "Gagal menambahkan. Jumlah Issue Qty untuk barcode ini sudah terpenuhi",
                     "error"
                 );
-                return true;
+                return false;
             }
             let inputQty = isIssuedQtyDone ?
                 'Qty yang di-issue sudah sesuai dengan plan' :
@@ -590,6 +608,7 @@
             if (newInput) {
                 formatInputDecimals(newInput);
             }
+            return;
         }
 
         function AddStockupForm() {
@@ -679,7 +698,7 @@
             setTimeout(() => {
                 box.classList.remove('show');
                 document.getElementById("scannerInput").focus();
-            }, 3000);
+            }, 6000);
         }
 
         function appendProdData(data) {

@@ -89,7 +89,7 @@ class TransactionController extends Controller
 
         $items = $this->sap->getStockItems([
             'ItemCode' => $barcode,
-            // 'WhsCode'  => $warehouse,
+            'WhsCode'  => $warehouse,
             'limit'    => 1,
             'page'     => 1
         ]);
@@ -108,13 +108,11 @@ class TransactionController extends Controller
             ]);
         }
         $item   = Arr::get($items, 'data.0', []);
-        $warehouseStock = collect(Arr::get($item, 'warehouses', []))
-            ->firstWhere('WhsCode', $warehouse);
         return response()->json([
             'success'        => true,
             'itemCode'       => Arr::get($item, 'ItemCode'),
             'ItemName'       => Arr::get($item, 'ItemName'),
-            'warehouseStock' => $warehouseStock,
+            'warehouseStock' => $item,
             // 'items'          => $items,
             'message'        => 'Item berhasil di scan!'
         ]);
@@ -503,7 +501,7 @@ class TransactionController extends Controller
         $barcode   = $validated['item_code'];
         $items = $this->sap->getStockItems([
             'ItemCode' => $barcode,
-            // 'WhsCode'  => $warehouse,
+            'WhsCode'  => $warehouse,
             'limit'    => 1,
             'page'     => 1
         ]);
@@ -515,8 +513,6 @@ class TransactionController extends Controller
             ]);
         }
         $item   = Arr::get($items, 'data.0', []);
-        $warehouseStock = collect(Arr::get($item, 'warehouses', []))
-            ->firstWhere('WhsCode', $warehouse);
         if (empty(Arr::get($items, 'total'))) {
             return response()->json([
                 'success' => false,
@@ -528,7 +524,7 @@ class TransactionController extends Controller
             'success'        => true,
             'itemCode'       => Arr::get($item, 'ItemCode'),
             'ItemName'       => Arr::get($item, 'ItemName'),
-            'warehouseStock' => $warehouseStock,
+            'warehouseStock' => $item,
             // 'items'          => $items,
             // 'prodData'         => $prodData,
             'message'        => 'Item berhasil di scan!'
@@ -819,7 +815,7 @@ class TransactionController extends Controller
         $barcode   = $validated['item_code'];
         $items = $this->sap->getStockItems([
             'ItemCode' => $barcode,
-            // 'WhsCode'  => $warehouse,
+            'WhsCode'  => $warehouse,
             'limit'    => 1,
             'page'     => 1
         ]);
@@ -831,8 +827,6 @@ class TransactionController extends Controller
             ]);
         }
         $item   = Arr::get($items, 'data.0', []);
-        $warehouseStock = collect(Arr::get($item, 'warehouses', []))
-            ->firstWhere('WhsCode', $warehouse);
         if (empty(Arr::get($items, 'total'))) {
             return response()->json([
                 'success' => false,
@@ -844,7 +838,7 @@ class TransactionController extends Controller
             'success'        => true,
             'itemCode'       => Arr::get($item, 'ItemCode'),
             'ItemName'       => Arr::get($item, 'ItemName'),
-            'warehouseStock' => $warehouseStock,
+            'warehouseStock' => $item,
             // 'items'          => $items,
             // 'prodData'         => $prodData,
             'message'        => 'Item berhasil di scan!'
@@ -1115,7 +1109,7 @@ class TransactionController extends Controller
 
         $items = $this->sap->getStockItems([
             'ItemCode' => $barcode,
-            // 'WhsCode'  => $warehouse,
+            'WhsCode'  => $warehouse,
             'limit'    => 1,
             'page'     => 1
         ]);
@@ -1135,14 +1129,12 @@ class TransactionController extends Controller
         }
 
         $item   = Arr::get($items, 'data.0', []);
-        $warehouseStock = collect(Arr::get($item, 'warehouses', []))
-            ->firstWhere('WhsCode', $warehouse);
 
         return response()->json([
             'success'        => true,
             'itemCode'       => Arr::get($item, 'ItemCode'),
             'ItemName'       => Arr::get($item, 'ItemName'),
-            'warehouseStock' => $warehouseStock,
+            'warehouseStock' => $item,
             'items'          => $items['data'],
             'message'        => 'Item berhasil di scan!'
         ]);
@@ -1459,7 +1451,7 @@ class TransactionController extends Controller
 
         $items = $this->sap->getStockItems([
             'ItemCode' => $barcode,
-            // 'WhsCode'  => $warehouse,
+            'WhsCode'  => $warehouse,
             'limit'    => 1,
             'page'     => 1
         ]);
@@ -1478,37 +1470,13 @@ class TransactionController extends Controller
             ]);
         }
 
-        // Build PO params
-        // $poData = [];
-        // $get_po = [];
-        // if (!empty($validated['docEntry']) && !empty($validated['po'])) {
-        //     $poParam = [
-        //         "page"      => 1,
-        //         "limit"     => 1,
-        //         "DocStatus" => "Open"
-        //     ];
-        //     $poParam['DocEntry'] = $validated['docEntry'];
-        //     $poParam['DocNum'] = $validated['po'];
-        //     $get_po = $this->sap->getPurchaseOrders($poParam);
-
-        //     if (!Arr::get($get_po, 'success') || empty(Arr::get($get_po, 'data'))) {
-        //         return response()->json([
-        //             'success' => false,
-        //             'message' => "Nomor PO untuk barcode {$barcode} tidak ditemukan. Silakan periksa kembali status Nomor PO."
-        //         ]);
-        //     }
-        //     $poData = Arr::get($get_po, 'data.0', []);
-        // }
-
         $item   = Arr::get($items, 'data.0', []);
-        $warehouseStock = collect(Arr::get($item, 'warehouses', []))
-            ->firstWhere('WhsCode', $warehouse);
 
         return response()->json([
             'success'        => true,
             'itemCode'       => Arr::get($item, 'ItemCode'),
             'ItemName'       => Arr::get($item, 'ItemName'),
-            'warehouseStock' => $warehouseStock,
+            'warehouseStock' => $item,
             'items'          => $items['data'],
             // 'poData'         => $poData,
             'message'        => 'Item berhasil di scan!'
