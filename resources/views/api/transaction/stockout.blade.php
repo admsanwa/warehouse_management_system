@@ -126,11 +126,11 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <label for="" class="col-sm-4 col-form-lable">Acct Code :</label>
+                                {{-- <label for="" class="col-sm-4 col-form-lable">Acct Code :</label>
                                 <div class="col-sm-6 mb-2">
                                     <input type="text" name="acct_code" id="acct_code" class="form-control mt-2"
                                         placeholder="Masukan Acct Code" required>
-                                </div>
+                                </div> --}}
                                 <label for="no_io" class="col-sm-4 col-form-label">No IO :</label>
                                 <div class="col-sm-6 mb-2">
                                     <input type="text" name="no_io" id="no_io" class="form-control mt-2"

@@ -603,7 +603,7 @@ class TransactionController extends Controller
                 'reason'      => 'required|string',
                 'reason'      => 'required|string',
                 'cost_center'      => 'nullable|string',
-                'acct_code'      => 'nullable|string',
+                // 'acct_code'      => 'nullable|string',
                 'prod_type'      => 'nullable|string',
                 'stocks'                       => 'required|array|min:1',
                 'stocks.*.BaseEntry'            => 'required|string',
@@ -655,7 +655,7 @@ class TransactionController extends Controller
                     'Quantity'    => $entryQty,
                     'WhsCode'    =>  $warehouse,
                     'Ext' => [
-                        'AcctCode'    => $validated['acct_code'],
+                        // 'AcctCode'    => $validated['acct_code'],
                     ]
                 ];
 
@@ -665,10 +665,10 @@ class TransactionController extends Controller
             }
             $postData['Lines'] = $lines;
             // Call API SAP
-            $post_gi = $this->sap->postProdIssue($postData);
-            if (empty($post_gi['success'])) {
-                throw new \Exception($post_gi['message'] ?? 'SAP Issue For Production failed without message');
-            }
+            // $post_gi = $this->sap->postProdIssue($postData);
+            // if (empty($post_gi['success'])) {
+            //     throw new \Exception($post_gi['message'] ?? 'SAP Issue For Production failed without message');
+            // }
 
 
             return response()->json([
