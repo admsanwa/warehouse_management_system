@@ -665,10 +665,10 @@ class TransactionController extends Controller
             }
             $postData['Lines'] = $lines;
             // Call API SAP
-            // $post_gi = $this->sap->postProdIssue($postData);
-            // if (empty($post_gi['success'])) {
-            //     throw new \Exception($post_gi['message'] ?? 'SAP Issue For Production failed without message');
-            // }
+            $post_gi = $this->sap->postProdIssue($postData);
+            if (empty($post_gi['success'])) {
+                throw new \Exception($post_gi['message'] ?? 'SAP Issue For Production failed without message');
+            }
 
 
             return response()->json([
