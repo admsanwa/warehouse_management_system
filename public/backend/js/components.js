@@ -78,3 +78,19 @@ function setDefaultSeries(selector, objectCode) {
         }
     });
 }
+
+function setDefaultWarehouse(selector, whsCode) {
+    $.ajax({
+        url: "/warehouseSearch",
+        data: { q: whsCode, limit: 1 },
+        dataType: "json",
+    }).done(function (data) {
+        if (data.results && data.results.length > 0) {
+            let found = data.results.find((item) => item.id === whsCode);
+            if (found) {
+                let option = new Option(found.text, found.id, true, true);
+                $(selector).append(option).trigger("change");
+            }
+        }
+    });
+}
