@@ -44,7 +44,7 @@
                                         <div class="form-group col-md-2">
                                             <label for="">IO</label>
                                             <input type="text" name="U_MEB_NO_IO" class="form-control"
-                                                placeholder="Enter IO Nomor" value="{{ Request()->io_no }}">
+                                                placeholder="Enter IO Nomor" value="{{ Request()->U_MEB_NO_IO }}">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Status</label>
