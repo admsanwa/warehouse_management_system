@@ -481,8 +481,7 @@ class TransactionController extends Controller
         $docEntry = $request->get('docEntry');
         $gi_reasons = SapReason::where('type', 'issue')
             ->orderBy('reason_code')
-            ->pluck('reason_desc', 'reason_code')
-            ->toArray();
+            ->get();
 
         return view('api.transaction.stockout', compact(
             'po',
@@ -584,6 +583,7 @@ class TransactionController extends Controller
 
         return view("backend.transaction.partials.scanned-out", compact('scannedBarcodes'));
     }
+
     // POST Issue For Production
     public function save_production_issue(Request $request)
     {
@@ -601,7 +601,9 @@ class TransactionController extends Controller
                 'project'      => 'nullable|string',
                 'warehouse'      => 'nullable|string',
                 'reason'      => 'required|string',
+                'reason'      => 'required|string',
                 'cost_center'      => 'nullable|string',
+                'acct_code'      => 'nullable|string',
                 'prod_type'      => 'nullable|string',
                 'stocks'                       => 'required|array|min:1',
                 'stocks.*.BaseEntry'            => 'required|string',
@@ -652,6 +654,9 @@ class TransactionController extends Controller
                     'BaseLineNum'  => (int) $row['BaseLine'],
                     'Quantity'    => $entryQty,
                     'WhsCode'    =>  $warehouse,
+                    'Ext' => [
+                        'AcctCode'    => $validated['acct_code'],
+                    ]
                 ];
 
                 // untuk DB
