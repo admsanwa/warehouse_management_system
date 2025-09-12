@@ -867,7 +867,7 @@ class TransactionController extends Controller
                 'warehouse'      => 'nullable|string',
                 'reason'      => 'required|string',
                 // 'cost_center'      => 'nullable|string',
-                'acct_code'      => 'nullable|string',
+                // 'acct_code'      => 'nullable|string',
                 'prod_type'      => 'nullable|string',
                 'stocks'                       => 'required|array|min:1',
                 'stocks.*.BaseEntry'            => 'required|string',
@@ -912,7 +912,7 @@ class TransactionController extends Controller
                     'Quantity'    => $entryQty,
                     'WhsCode'    =>  $warehouse,
                     'Ext' => [
-                        'AcctCode'    => $validated['acct_code'],
+                        // 'AcctCode'    => $validated['acct_code'],
                     ]
                 ];
 
