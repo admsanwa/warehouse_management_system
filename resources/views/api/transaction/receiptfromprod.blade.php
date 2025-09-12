@@ -101,16 +101,18 @@
                                 <label for="" class="col-sm-4 col-form-lable">Production Type:</label>
                                 <div class="col-sm-6 mb-2">
                                     <select name="prod_type" id="prod_type" class="form-control mt-2" required>
-                                        <option value="" disabled selected>Pilih Production Type</option>
-                                        <option value="Assembly">Assembly</option>
+                                        <option value="" disabled>Pilih Production Type</option>
+                                        <option value="Assembly" selected>Assembly</option>
                                         <option value="Disassembly">Disassembly</option>
                                     </select>
                                 </div>
-                                <label for="" class="col-sm-4 col-form-lable">Warehouse:</label>
+                                <label for="" class="col-sm-4 col-form-lable">Default Warehouse:</label>
                                 <div class="col-sm-6 mb-2">
-                                    <select name="warehouse" id="warehouse" class="form-control mt-2" required>
+                                    <input type="text" name="warehouse" id="warehouse" class="form-control mt-2"
+                                        placeholder="Default Warehouse akan terisi otomatis" readonly>
+                                    {{-- <select name="warehouse" id="warehouse" class="form-control mt-2" required>
                                         <option value="" disabled selected>Pilih Warehouse</option>
-                                    </select>
+                                    </select> --}}
                                 </div>
                                 <label for="" class="col-sm-4 col-form-lable">Alasan Goods Receipt :</label>
                                 <div class="col-sm-6 mb-2">
@@ -300,46 +302,47 @@
                 }
             });
 
-            const whSelect = $("#warehouse");
-            if (whSelect.length) {
-                whSelect.select2({
-                    placeholder: "Pilih Kode Warehouse",
-                    allowClear: true,
-                    width: "100%",
-                    language: {
-                        inputTooShort: function() {
-                            return "Ketik untuk mencari...";
-                        },
-                        noResults: function() {
-                            return "Tidak ada data ditemukan";
-                        },
-                        searching: function() {
-                            return "Sedang mencari...";
-                        }
-                    },
-                    ajax: {
-                        url: "/warehouseSearch",
-                        dataType: "json",
-                        delay: 250,
-                        data: function(params) {
-                            let searchData = {
-                                q: params.term,
-                                limit: 10,
-                            }
-                            return searchData;
-                        },
-                        processResults: function(data) {
-                            console.log("Response dari server:", data); // cek di console
-                            return {
-                                results: (data.results || []).map(item => ({
-                                    id: item.id,
-                                    text: item.text
-                                }))
-                            };
-                        }
-                    }
-                });
-            }
+            // const whSelect = $("#warehouse");
+            // if (whSelect.length) {
+            //     whSelect.select2({
+            //         placeholder: "Pilih Kode Warehouse",
+            //         allowClear: true,
+            //         width: "100%",
+            //         language: {
+            //             inputTooShort: function() {
+            //                 return "Ketik untuk mencari...";
+            //             },
+            //             noResults: function() {
+            //                 return "Tidak ada data ditemukan";
+            //             },
+            //             searching: function() {
+            //                 return "Sedang mencari...";
+            //             }
+            //         },
+            //         ajax: {
+            //             url: "/warehouseSearch",
+            //             dataType: "json",
+            //             delay: 250,
+            //             data: function(params) {
+            //                 let searchData = {
+            //                     q: params.term,
+            //                     limit: 10,
+            //                 }
+            //                 return searchData;
+            //             },
+            //             processResults: function(data) {
+            //                 console.log("Response dari server:", data); // cek di console
+            //                 return {
+            //                     results: (data.results || []).map(item => ({
+            //                         id: item.id,
+            //                         text: item.text
+            //                     }))
+            //                 };
+            //             }
+            //         }
+            //     });
+            // }
+
             $("#seriesSelect").select2({
                 placeholder: "Pilih Series",
                 allowClear: true,
@@ -518,7 +521,8 @@
                     document.getElementById("item_desc").value = data.ItemName;
                     document.getElementById("item_wh").value = data.warehouseStock.WhsCode;
                     document.getElementById("on_hand").value = data.warehouseStock.OnHand;
-                    setDefaultWarehouse("#warehouse", data.warehouseStock.WhsCode);
+                    document.getElementById("warehouse").value = data.warehouseStock.WhsCode;
+                    // setDefaultWarehouse("#warehouse", data.warehouseStock.WhsCode);
                     const loadScan = loadScannedBarcodes();
                     console.log(loadScan);
                     if (loadScan === false) {
