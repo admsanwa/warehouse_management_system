@@ -112,11 +112,6 @@
                                     <input type="text" name="acct_code" id="acct_code" class="form-control mt-2"
                                         placeholder="Masukan Acct Code" required>
                                 </div>
-                                <label for="" class="col-sm-4 col-form-lable">Project Code:</label>
-                                <div class="col-sm-6 mb-2">
-                                    <select name="project" id="project" class="form-control mt-2" required>
-                                    </select>
-                                </div>
                                 <label for="" class="col-sm-4 col-form-lable">No Surat Jalan :</label>
                                 <div class="col-sm-6">
                                     <input type="text" name="no_surat_jalan" id="no_surat_jalan"
@@ -165,6 +160,11 @@
                                             <option value="{{ $key }}">{{ $key }} - {{ $item }}
                                             </option>
                                         @endforeach
+                                    </select>
+                                </div>
+                                <label for="" class="col-sm-4 col-form-lable">Project Code:</label>
+                                <div class="col-sm-6 mb-2">
+                                    <select name="project" id="project" class="form-control mt-2" required>
                                     </select>
                                 </div>
                                 <label for="" class="col-sm-4 col-form-lable">OCR / Distribution Rules :</label>
