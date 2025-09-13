@@ -1210,8 +1210,8 @@ class TransactionController extends Controller
                     'Dscription'  => $row['Dscription'] ?? null,
                     'Quantity'    => $entryQty,
                     'WhsCode'    =>  $warehouse ?? '',
+                    'AccountCode'    => $validated['acct_code'],
                     'Ext' => [
-                        'AcctCode'    => $validated['acct_code'],
                         'OcrCode' => $ocr ?? '',
                         'Project' => $project ?? ''
                     ]
@@ -1557,8 +1557,8 @@ class TransactionController extends Controller
                     'Dscription'  => $row['Dscription'] ?? null,
                     'Quantity'    => $entryQty,
                     'WhsCode'    =>  $warehouse,
+                    'AccountCode'    => $validated['acct_code'],
                     'Ext' => [
-                        'AcctCode'    => $validated['acct_code'],
                         'OcrCode' => $ocr,
                         'Project' => $project
                     ]
