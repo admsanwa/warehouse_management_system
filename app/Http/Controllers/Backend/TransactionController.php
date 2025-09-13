@@ -603,7 +603,7 @@ class TransactionController extends Controller
                 'reason'      => 'required|string',
                 'reason'      => 'required|string',
                 'cost_center'      => 'nullable|string',
-                // 'acct_code'      => 'nullable|string',
+                'acct_code'      => 'nullable|string',
                 'prod_type'      => 'nullable|string',
                 'stocks'                       => 'required|array|min:1',
                 'stocks.*.BaseEntry'            => 'required|string',
@@ -654,9 +654,7 @@ class TransactionController extends Controller
                     'BaseLineNum'  => (int) $row['BaseLine'],
                     'Quantity'    => $entryQty,
                     'WhsCode'    =>  $warehouse,
-                    'Ext' => [
-                        // 'AcctCode'    => $validated['acct_code'],
-                    ]
+                    'WipAcct'    => $validated['acct_code'],
                 ];
 
                 // untuk DB
@@ -866,8 +864,8 @@ class TransactionController extends Controller
                 'project'      => 'nullable|string',
                 'warehouse'      => 'nullable|string',
                 'reason'      => 'required|string',
-                // 'cost_center'      => 'nullable|string',
-                // 'acct_code'      => 'nullable|string',
+                'cost_center'      => 'nullable|string',
+                'acct_code'      => 'nullable|string',
                 'prod_type'      => 'nullable|string',
                 'stocks'                       => 'required|array|min:1',
                 'stocks.*.BaseEntry'            => 'required|string',
@@ -891,7 +889,9 @@ class TransactionController extends Controller
                     "U_MEB_No_IO" =>   $validated['no_io'] ?? '',
                     "U_MEB_No_SO" =>   $validated['no_so'] ?? '',
                     "U_MEB_Project_Code" =>   $project ?? '',
+                    "U_MEB_DIST_RULE" =>  $validated['cost_center'] ?? ''
                 ],
+
                 'Lines'       => []
             ];
 
@@ -911,9 +911,7 @@ class TransactionController extends Controller
                     'BaseEntry'    => (int) $row['BaseEntry'],
                     'Quantity'    => $entryQty,
                     'WhsCode'    =>  $warehouse,
-                    'Ext' => [
-                        // 'AcctCode'    => $validated['acct_code'],
-                    ]
+                    'WipAcct'    => $validated['acct_code']
                 ];
 
                 // untuk DB
