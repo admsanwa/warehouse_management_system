@@ -598,10 +598,12 @@
                         <td>${idx + 1}</td>
                         <td>
                             ${stocks.ItemCode}
+                            <input type="hidden" name="stocks[${idx}][item_code]" value="${stocks.ItemCode}">
                             <input type="hidden" name="stocks[${idx}][BaseEntry]" value="${docEntry}">
                         </td>
                         <td>
                             ${stocks.ItemName}
+                            <input type="hidden" name="stocks[${idx}][item_desc]" value="${stocks.ItemName}">
                             <input type="hidden" name="stocks[${idx}][BaseLine]" value="${stocks.LineNum}">
                         </td>
                         <td>

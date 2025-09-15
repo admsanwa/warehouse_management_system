@@ -75,7 +75,7 @@
                                                     <td>{{ $grpo->no_po ?? 'N/A' }}</td>
                                                     <td>{{ $grpo->item_code ?? 'N/A' }}</td>
                                                     <td>{{ $grpo->item_desc ?? 'N/A' }}</td>
-                                                    <td>{{ $grpo->qty ?? 0 }}</td>
+                                                    <td>{{ formatDecimalsSAP($grpo->qty) }}</td>
                                                     <td>{{ $grpo->created_at ? $grpo->created_at->format('d-m-Y H:i') : 'N/A' }}
                                                     </td>
                                                     <td>{{ $grpo->fullname ?? 'N/A' }}</td>

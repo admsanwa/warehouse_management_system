@@ -210,6 +210,7 @@ class TransactionController extends Controller
                 'U_MEB_NO_IO'  => 'nullable|string',
                 'U_MEB_No_SO'  => 'nullable|string',
                 'U_MEB_Ket_Pur' => 'nullable|string',
+                'series' => 'nullable|string',
                 'stocks'                       => 'required|array',
                 'stocks.*.BaseEntry'           => 'nullable',
                 'stocks.*.LineNum'             => 'required',
@@ -244,14 +245,12 @@ class TransactionController extends Controller
             $user         = Auth::id();
 
             foreach ($validated['stocks'] as $row) {
-                $entryQty = (float) str_replace(',', '.', str_replace('.', '', $row['qty']));                // Qty baru yang diinput
-                $planQty = (float) $row['PlanQty'];    // Qty rencana
-                $openQty = (float) $row['OpenQty'];    // Qty sisa yang belum terpenuhi
+                $entryQty = (float) str_replace(',', '.', str_replace('.', '', $row['qty']));
+                $planQty = (float) $row['PlanQty'];
+                $openQty = (float) $row['OpenQty'];
 
-                // Qty yang sudah pernah diajukan sebelumnya
                 $totalSubmittedQty = $planQty - $openQty;
 
-                // Total qty jika ditambah dengan input baru
                 $totalEntryAndSubmittedQty = $totalSubmittedQty + $entryQty;
 
                 // Hitung toleransi 10%
@@ -285,7 +284,7 @@ class TransactionController extends Controller
                 // untuk DB
                 $insertedData[] = [
                     'no_po'        => $validated['docNum'],
-                    'no_series'  => "-",
+                    'no_series'  => $validated['series'] ?? "-",
                     'vendor_code'  => $validated['cardCode'],
                     'vendor'  => $validated['cardName'],
                     'vendor_ref_no' => $validated['numAtCard'],
@@ -588,101 +587,126 @@ class TransactionController extends Controller
     // POST Issue For Production
     public function save_production_issue(Request $request)
     {
-        $post_gi = null;
+        $post_ifp = null;
         $postData  = [];
+        $entryQty = null;
+        $qtyLeft = null;
 
+        DB::beginTransaction();
         try {
             $validated = $request->validate([
-                'prod_order'        => 'nullable',
-                'remarks'      => 'required|string',
-                'reason'      => 'required|string',
-                'docEntry'      => 'required|string',
-                'no_io'      => 'nullable|string',
-                'no_so'      => 'nullable|string',
-                'project'      => 'nullable|string',
-                'warehouse'      => 'nullable|string',
-                'reason'      => 'required|string',
-                'reason'      => 'required|string',
-                'cost_center'      => 'nullable|string',
-                'acct_code'      => 'nullable|string',
-                'prod_type'      => 'nullable|string',
-                'stocks'                       => 'required|array|min:1',
-                'stocks.*.BaseEntry'            => 'required|string',
-                'stocks.*.BaseLine'          => 'nullable|string',
-                'stocks.*.qty'                 => 'required|string',
-                'stocks.*.UnitMsr'             => 'nullable|string',
-                'stocks.*.PlannedQty'                 => 'nullable|numeric',
-                'stocks.*.IssuedQty'                 => 'nullable|numeric',
+                'prod_order' => 'nullable',
+                'series' => 'nullable',
+                'remarks' => 'required|string',
+                'reason' => 'required|string',
+                'docEntry' => 'required|string',
+                'no_io' => 'nullable|string',
+                'no_so' => 'nullable|string',
+                'project' => 'nullable|string',
+                'warehouse' => 'nullable|string',
+                'cost_center' => 'nullable|string',
+                'acct_code' => 'nullable|string',
+                'prod_type' => 'nullable|string',
+                'stocks' => 'required|array|min:1',
+                'stocks.*.BaseEntry' => 'required|string',
+                'stocks.*.BaseLine' => 'nullable|string',
+                'stocks.*.item_code' => 'nullable|string',
+                'stocks.*.item_desc' => 'nullable|string',
+                'stocks.*.qty' => 'required|string',
+                'stocks.*.UnitMsr' => 'nullable|string',
+                'stocks.*.PlannedQty' => 'nullable|numeric',
+                'stocks.*.IssuedQty' => 'nullable|numeric',
             ]);
 
             $warehouse = $validated['warehouse'] ?? '';
             $project = $validated['project'] ?? '';
 
-            // Header untuk API
             $postData = [
-                // "Series" => 694,
-                'DocDate'     => date("Y/m/d"),
-                'Comment'    => $validated['remarks'] ?? '',
-                'ProductionType'    => $validated['prod_type'] ?? '',
+                'DocDate' => date("Y/m/d"),
+                'Comment' => $validated['remarks'] ?? '',
+                'ProductionType' => $validated['prod_type'] ?? '',
                 "Ext" => [
                     "U_MEB_Alasan_GIssues" => $validated['reason'],
-                    "U_MEB_Default_Whse" =>   $warehouse,
-                    "U_MEB_No_IO" =>   $validated['no_io'] ?? '',
-                    "U_MEB_No_SO" =>   $validated['no_so'] ?? '',
-                    "U_MEB_Project_Code" =>   $project ?? '',
-                    "U_MEB_DIST_RULE" =>  $validated['cost_center'] ?? ''
+                    "U_MEB_Default_Whse" => $warehouse,
+                    "U_MEB_No_IO" => $validated['no_io'] ?? '',
+                    "U_MEB_No_SO" => $validated['no_so'] ?? '',
+                    "U_MEB_Project_Code" => $project ?? '',
+                    "U_MEB_DIST_RULE" => $validated['cost_center'] ?? ''
                 ],
-                'Lines'       => []
+                'Lines' => []
             ];
 
-            $lines        = [];
+            $lines = [];
+            $insertedData = [];
+            $user = Auth::id();
+
             foreach ($validated['stocks'] as $row) {
                 $entryQty = (float) str_replace(',', '.', str_replace('.', '', $row['qty']));
                 $planQty = (float) $row['PlannedQty'];
                 $issueQty = (float) $row['IssuedQty'];
 
-                // Qty yang sudah pernah dimasukan sebelumnya
                 $qtyLeft = round($planQty - $issueQty, 3);
 
                 if ($entryQty > $qtyLeft) {
-                    throw new \Exception(
-                        "Qty melebihi Plan QTY. Plan QTY = $planQty. Sudah issued = $issueQty. Sisa qty = $qtyLeft"
-                    );
+                    throw new \Exception("Qty melebihi Plan QTY. Plan QTY = $planQty. Sudah issued = $issueQty. Sisa qty = $qtyLeft");
                 }
 
                 $lines[] = [
-                    'BaseEntry'    => (int) $row['BaseEntry'],
-                    'BaseLineNum'  => (int) $row['BaseLine'],
-                    'Quantity'    => $entryQty,
-                    'WhsCode'    =>  $warehouse,
-                    'WipAcct'    => $validated['acct_code'],
+                    'BaseEntry' => (int) $row['BaseEntry'],
+                    'BaseLineNum' => (int) $row['BaseLine'],
+                    'Quantity' => $entryQty,
+                    'WhsCode' => $warehouse,
+                    'WipAcct' => $validated['acct_code'],
                 ];
 
-                // untuk DB
-                // $insertedData[] = [
-                // ];
-            }
-            $postData['Lines'] = $lines;
-            // Call API SAP
-            $post_gi = $this->sap->postProdIssue($postData);
-            if (empty($post_gi['success'])) {
-                throw new \Exception($post_gi['message'] ?? 'SAP Issue For Production failed without message');
+                $insertedData[] = [
+                    'no_po' => $validated['prod_order'],
+                    'no_series' => $validated['series'],
+                    'io' => $validated['no_io'],
+                    'so' => $validated['no_so'],
+                    'base_entry' => $row['BaseEntry'] ?? null,
+                    'baseline_num' => $row['BaseLine'] ?? null,
+                    'item_code' => $row['item_code'] ?? null,
+                    'item_desc' => $row['item_desc'] ?? null,
+                    'qty' => $entryQty,
+                    'uom' => $row['UnitMsr'] ?? null,
+                    'whse' => $warehouse,
+                    'project_code' => $project,
+                    'reason' => $validated['reason'],
+                    'remarks' => $validated['remarks'],
+                    'user_id' => $user,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
             }
 
+            $postData['Lines'] = $lines;
+
+            $post_ifp = $this->sap->postProdIssue($postData);
+            if (empty($post_ifp['success'])) {
+                throw new \Exception($post_ifp['message'] ?? 'SAP Issue For Production failed without message');
+            }
+
+            if (!empty($insertedData)) {
+                IFPModel::insert($insertedData);
+            }
+
+            DB::commit();
 
             return response()->json([
-                'success'  => true,
-                'message'  => 'Issue For Production Telah Berhasil Disimpan',
-                'request'  => $postData,
-                'response' => $post_gi ?? [],
+                'success' => true,
+                'message' => 'Issue For Production Telah Berhasil Disimpan',
+                'request' => $postData,
+                'response' => $post_ifp ?? [],
             ], 200);
         } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Validasi gagal',
-                'errors'  => $e->errors(),
+                'errors' => $e->errors(),
                 'request' => $postData,
-                'response' => $post_gi ?? [],
+                'response' => $post_ifp ?? [],
             ], 422);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -690,12 +714,13 @@ class TransactionController extends Controller
                 'success' => false,
                 'message' => $e->getMessage(),
                 'request' => $postData,
-                'response' => $post_gi ?? [],
+                'response' => $post_ifp ?? [],
                 'entryQty' => $entryQty,
                 'qtyLeft' => $qtyLeft,
             ], 500);
         }
     }
+
 
     public function stockout_up(Request $request)
     {
