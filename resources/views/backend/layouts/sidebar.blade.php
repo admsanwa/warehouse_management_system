@@ -376,7 +376,7 @@
                         </a>
                         <ul class="collapse list-unstyled {{ Request::is('admin/transaction/*') ? 'show' : '' }} itemSubMenu"
                             id="transactionSubMenu">
-                            @if ($authDept == 'IT' || $authDept == 'Production and Warehouse' || $authDept == 'Production')
+                            @if ($authDept == 'IT' || $authDept == 'Production and Warehouse')
                                 <li class="nav-item">
                                     <a href="{{ url('admin/transaction/stockin') }}"
                                         class="nav-link @if (Request::is('admin/transaction/stockin') || Request::is('admin/transaction/stockin/*')) active @endif">
@@ -400,7 +400,7 @@
                                     </a>
                                 </li>
                             @endif
-                            @if ($authDept == 'IT' || $authDept == 'Production and Warehouse' || $authDept == 'Production')
+                            @if ($authDept == 'IT' || $authDept == 'Production and Warehouse')
                                 <li class="nav-item">
                                     <a href="{{ url('admin/transaction/goodissued') }}"
                                         class="nav-link @if (Request::is(' admin/transaction/goodissued')) active @endif">
@@ -408,7 +408,7 @@
                                     </a>
                                 </li>
                             @endif
-                            @if ($authDept == 'IT' || $authDept == 'Production and Warehouse' || $authDept == 'Production')
+                            @if ($authDept == 'IT' || $authDept == 'Production and Warehouse')
                                 <li class="nav-item">
                                     <a href="{{ url('admin/transaction/goodreceipt') }}"
                                         class="nav-link @if (Request::is(' admin/transaction/goodreceipt')) active @endif">
