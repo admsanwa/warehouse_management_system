@@ -57,7 +57,20 @@ class ListTransactionsController extends Controller
 
     public function rfp(Request $request)
     {
-        $getRecord = RFPModel::getRecord($request);
+        $param = [
+            'item_code' => $request->get('item_code'),
+            'item_desc' => $request->get('item_desc'),
+        ];
+        $getRecord = RFPModel::query()
+            ->select('receipt_from_production.*', 'users.fullname')
+            ->join('users', 'receipt_from_production.user_id', '=', 'users.id')
+            ->when($param['item_code'], function ($query, $item_code) {
+                return $query->where('receipt_from_production.item_code', $item_code);
+            })
+            ->when($param['item_desc'], function ($query, $item_desc) {
+                return $query->where('receipt_from_production.item_desc', 'like', '%' . $item_desc . '%');
+            })
+            ->paginate(10);
 
         return view("backend.listtransactions.rfp", compact('getRecord'));
     }

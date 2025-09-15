@@ -11,7 +11,7 @@
                 </div>
             </div>
         </div>
-        
+
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
@@ -27,23 +27,29 @@
                                     <div class="row">
                                         <div class="form-group col-md-2">
                                             <label for="">IO</label>
-                                            <input type="text" name="io" class="form-control" value="{{ Request()->io }}" placeholder="Enter Item Code">
+                                            <input type="text" name="io" class="form-control"
+                                                value="{{ Request()->io }}" placeholder="Enter Item Code">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Production Order</label>
-                                            <input type="text" name="prod_order" class="form-control" value="{{ Request()->prod_order }}" placeholder="Enter Item Code">
+                                            <input type="text" name="prod_order" class="form-control"
+                                                value="{{ Request()->prod_order }}" placeholder="Enter Item Code">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Production Nomor</label>
-                                            <input type="text" name="prod_no" class="form-control" value="{{ Request()->prod_no }}" placeholder="Enter Item Code">
+                                            <input type="text" name="prod_no" class="form-control"
+                                                value="{{ Request()->prod_no }}" placeholder="Enter Item Code">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Production Description</label>
-                                            <input type="text" name="prod_desc" class="form-control" value="{{ Request()->prod_desc }}" placeholder="Enter Item Desc">
+                                            <input type="text" name="prod_desc" class="form-control"
+                                                value="{{ Request()->prod_desc }}" placeholder="Enter Item Desc">
                                         </div>
                                         <div class="form-group col-md-2">
-                                            <button type="submit" class="btn btn-primary" style="margin-top: 30px"><i class="fa fa-search"></i> Search</button>
-                                            <a href="{{ url('admin/listtransaction/rfp') }}" class="btn btn-warning" style="margin-top: 30px"><i class="fa fa-eraser"></i>Reset</a>
+                                            <button type="submit" class="btn btn-primary" style="margin-top: 30px"><i
+                                                    class="fa fa-search"></i> Search</button>
+                                            <a href="{{ url('admin/listtransaction/rfp') }}" class="btn btn-warning"
+                                                style="margin-top: 30px"><i class="fa fa-eraser"></i>Reset</a>
                                         </div>
                                     </div>
                                 </div>
@@ -72,21 +78,21 @@
                                             </tr>
                                         </thead>
 
-                                       @forelse ($getRecord as $rfp )                                           
-                                           <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $rfp->io ?? 'N/A'}}</td>
-                                            <td>{{ $rfp->prod_order ?? 'N/A'}}</td>
-                                            <td>{{ $rfp->prod_no }}</td>
-                                            <td>{{ $rfp->prod_desc }}</td>
-                                            <td>{{ $rfp->qty }}</td>
-                                            <td>{{ $rfp->updated_at }}</td>
-                                           </tr>
-                                       @empty
-                                           <tr>
-                                            <td colspan="100%">No Record Found</td>
-                                           </tr>
-                                       @endforelse
+                                        @forelse ($getRecord as $rfp)
+                                            <tr>
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td>{{ $rfp->io ?? 'N/A' }}</td>
+                                                <td>{{ $rfp->prod_order ?? 'N/A' }}</td>
+                                                <td>{{ $rfp->prod_no }}</td>
+                                                <td>{{ $rfp->prod_desc }}</td>
+                                                <td>{{ $rfp->qty }}</td>
+                                                <td>{{ $rfp->updated_at }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="100%">No Record Found</td>
+                                            </tr>
+                                        @endforelse
                                     </table>
                                 </div>
                                 <div class="card-footer">

@@ -598,14 +598,21 @@
                     <td>
                         ${stocks.ItemCode}
                         <input type="hidden" name="stocks[${idx}][BaseEntry]" value="${docEntry}">
+                        <input type="hidden" name="stocks[${idx}][item_code]" value="${stocks.ItemCode}">
                         <input type="hidden" name="stocks[${idx}][PlannedQty]" value="${stocks.PlannedQty}">
                         <input type="hidden" name="stocks[${idx}][totalReceiptQty]" value="${totalReceiptQty}">
                     </td>
-                    <td>${stocks.ItemName}</td>
+                    <td>
+                        ${stocks.ItemName}
+                        <input type="hidden" name="stocks[${idx}][item_desc]" value="${stocks.ItemName}">
+                    </td>
                     <td>${formatDecimalsSAP(stocks.PlannedQty)}</td>
                     <td>${formatDecimalsSAP(totalReceiptQty)}</td>
                     <td>${inputQty}</td>
-                    <td>${stocks.InvntryUoM ?? ""}</td>
+                    <td>
+                        ${stocks.InvntryUoM ?? ""}
+                        <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${stocks.InvntryUoM}">
+                    </td>
                     <td>
                         <button type="button" onclick="deleteItem(this)" class="btn btn-danger btn-sm">
                             <i class="fa fa-trash"></i>
