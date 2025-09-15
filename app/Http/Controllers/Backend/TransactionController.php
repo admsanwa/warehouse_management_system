@@ -299,6 +299,7 @@ class TransactionController extends Controller
                     'uom'    => $row['UnitMsr'] ?? null,
                     'whse'    =>  $this->default_warehouse,
                     'note'    => '-',
+                    'remarks'    =>  $validated['remarks'],
                     'user_id'      => $user,
                     'created_at'   => now(),
                     'updated_at'   => now()
