@@ -16,6 +16,7 @@ class grpoModel extends Model
         'base_entry',
         'line_num',
         'item_code',
+        'item_desc',
         'vendor_code',
         'user_id',
         'vendor',

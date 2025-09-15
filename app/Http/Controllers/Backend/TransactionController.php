@@ -283,26 +283,27 @@ class TransactionController extends Controller
                 ];
 
                 // untuk DB
-                // $insertedData[] = [
-                //     'no_po'        => $validated['docNum'],
-                //     'vendor_code'  => $validated['cardCode'],
-                //     'vendor'  => $validated['cardName'],
-                //     'vendor_ref_no' => $validated['numAtCard'],
-                //     'io'           => $validated['U_MEB_NO_IO'],
-                //     'so'           => $validated['U_MEB_No_SO'],
-                //     'internal_no'  => $row['U_MEB_Ket_Pur'] ?? null,
-                //     'base_entry'   => $row['BaseEntry'] ?? null,
-                //     'line_num'     => $row['LineNum'] ?? null,
-                //     'item_code'    => $row['ItemCode'] ?? null,
-                //     'item_desc'    => $row['Dscription'] ?? null,
-                //     'qty' => $entryQty,
-                //     'uom'    => $row['UnitMsr'] ?? null,
-                //     'whse'    =>  $this->default_warehouse,
-                //     'note'    => '-',
-                //     'user_id'      => $user,
-                //     'created_at'   => now(),
-                //     'updated_at'   => now()
-                // ];
+                $insertedData[] = [
+                    'no_po'        => $validated['docNum'],
+                    'no_series'  => "-",
+                    'vendor_code'  => $validated['cardCode'],
+                    'vendor'  => $validated['cardName'],
+                    'vendor_ref_no' => $validated['numAtCard'],
+                    'io'           => $validated['U_MEB_NO_IO'],
+                    'so'           => $validated['U_MEB_No_SO'],
+                    'internal_no'  => $row['U_MEB_Ket_Pur'] ?? null,
+                    'base_entry'   => $row['BaseEntry'] ?? null,
+                    'line_num'     => $row['LineNum'] ?? null,
+                    'item_code'    => $row['ItemCode'] ?? null,
+                    'item_desc'    => $row['Dscription'] ?? null,
+                    'qty' => $entryQty,
+                    'uom'    => $row['UnitMsr'] ?? null,
+                    'whse'    =>  $this->default_warehouse,
+                    'note'    => '-',
+                    'user_id'      => $user,
+                    'created_at'   => now(),
+                    'updated_at'   => now()
+                ];
             }
             $postData['Lines'] = $lines;
 
@@ -315,11 +316,11 @@ class TransactionController extends Controller
             }
 
             // Insert ke DB
-            // if (!empty($insertedData)) {
-            //     GrpoModel::insert($insertedData);
-            // }
+            if (!empty($insertedData)) {
+                GrpoModel::insert($insertedData);
+            }
 
-            // DB::commit();
+            DB::commit();
 
             return response()->json([
                 'success'  => true,

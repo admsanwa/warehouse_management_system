@@ -11,7 +11,7 @@
                 </div>
             </div>
         </div>
-        
+
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
@@ -27,15 +27,19 @@
                                     <div class="row">
                                         <div class="form-group col-md-2">
                                             <label for="">Item Code</label>
-                                            <input type="text" name="item_code" class="form-control" value="{{ Request()->item_code }}" placeholder="Enter Item Code">
+                                            <input type="text" name="item_code" class="form-control"
+                                                value="{{ Request()->item_code }}" placeholder="Enter Item Code">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Item Description</label>
-                                            <input type="text" name="item_desc" class="form-control" value="{{ Request()->item_desc }}" placeholder="Enter Item Desc">
+                                            <input type="text" name="item_desc" class="form-control"
+                                                value="{{ Request()->item_desc }}" placeholder="Enter Item Desc">
                                         </div>
                                         <div class="form-group col-md-2">
-                                            <button type="submit" class="btn btn-primary" style="margin-top: 30px"><i class="fa fa-search"></i> Search</button>
-                                            <a href="{{ url('admin/listtransaction/stockin') }}" class="btn btn-warning" style="margin-top: 30px"><i class="fa fa-eraser"></i>Reset</a>
+                                            <button type="submit" class="btn btn-primary" style="margin-top: 30px"><i
+                                                    class="fa fa-search"></i> Search</button>
+                                            <a href="{{ url('admin/listtransaction/stockin') }}" class="btn btn-warning"
+                                                style="margin-top: 30px"><i class="fa fa-eraser"></i>Reset</a>
                                         </div>
                                     </div>
                                 </div>
@@ -51,32 +55,37 @@
                             </div>
                             <div class="card-body p-0">
                                 <div class="table-responsive">
-                                    <table class="table table-stripped">
+                                    <table class="table table-striped">
                                         <thead>
                                             <tr>
                                                 <th>No</th>
+                                                <th>Nomor Po</th>
                                                 <th>Item Code</th>
                                                 <th>Item Desc</th>
                                                 <th>Stock In</th>
-                                                <th>Available</th>
-                                                <th>Update</th>
+                                                <th>Created At</th>
+                                                <th>User</th>
                                             </tr>
                                         </thead>
-
-                                       @forelse ($getRecord as $stock )                                           
-                                           <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $stock->item->code ?? 'N/A'}}</td>
-                                            <td>{{ $stock->item->name ?? 'N/A'}}</td>
-                                            <td>{{ $stock->stock_in }}</td>
-                                            <td>{{ $stock->on_hand }}</td>
-                                            <td>{{ $stock->updated_at }}</td>
-                                           </tr>
-                                       @empty
-                                           <tr>
-                                            <td colspan="100%">No Record Found</td>
-                                           </tr>
-                                       @endforelse
+                                        <tbody>
+                                            @forelse ($getRecord as $grpo)
+                                                <tr>
+                                                    <td>{{ $loop->iteration + ($getRecord->currentPage() - 1) * $getRecord->perPage() }}
+                                                    </td>
+                                                    <td>{{ $grpo->no_po ?? 'N/A' }}</td>
+                                                    <td>{{ $grpo->item_code ?? 'N/A' }}</td>
+                                                    <td>{{ $grpo->item_desc ?? 'N/A' }}</td>
+                                                    <td>{{ $grpo->qty ?? 0 }}</td>
+                                                    <td>{{ $grpo->created_at ? $grpo->created_at->format('d-m-Y H:i') : 'N/A' }}
+                                                    </td>
+                                                    <td>{{ $grpo->fullname ?? 'N/A' }}</td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="100%">No Record Found</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
                                     </table>
                                 </div>
                                 <div class="card-footer">
@@ -88,6 +97,7 @@
                                 </div>
                             </div>
                         </div>
+
                     </section>
                 </div>
             </div>
