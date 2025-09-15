@@ -33,7 +33,7 @@
                                     <i class="fas fa-info-circle"> Untuk Scan Item/Barang keluar dari Warehouse</i>
                                 </span>
                                 <div class="mb-2">
-                                    <button type="button" class="btn btn-sm btn-outline-danger mr-1"
+                                    <button type="button" class="btn btn-sm btn-outline-danger mr-1" id="btnScan"
                                         onclick="startCamera()">Use Camera</button>
                                     <button type="button" class="btn btn-sm btn-outline-secondary"
                                         onclick="showFileInput()">Upload Image</button>
@@ -387,40 +387,36 @@
             });
             // Set default series sesuai tahun
             setDefaultSeries("#seriesSelect", "202");
-
-            // $("#reason").on("change", function() {
-            //     const selected = $(this).find(":selected");
-
-            //     const acctCode = selected.data("acctcode");
-            //     const isLock = selected.data("islock");
-
-            //     $("#acct_code").val(acctCode);
-
-            //     // atur readonly sesuai islock
-            //     if (isLock === "Y") {
-            //         $("#acct_code").prop("readonly", true);
-            //     } else {
-            //         $("#acct_code").prop("readonly", false);
-            //     }
-            // });
         });
-        document.addEventListener("DOMContentLoaded", function() {
-            const input = document.getElementById("scannerInput");
-            input.focus();
-            input.addEventListener("keypress", function(e) {
-                // console.log("Pressed key:", e.key, e.keyCode);
-                if (e.key === "Enter") {
-                    e.preventDefault();
-                    const code = input.value.trim();
-                    if (code !== "") {
-                        document.getElementById('item_code').value = code;
-                        sendScannedCode(code);
-                        input.value = "";
-                    }
+
+        document.addEventListener("keydown", function(e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+
+                const scannerInput = document.getElementById("scannerInput");
+                const code = scannerInput.value.trim();
+
+                console.log("🔎 Enter ditekan, input terbaca:", code);
+
+                if (code !== "") {
+                    document.getElementById("item_code").value = code;
+                    console.log("✅ Kirim ke sendScannedCode dengan code:", code);
+
+                    sendScannedCode(code);
+
+                    scannerInput.value = "";
+                } else {
+                    console.log("⚠️ Tidak ada kode di scannerInput, abaikan.");
                 }
-            });
-
+                setTimeout(() => {
+                    scannerInput.focus();
+                    console.log("🎯 Fokus balik ke #scannerInput");
+                }, 50);
+            }
         });
+
+
+
         let html5QrCode;
 
 
