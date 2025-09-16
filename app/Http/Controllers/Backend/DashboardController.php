@@ -19,6 +19,9 @@ use Auth;
 use DB;
 use App\Services\SapService;
 
+use App\Models\ProgressTrackingModel;
+use App\Helpers\ProgressHelper;
+
 class DashboardController extends Controller
 {
     protected $sap;
@@ -160,51 +163,151 @@ class DashboardController extends Controller
 
     public function dashboard_invtf(Request $request)
     {
+        $getRap = $this->sap->getSeries([
+            'limit'      => 1,
+            'ObjectCode' => '67',
+            'SeriesName' => "BKS-" . date('y')
+        ]);
+        $seriesDefault = $getRap['data'][0]['Series'];
         $param = [
             'U_MEB_NO_IO' => $request->get('U_MEB_NO_IO'),
-            "page"  => (int) $request->get('page', 1),
-            "limit" => (int) $request->get('limit', 50),
-            'DocStatus' => 'O',
-            "DocDate" => date("Y")
+            'page'        => (int) $request->get('page', 1),
+            'limit'       => 10,
+            'Series'      => $seriesDefault
         ];
 
         $getInvtf = $this->sap->getInventoryTransfers($param);
 
-        if (empty($getInvtf) || $getInvtf['success'] !== true) {
+        if (empty($getInvtf) || ($getInvtf['success'] ?? false) !== true) {
             return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
         }
 
-        $invtf = collect($getInvtf['data'])
-            ->map(function ($row) {
-                $prjCode = $row['U_MEB_Project_Code'] ?? null;
+        $data = collect($getInvtf['data']);
 
-                if ($prjCode) {
-                    $getProject = $this->sap->getProjects([
-                        'limit'   => 1,
-                        'PrjCode' => $prjCode
-                    ]);
+        $noIOs        = $data->pluck('U_MEB_NO_IO')->filter()->unique()->toArray();
+        $progressData = ProgressTrackingModel::whereIn('no_io', $noIOs)->get()->keyBy('no_io');
 
-                    if (!empty($getProject) && $getProject['success'] === true && !empty($getProject['data'])) {
-                        // $row['project'] = $getProject['data'][0];
-                        $row['PrjName'] = $getProject['data'][0]['PrjName'] ?? null;
-                    } else {
-                        $row['PrjName'] = null;
-                    }
-                } else {
-                    $row['PrjName'] = null;
-                }
+        // Loop data + ambil project & series per item
+        $invtf = $data->map(function ($item) use ($progressData) {
+            $noIO    = $item['U_MEB_NO_IO'] ?? null;
+            // pastikan key sesuai data SAP
+            $project = $item['U_MEB_Project_Code']
+                ?? $item['ProjectCode']
+                ?? $item['PrjCode']
+                ?? null;
+            $series  = $item['Series'] ?? null;
 
-                return $row;
-            });
+            // Progress
+            $progress = $progressData[$noIO] ?? null;
+            $item['progress'] = [
+                'current_stage'    => $progress->current_stage ?? null,
+                'progress_percent' => $progress->progress_percent ?? 0,
+            ];
 
+            // Ambil nama project (langsung ke API)
+            if ($project) {
+                $respProject = $this->sap->getProjects([
+                    'limit'   => 1,
+                    'PrjCode' => $project
+                ]);
+
+                $item['PrjName'] = (!empty($respProject)
+                    && ($respProject['success'] ?? false) === true
+                    && !empty($respProject['data']))
+                    ? ($respProject['data'][0]['PrjName'] ?? '-')
+                    : '-';
+            } else {
+                $item['PrjName'] = '-';
+            }
+
+            // Ambil nama series (langsung ke API)
+            if ($series) {
+                $respSeries = $this->sap->getSeries([
+                    'limit'  => 1,
+                    'Series' => $series
+                ]);
+
+                $item['SeriesName'] = (!empty($respSeries)
+                    && ($respSeries['success'] ?? false) === true
+                    && !empty($respSeries['data']))
+                    ? ($respSeries['data'][0]['SeriesName'] ?? '-')
+                    : '-';
+            } else {
+                $item['SeriesName'] = '-';
+            }
+
+            return $item;
+        });
 
         $currentCount = $getInvtf['total'] ?? count($getInvtf['data'] ?? []);
-        $totalPages = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
-        $total = $getInvtf['total'];
-        $page = $getInvtf['page'];
-        $limit = $param['limit'];
+        $totalPages   = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
+        $total        = $getInvtf['total'] ?? count($invtf);
+        $page         = $getInvtf['page'] ?? $param['page'];
+        $limit        = $param['limit'];
+
         return view('backend.dashboard.inventory-list', compact('invtf', 'total', 'limit', 'page', 'totalPages'));
     }
+
+    public function syncInventoryProgress(Request $request)
+    {
+        $params = [
+            'page'  => (int) $request->get('page', 1),
+            'limit' => 10,
+        ];
+        if ($request->filled('U_MEB_NO_IO')) {
+            $params['U_MEB_NO_IO'] = $request->get('U_MEB_NO_IO');
+        }
+        if ($request->filled('Series')) {
+            $params['Series'] = $request->get('series');
+        }
+
+        $getInvtf = $this->sap->getInventoryTransfers($params);
+        $data = $getInvtf['data'] ?? [];
+
+        $grouped = collect($data)->groupBy('U_MEB_NO_IO');
+
+        foreach ($grouped as $noIO => $records) {
+            $latest = $records->sortByDesc('DocDate')->first();
+
+            $stage    = ProgressHelper::detectStage($latest);
+            $progress = ProgressHelper::progressPercent($stage);
+
+            // Project name
+            $projectName = null;
+            if (!empty($latest['U_MEB_Project_Code'])) {
+                $respProject = $this->sap->getProjects(['PrjCode' => $latest['U_MEB_Project_Code']]);
+                $projectName = $respProject['data'][0]['PrjName'] ?? null;
+            }
+
+            // Series name
+            $seriesName = null;
+            if (!empty($latest['Series'])) {
+                $respSeries = $this->sap->getSeries(['Series' => $latest['Series']]);
+                $seriesName = $respSeries['data'][0]['SeriesName'] ?? null;
+            }
+
+            ProgressTrackingModel::updateOrCreate(
+                ['no_io' => $noIO],
+                [
+                    'project_code'      => $latest['U_MEB_Project_Code'] ?? null,
+                    'project_name'      => $projectName,
+                    'prod_order_no'     => $latest['U_MEB_No_Prod_Order'] ?? null,
+                    'series'            => $latest['Series'] ?? null,
+                    'series_name'       => $seriesName,
+                    'current_stage'     => $stage,
+                    'progress_percent'  => $progress
+                ]
+            );
+        }
+
+        return response()->json(['message' => 'Progress synced', 'debug' => [
+            'stage' => $stage,
+            'progress' => $progress,
+            'getInvtf' => $getInvtf
+        ]]);
+    }
+
+
 
     public function clearBonNotif()
     {

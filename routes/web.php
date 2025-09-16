@@ -130,7 +130,7 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('admin/inventorytf/create', [InventorytfController::class, 'create']);
     Route::get('admin/inventorytf/list', [InventorytfController::class, 'list']);
     Route::get('admin/inventorytf/view', [InventorytfController::class, 'view']);
-
+    Route::get('admin/sync-inventory-progress', [DashboardController::class, 'syncInventoryProgress']);
     // transaction
     // stockin
     Route::get('/scanned-barcodes/{grpo}', [TransactionController::class, 'getScannedBarcodes']);
