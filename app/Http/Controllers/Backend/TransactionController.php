@@ -1304,7 +1304,7 @@ class TransactionController extends Controller
 
             // Insert ke DB
             if (!empty($insertedData)) {
-                goodreceiptModel::insert($insertedData);
+                goodissueModel::insert($insertedData);
             }
             DB::commit();
 
