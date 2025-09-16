@@ -72,7 +72,7 @@
                                             <tr>
                                                 <th>No</th>
                                                 <th>IO</th>
-                                                <th>Purchase Order</th>
+                                                <th>PO Maklon</th>
                                                 <th>Internal No</th>
                                                 <th>Item Code</th>
                                                 <th>Item Name</th>

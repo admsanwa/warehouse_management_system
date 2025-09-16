@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
 use App\Models\goodissueModel;
+use App\Models\goodreceiptModel;
 use App\Models\ItemsMaklonModel;
 use App\Models\RFPModel;
 use App\Models\IFPModel;
@@ -97,8 +98,20 @@ class ListTransactionsController extends Controller
 
     public function goodreceipt(Request $request)
     {
-        $getRecord = ItemsMaklonModel::getRecord($request)->where("gr", '>', 0)->paginate(5);
-
+        $param = [
+            'item_code' => $request->get('item_code'),
+            'item_desc' => $request->get('item_desc'),
+        ];
+        $getRecord = goodreceiptModel::query()
+            ->select('goods_receipt.*', 'users.fullname')
+            ->join('users', 'goods_receipt.user_id', '=', 'users.id')
+            ->when($param['item_code'], function ($query, $item_code) {
+                return $query->where('goods_receipt.item_code', $item_code);
+            })
+            ->when($param['item_desc'], function ($query, $item_desc) {
+                return $query->where('goods_receipt.item_desc', 'like', '%' . $item_desc . '%');
+            })
+            ->paginate(10);
         return view("backend.listtransactions.goodreceipt", compact('getRecord'));
     }
 }

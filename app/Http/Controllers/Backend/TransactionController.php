@@ -1292,6 +1292,7 @@ class TransactionController extends Controller
                     'remarks'    =>  $validated['remarks'],
                     'user_id'      => $user,
                     'created_at'   => now(),
+                    'updated_at'   => now(),
                 ];
             }
             $postData['Lines'] = $lines;
@@ -1303,7 +1304,7 @@ class TransactionController extends Controller
 
             // Insert ke DB
             if (!empty($insertedData)) {
-                goodissueModel::insert($insertedData);
+                goodreceiptModel::insert($insertedData);
             }
             DB::commit();
 
@@ -1576,6 +1577,7 @@ class TransactionController extends Controller
         $postData  = [];
 
         try {
+            DB::beginTransaction();
             $validated = $request->validate([
                 'docnum'        => 'nullable',
                 'remarks'      => 'required|string',
@@ -1626,7 +1628,8 @@ class TransactionController extends Controller
             ];
 
             $lines        = [];
-
+            $insertedData = [];
+            $user         = Auth::id();
             foreach ($validated['stocks'] as $row) {
                 // untuk API SAP
                 $entryQty = (float) str_replace(',', '.', str_replace('.', '', $row['qty']));                // Qty baru yang diinput
@@ -1643,8 +1646,26 @@ class TransactionController extends Controller
                 ];
 
                 // untuk DB
-                // $insertedData[] = [
-                // ];
+                $insertedData[] = [
+                    'po'        => $validated['docnum'],
+                    'io'        => $validated['no_io'],
+                    'so'        => $validated['no_so'],
+                    'no_gi'        => $validated['no_gi'] ?? '-',
+                    'internal_no'        => $validated['internal_no'],
+                    'no_inventory_tf'        => $validated['no_inventory_tf'],
+                    'type_inv_transaction'        => $validated['type_inv_transaction'],
+                    'project_code'        => $project,
+                    'distr_rule'        => $ocr,
+                    'whse'        => $warehouse,
+                    'item_code'    => $row['ItemCode'] ?? null,
+                    'item_desc'    => $row['Dscription'] ?? null,
+                    'qty' => $entryQty,
+                    'uom'    => $row['UnitMsr'] ?? null,
+                    'remarks'    =>  $validated['remarks'],
+                    'user_id'      => $user,
+                    'created_at'   => now(),
+                    'updated_at'   => now(),
+                ];
             }
             $postData['Lines'] = $lines;
             // Call API SAP
@@ -1654,6 +1675,11 @@ class TransactionController extends Controller
             }
 
 
+            // Insert ke DB
+            if (!empty($insertedData)) {
+                goodreceiptModel::insert($insertedData);
+            }
+            DB::commit();
             return response()->json([
                 'success'  => true,
                 'message'  => 'Telah berhasil Good Receipt item yang sudah di scan',

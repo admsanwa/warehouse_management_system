@@ -6,12 +6,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col col-sm-6">
-                        <h1>Good Issue</h1>
+                        <h1>Good Receipt</h1>
                     </div>
                 </div>
             </div>
         </div>
-        
+
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
@@ -19,13 +19,13 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">
-                                    Search Data Good Issue
+                                    Search Data Good Receipt
                                 </h3>
                             </div>
                             <form action="" method="get">
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="form-group col-md-2">
+                                        {{-- <div class="form-group col-md-2">
                                             <label for="">IO</label>
                                             <input type="text" name="io" class="form-control" value="{{ Request()->io }}" placeholder="Enter IO">
                                         </div>
@@ -36,18 +36,22 @@
                                         <div class="form-group col-md-2">
                                             <label for="">Internal No</label>
                                             <input type="text" name="internal_no" class="form-control" value="{{ Request()->internal_no }}" placeholder="Enter Internal No">
-                                        </div>
+                                        </div> --}}
                                         <div class="form-group col-md-2">
                                             <label for="">Item Code</label>
-                                            <input type="text" name="code" class="form-control" value="{{ Request()->code }}" placeholder="Enter Item Code">
-                                        </div>
-                                         <div class="form-group col-md-2">
-                                            <label for="">Item Desc</label>
-                                            <input type="text" name="name" class="form-control" value="{{ Request()->name }}" placeholder="Enter Item Name">
+                                            <input type="text" name="code" class="form-control"
+                                                value="{{ Request()->code }}" placeholder="Enter Item Code">
                                         </div>
                                         <div class="form-group col-md-2">
-                                            <button type="submit" class="btn btn-primary" style="margin-top: 30px"><i class="fa fa-search"></i> Search</button>
-                                            <a href="{{ url('admin/listtransaction/stockin') }}" class="btn btn-warning" style="margin-top: 30px"><i class="fa fa-eraser"></i>Reset</a>
+                                            <label for="">Item Desc</label>
+                                            <input type="text" name="name" class="form-control"
+                                                value="{{ Request()->name }}" placeholder="Enter Item Name">
+                                        </div>
+                                        <div class="form-group col-md-2">
+                                            <button type="submit" class="btn btn-primary" style="margin-top: 30px"><i
+                                                    class="fa fa-search"></i> Search</button>
+                                            <a href="{{ url('admin/listtransaction/stockin') }}" class="btn btn-warning"
+                                                style="margin-top: 30px"><i class="fa fa-eraser"></i>Reset</a>
                                         </div>
                                     </div>
                                 </div>
@@ -58,7 +62,7 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">
-                                    List of All Good Issue
+                                    List of All Good Receipt
                                 </h3>
                             </div>
                             <div class="card-body p-0">
@@ -68,31 +72,35 @@
                                             <tr>
                                                 <th>No</th>
                                                 <th>IO</th>
-                                                <th>Purchase Order</th>
+                                                <th>PO Maklon</th>
+                                                <th>No GI</th>
                                                 <th>Internal No</th>
                                                 <th>Item Code</th>
                                                 <th>Item Name</th>
-                                                <th>Good Issue</th>
-                                                <th>In Stock</th>
+                                                <th>Good Receipt</th>
+                                                <th>Cretaed At</th>
+                                                <th>User</th>
                                             </tr>
                                         </thead>
 
-                                       @forelse ($getRecord as $gi )                                           
-                                           <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $gi->io ?? 'N/A'}}</td>
-                                            <td>{{ $gi->po ?? 'N/A'}}</td>
-                                            <td>{{ $gi->internal_no ?? 'N/A' }}</td>
-                                            <td>{{ $gi->code }}</td>
-                                            <td>{{ $gi->name }}</td>
-                                            <td>{{ $gi->qty }}</td>
-                                            <td>{{ $gi->in_stock }}</td>
-                                           </tr>
-                                       @empty
-                                           <tr>
-                                            <td colspan="100%">No Record Found</td>
-                                           </tr>
-                                       @endforelse
+                                        @forelse ($getRecord as $gi)
+                                            <tr>
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td>{{ $gi->io ?? 'N/A' }}</td>
+                                                <td>{{ $gi->po ?? '-' }}</td>
+                                                <td>{{ $gi->no_gi ?? '-' }}</td>
+                                                <td>{{ $gi->internal_no ?? 'N/A' }}</td>
+                                                <td>{{ $gi->item_code }}</td>
+                                                <td>{{ $gi->item_desc }}</td>
+                                                <td>{{ formatDecimalsSAP($gi->qty) }}</td>
+                                                <td>{{ $gi->created_at->format('d-m-Y H:i') }}</td>
+                                                <td>{{ $gi->fullname }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="100%">No Record Found</td>
+                                            </tr>
+                                        @endforelse
                                     </table>
                                 </div>
                                 <div class="card-footer">
