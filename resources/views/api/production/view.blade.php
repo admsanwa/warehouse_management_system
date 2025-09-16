@@ -117,10 +117,25 @@
                                                     <th>Plan Qty</th>
                                                     <th>Issued Qty</th>
                                                     <th>Uom</th>
+                                                    @if ($user->department == "Quality Control" || $user->department == "IT")
+                                                        <th>QC</th>
+                                                        <th>Check Qty</th>                               
+                                                    @endif
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 @foreach ($lines as $line)
+                                                    @php
+                                                        $quality = $qualities->get($line['ItemCode'] ?? '');
+                                                        $statusMap = [
+                                                            1 => 'OK',
+                                                            2 => 'NG',
+                                                            3 => 'Need Approval',
+                                                            4 => 'Need Paint',
+                                                            5 => 'Painting by Inhouse',
+                                                            6 => 'Painting by Makloon'
+                                                        ];
+                                                    @endphp
                                                     <tr>
                                                         <td>{{ $loop->iteration }}</td>
                                                         <td>{{ $line['ItemCode'] ?? '-' }}</td>
@@ -128,6 +143,15 @@
                                                         <td>{{ formatDecimalsSAP($line['PlannedQty']) }}</td>
                                                         <td>{{ formatDecimalsSAP($line['IssuedQty']) }}</td>
                                                         <td>{{ $line['InvntryUoM'] ?? '-' }}</td>
+                                                        @if ($user->department == "Quality Control" || $user->department == "IT")
+                                                            @if (str_starts_with(strtoupper($line['ItemCode']), 'RM'))
+                                                                <td>{{ $statusMap[$quality->result ?? 0] ?? '-' }}</td>
+                                                                <td>
+                                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#modal_{{ $line['ItemCode'] }}"><i class="fa fa-eye"></i> Check QC</a>
+                                                                </td>
+                                                            @endif
+                                                        @endif
+                                                        @include('partials.modal.assessmentqc', ['quality' => $line, 'getRecord' => $getRecord, 'user' => $user])
                                                     </tr>
                                                 @endforeach
                                             </tbody>
@@ -157,6 +181,7 @@
             </div>
         </section>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 @endsection
 <div>
     <!-- Breathing in, I calm body and mind. Breathing out, I smile. - Thich Nhat Hanh -->

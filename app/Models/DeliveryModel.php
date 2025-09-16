@@ -12,32 +12,25 @@ class DeliveryModel extends Model
 
     protected $table = "delivery";
 
-    static public function getRecord()
+     static public function getRecord()
     {
-        $query = self::with('production');
-
+        $return = self::select('delivery.*'); 
+        if (!empty(Request::get('prod_order'))) {
+            $return = $return->where('prod_order', 'LIKE', '%' . Request::get('prod_order') . '%');
+        }
         if (!empty(Request::get('prod_no'))) {
-            $query = $query->whereHas('production', function ($q) {
-                $q->where('prod_no', 'LIKE', '%' . Request::get('prod_no') . '%');
-            });
+            $return = $return->where('prod_no', 'LIKE', '%' . Request::get('prod_no') . '%');
         }
         if (!empty(Request::get('prod_desc'))) {
-            $query = $query->whereHas('production', function ($q) {
-                $q->where('prod_desc', 'LIKE', '%' . Request::get('prod_desc') . '%');
-            });
+            $return = $return->where('prod_desc', 'LIKE', '%' . Request::get('prod_desc') . '%');
         }
         if (!empty(Request::get('io'))) {
-            $query = $query->where('io', 'LIKE', '%' . Request::get('io') . '%');
+            $return = $return->where('io', 'LIKE', '%' . Request::get('io') . '%');
         }
         if (!empty(Request::get('status'))) {
-            $query = $query->where('status', 'LIKE', '%' . Request::get('status') . '%');
+            $return = $return->where('status', 'LIKE', '%' . Request::get('status') . '%');
         }
 
-        return $query->orderBy('id', 'desc')->paginate(10);
-    }
-
-    public function production()
-    {
-        return $this->belongsTo(ProductionModel::class, 'io', 'io_no')->latest("id");
+        return $return->orderBy('id', 'desc');
     }
 }

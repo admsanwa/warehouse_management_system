@@ -40,6 +40,11 @@
                                                 placeholder="Enter Product Description" value="{{ Request()->prod_desc }}">
                                         </div>
                                         <div class="form-group col-md-2">
+                                            <label for="">Date</label>
+                                            <input type="date" name="date" class="form-control"
+                                                value="{{ Request()->date }}">
+                                        </div>
+                                        <div class="form-group col-md-2">
                                             <label for="status">Status QC</label>
                                             <select name="qc_status" id="qc_status" class="form-control">
                                                 <option value="">Select Status QC</option>
@@ -159,9 +164,13 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+   <script>
         window.addEventListener("load", function() {
             const selectSeries = $("#seriesSelect");
+            const defaultId = 701;
+            const defaultText = "BKS-25";
+            let option = new Option(defaultText, defaultId, true, true);
+            
             let selectedSeries = "{{ request()->series }}";
             console.log(selectedSeries);
             if (selectedSeries) {
@@ -179,7 +188,11 @@
                         selectSeries.append(option).trigger("change");
                     }
                 });
+            } else {
+                let option = new Option(defaultText, defaultId, true, true);
+                selectSeries.append(option).trigger("change");        
             }
+
             selectSeries.select2({
                 placeholder: "Ketik kode series...",
                 allowClear: true,

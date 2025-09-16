@@ -16,31 +16,34 @@ class QualityModel extends Model
 
     static public function getRecord()
     {
-        $query = self::with('production');
-
+        $return = self::select('quality.*'); 
+        if (!empty(Request::get('prod_order'))) {
+            $return = $return->where('prod_order', 'LIKE', '%' . Request::get('prod_order') . '%');
+        }
         if (!empty(Request::get('prod_no'))) {
-            $query = $query->whereHas('production', function ($q) {
-                $q->where('prod_no', 'LIKE', '%' . Request::get('prod_no') . '%');
-            });
+            $return = $return->where('prod_no', 'LIKE', '%' . Request::get('prod_no') . '%');
         }
         if (!empty(Request::get('prod_desc'))) {
-            $query = $query->whereHas('production', function ($q) {
-                $q->where('prod_desc', 'LIKE', '%' . Request::get('prod_desc') . '%');
-            });
+            $return = $return->where('prod_desc', 'LIKE', '%' . Request::get('prod_desc') . '%');
         }
         if (!empty(Request::get('io'))) {
-            $query = $query->where('io', 'LIKE', '%' . Request::get('io') . '%');
+            $return = $return->where('io', 'LIKE', '%' . Request::get('io') . '%');
         }
         if (!empty(Request::get('result'))) {
-            $query = $query->where('result', 'LIKE', '%' . Request::get('result') . '%');
+            $return = $return->where('result', 'LIKE', '%' . Request::get('result') . '%');
+        }
+        if (!empty(Request::get('status'))) {
+            $return = $return->whereHas('delivery', function($q) {
+                $q->where('status', 'LIKE', '%' . Request::get('status') . '%');                
+            });
         }
 
-        return $query->orderBy('id', 'desc')->paginate(5);
+        return $return->orderBy('id', 'desc');
     }
 
-    public function production()
+    public function delivery()
     {
-        return $this->belongsTo(ProductionModel::class, 'io', 'io_no')->latest("id");
+        return $this->hasOne(DeliveryModel::class, 'doc_entry', 'doc_entry')->latest("id");
     }
 
     public function user()

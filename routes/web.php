@@ -119,6 +119,7 @@ Route::group(['middleware' => 'admin'], function () {
     // qc
     Route::get("admin/quality/list", [QualityController::class, "index"]);
     Route::post("admin/quality/{docentry}", [QualityController::class, "result"]);
+    Route::post("admin/quality/{docEntry}/{itemCode}", [QualityController::class, "result_two"]);
     Route::get("admin/quality/history", [QualityController::class, "history"]);
 
     // stock

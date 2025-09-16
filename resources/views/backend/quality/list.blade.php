@@ -1,5 +1,5 @@
-@extends('backend.layouts.app')
-@section('content')
+@extends("backend.layouts.app")
+@section("content")
     <div class="content-wrapper">
         <div class="content-header">
             <div class="container-fluid">
@@ -17,7 +17,7 @@
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">
+                                <h3 class="card-title"> 
                                     Search Quality Control List
                                 </h3>
                             </div>
@@ -40,21 +40,20 @@
                                                 placeholder="Enter Nomor IO" value="{{ Request()->io_no }}">
                                         </div>
                                         <div class="form-group col-md-2">
+                                            <label for="">Date</label>
+                                            <input type="date" name="date" class="form-control"
+                                                value="{{ Request()->date }}">
+                                        </div>
+                                        <div class="form-group col-md-2">
                                             <label for="status">Status QC</label>
                                             <select name="qc_status" id="qc_status" class="form-control">
                                                 <option value="">Select Status QC</option>
-                                                <option value="1" {{ request('qc_status') == '1' ? 'selected' : '' }}>
-                                                    OK</option>
-                                                <option value="2" {{ request('qc_status') == '2' ? 'selected' : '' }}>
-                                                    NG</option>
-                                                <option value="3" {{ request('qc_status') == '3' ? 'selected' : '' }}>
-                                                    Need Approval</option>
-                                                <option value="4" {{ request('qc_status') == '4' ? 'selected' : '' }}>
-                                                    Need Paint</option>
-                                                <option value="5" {{ request('qc_status') == '5' ? 'selected' : '' }}>
-                                                    Painting by Inhouse</option>
-                                                <option value="6" {{ request('qc_status') == '6' ? 'selected' : '' }}>
-                                                    Painting by Maklon</option>
+                                                <option value="1" {{ request('qc_status') == '1' ? 'selected' : '' }}>OK</option>
+                                                <option value="2" {{ request('qc_status') == '2' ? 'selected' : '' }}>NG</option>
+                                                <option value="3" {{ request('qc_status') == '3' ? 'selected' : '' }}>Need Approval</option>
+                                                <option value="4" {{ request('qc_status') == '4' ? 'selected' : '' }}>Need Paint</option>
+                                                <option value="5" {{ request('qc_status') == '5' ? 'selected' : '' }}>Painting by Inhouse</option>
+                                                <option value="6" {{ request('qc_status') == '6' ? 'selected' : '' }}>Painting by Maklon</option>
                                             </select>
                                         </div>
                                         <div class="form-group col-md-2">
@@ -73,7 +72,7 @@
                             </form>
                         </div>
 
-                        @include('_message')
+                        @include("_message")
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">List Quality Control</h3>
@@ -100,20 +99,20 @@
                                                     $sap = $row['sap'];
                                                     $quality = $row['quality'];
                                                 @endphp
-                                                <tr
-                                                    class="
-                                                    @if ($quality && ($quality->result === 3 || $quality->result === 4)) table-primary @endif
+                                                <tr  class="
+                                                    @if($quality && ($quality->result === 3 || $quality->result === 4))
+                                                        table-primary
+                                                    @endif
                                                 ">
                                                     <td>
-                                                        @if ($quality && ($quality->result === 3 || $quality->result === 4))
+                                                        @if($quality && ($quality->result === 3 || $quality->result === 4))
                                                             <i class="fa fa-circle text-primary ms-2"
-                                                                style="font-size:10px; margin-right:10px;"
-                                                                title="Need Approval"></i>
+                                                            style="font-size:10px; margin-right:10px;"
+                                                            title="Need Approval"></i>
                                                         @endif
                                                         {{ $loop->iteration }}
                                                     </td>
-                                                    <td><a
-                                                            href="{{ url('admin/production/view?docEntry=' . $sap['DocEntry'] . '&docNum=' . $sap['DocNum']) }}">{{ $sap['ItemCode'] }}</a>
+                                                    <td><a href="{{ url('admin/production/view?docEntry=' . $sap['DocEntry'] . '&docNum=' . $sap['DocNum']) }}">{{ $sap['ItemCode'] }}</a> 
                                                     </td>
                                                     <td>{{ $sap['ItemName'] }}</td>
                                                     <td>{{ $sap['U_MEB_NO_IO'] }}</td>
@@ -126,40 +125,34 @@
                                                                 3 => 'Need Approval',
                                                                 4 => 'Need Paint',
                                                                 5 => 'Painting by Inhouse',
-                                                                6 => 'Painting by Makloon',
+                                                                6 => 'Painting by Makloon'
                                                             ];
                                                         @endphp
 
-                                                        @if ($quality)
+                                                        @if($quality)
                                                             {{ $statusMap[$quality->result] }} {{-- or any field in your Quality model --}}
                                                         @else
                                                             -
                                                         @endif
                                                     </td>
                                                     <td>
-                                                        @if ($quality && $quality->result_by === 'delvi')
-                                                            {{ 'Approve by ' . $quality->user->fullname }}
+                                                        @if ($quality && $quality->result_by === "delvi" )
+                                                            {{ "Approve by " . $quality->user->fullname}}
                                                         @else
                                                             -
                                                         @endif
                                                     </td>
-                                                    <td>
+                                                     <td>
                                                         @if ($quality && $quality->remark != null)
-                                                            {{ $quality->remark }}
+                                                            {{ $quality->remark}}
                                                         @else
                                                             -
                                                         @endif
                                                     </td>
-                                                    <td><a href="#" data-bs-toggle="modal"
-                                                            data-bs-target="#modal_{{ $sap['DocEntry'] }}"><i
-                                                                class="fa fa-eye"></i> Check</a></td>
+                                                    <td><a href="#" data-bs-toggle="modal" data-bs-target="#modal_{{ $sap['DocEntry'] }}"><i class="fa fa-eye"></i> Check</a></td>
                                                 </tr>
 
-                                                @include(
-                                                    'partials.modal.assessment',
-                                                    ['quality' => $sap],
-                                                    ['user' => $user]
-                                                )
+                                                @include('partials.modal.assessment', ['quality' => $sap], ['user' => $user])
                                             @empty
                                                 <tr>
                                                     <td colspan="100%">No Record Found</td>
@@ -217,6 +210,10 @@
     <script>
         window.addEventListener("load", function() {
             const selectSeries = $("#seriesSelect");
+            const defaultId = 701;
+            const defaultText = "BKS-25";
+            let option = new Option(defaultText, defaultId, true, true);
+            
             let selectedSeries = "{{ request()->series }}";
             console.log(selectedSeries);
             if (selectedSeries) {
@@ -234,7 +231,11 @@
                         selectSeries.append(option).trigger("change");
                     }
                 });
+            } else {
+                let option = new Option(defaultText, defaultId, true, true);
+                selectSeries.append(option).trigger("change");        
             }
+
             selectSeries.select2({
                 placeholder: "Ketik kode series...",
                 allowClear: true,

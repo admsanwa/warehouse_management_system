@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\BarcodeProductionModel;
 use App\Models\BonDetailsModel;
 use App\Models\BonModel;
+use App\Models\DeliveryModel;
 use App\Models\ItemsModel;
 use App\Models\MemoModel;
 use App\Models\ProductionModel;
 use App\Models\ProductionOrderDetailsModel;
+use App\Models\QualityModel;
 use App\Models\SignBonModel;
 use App\Models\SignModel;
 use App\Models\StockModel;
@@ -148,10 +150,20 @@ class ProductionController extends Controller
 
         $get_series = $this->sap->getSeries(['page' => 1, 'limit' => 1, 'Series' => (int) $prod['Series']]);
         $series =   Arr::get($get_series, 'data.0', []);
+
+        $qualities = QualityModel::where('doc_entry', $prod['DocEntry'])
+            ->orderByDesc('id')
+            ->get()
+            ->unique('prod_no')   // ambil yang terbaru per item
+            ->keyBy('prod_no');
+        $user = Auth::user();
+
         return view('api.production.view', [
             'getRecord'    => $prod,
             'lines' => $lines,
-            'series' => $series
+            'series' => $series,
+            'qualities' => $qualities,
+            'user'  => $user
         ]);
     }
 
