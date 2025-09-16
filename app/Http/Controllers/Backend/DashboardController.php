@@ -17,9 +17,16 @@ use App\Models\RFPModel;
 use App\Models\StockModel;
 use Auth;
 use DB;
+use App\Services\SapService;
 
 class DashboardController extends Controller
 {
+    protected $sap;
+
+    public function __construct(SapService $sap)
+    {
+        $this->sap = $sap;
+    }
     public function dashboard(Request $request)
     {
         // get value
@@ -106,7 +113,49 @@ class DashboardController extends Controller
             session()->flash('qcPendingProd', true);
         }
 
-        return view('backend.dashboard.list', compact('needBuy', 'afterCheck', 'deliveryStatus', 'prodRelease', 'purchaseOrder', 'goodIssued', 'goodReceipt', 'rfp', 'user'));
+        $param = [
+            "page"  => (int) $request->get('page', 1),
+            "limit" => (int) $request->get('limit', 10),
+            'DocStatus' => 'O',
+            "DocDate" => date("Y")
+        ];
+
+        $getInvtf = $this->sap->getInventoryTransfers($param);
+
+        if (empty($getInvtf) || $getInvtf['success'] !== true) {
+            return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
+        }
+
+        $invtf = collect($getInvtf['data'])
+            ->map(function ($row) {
+                $prjCode = $row['U_MEB_Project_Code'] ?? null;
+
+                if ($prjCode) {
+                    $getProject = $this->sap->getProjects([
+                        'limit'   => 1,
+                        'PrjCode' => $prjCode
+                    ]);
+
+                    if (!empty($getProject) && $getProject['success'] === true && !empty($getProject['data'])) {
+                        // $row['project'] = $getProject['data'][0];
+                        $row['PrjName'] = $getProject['data'][0]['PrjName'] ?? null;
+                    } else {
+                        $row['PrjName'] = null;
+                    }
+                } else {
+                    $row['PrjName'] = null;
+                }
+
+                return $row;
+            });
+
+
+        $currentCount = $getInvtf['total'] ?? count($getInvtf['data'] ?? []);
+        $totalPages = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
+        $total = $getInvtf['total'];
+        $page = $getInvtf['page'];
+        $limit = $param['limit'];
+        return view('backend.dashboard.list', compact('needBuy', 'afterCheck', 'deliveryStatus', 'prodRelease', 'purchaseOrder', 'goodIssued', 'goodReceipt', 'rfp', 'user', 'invtf', 'total', 'limit', 'page', 'totalPages'));
     }
 
     public function clearBonNotif()
