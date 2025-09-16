@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Models\goodissueModel;
 use App\Models\ItemsMaklonModel;
 use App\Models\RFPModel;
 use App\Models\IFPModel;
@@ -77,8 +78,20 @@ class ListTransactionsController extends Controller
 
     public function goodissue(Request $request)
     {
-        $getRecord = ItemsMaklonModel::getRecord($request)->where("gi", '>', 0)->paginate(5);
-
+        $param = [
+            'item_code' => $request->get('item_code'),
+            'item_desc' => $request->get('item_desc'),
+        ];
+        $getRecord = goodissueModel::query()
+            ->select('goods_issue.*', 'users.fullname')
+            ->join('users', 'goods_issue.user_id', '=', 'users.id')
+            ->when($param['item_code'], function ($query, $item_code) {
+                return $query->where('goods_issue.item_code', $item_code);
+            })
+            ->when($param['item_desc'], function ($query, $item_desc) {
+                return $query->where('goods_issue.item_desc', 'like', '%' . $item_desc . '%');
+            })
+            ->paginate(10);
         return view("backend.listtransactions.goodissue", compact('getRecord'));
     }
 

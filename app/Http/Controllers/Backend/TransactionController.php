@@ -200,6 +200,7 @@ class TransactionController extends Controller
         $postData  = [];
 
         try {
+            DB::beginTransaction();
             $validated = $request->validate([
                 'docNum'        => 'required',
                 'cardName'     => 'required',
@@ -337,7 +338,7 @@ class TransactionController extends Controller
                 'response' => $post_grpo ?? [],
             ], 422);
         } catch (\Exception $e) {
-            // DB::rollBack();
+            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
@@ -1207,6 +1208,7 @@ class TransactionController extends Controller
         $postData  = [];
 
         try {
+            DB::beginTransaction();
             $validated = $request->validate([
                 'docnum'        => 'nullable',
                 'remarks'      => 'required|string',
@@ -1252,7 +1254,9 @@ class TransactionController extends Controller
                 'Lines'       => []
             ];
 
-            $lines        = [];
+            $lines = [];
+            $insertedData = [];
+            $user         = Auth::id();
 
             foreach ($validated['stocks'] as $row) {
                 $entryQty = (float) str_replace(',', '.', str_replace('.', '', $row['qty']));                // Qty baru yang diinput
@@ -1271,8 +1275,24 @@ class TransactionController extends Controller
                 ];
 
                 // untuk DB
-                // $insertedData[] = [
-                // ];
+                $insertedData[] = [
+                    'po'        => $validated['docnum'],
+                    'io'        => $validated['no_io'],
+                    'so'        => $validated['no_so'],
+                    'internal_no'        => $validated['internal_no'],
+                    'no_inventory_tf'        => $validated['no_inventory_tf'],
+                    'type_inv_transaction'        => $validated['type_inv_transaction'],
+                    'project_code'        => $project,
+                    'distr_rule'        => $ocr,
+                    'whse'        => $warehouse,
+                    'item_code'    => $row['ItemCode'] ?? null,
+                    'item_desc'    => $row['Dscription'] ?? null,
+                    'qty' => $entryQty,
+                    'uom'    => $row['UnitMsr'] ?? null,
+                    'remarks'    =>  $validated['remarks'],
+                    'user_id'      => $user,
+                    'created_at'   => now(),
+                ];
             }
             $postData['Lines'] = $lines;
             // Call API SAP
@@ -1281,6 +1301,11 @@ class TransactionController extends Controller
                 throw new \Exception($post_gi['message'] ?? 'SAP Good Issue failed without message');
             }
 
+            // Insert ke DB
+            if (!empty($insertedData)) {
+                goodissueModel::insert($insertedData);
+            }
+            DB::commit();
 
             return response()->json([
                 'success'  => true,
