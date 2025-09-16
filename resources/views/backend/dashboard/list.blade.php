@@ -31,7 +31,7 @@
                 <!-- Small boxes (Stat box) -->
                 <div class="row">
                     @if ($authDept == 'PPIC' || $authDept == 'IT' || $authDept == 'Purchasing' || $authDept == 'Production and Warehouse')
-                        <div class="col-lg-2 col-6">
+                        <div class="col-lg-3 col-6">
                             <!-- small box -->
                             <div class="small-box bg-info">
                                 <div class="inner">
@@ -50,7 +50,7 @@
                     @endif
                     @if ($authDept == 'PPIC' || $authDept == 'IT' || $authDept == 'Production and Warehouse' || $authDept == 'Production')
                         <!-- ./col -->
-                        <div class="col-lg-2 col-6">
+                        <div class="col-lg-3 col-6">
                             <!-- small box -->
                             <div class="small-box bg-success">
                                 <div class="inner">
@@ -68,7 +68,7 @@
                     @endif
                     <!-- ./col -->
                     @if ($authDept == 'IT' || $authDept == 'Quality Control')
-                        <div class="col-lg-2 col-6">
+                        <div class="col-lg-3 col-6">
                             <!-- small box -->
                             <div class="small-box bg-warning">
                                 <div class="inner">
@@ -86,7 +86,7 @@
                     @endif
                     <!-- ./col -->
                     @if ($authDept == 'IT' || $authDept == 'Procurement, Installation and Delivery')
-                        <div class="col-lg-2 col-6">
+                        <div class="col-lg-3 col-6">
                             <!-- small box -->
                             <div class="small-box bg-danger">
                                 <div class="inner">
@@ -104,7 +104,7 @@
                         </div>
                     @endif
                     @if ($authDept == 'IT' || $authDept == 'Production and Warehouse')
-                        <div class="col-lg-2 col-6">
+                        <div class="col-lg-3 col-6">
                             <div class="small-box bg-info">
                                 <div class="inner">
                                     <h3>{{ $purchaseOrder }}</h3>
@@ -120,7 +120,7 @@
                         </div>
                     @endif
                     @if ($authDept == 'IT' || $authDept == 'Production and Warehouse')
-                        <div class="col-lg-2 col-6">
+                        <div class="col-lg-3 col-6">
                             <!-- small box -->
                             <div class="small-box bg-success">
                                 <div class="inner">
@@ -137,7 +137,7 @@
                         </div>
                     @endif
                     @if ($authDept == 'IT' || $authDept == 'Production and Warehouse')
-                        <div class="col-lg-2 col-6">
+                        <div class="col-lg-3 col-6">
                             <!-- small box -->
                             <div class="small-box bg-warning">
                                 <div class="inner">
@@ -154,7 +154,7 @@
                         </div>
                     @endif
                     @if ($authDept == 'IT' || $authDept == 'Production and Warehouse')
-                        <div class="col-lg-2 col-6">
+                        <div class="col-lg-3 col-6">
                             <!-- small box -->
                             <div class="small-box bg-danger">
                                 <div class="inner">
