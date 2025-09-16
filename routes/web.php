@@ -40,6 +40,7 @@ Route::post('login_post', [AuthController::class, 'login_post']);
 
 Route::group(['middleware' => 'admin'], function () {
     // dashboard
+    Route::get('admin/dashboard-list', [DashboardController::class, 'dashboard_invtf']);
     Route::get('admin/dashboard', [DashboardController::class, 'dashboard']);
     Route::get('admin/dashboard/minstock', [DashboardController::class, 'min_stock']);
     Route::get('admin/dashboard/aftercheck', [DashboardController::class, 'after_check']);
