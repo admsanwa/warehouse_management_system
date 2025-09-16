@@ -41,7 +41,8 @@
                                 <div class="icon">
                                     <i class="ion ion-bag"></i>
                                 </div>
-                                <a href="{{ url('admin/dashboard/minstock') }}" class="small-box-footer">
+                                <a href="{{ url('admin/items/list?item_code=&item_desc=&stockNotes=1&warehouse=BK001') }}"
+                                    class="small-box-footer">
                                     More info <i class="fas fa-arrow-circle-right"></i>
                                 </a>
                             </div>
@@ -188,7 +189,7 @@
                                         <th>IO</th>
                                         <th>Customer Name</th>
                                         <th>Project</th>
-                                        <th>Prod Order</th>
+                                        {{-- <th>Prod Order</th> --}}
                                         <th>Delivery</th>
                                         {{-- <th>Doc Date</th> --}}
                                     </tr>
@@ -200,7 +201,7 @@
                                             <td>{{ $inv['U_MEB_NO_IO'] ?? '-' }}</td>
                                             <td>{{ $inv['CardName'] ?? '-' }}</td>
                                             <td>{{ $inv['PrjName'] ?? '-' }}</td>
-                                            <td>{{ $inv['U_MEB_No_Prod_Order'] ?? '-' }}</td>
+                                            {{-- <td>{{ $inv['U_MEB_No_Prod_Order'] ?? '-' }}</td> --}}
                                             <td>{{ $inv['U_SI_HARI_TGL_KIRIM'] ?? '-' }}</td>
                                             {{-- <td>{{ $inv['DocDate'] ?? '-' }}</td> --}}
                                         </tr>
