@@ -161,6 +161,7 @@ class DashboardController extends Controller
     public function dashboard_invtf(Request $request)
     {
         $param = [
+            'U_MEB_NO_IO' => $request->get('U_MEB_NO_IO'),
             "page"  => (int) $request->get('page', 1),
             "limit" => (int) $request->get('limit', 50),
             'DocStatus' => 'O',
