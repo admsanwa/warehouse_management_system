@@ -115,7 +115,7 @@ class DashboardController extends Controller
 
         $param = [
             "page"  => (int) $request->get('page', 1),
-            "limit" => (int) $request->get('limit', 10),
+            "limit" => (int) $request->get('limit', 50),
             'DocStatus' => 'O',
             "DocDate" => date("Y")
         ];
