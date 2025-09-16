@@ -120,7 +120,7 @@ class QualityController extends Controller
         ];
 
         $check  = $request->check !== null ? ($statusMap[$request->check] ?? "-") : "-";
-        $user   = Auth::user()->username;
+        $user   = Auth::user();
 
         $quality                = new QualityModel();
         $quality->doc_entry     = $sapData['DocEntry'];
@@ -132,7 +132,7 @@ class QualityController extends Controller
         $quality->series        = $sapData['Series'];
         $quality->result        = $request->check;
         $quality->remark        = $request->remark;
-        $quality->result_by     = $user;
+        $quality->result_by     = $user->username;
         $quality->save();
 
 
@@ -199,7 +199,7 @@ class QualityController extends Controller
         ];
 
         $check  = $request->check !== null ? ($statusMap[$request->check] ?? "-") : "-";
-        $user   = Auth::user()->username;
+        $user   = Auth::user();
 
         $quality                = new QualityModel();
         $quality->doc_entry     = $sapData['DocEntry'];
@@ -211,7 +211,7 @@ class QualityController extends Controller
         $quality->series        = $sapData['Series'];
         $quality->result        = $request->check;
         $quality->remark        = $request->remark;
-        $quality->result_by     = $user;
+        $quality->result_by     = $user->username;
         $quality->save();
 
         $isProcManager = $user->department === 'Procurement, Installation and Delivery'
