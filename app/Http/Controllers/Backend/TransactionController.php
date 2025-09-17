@@ -485,10 +485,16 @@ class TransactionController extends Controller
             ->orderBy('reason_code')
             ->get();
 
+        $inv_trans_reasons = SapReason::where('type', 'inv-trans')
+            ->orderBy('reason_code')
+            ->pluck('reason_desc', 'reason_code')
+            ->toArray();
+
         return view('api.transaction.stockout', compact(
             'po',
             'docEntry',
             'gi_reasons',
+            'inv_trans_reasons',
         ));
     }
 
@@ -609,6 +615,7 @@ class TransactionController extends Controller
                 'cost_center' => 'nullable|string',
                 'acct_code' => 'nullable|string',
                 'prod_type' => 'nullable|string',
+                'type_inv_transaction'      => 'nullable|string',
                 'stocks' => 'required|array|min:1',
                 'stocks.*.BaseEntry' => 'required|string',
                 'stocks.*.BaseLine' => 'nullable|string',
@@ -633,6 +640,7 @@ class TransactionController extends Controller
                     "U_MEB_No_IO" => $validated['no_io'] ?? '',
                     "U_MEB_No_SO" => $validated['no_so'] ?? '',
                     "U_MEB_Project_Code" => $project ?? '',
+                    "U_MEB_Type_Inv_Trans" => $validated['type_inv_transaction'] ?? '',
                     "U_MEB_DIST_RULE" => $validated['cost_center'] ?? ''
                 ],
                 'Lines' => []
@@ -827,11 +835,16 @@ class TransactionController extends Controller
         $gr_reasons = SapReason::where('type', 'receipt')
             ->orderBy('reason_code')
             ->get();
+        $inv_trans_reasons = SapReason::where('type', 'inv-trans')
+            ->orderBy('reason_code')
+            ->pluck('reason_desc', 'reason_code')
+            ->toArray();
 
         return view('api.transaction.receiptfromprod', compact(
             'po',
             'docEntry',
             'gr_reasons',
+            'inv_trans_reasons',
         ));
     }
 
@@ -893,6 +906,7 @@ class TransactionController extends Controller
                 'no_io'      => 'nullable|string',
                 'no_so'      => 'nullable|string',
                 'project'      => 'nullable|string',
+                'type_inv_transaction'      => 'nullable|string',
                 'warehouse'      => 'nullable|string',
                 'cost_center'      => 'nullable|string',
                 'acct_code'      => 'nullable|string',
@@ -922,6 +936,7 @@ class TransactionController extends Controller
                     "U_MEB_No_IO" =>   $validated['no_io'] ?? '',
                     "U_MEB_No_SO" =>   $validated['no_so'] ?? '',
                     "U_MEB_Project_Code" =>   $project ?? '',
+                    "U_MEB_Type_Inv_Trans" => $validated['type_inv_transaction'] ?? '',
                     "U_MEB_DIST_RULE" =>  $validated['cost_center'] ?? ''
                 ],
 

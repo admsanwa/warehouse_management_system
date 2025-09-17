@@ -127,6 +127,17 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                <label for="" class="col-sm-4 col-form-lable">Type Inventory Transaction :</label>
+                                <div class="col-sm-6 mb-2">
+                                    <select name="type_inv_transaction" id="type_inv_transaction"
+                                        class="form-control mt-2" required>
+                                        <option value="" disabled selected>Pilih Inventory Transfer</option>
+                                        @foreach ($inv_trans_reasons as $key => $item)
+                                            <option value="{{ $key }}">{{ $key }} - {{ $item }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 <label for="" class="col-sm-4 col-form-lable">WIP Account Code :</label>
                                 <div class="col-sm-6 mb-2">
                                     <input type="text" name="acct_code" id="acct_code" class="form-control mt-2"
