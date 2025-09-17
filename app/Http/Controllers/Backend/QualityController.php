@@ -38,7 +38,7 @@ class QualityController extends Controller
             "ItemCode" =>  $request->get('prod_no'),
             "ItemName" =>  $request->get('prod_desc'),
             "Series" =>  $request->get('series', 701),
-            "Status" =>  $request->get('status', 'Closed'),
+            "Status" =>  $request->get('status', 'Released'),
         ];
 
         $getProds = $this->sap->getProductionOrders($param);
@@ -132,7 +132,7 @@ class QualityController extends Controller
         $quality->series        = $sapData['Series'];
         $quality->result        = $request->check;
         $quality->remark        = $request->remark;
-        $quality->result_by     = $user->username;
+        $quality->result_by     = $user->fullname;
         $quality->save();
 
 
@@ -211,7 +211,7 @@ class QualityController extends Controller
         $quality->series        = $sapData['Series'];
         $quality->result        = $request->check;
         $quality->remark        = $request->remark;
-        $quality->result_by     = $user->username;
+        $quality->result_by     = $$user->fullname;
         $quality->save();
 
         $isProcManager = $user->department === 'Procurement, Installation and Delivery'
@@ -243,67 +243,14 @@ class QualityController extends Controller
                 url('admin/quality/list')
             ));
         }
-
         return redirect()->back()->with("success", "Telah berhasil menilai product: {$itemCode} menjadi {$check}");
     }
 
     public function history(Request $request)
     {
-        $param = [
-            "page" => (int) $request->get('page', 1),
-            "limit" => (int) $request->get('limit', 50),
-            "DueDate" => formatDateSlash($request->get('date')),
-            "DocNum" => $request->get('doc_num'),
-            "U_MEB_NO_IO" => $request->get('io_no'),
-            "ItemCode" =>  $request->get('prod_no'),
-            "ItemName" =>  $request->get('prod_desc'),
-            "Series" =>  $request->get('series', 701),
-            "Status" =>  $request->get('status', 'Closed'),
-        ];
+        $getRecord = QualityModel::getRecord($request)
+            ->paginate(10);
 
-        $getProds = $this->sap->getProductionOrders($param);
-        if (empty($getProds) || $getProds['success'] !== true) {
-            return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
-        }
-
-        $totalPages  = ceil($getProds['total'] / $param['limit']);
-        $user        = Auth::user();
-        $sapDocEntry = collect($getProds['data'] ?? [])
-            ->pluck('DocEntry')
-            ->map(fn($code) => strtoupper(trim($code)))
-            ->toArray();
-
-        $qualityQuery = QualityModel::whereIn('doc_entry', $sapDocEntry);
-        if ($request->filled('qc_status')) {
-            $qualityQuery->where('result', $request->qc_status);
-        }
-        $qualityData = $qualityQuery->get()->keyBy('doc_entry');
-
-        $mergedData = collect($getProds['data'])->map(function ($sapItem) use ($qualityData) {
-            $docEntry = $sapItem['DocEntry'];
-
-            return [
-                'sap'     => $sapItem,
-                'quality' => $qualityData[$docEntry] ?? null,
-            ];
-        })->filter(function ($row) {
-            // SELALU butuh quality, jadi hanya ambil data yang punya pasangan QC
-            return !is_null($row['quality']);
-        })->values();
-
-        // dd([
-        //     'sap_data'    => $getProds['data'] ?? [],
-        //     'qualityData' => $qualityData,
-        //     'mergedData'  => $mergedData,
-        // ]);
-
-        return view('backend.quality.history', [
-            'mergedData'    => $mergedData,
-            'page'        => $getProds['page'],
-            'limit'       => $getProds['limit'],
-            'total'       => $mergedData->count(),
-            'totalPages'  => $totalPages,
-            'user'        => $user
-        ]);
+        return view('backend.quality.history', compact('getRecord'));
     }
 }

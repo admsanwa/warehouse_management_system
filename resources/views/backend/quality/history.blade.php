@@ -26,41 +26,36 @@
                                     <div class="row">
                                         <div class="form-group col-md-2">
                                             <label for="">IO No</label>
-                                            <input type="text" name="io_no" class="form-control"
-                                                placeholder="Enter Nomor IO" value="{{ Request()->io_no }}">
+                                            <input type="text" name="io" class="form-control"
+                                                placeholder="Enter Nomor IO">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Product No</label>
                                             <input type="text" name="prod_no" class="form-control"
-                                                placeholder="Enter Product Nomor" value="{{ Request()->prod_no }}">
+                                                placeholder="Enter Product Nomor">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Product Desc</label>
                                             <input type="text" name="prod_desc" class="form-control"
-                                                placeholder="Enter Product Description" value="{{ Request()->prod_desc }}">
-                                        </div>
-                                        <div class="form-group col-md-2">
-                                            <label for="">Date</label>
-                                            <input type="date" name="date" class="form-control"
-                                                value="{{ Request()->date }}">
+                                                placeholder="Enter Product Description">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="status">Status QC</label>
-                                            <select name="qc_status" id="qc_status" class="form-control">
-                                                <option value="">Select Status QC</option>
-                                                <option value="1" {{ request('qc_status') == '1' ? 'selected' : '' }}>OK</option>
-                                                <option value="2" {{ request('qc_status') == '2' ? 'selected' : '' }}>NG</option>
-                                                <option value="3" {{ request('qc_status') == '3' ? 'selected' : '' }}>Need Approval</option>
-                                                <option value="4" {{ request('qc_status') == '4' ? 'selected' : '' }}>Need Paint</option>
-                                                <option value="5" {{ request('qc_status') == '5' ? 'selected' : '' }}>Painting by Inhouse</option>
-                                                <option value="6" {{ request('qc_status') == '6' ? 'selected' : '' }}>Painting by Maklon</option>
+                                            <select name="result" id="result" class="form-control">
+                                                <option value="">Select result QC</option>
+                                                <option value="1" {{ request('result') == '1' ? 'selected' : '' }}>OK</option>
+                                                <option value="2" {{ request('result') == '2' ? 'selected' : '' }}>NG</option>
+                                                <option value="3" {{ request('result') == '3' ? 'selected' : '' }}>Need Approval</option>
+                                                <option value="4" {{ request('result') == '4' ? 'selected' : '' }}>Need Paint</option>
+                                                <option value="5" {{ request('result') == '5' ? 'selected' : '' }}>Painting by Inhouse</option>
+                                                <option value="6" {{ request('result') == '6' ? 'selected' : '' }}>Painting by Maklon</option>
                                             </select>
                                         </div>
-                                        <div class="form-group col-md-2">
+                                        {{-- <div class="form-group col-md-2">
                                             <label for="series">Series</label>
                                             <select name="series" class="form-control" id="seriesSelect">
                                             </select>
-                                        </div>
+                                        </div> --}}
                                         <div class="form-group col-md-3">
                                             <button type="submit" class="btn btn-primary" style="margin-top: 20px"><i
                                                     class="fa fa-search"></i> Search</button>
@@ -86,32 +81,26 @@
                                                 <th>Product Nomer</th>
                                                 <th>Description</th>
                                                 <th>IO</th>
-                                                <th>Due Date</th>
                                                 <th>QC</th>
                                                 <th>Result By</th>
                                                 <th>Remarks</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse ($mergedData as $prod)
-                                                @php
-                                                    $sap = $prod['sap'];
-                                                    $quality = $prod['quality'];
-                                                @endphp
+                                            @forelse ($getRecord as $quality)
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>
-                                                        @if ($sap)
-                                                            <a href="{{ url('admin/production/view?docEntry=' . $sap['DocEntry'] . '&docNum=' . $sap['DocNum']) }}">
-                                                                {{ $sap['ItemCode'] }}
+                                                        @if ($quality)
+                                                            <a href="{{ url('admin/production/view?docEntry=' . $quality->doc_entry . '&docNum=' . $quality->prod_order) }}">
+                                                                {{ $quality->prod_no }}
                                                             </a>
                                                         @else
-                                                            {{ $quality->item_code }}
+                                                            {{ $quality->prod_no }}
                                                         @endif
                                                     </td>
-                                                    <td>{{ $sap['ItemName'] ?? '-' }}</td>
-                                                    <td>{{ $sap['U_MEB_NO_IO'] ?? '-' }}</td>
-                                                    <td>{{ $sap['DueDate'] ?? '-' }}</td>
+                                                    <td>{{ $quality->prod_desc ?? '-' }}</td>
+                                                    <td>{{ $quality->io ?? '-' }}</td>
                                                     <td>
                                                         @php
                                                             $statusMap = [

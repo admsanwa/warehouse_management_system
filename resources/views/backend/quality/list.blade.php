@@ -88,6 +88,7 @@
                                                 <th>IO</th>
                                                 <th>Due Date</th>
                                                 <th>QC</th>
+                                                <th>Result By</th>
                                                 <th>Status</th>
                                                 <th>Remarks</th>
                                                 <th>Check</th>
@@ -100,12 +101,12 @@
                                                     $quality = $row['quality'];
                                                 @endphp
                                                 <tr  class="
-                                                    @if($quality && ($quality->result === 3 || $quality->result === 4))
+                                                    @if($quality && ($quality->result === 2 ||$quality->result === 3 || $quality->result === 4))
                                                         table-primary
                                                     @endif
                                                 ">
                                                     <td>
-                                                        @if($quality && ($quality->result === 3 || $quality->result === 4))
+                                                        @if($quality && ($quality->result === 2 ||$quality->result === 3 || $quality->result === 4))
                                                             <i class="fa fa-circle text-primary ms-2"
                                                             style="font-size:10px; margin-right:10px;"
                                                             title="Need Approval"></i>
@@ -135,6 +136,7 @@
                                                             -
                                                         @endif
                                                     </td>
+                                                    <td>{{ $quality->result_by ?? "-" }}</td>
                                                     <td>
                                                         @if ($quality && $quality->result_by === "delvi" )
                                                             {{ "Approve by " . $quality->user->fullname}}
