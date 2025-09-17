@@ -7,12 +7,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1 class="m-0">Inventory Transfer Dashboard</h1>
+                        <h1 class="m-0">Dashboard Plan</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Inventory Transfer</li>
+                            <li class="breadcrumb-item active"></li>
                         </ol>
                     </div>
                 </div>
@@ -26,7 +26,7 @@
                 <!-- Search Card -->
                 <div class="card mb-3">
                     <div class="card-header">
-                        <h3 class="card-title">Search Inventory Transfer</h3>
+                        <h3 class="card-title">Search</h3>
                     </div>
                     <form action="" method="get">
                         <div class="card-body">
@@ -60,7 +60,7 @@
                 <!-- Dashboard Card -->
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Inventory Transfer List</h3>
+                        <h3 class="card-title">Sales Order Progress List</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="fullscreen">
                                 <i class="fas fa-expand"></i> Fullscreen
@@ -75,18 +75,20 @@
                                     <tr>
                                         <th>Series Name</th>
                                         <th>No IO</th>
+                                        <th>No SO</th>
                                         <th>Customer Name</th>
                                         <th>Project Name</th>
                                         <th>From → To</th>
-                                        <th>Status</th>
                                         <th>Progress</th>
+                                        <th>Current Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($invtf as $item)
+                                    @forelse ($purchase_orders as $item)
                                         <tr>
                                             <td>{{ $item['SeriesName'] ?? '-' }}</td>
                                             <td>{{ $item['U_MEB_NO_IO'] ?? '-' }}</td>
+                                            <td>{{ $item['DocNum'] ?? '-' }}</td>
                                             <td>{{ $item['CardName'] ?? '-' }}</td>
                                             <td>{{ $item['ProjectName'] ?? '-' }}</td>
                                             <td>
@@ -98,22 +100,19 @@
                                                     {{ $item['ToWhsCode'] ?? '-' }}
                                                 </span>
                                             </td>
-                                            <td>
-                                                <span class="badge bg-primary">
-                                                    {{ ucfirst($item['Stage']) }}
-                                                </span>
-                                            </td>
                                             <td style="min-width:180px;">
-                                                <div class="progress progress-sm">
+                                                <div class="progress progress-sm" style="height: 20px;">
                                                     <div class="progress-bar 
-                                                    @if ($item['Progress'] < 30) bg-danger 
-                                                    @elseif($item['Progress'] < 70) bg-warning 
-                                                    @else bg-success @endif"
-                                                        role="progressbar" style="width: {{ $item['Progress'] }}%">
+                                                            @if ($item['ProgressPercent'] < 30) bg-danger 
+                                                            @elseif($item['ProgressPercent'] < 70) bg-warning 
+                                                            @else bg-success @endif"
+                                                        role="progressbar"
+                                                        style="width: {{ $item['ProgressPercent'] ?? 0 }}%;">
+                                                        {{ $item['ProgressPercent'] ?? 0 }}%
                                                     </div>
                                                 </div>
-                                                <small>{{ $item['Progress'] }}%</small>
                                             </td>
+                                            <td>{{ $item['Stage'] ?? '-' }}</td>
                                         </tr>
                                     @empty
                                         <tr>
@@ -158,52 +157,57 @@
                 </div>
             </div>
         </section>
-    </div>
-
-    {{-- Select2 Series --}}
-    @push('scripts')
         <script>
-            $(function() {
+            window.addEventListener("load", function() {
                 const selectSeries = $("#seriesSelect");
-                const selectedSeries = "{{ request()->get('series') ?? '' }}";
-
+                let selectedSeries = "{{ request()->series }}";
+                console.log(selectedSeries);
                 if (selectedSeries) {
                     $.ajax({
                         url: "/purchasing/seriesSearch",
                         data: {
                             Series: selectedSeries,
-                            ObjectCode: "67"
+                            ObjectCode: "17"
                         },
                         dataType: "json"
                     }).then(function(data) {
                         if (data.results && data.results.length > 0) {
-                            let item = data.results[0];
+                            let item = data.results[0]; // ambil hasil pertama
                             let option = new Option(item.text, item.id, true, true);
                             selectSeries.append(option).trigger("change");
                         }
                     });
                 }
-
                 selectSeries.select2({
-                    placeholder: "Cari Series...",
+                    placeholder: "Ketik kode series...",
                     allowClear: true,
                     width: "100%",
                     language: {
-                        inputTooShort: () => "Ketik kode series...",
-                        noResults: () => "Tidak ada data",
-                        searching: () => "Mencari..."
+                        inputTooShort: function() {
+                            return "Ketik kode series untuk mencari...";
+                        },
+                        noResults: function() {
+                            return "Tidak ada data ditemukan";
+                        },
+                        searching: function() {
+                            return "Sedang mencari...";
+                        },
                     },
                     ajax: {
                         url: "/purchasing/seriesSearch",
                         dataType: "json",
                         delay: 250,
                         data: function(params) {
+                            if (!params) {
+                                return;
+                            }
                             return {
                                 q: params.term,
-                                ObjectCode: '67'
+                                ObjectCode: '17'
                             };
                         },
                         processResults: function(data) {
+                            console.log("Response dari server:", data); // cek di console
                             return {
                                 results: (data.results || []).map(item => ({
                                     id: item.id,
@@ -215,5 +219,5 @@
                 });
             });
         </script>
-    @endpush
+    </div>
 @endsection

@@ -123,191 +123,151 @@ class DashboardController extends Controller
             "DocDate" => date("Y")
         ];
 
-        $getInvtf = $this->sap->getInventoryTransfers($param);
+        // $getInvtf = $this->sap->getInventoryTransfers($param);
 
-        if (empty($getInvtf) || $getInvtf['success'] !== true) {
-            return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
-        }
+        // if (empty($getInvtf) || $getInvtf['success'] !== true) {
+        //     return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
+        // }
 
-        $invtf = collect($getInvtf['data'])
-            ->map(function ($row) {
-                $prjCode = $row['U_MEB_Project_Code'] ?? null;
+        // $invtf = collect($getInvtf['data'])
+        //     ->map(function ($row) {
+        //         $prjCode = $row['U_MEB_Project_Code'] ?? null;
 
-                if ($prjCode) {
-                    $getProject = $this->sap->getProjects([
-                        'limit'   => 1,
-                        'PrjCode' => $prjCode
-                    ]);
+        //         if ($prjCode) {
+        //             $getProject = $this->sap->getProjects([
+        //                 'limit'   => 1,
+        //                 'PrjCode' => $prjCode
+        //             ]);
 
-                    if (!empty($getProject) && $getProject['success'] === true && !empty($getProject['data'])) {
-                        // $row['project'] = $getProject['data'][0];
-                        $row['PrjName'] = $getProject['data'][0]['PrjName'] ?? null;
-                    } else {
-                        $row['PrjName'] = null;
-                    }
-                } else {
-                    $row['PrjName'] = null;
-                }
+        //             if (!empty($getProject) && $getProject['success'] === true && !empty($getProject['data'])) {
+        //                 // $row['project'] = $getProject['data'][0];
+        //                 $row['PrjName'] = $getProject['data'][0]['PrjName'] ?? null;
+        //             } else {
+        //                 $row['PrjName'] = null;
+        //             }
+        //         } else {
+        //             $row['PrjName'] = null;
+        //         }
 
-                return $row;
-            });
+        //         return $row;
+        //     });
 
 
-        $currentCount = $getInvtf['total'] ?? count($getInvtf['data'] ?? []);
-        $totalPages = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
-        $total = $getInvtf['total'];
-        $page = $getInvtf['page'];
-        $limit = $param['limit'];
-        return view('backend.dashboard.list', compact('needBuy', 'afterCheck', 'deliveryStatus', 'prodRelease', 'purchaseOrder', 'goodIssued', 'goodReceipt', 'rfp', 'user', 'invtf', 'total', 'limit', 'page', 'totalPages'));
+        // $currentCount = $getInvtf['total'] ?? count($getInvtf['data'] ?? []);
+        // $totalPages = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
+        // $total = $getInvtf['total'];
+        // $page = $getInvtf['page'];
+        // $limit = $param['limit'];
+        return view('backend.dashboard.list', compact('needBuy', 'afterCheck', 'deliveryStatus', 'prodRelease', 'purchaseOrder', 'goodIssued', 'goodReceipt', 'rfp', 'user'));
     }
 
-    public function dashboard_invtf(Request $request)
+    public function dashboard_plan(Request $request)
     {
-        $getRap = $this->sap->getSeries([
-            'limit'      => 1,
-            'ObjectCode' => '67',
-            'SeriesName' => "BKS-" . date('y')
-        ]);
-        $seriesDefault = $getRap['data'][0]['Series'];
+        // Param untuk Sales Orders
         $param = [
             'U_MEB_NO_IO' => $request->get('U_MEB_NO_IO'),
             'page'        => (int) $request->get('page', 1),
+            'Series' => $request->get('series'),
             'limit'       => 10,
-            'Series'      => $seriesDefault
         ];
 
-        $getInvtf = $this->sap->getInventoryTransfers($param);
+        // Ambil data SO
+        $getSO = $this->sap->getSalesOrders($param);
 
-        if (empty($getInvtf) || ($getInvtf['success'] ?? false) !== true) {
+        if (empty($getSO) || ($getSO['success'] ?? false) !== true) {
             return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
         }
 
-        $data = collect($getInvtf['data']);
-
-        $noIOs        = $data->pluck('U_MEB_NO_IO')->filter()->unique()->toArray();
-        $progressData = ProgressTrackingModel::whereIn('no_io', $noIOs)->get()->keyBy('no_io');
-
-        // Loop data + ambil project & series per item
-        $invtf = $data->map(function ($item) use ($progressData) {
-            $noIO    = $item['U_MEB_NO_IO'] ?? null;
-            // pastikan key sesuai data SAP
-            $project = $item['U_MEB_Project_Code']
-                ?? $item['ProjectCode']
-                ?? $item['PrjCode']
-                ?? null;
-            $series  = $item['Series'] ?? null;
-
-            // Progress
-            $progress = $progressData[$noIO] ?? null;
-            $item['progress'] = [
-                'current_stage'    => $progress->current_stage ?? null,
-                'progress_percent' => $progress->progress_percent ?? 0,
-            ];
-
-            // Ambil nama project (langsung ke API)
-            if ($project) {
-                $respProject = $this->sap->getProjects([
-                    'limit'   => 1,
-                    'PrjCode' => $project
+        // Koleksi data
+        $data = collect($getSO['data'])->map(function ($row) {
+            // Ambil project name dari lines
+            if (!empty($row['Lines'][0]['Project'])) {
+                $getProject = $this->sap->getProjects([
+                    'PrjCode' => $row['Lines'][0]['Project'],
+                    'limit'   => 1
                 ]);
 
-                $item['PrjName'] = (!empty($respProject)
-                    && ($respProject['success'] ?? false) === true
-                    && !empty($respProject['data']))
-                    ? ($respProject['data'][0]['PrjName'] ?? '-')
-                    : '-';
-            } else {
-                $item['PrjName'] = '-';
+                if (!empty($getProject['data'][0]['PrjName'])) {
+                    $row['ProjectName'] = $getProject['data'][0]['PrjName'];
+                }
             }
 
-            // Ambil nama series (langsung ke API)
-            if ($series) {
-                $respSeries = $this->sap->getSeries([
-                    'limit'  => 1,
-                    'Series' => $series
+            // Ambil series name
+            if (!empty($row['Series'])) {
+                $getSeries = $this->sap->getSeries([
+                    'Series' => $row['Series'],
+                    'limit'  => 1
                 ]);
 
-                $item['SeriesName'] = (!empty($respSeries)
-                    && ($respSeries['success'] ?? false) === true
-                    && !empty($respSeries['data']))
-                    ? ($respSeries['data'][0]['SeriesName'] ?? '-')
-                    : '-';
-            } else {
-                $item['SeriesName'] = '-';
+                if (!empty($getSeries['data'][0]['SeriesName'])) {
+                    $row['SeriesName'] = $getSeries['data'][0]['SeriesName'];
+                }
             }
 
-            return $item;
+            // Ambil inventory transfer & deteksi progress
+            $totalProgress = 0;
+            $lastStage     = 'not_started';
+
+            if (!empty($row['U_MEB_NO_IO'])) {
+                $get_invtf = $this->sap->getInventoryTransfers([
+                    'U_MEB_NO_IO' => $row['U_MEB_NO_IO'],
+                    'U_MEB_NO_SO' => $row['DocNum'],
+                ]);
+
+                if (!empty($get_invtf['data'])) {
+                    // Urutkan transfer berdasarkan tanggal terbaru
+                    $transfers = collect($get_invtf['data'])
+                        ->sortByDesc(fn($x) => $x['DocEntry'] ?? '')
+                        ->values();
+
+                    // Loop semua transfer untuk sum progress
+                    foreach ($transfers as $transfer) {
+                        $progressData = ProgressHelper::detectStage($transfer);
+
+                        // tambahkan percent
+                        $totalProgress += $progressData['progress_percent'] ?? 0;
+
+                        // simpan stage terakhir (yang paling baru)
+                        if ($lastStage === 'not_started' || !empty($progressData['stage'])) {
+                            $lastStage = $progressData['stage'];
+                        }
+                    }
+
+                    // Ambil whs terakhir dari transfer terbaru
+                    $latestTransfer = $transfers->first();
+                    $row['FromWhsCode'] = $latestTransfer['FromWhsCode'] ?? null;
+                    $row['ToWhsCode']   = $latestTransfer['ToWhsCode'] ?? null;
+
+                    $row['Stage']           = $lastStage;
+                    $row['ProgressPercent'] = $totalProgress;
+                } else {
+                    $row['Stage']           = 'not_started';
+                    $row['ProgressPercent'] = 0;
+                }
+            } else {
+                $row['Stage']           = 'not_started';
+                $row['ProgressPercent'] = 0;
+            }
+
+            return $row;
         });
 
-        $currentCount = $getInvtf['total'] ?? count($getInvtf['data'] ?? []);
+
+        $currentCount = $getSO['total'] ?? count($getSO['data'] ?? []);
         $totalPages   = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
-        $total        = $getInvtf['total'] ?? count($invtf);
-        $page         = $getInvtf['page'] ?? $param['page'];
+        $total        = $getSO['total'] ?? count($getSO['data']);
+        $page         = $getSO['page'] ?? $param['page'];
         $limit        = $param['limit'];
 
-        return view('backend.dashboard.inventory-list', compact('invtf', 'total', 'limit', 'page', 'totalPages'));
+        return view('backend.dashboard.plan-list', [
+            'purchase_orders'      => $data,
+            'total'      => $total,
+            'limit'      => $limit,
+            'page'       => $page,
+            'totalPages' => $totalPages,
+            'seriesName' => null // di sini default null biar aman
+        ]);
     }
-
-    public function syncInventoryProgress(Request $request)
-    {
-        $params = [
-            'page'  => (int) $request->get('page', 1),
-            'limit' => 10,
-        ];
-        if ($request->filled('U_MEB_NO_IO')) {
-            $params['U_MEB_NO_IO'] = $request->get('U_MEB_NO_IO');
-        }
-        if ($request->filled('Series')) {
-            $params['Series'] = $request->get('series');
-        }
-
-        $getInvtf = $this->sap->getInventoryTransfers($params);
-        $data = $getInvtf['data'] ?? [];
-
-        $grouped = collect($data)->groupBy('U_MEB_NO_IO');
-
-        foreach ($grouped as $noIO => $records) {
-            $latest = $records->sortByDesc('DocDate')->first();
-
-            $stage    = ProgressHelper::detectStage($latest);
-            $progress = ProgressHelper::progressPercent($stage);
-
-            // Project name
-            $projectName = null;
-            if (!empty($latest['U_MEB_Project_Code'])) {
-                $respProject = $this->sap->getProjects(['PrjCode' => $latest['U_MEB_Project_Code']]);
-                $projectName = $respProject['data'][0]['PrjName'] ?? null;
-            }
-
-            // Series name
-            $seriesName = null;
-            if (!empty($latest['Series'])) {
-                $respSeries = $this->sap->getSeries(['Series' => $latest['Series']]);
-                $seriesName = $respSeries['data'][0]['SeriesName'] ?? null;
-            }
-
-            ProgressTrackingModel::updateOrCreate(
-                ['no_io' => $noIO],
-                [
-                    'project_code'      => $latest['U_MEB_Project_Code'] ?? null,
-                    'project_name'      => $projectName,
-                    'prod_order_no'     => $latest['U_MEB_No_Prod_Order'] ?? null,
-                    'series'            => $latest['Series'] ?? null,
-                    'series_name'       => $seriesName,
-                    'current_stage'     => $stage,
-                    'progress_percent'  => $progress
-                ]
-            );
-        }
-
-        return response()->json(['message' => 'Progress synced', 'debug' => [
-            'stage' => $stage,
-            'progress' => $progress,
-            'getInvtf' => $getInvtf
-        ]]);
-    }
-
-
 
     public function clearBonNotif()
     {

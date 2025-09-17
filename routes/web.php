@@ -40,7 +40,7 @@ Route::post('login_post', [AuthController::class, 'login_post']);
 
 Route::group(['middleware' => 'admin'], function () {
     // dashboard
-    Route::get('admin/dashboard-list', [DashboardController::class, 'dashboard_invtf']);
+    Route::get('admin/dashboard-list', [DashboardController::class, 'dashboard_plan']);
     Route::get('admin/dashboard', [DashboardController::class, 'dashboard']);
     Route::get('admin/dashboard/minstock', [DashboardController::class, 'min_stock']);
     Route::get('admin/dashboard/aftercheck', [DashboardController::class, 'after_check']);
@@ -130,7 +130,6 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('admin/inventorytf/create', [InventorytfController::class, 'create']);
     Route::get('admin/inventorytf/list', [InventorytfController::class, 'list']);
     Route::get('admin/inventorytf/view', [InventorytfController::class, 'view']);
-    Route::get('admin/sync-inventory-progress', [DashboardController::class, 'syncInventoryProgress']);
     // transaction
     // stockin
     Route::get('/scanned-barcodes/{grpo}', [TransactionController::class, 'getScannedBarcodes']);
