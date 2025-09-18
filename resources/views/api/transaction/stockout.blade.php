@@ -430,80 +430,46 @@
 
         let html5QrCode;
 
+
         function startCamera() {
             document.getElementById("reader").style.display = "block";
             document.getElementById("fileInput").style.display = "none";
 
-            // Pastikan permission camera sudah diberikan
             if (!html5QrCode) {
                 html5QrCode = new Html5Qrcode("reader");
             }
 
             Html5Qrcode.getCameras().then(devices => {
                 if (devices && devices.length) {
-                    // Logic pemilihan kamera yang lebih baik
-                    let cameraId;
-                    const backCameras = devices.filter(device =>
-                        device.label.toLowerCase().includes('back') ||
-                        device.label.toLowerCase().includes('rear')
-                    );
-
-                    const frontCameras = devices.filter(device =>
-                        device.label.toLowerCase().includes('front') ||
-                        device.label.toLowerCase().includes('selfie')
-                    );
-
-                    // Prioritaskan kamera belakang, lalu depan, lalu default
-                    if (backCameras.length > 0) {
-                        cameraId = backCameras[0].id;
-                    } else if (frontCameras.length > 0) {
-                        cameraId = frontCameras[0].id;
-                    } else {
-                        cameraId = devices[0].id;
-                    }
+                    // Try to use the back camera if available
+                    const backCamera = devices.find(device => device.label.toLowerCase().includes('back'));
+                    const cameraId = backCamera ? backCamera.id : devices[0].id;
 
                     html5QrCode.start(
                         cameraId, {
-                            fps: 15,
+                            fps: 15, // Higher FPS for faster detection (try 10–30)
                             qrbox: {
                                 width: 300,
                                 height: 300
-                            },
-                            aspectRatio: 1.7777778,
-                            disableFlip: true
+                            }, // Larger box can help accuracy
+                            aspectRatio: 1.7777778, // 16:9 ratio for widescreen cams
+                            disableFlip: true // Prevent flip issues on mirrored webcams
                         },
                         decodedText => {
                             document.getElementById('item_code').value = decodedText;
-                            html5QrCode.stop();
+                            html5QrCode.stop(); // Stop scanning after successful read
                             sendScannedCode(decodedText);
                         },
                         error => {
-                            // Jangan stop camera pada error, biarkan terus scan
-                            console.warn("Scan error:", error);
-                        }
-                    ).catch(error => {
-                        console.error("Failed to start camera:", error);
-                        handleCameraError(error);
-                    });
-                } else {
-                    console.error("No cameras found");
-                    alert("Tidak ada kamera yang terdeteksi. Pastikan permission camera sudah diberikan.");
-                }
-            }).catch(error => {
-                console.error("Cannot get cameras:", error);
-                alert("Tidak dapat mengakses kamera. Pastikan browser memiliki izin camera.");
-            });
-        }
+                            document.getElementById('item_code').value = decodedText;
+                            html5QrCode.stop();
+                            sendScannedCode(decodedText);
 
-        // Fungsi untuk menangani error kamera
-        function handleCameraError(error) {
-            if (error.includes('Permission')) {
-                alert("Izin kamera ditolak. Silakan berikan izin kamera di pengaturan browser.");
-            } else if (error.includes('NotFoundError')) {
-                alert("Kamera tidak ditemukan.");
-            } else {
-                alert("Error kamera: " + error);
-            }
+                            console.warn("Scanning not found", error);
+                        }
+                    );
+                }
+            });
         }
 
         function showFileInput() {
