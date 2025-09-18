@@ -160,114 +160,208 @@ class DashboardController extends Controller
         // $limit = $param['limit'];
         return view('backend.dashboard.list', compact('needBuy', 'afterCheck', 'deliveryStatus', 'prodRelease', 'purchaseOrder', 'goodIssued', 'goodReceipt', 'rfp', 'user'));
     }
-
     public function dashboard_plan(Request $request)
     {
-        // Param untuk Sales Orders
         $param = [
             'U_MEB_NO_IO' => $request->get('U_MEB_NO_IO'),
             'page'        => (int) $request->get('page', 1),
-            'Series' => $request->get('series'),
+            'Series'      => $request->get('series'),
             'limit'       => 10,
         ];
 
-        // Ambil data SO
         $getSO = $this->sap->getSalesOrders($param);
 
         if (empty($getSO) || ($getSO['success'] ?? false) !== true) {
             return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
         }
 
-        // Koleksi data
-        $data = collect($getSO['data'])->map(function ($row) {
-            // Ambil project name dari lines
-            if (!empty($row['Lines'][0]['Project'])) {
-                $getProject = $this->sap->getProjects([
-                    'PrjCode' => $row['Lines'][0]['Project'],
-                    'limit'   => 1
-                ]);
-
-                if (!empty($getProject['data'][0]['PrjName'])) {
-                    $row['ProjectName'] = $getProject['data'][0]['PrjName'];
-                }
-            }
-
-            // Ambil series name
-            if (!empty($row['Series'])) {
-                $getSeries = $this->sap->getSeries([
-                    'Series' => $row['Series'],
-                    'limit'  => 1
-                ]);
-
-                if (!empty($getSeries['data'][0]['SeriesName'])) {
-                    $row['SeriesName'] = $getSeries['data'][0]['SeriesName'];
-                }
-            }
-
-            // Ambil inventory transfer & deteksi progress
-            $totalProgress = 0;
-            $lastStage     = 'not_started';
-
-            if (!empty($row['U_MEB_NO_IO'])) {
-                $get_invtf = $this->sap->getInventoryTransfers([
-                    'U_MEB_NO_IO' => $row['U_MEB_NO_IO'],
-                    'U_MEB_NO_SO' => $row['DocNum'],
-                ]);
-
-                if (!empty($get_invtf['data'])) {
-                    // Urutkan transfer berdasarkan tanggal terbaru
-                    $transfers = collect($get_invtf['data'])
-                        ->sortByDesc(fn($x) => $x['DocEntry'] ?? '')
-                        ->values();
-
-                    // Loop semua transfer untuk sum progress
-                    foreach ($transfers as $transfer) {
-                        $progressData = ProgressHelper::detectStage($transfer);
-
-                        // tambahkan percent
-                        $totalProgress += $progressData['progress_percent'] ?? 0;
-
-                        // simpan stage terakhir (yang paling baru)
-                        if ($lastStage === 'not_started' || !empty($progressData['stage'])) {
-                            $lastStage = $progressData['stage'];
-                        }
+        $data = collect($getSO['data'])
+            ->map(function ($row) {
+                // Ambil project name
+                if (!empty($row['Lines'][0]['Project'])) {
+                    $getProject = $this->sap->getProjects([
+                        'PrjCode' => $row['Lines'][0]['Project'],
+                        'limit'   => 1
+                    ]);
+                    if (!empty($getProject['data'][0]['PrjName'])) {
+                        $row['ProjectName'] = $getProject['data'][0]['PrjName'];
                     }
-
-                    // Ambil whs terakhir dari transfer terbaru
-                    $latestTransfer = $transfers->first();
-                    $row['FromWhsCode'] = $latestTransfer['FromWhsCode'] ?? null;
-                    $row['ToWhsCode']   = $latestTransfer['ToWhsCode'] ?? null;
-
-                    $row['Stage']           = $lastStage;
-                    $row['ProgressPercent'] = $totalProgress;
-                } else {
-                    $row['Stage']           = 'not_started';
-                    $row['ProgressPercent'] = 0;
                 }
-            } else {
-                $row['Stage']           = 'not_started';
-                $row['ProgressPercent'] = 0;
-            }
 
-            return $row;
-        });
+                // Ambil series name
+                if (!empty($row['Series'])) {
+                    $getSeries = $this->sap->getSeries([
+                        'Series' => $row['Series'],
+                        'limit'  => 1
+                    ]);
+                    if (!empty($getSeries['data'][0]['SeriesName'])) {
+                        $row['SeriesName'] = $getSeries['data'][0]['SeriesName'];
+                    }
+                }
 
+                // Ambil transfer terbaru
+                if (!empty($row['U_MEB_NO_IO'])) {
+                    $get_invtf = $this->sap->getInventoryTransfers([
+                        'U_MEB_NO_IO' => $row['U_MEB_NO_IO'],
+                        'U_MEB_NO_SO' => $row['DocNum'],
+                        'limit'       => 50,
+                    ]);
 
-        $currentCount = $getSO['total'] ?? count($getSO['data'] ?? []);
+                    if (!empty($get_invtf['data'])) {
+                        // ambil transfer terbaru (DocEntry terbesar)
+                        $latestTransfer = collect($get_invtf['data'])
+                            ->sortByDesc(fn($x) => $x['DocEntry'] ?? '')
+                            ->first();
+
+                        $progressData = ProgressHelper::detectStage($latestTransfer);
+
+                        $row['FromWhsCode']    = $latestTransfer['FromWhsCode'] ?? null;
+                        $row['ToWhsCode']      = $latestTransfer['ToWhsCode'] ?? null;
+                        $row['Stage']          = $progressData['stage'] ?? null;
+                        $row['CurrentStatus']  = $progressData['status'] ?? null;
+                        $row['ProgressPercent'] = $progressData['progress_percent'] ?? 0;
+
+                        return $row;
+                    }
+                }
+
+                return null;
+            })
+            ->filter(); // hanya SO dengan transfer terbaru
+
+        $currentCount = $getSO['total'] ?? count($data);
         $totalPages   = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
-        $total        = $getSO['total'] ?? count($getSO['data']);
+        $total        = $getSO['total'] ?? count($data);
         $page         = $getSO['page'] ?? $param['page'];
         $limit        = $param['limit'];
 
         return view('backend.dashboard.plan-list', [
-            'purchase_orders'      => $data,
-            'total'      => $total,
-            'limit'      => $limit,
-            'page'       => $page,
-            'totalPages' => $totalPages,
-            'seriesName' => null // di sini default null biar aman
+            'purchase_orders' => $data,
+            'total'           => $total,
+            'limit'           => $limit,
+            'page'            => $page,
+            'totalPages'      => $totalPages,
+            'seriesName'      => null
         ]);
     }
+
+    // public function dashboard_plan_2(Request $request)
+    // {
+    //     $param = [
+    //         'U_MEB_NO_IO' => $request->get('U_MEB_NO_IO'),
+    //         'page'        => (int) $request->get('page', 1),
+    //         'Series'      => $request->get('series'),
+    //         'limit'       => 10,
+    //     ];
+
+    //     $getSO = $this->sap->getSalesOrders($param);
+
+    //     if (empty($getSO) || ($getSO['success'] ?? false) !== true) {
+    //         return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
+    //     }
+
+    //     // Ambil hanya SO yang punya Inventory Transfer
+    //     $data = collect($getSO['data'])
+    //         ->map(function ($row) {
+    //             // Ambil project name
+    //             if (!empty($row['Lines'][0]['Project'])) {
+    //                 $getProject = $this->sap->getProjects([
+    //                     'PrjCode' => $row['Lines'][0]['Project'],
+    //                     'limit'   => 1
+    //                 ]);
+
+    //                 if (!empty($getProject['data'][0]['PrjName'])) {
+    //                     $row['ProjectName'] = $getProject['data'][0]['PrjName'];
+    //                 }
+    //             }
+
+    //             // Ambil series name
+    //             if (!empty($row['Series'])) {
+    //                 $getSeries = $this->sap->getSeries([
+    //                     'Series' => $row['Series'],
+    //                     'limit'  => 1
+    //                 ]);
+
+    //                 if (!empty($getSeries['data'][0]['SeriesName'])) {
+    //                     $row['SeriesName'] = $getSeries['data'][0]['SeriesName'];
+    //                 }
+    //             }
+
+    //             // Cek Inventory Transfer
+    //             if (!empty($row['U_MEB_NO_IO'])) {
+    //                 $get_invtf = $this->sap->getInventoryTransfers([
+    //                     'U_MEB_NO_IO' => $row['U_MEB_NO_IO'],
+    //                     'U_MEB_NO_SO' => $row['DocNum'],
+    //                     'limit' => 50,
+    //                 ]);
+
+    //                 if (!empty($get_invtf['data'])) {
+    //                     // Urutkan transfer berdasarkan DocEntry terbaru
+    //                     $transfers = collect($get_invtf['data'])
+    //                         ->sortByDesc(fn($x) => $x['DocEntry'] ?? '')
+    //                         ->values();
+
+    //                     $lastStage     = 'not_started';
+    //                     $currentStatus = null;
+
+    //                     $totalProgress = 0;
+    //                     $calculatedStages = []; // simpan pasangan from-to unik
+
+    //                     foreach ($transfers as $transfer) {
+    //                         $progressData = ProgressHelper::detectStage($transfer);
+
+    //                         $from = strtoupper($transfer['FromWhsCode'] ?? '');
+    //                         $to   = strtoupper($transfer['ToWhsCode'] ?? '');
+    //                         $key  = $from . '>' . $to; // unik key
+
+    //                         if (!isset($calculatedStages[$key])) {
+    //                             $totalProgress += $progressData['progress_percent'] ?? 0;
+    //                             $calculatedStages[$key] = true;
+    //                         }
+
+    //                         // simpan stage terakhir (yang paling baru)
+    //                         if (!empty($progressData['stage'])) {
+    //                             $lastStage     = $progressData['stage'];
+    //                             $currentStatus = $progressData['status'] ?? null;
+    //                         }
+    //                     }
+
+    //                     // $totalProgress = min($totalProgress, 100);
+
+
+    //                     $latestTransfer = $transfers->first();
+    //                     $row['FromWhsCode']    = $latestTransfer['FromWhsCode'] ?? null;
+    //                     $row['ToWhsCode']      = $latestTransfer['ToWhsCode'] ?? null;
+    //                     $row['Stage']          = $lastStage;
+    //                     $row['CurrentStatus']  = $currentStatus;
+    //                     $row['ProgressPercent'] = $totalProgress;
+
+    //                     return $row; // <-- hanya return kalau ada transfer
+    //                 }
+    //             }
+
+    //             // jika tidak ada IO atau transfer kosong, return null supaya di-filter
+    //             return null;
+    //         })
+    //         ->filter(); // buang null
+
+
+    //     $currentCount = $getSO['total'] ?? count($data);
+    //     $totalPages   = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
+    //     $total        = $getSO['total'] ?? count($data);
+    //     $page         = $getSO['page'] ?? $param['page'];
+    //     $limit        = $param['limit'];
+
+    //     return view('backend.dashboard.plan-list', [
+    //         'purchase_orders' => $data,
+    //         'total'           => $total,
+    //         'limit'           => $limit,
+    //         'page'            => $page,
+    //         'totalPages'      => $totalPages,
+    //         'seriesName'      => null
+    //     ]);
+    // }
+
 
     public function clearBonNotif()
     {

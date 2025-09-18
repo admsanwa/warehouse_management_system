@@ -4,169 +4,70 @@ namespace App\Helpers;
 
 class ProgressHelper
 {
-    public static $stages = [
-        'gudang_to_produksi' => 5,
-        'produksi' => 20,
-        'qc' => 15,
-        'packing' => 10,
-        'gudang_receive_packing' => 5,
-        'finance' => 5,
-        'transfer_project' => 5,
-        'delivery' => 15,
-        'installation' => 20,
-    ];
-
     public static function detectStage($row)
     {
         $from = strtoupper($row['FromWhsCode'] ?? '');
         $to   = strtoupper($row['ToWhsCode'] ?? '');
 
-        // default return
+        // default
         $result = [
-            'stage'           => 'unknown',
+            'stage'            => 'Tidak Ada',
+            'status'           => null,
             'progress_percent' => 0
         ];
 
-        // (BK001) Gudang → (BK002) Produksi (Transfer) = 5%
-        if ($from === 'BK001' && $to === 'BK002') {
-            $result['stage'] = 'Produksi (Transfer)';
-            $result['progress_percent'] = 5;
-            return $result;
-        }
+        // definisi rule by mapping
+        $rules = [
+            // Gudang → Produksi
+            ['from' => 'BK001', 'to' => 'BK002', 'stage' => 'Produksi (Transfer)', 'status' => 'Issue For Production', 'percent' => 30],
+            // Produksi → QC
+            ['from' => 'BK002', 'to' => 'BK003', 'stage' => 'QC (Transfer)', 'status' => 'QC Check', 'percent' => 45],
+            // QC → Packing
+            ['from' => 'BK003', 'to' => 'BK002', 'stage' => 'Packing (Transfer)', 'status' => 'Packing Barang', 'percent' => 60],
+            // Produksi → Gudang (Terima Barang)
+            ['from' => 'BK002', 'to' => 'BK001', 'stage' => 'Terima Barang (Transfer)', 'status' => 'Receipt From Production', 'percent' => 75],
+            // Produksi → Sales Transit
+            ['from' => 'BK001', 'to' => 'JK001', 'stage' => 'Transit Ke Warehouse Jakarta (Transfer)', 'status' => 'Transit Barang', 'percent' => 90],
+            ['from' => 'BK001', 'to' => 'SB904', 'stage' => 'Transit Ke Warehouse Surabaya (Transfer)', 'status' => 'Transit Barang', 'percent' => 80],
+            // Transit → Instalasi Jakarta
+            ['from' => 'JK001', 'to' => 'JK901', 'stage' => 'Warehouse Sales Jakarta (Transfer)', 'status' => 'Transfer Warehouse', 'percent' => 95],
+            ['from' => 'JK901', 'to' => 'JK902', 'stage' => 'Instalasi (Transfer)', 'status' => 'Instalasi', 'percent' => 100],
+            // Transit → Instalasi Surabaya
+            ['from' => 'SB904', 'to' => 'SB001', 'stage' => 'Warehouse Surabaya(Transfer)', 'status' => 'Transfer Warehouse', 'percent' => 90],
+            ['from' => 'SB001', 'to' => 'SB901', 'stage' => 'Warehouse Sales Surabaya (Transfer)', 'status' => 'Transfer Warehouse', 'percent' => 95],
+            ['from' => 'SB901', 'to' => 'SB902', 'stage' => 'Instalasi (Transfer)', 'status' => 'Instalasi', 'percent' => 100],
+        ];
+        // $rules2 = [
+        //     // Gudang → Produksi
+        //     ['from' => 'BK001', 'to' => 'BK002', 'stage' => 'Produksi (Transfer)', 'status' => 'Issue For Production', 'percent' => 30],
+        //     // Produksi → QC
+        //     ['from' => 'BK002', 'to' => 'BK003', 'stage' => 'QC (Transfer)', 'status' => 'QC Check', 'percent' => 15],
+        //     // QC → Packing
+        //     ['from' => 'BK003', 'to' => 'BK002', 'stage' => 'Packing (Transfer)', 'status' => 'Packing Barang', 'percent' => 15],
+        //     // Produksi → Gudang (Terima Barang)
+        //     ['from' => 'BK002', 'to' => 'BK001', 'stage' => 'Terima Barang (Transfer)', 'status' => 'Receipt From Production', 'percent' => 15],
+        //     // Produksi → Sales Transit
+        //     ['from' => 'BK001', 'to' => 'JK001', 'stage' => 'Transit Ke Warehouse Jakarta (Transfer)', 'status' => 'Transit Barang', 'percent' => 10],
+        //     ['from' => 'BK001', 'to' => 'SB904', 'stage' => 'Transit Ke Warehouse Surabaya (Transfer)', 'status' => 'Transit Barang', 'percent' => 10],
+        //     // Transit → Instalasi Jakarta
+        //     ['from' => 'JK001', 'to' => 'JK901', 'stage' => 'Warehouse Sales Jakarta (Transfer)', 'status' => 'Transfer Warehouse', 'percent' => 5],
+        //     ['from' => 'JK901', 'to' => 'JK902', 'stage' => 'Instalasi (Transfer)', 'status' => 'Instalasi', 'percent' => 10],
+        //     // Transit → Instalasi Surabaya
+        //     ['from' => 'SB904', 'to' => 'SB001', 'stage' => 'Warehouse Surabaya(Transfer)', 'status' => 'Transfer Warehouse', 'percent' => 5],
+        //     ['from' => 'SB001', 'to' => 'SB901', 'stage' => 'Warehouse Sales Surabaya (Transfer)', 'status' => 'Transfer Warehouse', 'percent' => 5],
+        //     ['from' => 'SB901', 'to' => 'SB902', 'stage' => 'Instalasi (Transfer)', 'status' => 'Instalasi', 'percent' => 5],
+        // ];
 
-        // (BK002) Produksi (Issue for Production & Production) = 15%
-        if ($from === 'BK002' && empty($to)) { // Issue for Production (keluar)
-            $result['stage'] = 'Issue for Production & Production';
-            $result['progress_percent'] = 15;
-            return $result;
-        }
-
-        // (BK002) Produksi → (BK003) QC (Check & Repair sampai OK) = 15%
-        if ($from === 'BK002' && $to === 'BK003') {
-            $result['stage'] = 'QC (Check & Repair sampai OK) ';
-            $result['progress_percent'] = 15;
-            return $result;
-        }
-
-        // (BK003) QC → (BK002) Produksi Receipt Production Semi Finish Good & Packing Produksi = 15%
-        if ($from === 'BK003' && $to === 'BK002') {
-            $result['stage'] = ' Produksi Receipt Production Semi Finish Good & Packing Produksi';
-            $result['progress_percent'] = 15;
-            return $result;
-        }
-
-        // (BK002) Produksi → (BK001) Gudang (Serah terima hasil packing) = 5%
-        if ($from === 'BK002' && $to === 'BK001') {
-            $result['stage'] = 'Gudang (Serah Terima Barang Packing)';
-            $result['progress_percent'] = 5;
-            return $result;
-        }
-
-        // Cek Payment (Finance/AR) = 5%
-        if ($row['Stage'] ?? '' === 'PAYMENT_CHECK') {
-            $result['stage'] = 'Cek Payment (Finance/AR)';
-            $result['progress_percent'] = 5;
-            return $result;
-        }
-
-        // (BK001) Gudang → (JK001) Transfer Project = 5%
-        if ($from === 'BK001' && $to === 'JK001') {
-            $result['stage'] = 'Transfer Project';
-            $result['progress_percent'] = 5;
-            return $result;
-        }
-
-        // Delivery (Muat, Tracking, Kirim) = 15%
-        if ($row['Stage'] ?? '' === 'DELIVERY') {
-            $result['stage'] = 'Delivery';
-            $result['progress_percent'] = 15;
-            return $result;
-        }
-
-        // Instalasi = 20%
-        if ($row['Stage'] ?? '' === 'INSTALLATION') {
-            $result['stage'] = 'Instalasi';
-            $result['progress_percent'] = 20;
-            return $result;
+        // cek rules
+        foreach ($rules as $rule) {
+            if ($from === $rule['from'] && $to === $rule['to']) {
+                $result['stage']            = $rule['stage'];
+                $result['status']           = $rule['status'];
+                $result['progress_percent'] = $rule['percent'];
+                return $result;
+            }
         }
 
         return $result;
     }
-    // public static function detectStage($row)
-    // {
-    //     $from = strtoupper($row['FromWhsCode'] ?? '');
-    //     $to   = strtoupper($row['ToWhsCode'] ?? '');
-    //     $stageFlag = strtoupper($row['Stage'] ?? '');
-
-    //     // default return
-    //     $result = [
-    //         'stage'            => 'unknown',
-    //         'progress_percent' => 0
-    //     ];
-
-    //     // (BK001) Gudang → (BK002) Produksi (Transfer) = 5%
-    //     if ($from === 'BK001' && $to === 'BK002') {
-    //         $result['stage'] = 'Produksi (Transfer)';
-    //         $result['progress_percent'] = 5;
-    //         return $result;
-    //     }
-
-    //     // (BK002) Produksi (Issue for Production & Production) = 15%
-    //     if ($from === 'BK002' && empty($to)) {
-    //         $result['stage'] = 'Issue for Production & Production';
-    //         $result['progress_percent'] = 15;
-    //         return $result;
-    //     }
-
-    //     // (BK002) Produksi → (BK003) QC (Check & Repair sampai OK) = 30%
-    //     if ($from === 'BK002' && $to === 'BK003') {
-    //         $result['stage'] = 'QC (Check & Repair sampai OK)';
-    //         $result['progress_percent'] = 30;
-    //         return $result;
-    //     }
-
-    //     // (BK003) QC → (BK002) Produksi Receipt Production Semi Finish Good & Packing Produksi = 45%
-    //     if ($from === 'BK003' && $to === 'BK002') {
-    //         $result['stage'] = 'Produksi Receipt Production Semi Finish Good & Packing Produksi';
-    //         $result['progress_percent'] = 45;
-    //         return $result;
-    //     }
-
-    //     // (BK002) Produksi → (BK001) Gudang (Serah terima hasil packing) = 50%
-    //     if ($from === 'BK002' && $to === 'BK001') {
-    //         $result['stage'] = 'Gudang (Serah Terima Barang Packing)';
-    //         $result['progress_percent'] = 50;
-    //         return $result;
-    //     }
-
-    //     // Cek Payment (Finance/AR) = 55%
-    //     if ($stageFlag === 'PAYMENT_CHECK') {
-    //         $result['stage'] = 'Cek Payment (Finance/AR)';
-    //         $result['progress_percent'] = 55;
-    //         return $result;
-    //     }
-
-    //     // (BK001) Gudang → (JK001) Transfer Project = 60%
-    //     if ($from === 'BK001' && $to === 'JK001') {
-    //         $result['stage'] = 'Transfer Project';
-    //         $result['progress_percent'] = 60;
-    //         return $result;
-    //     }
-
-    //     // Delivery (Muat, Tracking, Kirim) = 75%
-    //     // if ($stageFlag === 'DELIVERY') {
-    //     //     $result['stage'] = 'Delivery';
-    //     //     $result['progress_percent'] = 75;
-    //     //     return $result;
-    //     // }
-
-    //     // // Instalasi = 100%
-    //     // if ($stageFlag === 'INSTALLATION') {
-    //     //     $result['stage'] = 'Instalasi';
-    //     //     $result['progress_percent'] = 100;
-    //     //     return $result;
-    //     // }
-
-    //     return $result;
-    // }
 }

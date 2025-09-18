@@ -112,7 +112,7 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>{{ $item['Stage'] ?? '-' }}</td>
+                                            <td>{{ $item['CurrentStatus'] ?? '-' }}</td>
                                         </tr>
                                     @empty
                                         <tr>
