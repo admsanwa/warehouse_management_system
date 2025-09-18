@@ -101,9 +101,9 @@
                                 <label for="" class="col-sm-4 col-form-lable">Production Type:</label>
                                 <div class="col-sm-6 mb-2">
                                     <select name="prod_type" id="prod_type" class="form-control mt-2" required>
-                                        <option value="" disabled>Pilih Production Type</option>
+                                        {{-- <option value="" disabled>Pilih Production Type</option> --}}
                                         <option value="Assembly" selected>Assembly</option>
-                                        <option value="Disassembly">Disassembly</option>
+                                        {{-- <option value="Disassembly">Disassembly</option> --}}
                                     </select>
                                 </div>
                                 <label for="" class="col-sm-4 col-form-lable">Default Warehouse:</label>
@@ -141,7 +141,7 @@
                                 <label for="" class="col-sm-4 col-form-lable">WIP Account Code :</label>
                                 <div class="col-sm-6 mb-2">
                                     <input type="text" name="acct_code" id="acct_code" class="form-control mt-2"
-                                        placeholder="Masukan WIP Acct Code" required>
+                                        value="114200" placeholder="Masukan WIP Acct Code" required>
                                 </div>
                                 <label for="no_io" class="col-sm-4 col-form-label">No IO :</label>
                                 <div class="col-sm-6 mb-2">
