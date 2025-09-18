@@ -142,7 +142,7 @@
                                 <label for="" class="col-sm-4 col-form-lable">WIP Account Code :</label>
                                 <div class="col-sm-6 mb-2">
                                     <input type="text" name="acct_code" id="acct_code" class="form-control mt-2"
-                                        value="114200" placeholder="Masukan WIP Acct Code" required>
+                                        value="" placeholder="Masukan WIP Acct Code" required>
                                 </div>
                                 <label for="no_io" class="col-sm-4 col-form-label">No IO :</label>
                                 <div class="col-sm-6 mb-2">
