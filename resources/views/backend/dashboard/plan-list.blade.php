@@ -81,6 +81,7 @@
                                         <th>From → To</th>
                                         <th>Progress</th>
                                         <th>Current Status</th>
+                                        <th>Due Date</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -113,6 +114,7 @@
                                                 </div>
                                             </td>
                                             <td>{{ $item['CurrentStatus'] ?? '-' }}</td>
+                                            <td>{{ $item['DocDueDate'] ?? '-' }}</td>
                                         </tr>
                                     @empty
                                         <tr>
