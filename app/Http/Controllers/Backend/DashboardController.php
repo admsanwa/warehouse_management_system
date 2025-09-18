@@ -230,11 +230,11 @@ class DashboardController extends Controller
             })
             ->filter(); // hanya SO dengan transfer terbaru
 
+        $currentCount = $getSO['total'] ?? count($data);
+        $totalPages   = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
         $total = $data->count();
-        $page  = (int) $param['page'];
-        $limit = (int) $param['limit'];
-
-        $totalPages = (int) ceil($total / $limit);
+        $page         = $getSO['page'] ?? $param['page'];
+        $limit        = $param['limit'];
 
         return view('backend.dashboard.plan-list', [
             'purchase_orders' => $data,
