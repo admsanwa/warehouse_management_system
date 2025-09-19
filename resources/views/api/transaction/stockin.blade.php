@@ -326,31 +326,26 @@
             });
             setDefaultSeries("#seriesSelect", "22");
         })
-        document.addEventListener("keydown", function(e) {
-            if (e.key === "Enter") {
-                e.preventDefault();
+        document.addEventListener("DOMContentLoaded", function() {
+            const input = document.getElementById("scannerInput");
+            input.focus();
 
-                const scannerInput = document.getElementById("scannerInput");
-                const code = scannerInput.value.trim();
+            input.addEventListener("keydown", function(e) {
+                console.log("Pressed key:", e.key, e.keyCode);
+                if (e.key === "Enter") {
+                    e.preventDefault(); // ← 🛑 This stops the form from submitting
+                    const code = input.value.trim();
+                    if (code !== "") {
+                        document.getElementById('item_code').value = code;
+                        sendScannedCode(code);
 
-                console.log("🔎 Enter ditekan, input terbaca:", code);
-
-                if (code !== "") {
-                    document.getElementById("item_code").value = code;
-                    console.log("✅ Kirim ke sendScannedCode dengan code:", code);
-
-                    sendScannedCode(code);
-
-                    scannerInput.value = "";
-                } else {
-                    console.log("⚠️ Tidak ada kode di scannerInput, abaikan.");
+                        input.value = "";
+                        setTimeout(() => input.focus(), 50);
+                    }
                 }
-                setTimeout(() => {
-                    scannerInput.focus();
-                    console.log("🎯 Fokus balik ke #scannerInput");
-                }, 50);
-            }
+            });
         });
+        let html5QrCode;
         let html5QrCode;
 
         function startCamera() {
