@@ -19,6 +19,7 @@ class ProgressHelper
         // definisi rule by mapping
         $rules = [
             // Gudang → Produksi
+            ['from' => 'BK001', 'to' => 'BK901', 'stage' => 'Maklon (Transfer)', 'status' => 'Proses Maklon', 'percent' => 10],
             ['from' => 'BK001', 'to' => 'BK002', 'stage' => 'Produksi (Transfer)', 'status' => 'Issue For Production', 'percent' => 30],
             // Produksi → QC
             ['from' => 'BK002', 'to' => 'BK003', 'stage' => 'QC (Transfer)', 'status' => 'QC Check', 'percent' => 45],
