@@ -135,16 +135,35 @@ class QualityController extends Controller
         $quality->result_by     = $user->fullname;
         $quality->save();
 
-
         $isProcManager = $user->department === 'Procurement, Installation and Delivery'
             && $user->level === 'Manager';
 
         $dev_users = User::where('department', 'IT')->get();
 
-        if ($isProcManager) {
-            $recipients = User::where('department', 'Quality Control')
-                ->where('level', 'Operator')
+        /**
+         * 1) Jika hasil QC = Need Approval (3)
+         *    → Notifikasi ke Manager Procurement, Installation and Delivery + IT
+         */
+        if ($request->check == 3) {
+            $recipients = User::where('department', 'Procurement, Installation and Delivery')
+                ->where('level', 'Manager')
                 ->get();
+            $recipients = $recipients->merge($dev_users);
+
+            Notification::send($recipients, new MailQcResult(
+                $sapData['U_MEB_NO_IO'],
+                $check,
+                $request->remark ?? '',
+                url('admin/quality/list')
+            ));
+        }
+
+        /**
+         * 2) Jika user adalah Manager Procurement
+         *    → Notifikasi ke semua user Quality Control + IT
+         */
+        if ($isProcManager) {
+            $recipients = User::where('department', 'Quality Control')->get();
             $recipients = $recipients->merge($dev_users);
 
             Notification::send($recipients, new MailQcApproval(
@@ -154,66 +173,42 @@ class QualityController extends Controller
                 url('admin/quality/list')
             ));
         }
+        /**
+         * 3) Jika user berasal dari Quality Control
+         *    dan hasil = OK (1) / NG (2) / Need Paint (4)
+         *    → Notifikasi ke Production + IT
+         */
+        else if ($user->department === "Quality Control") {
+            if ($request->check == 1 || $request->check == 2 || $request->check == 4) {
+                $recipients = User::where('department', 'Production')->get();
+                $recipients = $recipients->merge($dev_users);
 
-        //  If Result Painting By Maklon/InHouse → Notif email ke Quality,
-        if ($request->check === 5 || $request->check === 6) {
-            $recipients = User::where('department', 'Quality Control')
-                ->where('level', 'Manager')
-                ->get();
-            $recipients = $recipients->merge($dev_users);
-
-            Notification::send($recipients, new MailQcResult(
-                $sapData['U_MEB_NO_IO'],
-                $check,
-                $request->remark ?? '',
-                url('admin/quality/list')
-            ));
-        } else if ($request->check == 2 || $request->check === 4) {
-            //Quality Check NG/Need Paint -> notif ke email produksi
-            $recipients2 = User::where('department', 'Production')
-                ->get();
-            $recipients = User::where('department', 'Procurement, Installation and Delivery')
-                ->where('level', 'Manager')
-                ->get();
-            $recipients = $recipients->merge($dev_users);
-            $recipients = $recipients->merge($recipients2);
-
-            Notification::send($recipients, new MailQcResult(
-                $sapData['U_MEB_NO_IO'],
-                $check,
-                $request->remark ?? '',
-                url('admin/quality/list')
-            ));
-        } else if ($request->check == 3) {
-            // If Result Need Approval kirim ke produksi dan Procurement, Installation and Delivery
-            // $recipients2 = User::where('department', 'Production')
-            //     ->get();
-            $recipients = User::where('department', 'Procurement, Installation and Delivery')
-                ->where('level', 'Manager')
-                ->get();
-            $recipients = $recipients->merge($dev_users);
-            // $recipients = $recipients->merge($recipients2);
-
-            Notification::send($recipients, new MailQcResult(
-                $sapData['U_MEB_NO_IO'],
-                $check,
-                $request->remark ?? '',
-                url('admin/quality/list')
-            ));
-        } else  if ($request->check == 1) {
-            //  If Result OK → Notif email ke Produksi
-            $recipients = User::where('department', 'Production')->get();
-            $recipients = $recipients->merge($dev_users);
-
-            Notification::send($recipients, new MailQcResult(
-                $sapData['U_MEB_NO_IO'],
-                $check,
-                $request->remark ?? '',
-                url('admin/quality/list')
-            ));
+                Notification::send($recipients, new MailQcResult(
+                    $sapData['U_MEB_NO_IO'],
+                    $check,
+                    $request->remark ?? '',
+                    url('admin/quality/list')
+                ));
+            }
         }
+        /**
+         * 4) Jika user berasal dari Production
+         *    dan hasil = OK (1) / NG (2) / Painting by Inhouse (5) / Painting by Makloon (6)
+         *    → Notifikasi ke Quality Control + IT
+         */
+        else if ($user->department === "Production") {
+            if ($request->check == 1 || $request->check == 2 || $request->check == 5 || $request->check == 6) {
+                $recipients = User::where('department', 'Quality Control')->get();
+                $recipients = $recipients->merge($dev_users);
 
-
+                Notification::send($recipients, new MailQcResult(
+                    $sapData['U_MEB_NO_IO'],
+                    $check,
+                    $request->remark ?? '',
+                    url('admin/quality/list')
+                ));
+            }
+        }
 
         return redirect()->back()->with("success", "Telah berhasil menilai product: {$itemCode} menjadi {$check}");
     }
@@ -268,10 +263,30 @@ class QualityController extends Controller
 
         $dev_users = User::where('department', 'IT')->get();
 
-        if ($isProcManager) {
-            $recipients = User::where('department', 'Quality Control')
-                ->where('level', 'Operator')
+        /**
+         * 1) Jika hasil QC = Need Approval (3)
+         *    → Notifikasi ke Manager Procurement, Installation and Delivery + IT
+         */
+        if ($request->check == 3) {
+            $recipients = User::where('department', 'Procurement, Installation and Delivery')
+                ->where('level', 'Manager')
                 ->get();
+            $recipients = $recipients->merge($dev_users);
+
+            Notification::send($recipients, new MailQcResult(
+                $sapData['U_MEB_NO_IO'],
+                $check,
+                $request->remark ?? '',
+                url('admin/quality/list')
+            ));
+        }
+
+        /**
+         * 2) Jika user adalah Manager Procurement
+         *    → Notifikasi ke semua user Quality Control + IT
+         */
+        if ($isProcManager) {
+            $recipients = User::where('department', 'Quality Control')->get();
             $recipients = $recipients->merge($dev_users);
 
             Notification::send($recipients, new MailQcApproval(
@@ -281,63 +296,41 @@ class QualityController extends Controller
                 url('admin/quality/list')
             ));
         }
+        /**
+         * 3) Jika user berasal dari Quality Control
+         *    dan hasil = OK (1) / NG (2) / Need Paint (4)
+         *    → Notifikasi ke Production + IT
+         */
+        else if ($user->department === "Quality Control") {
+            if ($request->check == 1 || $request->check == 2 || $request->check == 4) {
+                $recipients = User::where('department', 'Production')->get();
+                $recipients = $recipients->merge($dev_users);
 
-        //  If Result Painting By Maklon/InHouse → Notif email ke Quality,
-        if ($request->check === 5 || $request->check === 6) {
-            $recipients = User::where('department', 'Quality Control')
-                ->where('level', 'Manager')
-                ->get();
-            $recipients = $recipients->merge($dev_users);
+                Notification::send($recipients, new MailQcResult(
+                    $sapData['U_MEB_NO_IO'],
+                    $check,
+                    $request->remark ?? '',
+                    url('admin/quality/list')
+                ));
+            }
+        }
+        /**
+         * 4) Jika user berasal dari Production
+         *    dan hasil = OK (1) / NG (2) / Painting by Inhouse (5) / Painting by Makloon (6)
+         *    → Notifikasi ke Quality Control + IT
+         */
+        else if ($user->department === "Production") {
+            if ($request->check == 1 || $request->check == 2 || $request->check == 5 || $request->check == 6) {
+                $recipients = User::where('department', 'Quality Control')->get();
+                $recipients = $recipients->merge($dev_users);
 
-            Notification::send($recipients, new MailQcResult(
-                $sapData['U_MEB_NO_IO'],
-                $check,
-                $request->remark ?? '',
-                url('admin/quality/list')
-            ));
-        } else if ($request->check == 2 || $request->check === 4) {
-            //Quality Check NG/Need Paint -> notif ke email produksi
-            $recipients2 = User::where('department', 'Production')
-                ->get();
-            $recipients = User::where('department', 'Procurement, Installation and Delivery')
-                ->where('level', 'Manager')
-                ->get();
-            $recipients = $recipients->merge($dev_users);
-            $recipients = $recipients->merge($recipients2);
-
-            Notification::send($recipients, new MailQcResult(
-                $sapData['U_MEB_NO_IO'],
-                $check,
-                $request->remark ?? '',
-                url('admin/quality/list')
-            ));
-        } else if ($request->check == 3) {
-            // If Result Need Approval kirim ke produksi dan Procurement, Installation and Delivery
-            // $recipients2 = User::where('department', 'Production')
-            //     ->get();
-            $recipients = User::where('department', 'Procurement, Installation and Delivery')
-                ->where('level', 'Manager')
-                ->get();
-            $recipients = $recipients->merge($dev_users);
-            // $recipients = $recipients->merge($recipients2);
-
-            Notification::send($recipients, new MailQcResult(
-                $sapData['U_MEB_NO_IO'],
-                $check,
-                $request->remark ?? '',
-                url('admin/quality/list')
-            ));
-        } else  if ($request->check == 1) {
-            //  If Result OK → Notif email ke Produksi
-            $recipients = User::where('department', 'Production')->get();
-            $recipients = $recipients->merge($dev_users);
-
-            Notification::send($recipients, new MailQcResult(
-                $sapData['U_MEB_NO_IO'],
-                $check,
-                $request->remark ?? '',
-                url('admin/quality/list')
-            ));
+                Notification::send($recipients, new MailQcResult(
+                    $sapData['U_MEB_NO_IO'],
+                    $check,
+                    $request->remark ?? '',
+                    url('admin/quality/list')
+                ));
+            }
         }
         return redirect()->back()->with("success", "Telah berhasil menilai product: {$itemCode} menjadi {$check}");
     }

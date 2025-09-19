@@ -20,23 +20,23 @@ class ProgressHelper
         $rules = [
             // Gudang → Produksi
             ['from' => 'BK001', 'to' => 'BK901', 'stage' => 'Maklon (Transfer)', 'status' => 'Proses Maklon', 'percent' => 10],
-            ['from' => 'BK001', 'to' => 'BK002', 'stage' => 'Produksi (Transfer)', 'status' => 'Issue For Production', 'percent' => 30],
+            ['from' => 'BK001', 'to' => 'BK002', 'stage' => 'Produksi (Transfer)', 'status' => 'Production Process', 'percent' => 30],
             // Produksi → QC
             ['from' => 'BK002', 'to' => 'BK003', 'stage' => 'QC (Transfer)', 'status' => 'QC Check', 'percent' => 45],
             // QC → Packing
-            ['from' => 'BK003', 'to' => 'BK002', 'stage' => 'Packing (Transfer)', 'status' => 'Packing Barang', 'percent' => 60],
+            ['from' => 'BK003', 'to' => 'BK002', 'stage' => 'Packing (Transfer)', 'status' => 'Packing Process', 'percent' => 60],
             // Produksi → Gudang (Terima Barang)
             ['from' => 'BK002', 'to' => 'BK001', 'stage' => 'Terima Barang (Transfer)', 'status' => 'Receipt From Production', 'percent' => 75],
             // Produksi → Sales Transit
-            ['from' => 'BK001', 'to' => 'JK001', 'stage' => 'Transit Ke Warehouse Jakarta (Transfer)', 'status' => 'Transit Barang', 'percent' => 90],
-            ['from' => 'BK001', 'to' => 'SB904', 'stage' => 'Transit Ke Warehouse Surabaya (Transfer)', 'status' => 'Transit Barang', 'percent' => 80],
+            ['from' => 'BK001', 'to' => 'JK001', 'stage' => 'Transit Ke Warehouse Jakarta (Transfer)', 'status' => 'Transfer', 'percent' => 90],
+            ['from' => 'BK001', 'to' => 'SB904', 'stage' => 'Transit Ke Warehouse Surabaya (Transfer)', 'status' => 'Transfer', 'percent' => 80],
             // Transit → Instalasi Jakarta
-            ['from' => 'JK001', 'to' => 'JK901', 'stage' => 'Warehouse Sales Jakarta (Transfer)', 'status' => 'Transfer Warehouse', 'percent' => 95],
-            ['from' => 'JK901', 'to' => 'JK902', 'stage' => 'Instalasi (Transfer)', 'status' => 'Instalasi', 'percent' => 100],
+            ['from' => 'JK001', 'to' => 'JK901', 'stage' => 'Warehouse Sales Jakarta (Transfer)', 'status' => 'Transfer', 'percent' => 95],
+            ['from' => 'JK901', 'to' => 'JK902', 'stage' => 'Instalasi (Transfer)', 'status' => 'Installed', 'percent' => 100],
             // Transit → Instalasi Surabaya
-            ['from' => 'SB904', 'to' => 'SB001', 'stage' => 'Warehouse Surabaya(Transfer)', 'status' => 'Transfer Warehouse', 'percent' => 90],
-            ['from' => 'SB001', 'to' => 'SB901', 'stage' => 'Warehouse Sales Surabaya (Transfer)', 'status' => 'Transfer Warehouse', 'percent' => 95],
-            ['from' => 'SB901', 'to' => 'SB902', 'stage' => 'Instalasi (Transfer)', 'status' => 'Instalasi', 'percent' => 100],
+            ['from' => 'SB904', 'to' => 'SB001', 'stage' => 'Warehouse Surabaya(Transfer)', 'status' => 'Transfer', 'percent' => 90],
+            ['from' => 'SB001', 'to' => 'SB901', 'stage' => 'Warehouse Sales Surabaya (Transfer)', 'status' => 'Transfer', 'percent' => 95],
+            ['from' => 'SB901', 'to' => 'SB902', 'stage' => 'Instalasi (Transfer)', 'status' => 'Installed', 'percent' => 100],
         ];
         // $rules2 = [
         //     // Gudang → Produksi
