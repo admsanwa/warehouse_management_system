@@ -11,8 +11,8 @@ class ProgressHelper
 
         // default
         $result = [
-            'stage'            => 'Tidak Ada',
-            'status'           => null,
+            'stage'            => 'Belum Dimulai',
+            'status'           => "Not Started",
             'progress_percent' => 0
         ];
 

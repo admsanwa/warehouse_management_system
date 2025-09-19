@@ -165,6 +165,7 @@ class DashboardController extends Controller
     {
         $param = [
             'U_MEB_NO_IO' => $request->get('U_MEB_NO_IO'),
+            'U_MEB_Sales_Type' => '01', //Default
             'page'        => (int) $request->get('page', 1),
             'Series'      => $request->get('series'),
             'limit'       => 10,
@@ -201,32 +202,26 @@ class DashboardController extends Controller
                 }
 
                 // Ambil transfer terbaru
-                if (!empty($row['U_MEB_NO_IO'])) {
-                    $get_invtf = $this->sap->getInventoryTransfers([
-                        'U_MEB_NO_IO' => $row['U_MEB_NO_IO'],
-                        'U_MEB_NO_SO' => $row['DocNum'],
-                        'limit'       => 50,
-                    ]);
+                $get_invtf = $this->sap->getInventoryTransfers([
+                    'U_MEB_NO_IO' => $row['U_MEB_NO_IO'],
+                    'U_MEB_NO_SO' => $row['DocNum'],
+                    'limit'       => 50,
+                ]);
 
-                    if (!empty($get_invtf['data'])) {
-                        // ambil transfer terbaru (DocEntry terbesar)
-                        $latestTransfer = collect($get_invtf['data'])
-                            ->sortByDesc(fn($x) => $x['DocEntry'] ?? '')
-                            ->first();
+                // ambil transfer terbaru (DocEntry terbesar)
+                $latestTransfer = collect($get_invtf['data'])
+                    ->sortByDesc(fn($x) => $x['DocEntry'] ?? '')
+                    ->first();
 
-                        $progressData = ProgressHelper::detectStage($latestTransfer);
+                $progressData = ProgressHelper::detectStage($latestTransfer);
 
-                        $row['FromWhsCode']    = $latestTransfer['FromWhsCode'] ?? null;
-                        $row['ToWhsCode']      = $latestTransfer['ToWhsCode'] ?? null;
-                        $row['Stage']          = $progressData['stage'] ?? null;
-                        $row['CurrentStatus']  = $progressData['status'] ?? null;
-                        $row['ProgressPercent'] = $progressData['progress_percent'] ?? 0;
+                $row['FromWhsCode']    = $latestTransfer['FromWhsCode'] ?? null;
+                $row['ToWhsCode']      = $latestTransfer['ToWhsCode'] ?? null;
+                $row['Stage']          = $progressData['stage'] ?? null;
+                $row['CurrentStatus']  = $progressData['status'] ?? null;
+                $row['ProgressPercent'] = $progressData['progress_percent'] ?? 0;
 
-                        return $row;
-                    }
-                }
-
-                return null;
+                return $row;
             })
             ->filter(); // hanya SO dengan transfer terbaru
 
