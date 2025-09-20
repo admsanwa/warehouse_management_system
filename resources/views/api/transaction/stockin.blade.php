@@ -366,7 +366,6 @@
             }
         });
         let html5QrCode;
-        let html5QrCode;
 
         function startCamera() {
             document.getElementById("reader").style.display = "block";
