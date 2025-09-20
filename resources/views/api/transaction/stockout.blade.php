@@ -219,11 +219,16 @@
                             Back</button>
                     </div>
                 </div>
-                <!-- Floating Button -->
-                <button type="button" id="focusScannerBtn" class="btn btn-primary rounded-circle btn-xs shadow-lg"
-                    style="position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; z-index: 9999;">
-                    <i class="fas fa-barcode"></i>
-                </button>
+                <!-- Floating Scanner Button -->
+                <div style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; text-align: center;">
+                    <button type="button" id="focusScannerBtn" class="btn btn-primary rounded-circle shadow-lg"
+                        style="width: 60px; height: 60px;">
+                        <i class="fas fa-barcode fa-lg"></i>
+                    </button>
+                    <div style="margin-top: 6px; font-size: 12px; font-weight: 600;" class="text-primary">
+                        Ready Scan
+                    </div>
+                </div>
             </div>
         </section>
     </div>
@@ -408,13 +413,13 @@
         // Event untuk fokuskan ke #scannerInput saat klik floating button
         document.getElementById("focusScannerBtn").addEventListener("click", function() {
             const scannerInput = document.getElementById("scannerInput");
-            scannerInput.focus();
-            console.log("🎯 Fokus ke #scannerInput dari floating button");
-            // Tambahin animasi supaya user tau sudah fokus
+            scannerInput.value = ""; // kosongkan input dulu
+            scannerInput.focus(); // lalu fokus
+            console.log("🎯 Fokus ke #scannerInput dari floating button & reset value");
+
             this.classList.add("btn-success");
             setTimeout(() => this.classList.remove("btn-success"), 500);
         });
-
         document.addEventListener("keydown", function(e) {
             if (e.key === "Enter") {
                 e.preventDefault();
