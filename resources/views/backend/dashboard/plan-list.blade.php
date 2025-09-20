@@ -10,8 +10,25 @@
             /* biar muat di layar */
             overflow-y: auto;
         }
+
+        /* 👇 shrink font size to 10px */
+        .small-text {
+            font-size: 10px;
+        }
+
+        .small-text .form-control form-control-sm,
+        .small-text .btn,
+        .small-text .table {
+            font-size: 10px;
+        }
+
+        .small-text .table th,
+        .small-text .table td {
+            padding: 4px 6px;
+            /* biar tetap rapih */
+        }
     </style>
-    <div class="content-wrapper">
+    <div class="content-wrapper small-text">
         <!-- Content Header (Page header) -->
         <div class="content-header">
             <div class="container-fluid">
@@ -50,21 +67,23 @@
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="U_MEB_NO_IO">IO</label>
-                                            <input type="text" id="U_MEB_NO_IO" name="U_MEB_NO_IO" class="form-control"
-                                                placeholder="Enter IO Number" value="{{ request()->U_MEB_NO_IO }}">
+                                            <input type="text" id="U_MEB_NO_IO" name="U_MEB_NO_IO"
+                                                class="form-control form-control-sm" placeholder="Enter IO Number"
+                                                value="{{ request()->U_MEB_NO_IO }}">
                                         </div>
                                     </div>
 
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <label for="series">Series</label>
-                                            <select name="series" class="form-control" id="seriesSelect"></select>
+                                            <select name="series" class="form-control form-control-sm"
+                                                id="seriesSelect"></select>
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="status">Status</label>
-                                            <select name="status" id="status" class="form-control">
+                                            <select name="status" id="status" class="form-control form-control-sm">
                                                 <option value="">-- All Status --</option>
                                                 @foreach ($statuses as $status)
                                                     <option value="{{ $status }}"
@@ -92,7 +111,7 @@
                             </form>
                             <hr>
                             <div class="table-responsive">
-                                <table class="table table-bordered table-hover">
+                                <table class="table table-bordered table-hover table-sm">
                                     <thead class="thead-light">
                                         <tr>
                                             <th>Series Name</th>

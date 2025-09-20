@@ -168,7 +168,7 @@ class DashboardController extends Controller
             'U_MEB_Sales_Type' => '01', //Default
             'page'        => (int) $request->get('page', 1),
             'Series'      => $request->get('series'),
-            'limit'       => 10,
+            'limit'       => 20,
         ];
 
         $getSO = $this->sap->getSalesOrders($param);
