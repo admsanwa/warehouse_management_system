@@ -200,10 +200,14 @@
                             Back</button>
                     </div>
                 </div>
+                <!-- Floating Button -->
+                <button type="button" id="focusScannerBtn" class="btn btn-primary rounded-circle btn-xs shadow-lg"
+                    style="position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; z-index: 9999;">
+                    <i class="fas fa-barcode"></i>
+                </button>
             </div>
         </section>
     </div>
-
     <script>
         let temPoData = [];
 
@@ -402,7 +406,15 @@
             });
 
         });
-
+        // Event untuk fokuskan ke #scannerInput saat klik floating button
+        document.getElementById("focusScannerBtn").addEventListener("click", function() {
+            const scannerInput = document.getElementById("scannerInput");
+            scannerInput.focus();
+            console.log("🎯 Fokus ke #scannerInput dari floating button");
+            // Tambahin animasi supaya user tau sudah fokus
+            this.classList.add("btn-success");
+            setTimeout(() => this.classList.remove("btn-success"), 500);
+        });
         document.addEventListener("keydown", function(e) {
             if (e.key === "Enter") {
                 e.preventDefault();

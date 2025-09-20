@@ -168,6 +168,11 @@
                                 Back</button>
                         </div>
                     </div>
+                    <!-- Floating Button -->
+                    <button type="button" id="focusScannerBtn" class="btn btn-primary rounded-circle btn-xs shadow-lg"
+                        style="position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; z-index: 9999;">
+                        <i class="fas fa-barcode"></i>
+                    </button>
                 </form>
             </div>
         </section>
@@ -325,25 +330,40 @@
                 }
             });
             setDefaultSeries("#seriesSelect", "22");
-        })
-        document.addEventListener("DOMContentLoaded", function() {
-            const input = document.getElementById("scannerInput");
-            input.focus();
+        });
+        // Event untuk fokuskan ke #scannerInput saat klik floating button
+        document.getElementById("focusScannerBtn").addEventListener("click", function() {
+            const scannerInput = document.getElementById("scannerInput");
+            scannerInput.focus();
+            console.log("🎯 Fokus ke #scannerInput dari floating button");
+            // Tambahin animasi supaya user tau sudah fokus
+            this.classList.add("btn-success");
+            setTimeout(() => this.classList.remove("btn-success"), 500);
+        });
+        document.addEventListener("keydown", function(e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
 
-            input.addEventListener("keydown", function(e) {
-                console.log("Pressed key:", e.key, e.keyCode);
-                if (e.key === "Enter") {
-                    e.preventDefault(); // ← 🛑 This stops the form from submitting
-                    const code = input.value.trim();
-                    if (code !== "") {
-                        document.getElementById('item_code').value = code;
-                        sendScannedCode(code);
+                const scannerInput = document.getElementById("scannerInput");
+                const code = scannerInput.value.trim();
 
-                        input.value = "";
-                        setTimeout(() => input.focus(), 50);
-                    }
+                console.log("🔎 Enter ditekan, input terbaca:", code);
+
+                if (code !== "") {
+                    document.getElementById("item_code").value = code;
+                    console.log("✅ Kirim ke sendScannedCode dengan code:", code);
+
+                    sendScannedCode(code);
+
+                    scannerInput.value = "";
+                } else {
+                    console.log("⚠️ Tidak ada kode di scannerInput, abaikan.");
                 }
-            });
+                setTimeout(() => {
+                    scannerInput.focus();
+                    console.log("🎯 Fokus balik ke #scannerInput");
+                }, 50);
+            }
         });
         let html5QrCode;
         let html5QrCode;

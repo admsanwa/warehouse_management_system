@@ -47,7 +47,7 @@
                             <!-- === Search Form pindah ke sini === -->
                             <form action="" method="get" class="mb-3">
                                 <div class="row g-3 mb-4">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <div class="form-group">
                                             <label for="U_MEB_NO_IO">IO</label>
                                             <input type="text" id="U_MEB_NO_IO" name="U_MEB_NO_IO" class="form-control"
@@ -55,13 +55,26 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-2">
                                         <div class="form-group">
                                             <label for="series">Series</label>
                                             <select name="series" class="form-control" id="seriesSelect"></select>
                                         </div>
                                     </div>
-
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="status">Status</label>
+                                            <select name="status" id="status" class="form-control">
+                                                <option value="">-- All Status --</option>
+                                                @foreach ($statuses as $status)
+                                                    <option value="{{ $status }}"
+                                                        {{ request()->status == $status ? 'selected' : '' }}>
+                                                        {{ $status }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label>&nbsp;</label>
@@ -127,7 +140,7 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="7" class="text-center text-muted">
+                                                <td colspan="9" class="text-center text-muted">
                                                     No data available
                                                 </td>
                                             </tr>

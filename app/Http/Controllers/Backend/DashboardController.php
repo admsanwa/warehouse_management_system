@@ -208,36 +208,45 @@ class DashboardController extends Controller
                     'limit'       => 50,
                 ]);
 
-                // ambil transfer terbaru (DocEntry terbesar)
                 $latestTransfer = collect($get_invtf['data'])
                     ->sortByDesc(fn($x) => $x['DocEntry'] ?? '')
                     ->first();
 
                 $progressData = ProgressHelper::detectStage($latestTransfer);
 
-                $row['FromWhsCode']    = $latestTransfer['FromWhsCode'] ?? null;
-                $row['ToWhsCode']      = $latestTransfer['ToWhsCode'] ?? null;
-                $row['Stage']          = $progressData['stage'] ?? null;
-                $row['CurrentStatus']  = $progressData['status'] ?? null;
+                $row['FromWhsCode']     = $latestTransfer['FromWhsCode'] ?? null;
+                $row['ToWhsCode']       = $latestTransfer['ToWhsCode'] ?? null;
+                $row['Stage']           = $progressData['stage'] ?? null;
+                $row['CurrentStatus']   = $progressData['status'] ?? null;
                 $row['ProgressPercent'] = $progressData['progress_percent'] ?? 0;
 
                 return $row;
             })
-            ->filter(); // hanya SO dengan transfer terbaru
+            ->filter();
+
+
+        // ✅ Filter by Status dari request
+        if ($request->filled('status')) {
+            $data = $data->filter(function ($row) use ($request) {
+                return ($row['CurrentStatus'] ?? null) === $request->status;
+            });
+        }
+        // hanya SO dengan transfer terbaru
 
         $currentCount = $getSO['total'] ?? count($data);
         $totalPages   = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
         $total = $data->count();
         $page         = $getSO['page'] ?? $param['page'];
         $limit        = $param['limit'];
-
+        $statuses = ProgressHelper::getStatusList();
         return view('backend.dashboard.plan-list', [
             'purchase_orders' => $data,
             'total'           => $total,
             'limit'           => $limit,
             'page'            => $page,
             'totalPages'      => $totalPages,
-            'seriesName'      => null
+            'seriesName'      => null,
+            'statuses'        => $statuses,
         ]);
     }
 
