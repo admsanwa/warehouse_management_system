@@ -9,11 +9,14 @@ use App\Models\DeliveryModel;
 use App\Models\ItemsModel;
 use App\Models\MemoModel;
 use App\Models\ProductionModel;
+use App\Models\goodissueModel;
+use App\Models\goodreceiptModel;
 use App\Models\ProductionOrderDetailsModel;
 use App\Models\PurchaseOrderDetailsModel;
 use App\Models\PurchasingModel;
 use App\Models\QualityModel;
 use App\Models\RFPModel;
+use App\Models\IFPModel;
 use App\Models\StockModel;
 use Auth;
 use DB;
@@ -21,6 +24,7 @@ use App\Services\SapService;
 
 use App\Models\ProgressTrackingModel;
 use App\Helpers\ProgressHelper;
+use App\Models\grpoModel;
 
 class DashboardController extends Controller
 {
@@ -30,54 +34,32 @@ class DashboardController extends Controller
     {
         $this->sap = $sap;
     }
+
     public function dashboard(Request $request)
     {
         // get value
-        $getQuality     = QualityModel::whereNot("result", 3)->get()->unique('io');
-        $getDelivery    = DeliveryModel::whereNotNull("status")->get()->unique('io');
-        $getProd        = ProductionModel::where("status", "Released")->get();
+        // $getQuality     = QualityModel::whereNot("result", 3)->get()->unique('io');
+        // $getDelivery    = DeliveryModel::whereNotNull("status")->get()->unique('io');
 
         // count value
-        $latestStock = DB::table('stocks as s1')
-            ->select('s1.item_code', 's1.stock_in', 's1.stock_out', 's1.id as stock_id')
-            ->whereRaw('s1.id = (SELECT MAX(s2.id) FROM stocks s2 WHERE s2.item_code = s1.item_code)');
+        $getItems = $this->sap->getStockItems([
+            'Status' => 1,
+        ]);
 
-        $needBuy = ItemsModel::leftJoinSub($latestStock, 'latest', function ($join) {
-            $join->on('latest.item_code', '=', 'items.code');
-        })
-            ->select('items.id', 'items.code', 'items.name', 'items.uom', 'items.stock_min', 'items.in_stock', 'items.updated_at')
-            ->selectRaw('COALESCE(latest.stock_in,0) as last_in')
-            ->selectRaw('COALESCE(latest.stock_out,0) as last_out')
-            ->selectRaw('latest.stock_id')
-            ->whereRaw('items.stock_min >= (items.in_stock + (COALESCE(latest.stock_in,0) - COALESCE(latest.stock_out,0)))')
-            ->orderByDesc('latest.stock_id')
-            ->count();
-        $afterCheck     = $getQuality->count();
-        $deliveryStatus = $getDelivery->count();
-        $prodRelease    = $getProd->count();
-        $purchaseOrder  = PurchasingModel::where("status", "Open")->whereHas('po_details', function ($query) {
-            $query->where('item_code', 'NOT LIKE', '%Maklon%');
-        })->count();
-        $goodIssued     = PurchasingModel::where("status", "GI")->whereHas('po_details', function ($query) {
-            $query->where('item_code', 'LIKE', '%Maklon%');
-        })->count();
-        $goodReceipt    = PurchasingModel::where("status", "GR")->whereHas('po_details', function ($query) {
-            $query->where('item_code', 'LIKE', '%Maklon%');
-        })->count();
-        $rfp            = ProductionModel::with('qualityTwo')
-            ->whereHas('qualityTwo', function ($q) {
-                $q->where('result', 1);
-            })
-            ->addSelect([
-                'latest_quality_id' => QualityModel::select('id')
-                    ->whereColumn('quality.io', 'production_order.io_no')
-                    ->orderByDesc('id')
-                    ->limit(1)
-            ])
-            ->where('prod_no', '$rfpProdNo')
-            ->orderByDesc('latest_quality_id')
-            ->filter($request) // <-- using the scope
-            ->count();
+        $needBuy = $getItems['total'];
+        $afterCheck     = QualityModel::count();
+        $deliveryStatus = DeliveryModel::count();
+
+        $getProdRelease = $this->sap->getProductionOrders([
+            'Status' => 'Released'
+        ]);
+        $prodRelease    = $getProdRelease['total'];
+
+
+        $purchaseOrder  = grpoModel::count();
+        $goodIssued     = goodissueModel::count();
+        $goodReceipt = goodreceiptModel::count();
+        $rfp            = RFPModel::count();
 
         // notif modal
         $user           = Auth::user();
@@ -116,48 +98,6 @@ class DashboardController extends Controller
             session()->flash('qcPendingProd', true);
         }
 
-        $param = [
-            "page"  => (int) $request->get('page', 1),
-            "limit" => (int) $request->get('limit', 50),
-            'DocStatus' => 'O',
-            "DocDate" => date("Y")
-        ];
-
-        // $getInvtf = $this->sap->getInventoryTransfers($param);
-
-        // if (empty($getInvtf) || $getInvtf['success'] !== true) {
-        //     return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
-        // }
-
-        // $invtf = collect($getInvtf['data'])
-        //     ->map(function ($row) {
-        //         $prjCode = $row['U_MEB_Project_Code'] ?? null;
-
-        //         if ($prjCode) {
-        //             $getProject = $this->sap->getProjects([
-        //                 'limit'   => 1,
-        //                 'PrjCode' => $prjCode
-        //             ]);
-
-        //             if (!empty($getProject) && $getProject['success'] === true && !empty($getProject['data'])) {
-        //                 // $row['project'] = $getProject['data'][0];
-        //                 $row['PrjName'] = $getProject['data'][0]['PrjName'] ?? null;
-        //             } else {
-        //                 $row['PrjName'] = null;
-        //             }
-        //         } else {
-        //             $row['PrjName'] = null;
-        //         }
-
-        //         return $row;
-        //     });
-
-
-        // $currentCount = $getInvtf['total'] ?? count($getInvtf['data'] ?? []);
-        // $totalPages = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
-        // $total = $getInvtf['total'];
-        // $page = $getInvtf['page'];
-        // $limit = $param['limit'];
         return view('backend.dashboard.list', compact('needBuy', 'afterCheck', 'deliveryStatus', 'prodRelease', 'purchaseOrder', 'goodIssued', 'goodReceipt', 'rfp', 'user'));
     }
 

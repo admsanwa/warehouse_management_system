@@ -35,7 +35,7 @@
                             <!-- small box -->
                             <div class="small-box bg-info">
                                 <div class="inner">
-                                    <h3>{{ $needBuy }}</h3>
+                                    <h3>{{ $needBuy > 0 ? $needBuy . '+' : 0 }}</h3>
                                     <p>Items to Purchase</p>
                                 </div>
                                 <div class="icon">
@@ -54,14 +54,14 @@
                             <!-- small box -->
                             <div class="small-box bg-success">
                                 <div class="inner">
-                                    <h3>{{ $prodRelease }}</h3>
+                                    <h3>{{ $prodRelease > 0 ? $prodRelease . '+' : 0 }}</h3>
 
                                     <p>Production Release</p>
                                 </div>
                                 <div class="icon">
                                     <i class="ion ion-ios-cog-outline"></i>
                                 </div>
-                                <a href="{{ url('admin/dashboard/prodrelease') }}" class="small-box-footer">More info <i
+                                <a href="{{ url('admin/production/po') }}" class="small-box-footer">More info <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -79,7 +79,7 @@
                                 <div class="icon">
                                     <i class="ion ion-android-checkmark-circle"></i>
                                 </div>
-                                <a href="{{ url('admin/dashboard/aftercheck') }}" class="small-box-footer">More info <i
+                                <a href="{{ url('admin/quality/history') }}" class="small-box-footer">More info <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -97,7 +97,7 @@
                                 <div class="icon">
                                     <i class="ion ion-ios-pricetags-outline"></i>
                                 </div>
-                                <a href="{{ url('admin/dashboard/delivstatus') }}" class="small-box-footer">More info <i
+                                <a href="{{ url('admin/delivery/history') }}" class="small-box-footer">More info <i
                                         class="fas fa-arrow-circle-right"></i></a>
 
                             </div>
@@ -114,7 +114,7 @@
                                 <div class="icon">
                                     <i class="ion ion-clipboard"></i>
                                 </div>
-                                <a href="{{ url('admin/dashboard/goodreceiptpo') }}" class="small-box-footer">More info <i
+                                <a href="{{ url('admin/listtransaction/stockin') }}" class="small-box-footer">More info <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -131,8 +131,8 @@
                                 <div class="icon">
                                     <i class="ion ion-log-out"></i>
                                 </div>
-                                <a href="{{ url('admin/dashboard/goodissued') }}" class="small-box-footer">More info <i
-                                        class="fas fa-arrow-circle-right"></i></a>
+                                <a href="{{ url('admin/listtransaction/goodissued') }}" class="small-box-footer">More info
+                                    <i class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
                     @endif
@@ -148,8 +148,8 @@
                                 <div class="icon">
                                     <i class="ion ion-android-checkbox-outline"></i>
                                 </div>
-                                <a href="{{ url('admin/dashboard/goodreceipt') }}" class="small-box-footer">More info <i
-                                        class="fas fa-arrow-circle-right"></i></a>
+                                <a href="{{ url('admin/listtransaction/goodreceipt') }}" class="small-box-footer">More info
+                                    <i class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
                     @endif
@@ -165,8 +165,8 @@
                                 <div class="icon">
                                     <i class="ion ion-checkmark-circled"></i>
                                 </div>
-                                <a href="{{ url('admin/dashboard/rfp') }}" class="small-box-footer">More info <i
-                                        class="fas fa-arrow-circle-right"></i></a>
+                                <a href="{{ url('admin/listtransaction/rfp') }}" class="small-box-footer">More info
+                                    <i class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
                     @endif

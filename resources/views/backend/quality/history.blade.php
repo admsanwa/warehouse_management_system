@@ -1,5 +1,5 @@
-@extends("backend.layouts.app")
-@section("content")
+@extends('backend.layouts.app')
+@section('content')
     <div class="content-wrapper">
         <div class="content-header">
             <div class="container-fluid">
@@ -17,7 +17,7 @@
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title"> 
+                                <h3 class="card-title">
                                     Search Quality Control List
                                 </h3>
                             </div>
@@ -43,12 +43,18 @@
                                             <label for="status">Status QC</label>
                                             <select name="result" id="result" class="form-control">
                                                 <option value="">Select result QC</option>
-                                                <option value="1" {{ request('result') == '1' ? 'selected' : '' }}>OK</option>
-                                                <option value="2" {{ request('result') == '2' ? 'selected' : '' }}>NG</option>
-                                                <option value="3" {{ request('result') == '3' ? 'selected' : '' }}>Need Approval</option>
-                                                <option value="4" {{ request('result') == '4' ? 'selected' : '' }}>Need Paint</option>
-                                                <option value="5" {{ request('result') == '5' ? 'selected' : '' }}>Painting by Inhouse</option>
-                                                <option value="6" {{ request('result') == '6' ? 'selected' : '' }}>Painting by Maklon</option>
+                                                <option value="1" {{ request('result') == '1' ? 'selected' : '' }}>OK
+                                                </option>
+                                                <option value="2" {{ request('result') == '2' ? 'selected' : '' }}>NG
+                                                </option>
+                                                <option value="3" {{ request('result') == '3' ? 'selected' : '' }}>Need
+                                                    Approval</option>
+                                                <option value="4" {{ request('result') == '4' ? 'selected' : '' }}>Need
+                                                    Paint</option>
+                                                <option value="5" {{ request('result') == '5' ? 'selected' : '' }}>
+                                                    Painting by Inhouse</option>
+                                                <option value="6" {{ request('result') == '6' ? 'selected' : '' }}>
+                                                    Painting by Maklon</option>
                                             </select>
                                         </div>
                                         {{-- <div class="form-group col-md-2">
@@ -67,7 +73,7 @@
                             </form>
                         </div>
 
-                        @include("_message")
+                        @include('_message')
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">History Quality Control</h3>
@@ -92,7 +98,8 @@
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>
                                                         @if ($quality)
-                                                            <a href="{{ url('admin/production/view?docEntry=' . $quality->doc_entry . '&docNum=' . $quality->prod_order) }}">
+                                                            <a
+                                                                href="{{ url('admin/production/view?docEntry=' . $quality->doc_entry . '&docNum=' . $quality->prod_order) }}">
                                                                 {{ $quality->prod_no }}
                                                             </a>
                                                         @else
@@ -109,7 +116,7 @@
                                                                 3 => 'Need Approval',
                                                                 4 => 'Need Paint',
                                                                 5 => 'Painting by Inhouse',
-                                                                6 => 'Painting by Makloon'
+                                                                6 => 'Painting by Makloon',
                                                             ];
                                                         @endphp
 
@@ -121,7 +128,7 @@
                                                     </td>
                                                     <td>
                                                         @if ($quality && $quality->result_by != null)
-                                                            {{ $quality->result_by}}
+                                                            {{ $quality->result_by }}
                                                         @else
                                                             -
                                                         @endif
@@ -140,11 +147,47 @@
                             @php
                                 $query = request()->all();
                             @endphp
+                            @php
+                                $page = $getRecord->currentPage();
+                                $totalPages = $getRecord->lastPage();
+                                $total = $getRecord->total();
+                                $limit = $getRecord->perPage();
+                                $query = request()->all();
+                            @endphp
+
                             <div class="card-footer">
                                 <div class="d-flex justify-content-between align-items-center">
+                                    <span>
+                                        Showing page <b class="text-primary">{{ $page }}</b> of
+                                        {{ $totalPages }}
+                                        (Total {{ $total }} records)
+                                    </span>
+
+                                    <div class="btn-group">
+                                        {{-- Previous --}}
+                                        @if ($getRecord->previousPageUrl())
+                                            <a href="{{ $getRecord->previousPageUrl() }}"
+                                                class="btn btn-outline-primary btn-sm" aria-label="Previous Page">
+                                                Previous
+                                            </a>
+                                        @endif
+
+                                        {{-- Current Page --}}
+                                        <span class="btn btn-primary btn-sm disabled">
+                                            {{ $page }}
+                                        </span>
+
+                                        {{-- Next --}}
+                                        @if ($getRecord->nextPageUrl())
+                                            <a href="{{ $getRecord->nextPageUrl() }}"
+                                                class="btn btn-outline-primary btn-sm" aria-label="Next Page">
+                                                Next
+                                            </a>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -153,13 +196,13 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-   <script>
+    <script>
         window.addEventListener("load", function() {
             const selectSeries = $("#seriesSelect");
             const defaultId = 701;
             const defaultText = "BKS-25";
             let option = new Option(defaultText, defaultId, true, true);
-            
+
             let selectedSeries = "{{ request()->series }}";
             console.log(selectedSeries);
             if (selectedSeries) {
@@ -179,7 +222,7 @@
                 });
             } else {
                 let option = new Option(defaultText, defaultId, true, true);
-                selectSeries.append(option).trigger("change");        
+                selectSeries.append(option).trigger("change");
             }
 
             selectSeries.select2({
