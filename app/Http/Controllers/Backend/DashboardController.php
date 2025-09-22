@@ -55,11 +55,12 @@ class DashboardController extends Controller
         ]);
         $prodRelease    = $getProdRelease['total'];
 
-
         $purchaseOrder  = grpoModel::count();
         $goodIssued     = goodissueModel::count();
         $goodReceipt = goodreceiptModel::count();
         $rfp            = RFPModel::count();
+        $memos = MemoModel::count();
+        $bons = BonModel::count();
 
         // notif modal
         $user           = Auth::user();
@@ -98,7 +99,19 @@ class DashboardController extends Controller
             session()->flash('qcPendingProd', true);
         }
 
-        return view('backend.dashboard.list', compact('needBuy', 'afterCheck', 'deliveryStatus', 'prodRelease', 'purchaseOrder', 'goodIssued', 'goodReceipt', 'rfp', 'user'));
+        return view('backend.dashboard.list', compact(
+            'needBuy',
+            'afterCheck',
+            'deliveryStatus',
+            'prodRelease',
+            'purchaseOrder',
+            'goodIssued',
+            'goodReceipt',
+            'rfp',
+            'memos',
+            'bons',
+            'user'
+        ));
     }
 
     public function dashboard_plan(Request $request)

@@ -170,6 +170,46 @@
                             </div>
                         </div>
                     @endif
+                    @if (
+                        $authDept == 'IT' ||
+                            $authDept == 'PPIC' ||
+                            $authDept == 'Purchasing' ||
+                            $authDept == 'Procurement, Installation and Delivery')
+                        <div class="col-lg-3 col-6">
+                            <!-- small box -->
+                            <div class="small-box bg-info">
+                                <div class="inner">
+                                    <h3>{{ $memos }}</h3>
+                                    <p>Memo</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-checkmark"></i>
+                                </div>
+                                <a href="{{ url('admin/production/listmemo') }}" class="small-box-footer">More info
+                                    <i class="fas fa-arrow-circle-right"></i></a>
+                            </div>
+                        </div>
+                    @endif
+                    @if (
+                        $authDept == 'IT' ||
+                            $authDept == 'PPIC' ||
+                            $authDept == 'Purchasing' ||
+                            $authDept == 'Procurement, Installation and Delivery')
+                        <div class="col-lg-3 col-6">
+                            <!-- small box -->
+                            <diiv class="small-box bg-success">
+                                <div class="inner">
+                                    <h3>{{ $bons }}</h3>
+                                    <p>Bon Pembelian Barang</p>
+                                </div>
+                                <div class="icon">
+                                    <i class="ion ion-checkmark"></i>
+                                </div>
+                                <a href="{{ url('admin/production/listbon') }}" class="small-box-footer">More info
+                                    <i class="fas fa-arrow-circle-right"></i></a>
+                            </diiv>
+                        </div>
+                    @endif
                     <!-- ./col -->
                 </div>
                 <!-- /.row -->
