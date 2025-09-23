@@ -49,16 +49,24 @@ class DashboardController extends Controller
         $needBuy = $getItems['total'];
         $afterCheck     = QualityModel::count();
         $deliveryStatus = DeliveryModel::count();
-
+        // Rumus hitung Issue For Production & Receipt From Production
         $getProdRelease = $this->sap->getProductionOrders([
-            'Status' => 'Released'
+            'Status' => 'Released',
+            'limit' => 100,
         ]);
-        $prodRelease    = $getProdRelease['total'];
+        $filterIFP = $this->filterIssueForProduction($getProdRelease['data']);
+        $filterRFP = $this->filterReceiptForProduction($getProdRelease['data']);
+        $prodRelease    = count($filterIFP);
+        // Rumus hitung GI, GR & GRPO
+        $getPurchaseOrders =    $this->sap->getPurchaseOrders(['page' => 1, 'limit' => 100, 'DocStatus' => 'Open']);
+        $filteredGI = $this->filterGoodIssueData($getPurchaseOrders['data']);
+        $filteredGR = $this->filterGoodReceiptData($getPurchaseOrders['data']);
+        $filteredGRPO = $this->filterGRPOData($getPurchaseOrders['data']);
 
-        $purchaseOrder  = grpoModel::count();
-        $goodIssued     = goodissueModel::count();
-        $goodReceipt = goodreceiptModel::count();
-        $rfp            = RFPModel::count();
+        $grpo = count($filteredGRPO);
+        $goodIssued     = count($filteredGI);
+        $goodReceipt = count($filteredGR);
+        $rfp            = count($filterRFP);
         $memos = MemoModel::count();
         $bons = BonModel::count();
 
@@ -104,7 +112,7 @@ class DashboardController extends Controller
             'afterCheck',
             'deliveryStatus',
             'prodRelease',
-            'purchaseOrder',
+            'grpo',
             'goodIssued',
             'goodReceipt',
             'rfp',
@@ -203,124 +211,6 @@ class DashboardController extends Controller
         ]);
     }
 
-    // public function dashboard_plan_2(Request $request)
-    // {
-    //     $param = [
-    //         'U_MEB_NO_IO' => $request->get('U_MEB_NO_IO'),
-    //         'page'        => (int) $request->get('page', 1),
-    //         'Series'      => $request->get('series'),
-    //         'limit'       => 10,
-    //     ];
-
-    //     $getSO = $this->sap->getSalesOrders($param);
-
-    //     if (empty($getSO) || ($getSO['success'] ?? false) !== true) {
-    //         return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
-    //     }
-
-    //     // Ambil hanya SO yang punya Inventory Transfer
-    //     $data = collect($getSO['data'])
-    //         ->map(function ($row) {
-    //             // Ambil project name
-    //             if (!empty($row['Lines'][0]['Project'])) {
-    //                 $getProject = $this->sap->getProjects([
-    //                     'PrjCode' => $row['Lines'][0]['Project'],
-    //                     'limit'   => 1
-    //                 ]);
-
-    //                 if (!empty($getProject['data'][0]['PrjName'])) {
-    //                     $row['ProjectName'] = $getProject['data'][0]['PrjName'];
-    //                 }
-    //             }
-
-    //             // Ambil series name
-    //             if (!empty($row['Series'])) {
-    //                 $getSeries = $this->sap->getSeries([
-    //                     'Series' => $row['Series'],
-    //                     'limit'  => 1
-    //                 ]);
-
-    //                 if (!empty($getSeries['data'][0]['SeriesName'])) {
-    //                     $row['SeriesName'] = $getSeries['data'][0]['SeriesName'];
-    //                 }
-    //             }
-
-    //             // Cek Inventory Transfer
-    //             if (!empty($row['U_MEB_NO_IO'])) {
-    //                 $get_invtf = $this->sap->getInventoryTransfers([
-    //                     'U_MEB_NO_IO' => $row['U_MEB_NO_IO'],
-    //                     'U_MEB_NO_SO' => $row['DocNum'],
-    //                     'limit' => 50,
-    //                 ]);
-
-    //                 if (!empty($get_invtf['data'])) {
-    //                     // Urutkan transfer berdasarkan DocEntry terbaru
-    //                     $transfers = collect($get_invtf['data'])
-    //                         ->sortByDesc(fn($x) => $x['DocEntry'] ?? '')
-    //                         ->values();
-
-    //                     $lastStage     = 'not_started';
-    //                     $currentStatus = null;
-
-    //                     $totalProgress = 0;
-    //                     $calculatedStages = []; // simpan pasangan from-to unik
-
-    //                     foreach ($transfers as $transfer) {
-    //                         $progressData = ProgressHelper::detectStage($transfer);
-
-    //                         $from = strtoupper($transfer['FromWhsCode'] ?? '');
-    //                         $to   = strtoupper($transfer['ToWhsCode'] ?? '');
-    //                         $key  = $from . '>' . $to; // unik key
-
-    //                         if (!isset($calculatedStages[$key])) {
-    //                             $totalProgress += $progressData['progress_percent'] ?? 0;
-    //                             $calculatedStages[$key] = true;
-    //                         }
-
-    //                         // simpan stage terakhir (yang paling baru)
-    //                         if (!empty($progressData['stage'])) {
-    //                             $lastStage     = $progressData['stage'];
-    //                             $currentStatus = $progressData['status'] ?? null;
-    //                         }
-    //                     }
-
-    //                     // $totalProgress = min($totalProgress, 100);
-
-
-    //                     $latestTransfer = $transfers->first();
-    //                     $row['FromWhsCode']    = $latestTransfer['FromWhsCode'] ?? null;
-    //                     $row['ToWhsCode']      = $latestTransfer['ToWhsCode'] ?? null;
-    //                     $row['Stage']          = $lastStage;
-    //                     $row['CurrentStatus']  = $currentStatus;
-    //                     $row['ProgressPercent'] = $totalProgress;
-
-    //                     return $row; // <-- hanya return kalau ada transfer
-    //                 }
-    //             }
-
-    //             // jika tidak ada IO atau transfer kosong, return null supaya di-filter
-    //             return null;
-    //         })
-    //         ->filter(); // buang null
-
-
-    //     $currentCount = $getSO['total'] ?? count($data);
-    //     $totalPages   = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
-    //     $total        = $getSO['total'] ?? count($data);
-    //     $page         = $getSO['page'] ?? $param['page'];
-    //     $limit        = $param['limit'];
-
-    //     return view('backend.dashboard.plan-list', [
-    //         'purchase_orders' => $data,
-    //         'total'           => $total,
-    //         'limit'           => $limit,
-    //         'page'            => $page,
-    //         'totalPages'      => $totalPages,
-    //         'seriesName'      => null
-    //     ]);
-    // }
-
-
     public function clearBonNotif()
     {
         session()->forget('bonPending');
@@ -396,121 +286,381 @@ class DashboardController extends Controller
 
     public function prod_release(Request $request)
     {
-        $getData    = ProductionModel::getRecord($request)->withCount("stocks")->where('status', 'Released')->orderBy("id", "desc")->paginate(10);
-        $getRecord  = ProductionOrderDetailsModel::with("stocks")->get()->unique("doc_num")->values();
-        $getSeries  = ProductionModel::getRecord($request)->get();
-        $user       = Auth::user();
+        $param = [
+            "page" => (int) $request->get('page', 1),
+            "limit" => 100,
+            "DueDate" => formatDateSlash($request->get('date')),
+            "DocNum" => $request->get('doc_num'),
+            "U_MEB_NO_IO" => $request->get('io_no'),
+            "ItemCode" =>  $request->get('prod_no'),
+            "ItemName" =>  $request->get('prod_desc'),
+            "Series" =>  $request->get('series'),
+            "Status" =>  'Released',
+        ];
 
-        $productionSummary = [];
-        foreach ($getRecord as $record) {
-            $po = $record->doc_num;
-
-            $productionQty  = ProductionOrderDetailsModel::where("doc_num", $po)->sum("qty");
-            $stockOutQty    = StockModel::where("prod_order", $po)->sum("qty");
-
-            $productionSummary[$po] = [
-                "remain" => $productionQty - $stockOutQty
-            ];
+        $getProds = $this->sap->getProductionOrders($param);
+        if (empty($getProds) || $getProds['success'] !== true) {
+            return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
         }
-        return view('backend.dashboard.prodrelease', compact('getData', 'productionSummary', 'getSeries', 'user'));
+
+        // Filter ulang kalau ada Series
+        if (!empty($param['Series']) && !empty($getProds['data'])) {
+            $getProds['data'] = collect($getProds['data'])
+                ->where('Series', $param['Series'])
+                ->values()
+                ->all();
+
+            // update total sesuai hasil filter
+            $getProds['total'] = count($getProds['data']);
+        }
+
+        $filtered = $this->filterIssueForProduction($getProds['data']);
+
+        $currentCount = $getProds['total'] ?? count($filtered); // total asli sebelum filter
+        $totalPages   = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
+        $total        = count($filtered);
+        $page         = $getProds['page'] ?? $param['page'];
+        $limit        = $param['limit'];
+
+        return view('backend.dashboard.prodrelease', [
+            'getProds'      => $filtered,
+            'page'        => $page,
+            'limit'       => $limit,
+            'total'       => $total,
+            'totalPages'  => $totalPages,
+        ]);
     }
 
     public function grpo(Request $request)
     {
-        $getRecord      = PurchasingModel::with("po_details")->get()->values();
-        $user           = Auth::user();
-        // $getRecord      = PurchaseOrderDetailsModel::with("stocks")->get()->unique("nopo")->values();
-        $getPagination = PurchasingModel::where('status', 'Open')
-            ->whereHas('po_details', function ($query) {
-                $query->where('item_code', 'not like', '%Maklon%');
-            })
-            ->paginate(10); // example pagination
+        $param = [
+            "page" => (int) $request->get('page', 1),
+            'limit' => 100,
+            "DocStatus" => $request->get('docStatus', 'Open'),
+            "DocNum" => $request->get('docNum'),
+            "DocDueDate" => formatDateSlash($request->get('DocDueDate')),
+            "CardName" =>  $request->get('cardName'),
+            "DocDate" => formatDateSlash($request->get('docDate')),
+            "Series" =>  $request->get('series')
+        ];
 
-
-        $purchasingSummary = [];
-        foreach ($getRecord as $record) {
-            $po = $record->no_po;
-            $purchaseQty = PurchaseOrderDetailsModel::where("nopo", $po)->sum("qty");
-            $stockInQty = StockModel::where("no_po", $po)->sum("qty");
-
-            $purchasingSummary[$po] = [
-                'remain' => $purchaseQty - $stockInQty
-            ];
+        $orders = $this->sap->getPurchaseOrders($param);
+        if (empty($orders) || ($orders['success'] ?? false) !== true) {
+            return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
         }
 
-        return view("backend.dashboard.goodreceiptpo", compact('getRecord', 'getPagination', 'purchasingSummary', 'user'));
+        if (!empty($param['Series']) && !empty($orders['data'])) {
+            $orders['data'] = collect($orders['data'])
+                ->where('Series', $param['Series'])
+                ->values()
+                ->all();
+            $orders['total'] = count($orders['data']);
+        }
+
+        $filtered = $this->filterGRPOData($orders['data']);
+
+        $currentCount = $orders['total'] ?? count($filtered); // total asli sebelum filter
+        $totalPages   = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
+        $total        = count($filtered);
+        $page         = $orders['page'] ?? $param['page'];
+        $limit        = $param['limit'];
+
+        return view("backend.dashboard.goodreceiptpo", [
+            'orders'      => $filtered,
+            'page'        => $page,
+            'limit'       => $limit,
+            'total'       => $total,
+            'totalPages'  => $totalPages,
+            'statuses'    => ['Open', 'Close'],
+        ]);
     }
 
     public function good_issued(Request $request)
     {
-        $getRecord      = PurchasingModel::with("po_details")->get()->values();
-        // $getRecord      = PurchaseOrderDetailsModel::with("stocks")->get()->unique("nopo")->values();
-        $getPagination = PurchasingModel::where('status', 'GI')
-            ->whereHas('po_details', function ($query) {
-                $query->where('item_code', 'like', '%Maklon%');
-            })
-            ->paginate(10); // example pagination
+        $param = [
+            "page" => (int) $request->get('page', 1),
+            'limit' => 100,
+            "DocStatus" => $request->get('docStatus', 'Open'),
+            "DocNum" => $request->get('docNum'),
+            "DocDueDate" => formatDateSlash($request->get('DocDueDate')),
+            "CardName" =>  $request->get('cardName'),
+            "DocDate" => formatDateSlash($request->get('docDate')),
+            "Series" =>  $request->get('series')
+        ];
 
-
-        $purchasingSummary = [];
-        foreach ($getRecord as $record) {
-            $po = $record->no_po;
-            $purchaseQty = PurchaseOrderDetailsModel::where("nopo", $po)->sum("qty");
-            $stockInQty = StockModel::where("no_po", $po)->sum("qty");
-
-            $purchasingSummary[$po] = [
-                'remain' => $purchaseQty - $stockInQty
-            ];
+        $orders = $this->sap->getPurchaseOrders($param);
+        if (empty($orders) || ($orders['success'] ?? false) !== true) {
+            return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
         }
 
-        return view("backend.dashboard.goodreceiptpo", compact('getRecord', 'getPagination', 'purchasingSummary'));
+        if (!empty($param['Series']) && !empty($orders['data'])) {
+            $orders['data'] = collect($orders['data'])
+                ->where('Series', $param['Series'])
+                ->values()
+                ->all();
+            $orders['total'] = count($orders['data']);
+        }
+
+        $filtered = $this->filterGoodIssueData($orders['data']);
+
+        $currentCount = $orders['total'] ?? count($filtered); // total asli sebelum filter
+        $totalPages   = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
+        $total        = count($filtered);
+        $page         = $orders['page'] ?? $param['page'];
+        $limit        = $param['limit'];
+
+        return view('backend.dashboard.goodissue', [
+            'orders'      => $filtered,
+            'page'        => $page,
+            'limit'       => $limit,
+            'total'       => $total,
+            'totalPages'  => $totalPages,
+            'statuses'    => ['Open', 'Close'],
+        ]);
     }
 
     public function good_receipt(Request $request)
     {
-        $getRecord      = PurchasingModel::with("po_details")->get()->values();
-        $user           = Auth::user();
-        // $getRecord      = PurchaseOrderDetailsModel::with("stocks")->get()->unique("nopo")->values();
-        $getPagination = PurchasingModel::where('status', 'GR')
-            ->whereHas('po_details', function ($query) {
-                $query->where('item_code', 'like', '%Maklon%');
-            })
-            ->paginate(10); // example pagination
+        $param = [
+            "page" => (int) $request->get('page', 1),
+            'limit' => 100,
+            "DocStatus" => $request->get('docStatus', 'Open'),
+            "DocNum" => $request->get('docNum'),
+            "DocDueDate" => formatDateSlash($request->get('DocDueDate')),
+            "CardName" =>  $request->get('cardName'),
+            "DocDate" => formatDateSlash($request->get('docDate')),
+            "Series" =>  $request->get('series')
+        ];
 
-
-        $purchasingSummary = [];
-        foreach ($getRecord as $record) {
-            $po = $record->no_po;
-            $purchaseQty = PurchaseOrderDetailsModel::where("nopo", $po)->sum("qty");
-            $stockInQty = StockModel::where("no_po", $po)->sum("qty");
-
-            $purchasingSummary[$po] = [
-                'remain' => $purchaseQty - $stockInQty
-            ];
+        $orders = $this->sap->getPurchaseOrders($param);
+        if (empty($orders) || ($orders['success'] ?? false) !== true) {
+            return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
         }
 
-        return view("backend.dashboard.goodreceiptpo", compact('getRecord', 'getPagination', 'purchasingSummary', 'user'));
+        if (!empty($param['Series']) && !empty($orders['data'])) {
+            $orders['data'] = collect($orders['data'])
+                ->where('Series', $param['Series'])
+                ->values()
+                ->all();
+            $orders['total'] = count($orders['data']);
+        }
+
+        $filtered = $this->filterGoodReceiptData($orders['data']);
+
+        $currentCount = $orders['total'] ?? count($filtered); // total asli sebelum filter
+        $totalPages   = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
+        $total        = count($filtered);
+        $page         = $orders['page'] ?? $param['page'];
+        $limit        = $param['limit'];
+
+        return view('backend.dashboard.goodreceipt', [
+            'orders'      => $filtered,
+            'page'        => $page,
+            'limit'       => $limit,
+            'total'       => $total,
+            'totalPages'  => $totalPages,
+        ]);
+    }
+
+    public function good_receiptpo(Request $request)
+    {
+        $param = [
+            "page" => (int) $request->get('page', 1),
+            'limit' => 50,
+            "DocStatus" => $request->get('docStatus', 'Open'),
+            "DocNum" => $request->get('docNum'),
+            "DocDueDate" => formatDateSlash($request->get('DocDueDate')),
+            "CardName" =>  $request->get('cardName'),
+            "DocDate" => formatDateSlash($request->get('docDate')),
+            "Series" =>  $request->get('series')
+        ];
+
+        $orders = $this->sap->getPurchaseOrders($param);
+        if (empty($orders) || ($orders['success'] ?? false) !== true) {
+            return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
+        }
+
+        if (!empty($param['Series']) && !empty($orders['data'])) {
+            $orders['data'] = collect($orders['data'])
+                ->where('Series', $param['Series'])
+                ->values()
+                ->all();
+            $orders['total'] = count($orders['data']);
+        }
+
+        $filtered = $this->filterGRPOData($orders['data']);
+
+        $currentCount = $orders['total'] ?? count($filtered); // total asli sebelum filter
+        $totalPages   = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
+        $total        = count($filtered);
+        $page         = $orders['page'] ?? $param['page'];
+        $limit        = $param['limit'];
+
+        return view('backend.dashboard.goodreceipt', [
+            'orders'      => $filtered,
+            'page'        => $page,
+            'limit'       => $limit,
+            'total'       => $total,
+            'totalPages'  => $totalPages,
+        ]);
     }
 
     public function receipt_from_prod(Request $request)
     {
-        $rfpProdNo  = RFPModel::whereNotNull('prod_no')->pluck('prod_no');
-        $getRecord  = ProductionModel::with('qualityTwo')
-            ->whereHas('qualityTwo', function ($q) {
-                $q->where('result', 1);
-            })
-            ->addSelect([
-                'latest_quality_id' => QualityModel::select('id')
-                    ->whereColumn('quality.io', 'production_order.io_no')
-                    ->orderByDesc('id')
-                    ->limit(1)
-            ])
-            ->where('prod_no', '$rfpProdNo')
-            ->orderByDesc('latest_quality_id')
-            ->filter($request) // <-- using the scope
-            ->get();
-        // dd($getRecord->first()->quality);
+        $param = [
+            "page" => (int) $request->get('page', 1),
+            "limit" => 100,
+            "DueDate" => formatDateSlash($request->get('date')),
+            "DocNum" => $request->get('doc_num'),
+            "U_MEB_NO_IO" => $request->get('io_no'),
+            "ItemCode" =>  $request->get('prod_no'),
+            "ItemName" =>  $request->get('prod_desc'),
+            "Series" =>  $request->get('series'),
+            "Status" =>  'Released',
+        ];
 
-        return view("backend.dashboard.receiptfromprod", compact("getRecord"));
+        $getProds = $this->sap->getProductionOrders($param);
+        if (empty($getProds) || $getProds['success'] !== true) {
+            return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
+        }
+
+        // Filter ulang kalau ada Series
+        if (!empty($param['Series']) && !empty($getProds['data'])) {
+            $getProds['data'] = collect($getProds['data'])
+                ->where('Series', $param['Series'])
+                ->values()
+                ->all();
+
+            // update total sesuai hasil filter
+            $getProds['total'] = count($getProds['data']);
+        }
+
+        $filtered = $this->filterReceiptForProduction($getProds['data']);
+
+        $currentCount = $getProds['total'] ?? count($filtered); // total asli sebelum filter
+        $totalPages   = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
+        $total        = count($filtered);
+        $page         = $getProds['page'] ?? $param['page'];
+        $limit        = $param['limit'];
+
+        return view('backend.dashboard.receiptfromprod', [
+            'getProds'      => $filtered,
+            'page'        => $page,
+            'limit'       => $limit,
+            'total'       => $total,
+            'totalPages'  => $totalPages,
+        ]);
+    }
+
+    private function filterGoodIssueData(array $orders, bool $onlyMaklon = true): array
+    {
+        return collect($orders)->filter(function ($order) use ($onlyMaklon) {
+            $lines = $order['Lines'] ?? [];
+            if (empty($lines)) return false;
+
+            // cek maklon
+            $isMaklon = false;
+            if (!empty($order['U_MEB_PONo_Maklon'])) {
+                $isMaklon = true;
+            } else {
+                foreach ($lines as $l) {
+                    if (stripos($l['Dscription'], 'Maklon') !== false) {
+                        $isMaklon = true;
+                        break;
+                    }
+                }
+            }
+
+            if ($onlyMaklon && !$isMaklon) return false;
+
+            // cek open qty
+            $totalOpenQty = 0;
+            foreach ($lines as $l) {
+                $totalOpenQty += (float) $l['OpenQty'];
+            }
+
+            return $totalOpenQty > 0;
+        })->values()->all();
+    }
+
+    private function filterGoodReceiptData(array $orders): array
+    {
+        return collect($orders)->filter(function ($order) {
+            $lines = $order['Lines'] ?? [];
+            if (empty($lines)) return false;
+
+            // cek kalau salah satu ItemCode mengandung 'Maklon'
+            $hasMaklon = collect($lines)->contains(function ($l) {
+                return str_contains($l['ItemCode'] ?? '', 'Maklon');
+            });
+
+            // total open qty harus > 0 juga
+            $totalOpenQty = collect($lines)->sum(function ($l) {
+                return (float) ($l['OpenQty'] ?? 0);
+            });
+
+            return $hasMaklon && $totalOpenQty > 0;
+        })->values()->all();
+    }
+
+    private function filterGRPOData(array $orders): array
+    {
+        return collect($orders)->filter(function ($order) {
+            $lines = $order['Lines'] ?? [];
+            if (empty($lines)) return false;
+
+            // cek apakah ada 'Maklon' di salah satu ItemCode
+            $hasMaklon = collect($lines)->contains(function ($l) {
+                return str_contains(strtolower($l['ItemCode'] ?? ''), 'maklon');
+            });
+
+            // total open qty
+            $totalOpenQty = collect($lines)->sum(function ($l) {
+                return (float) ($l['OpenQty'] ?? 0);
+            });
+
+            // GRPO = tidak ada Maklon, open qty > 0
+            return !$hasMaklon && $totalOpenQty > 0;
+        })->values()->all();
+    }
+
+    private function filterIssueForProduction(array $orders): array
+    {
+        return collect($orders)->filter(function ($order) {
+            $lines = $order['Lines'] ?? [];
+            if (empty($lines)) return false;
+
+            // hanya line yang diawali "RM"
+            $rmLines = collect($lines)->filter(fn($l) => str_starts_with($l['ItemCode'] ?? '', 'RM'));
+
+            $totalPlannedQty = $rmLines->sum(fn($l) => (float) ($l['PlannedQty'] ?? 0));
+            $totalIssuedQty  = $rmLines->sum(fn($l) => (float) ($l['IssuedQty'] ?? 0));
+
+            return $totalIssuedQty < $totalPlannedQty;
+        })->values()->all();
+    }
+
+
+    private function filterReceiptForProduction(array $orders): array
+    {
+        return collect($orders)->filter(function ($order) {
+            $lines = $order['Lines'] ?? [];
+            if (empty($lines)) return false;
+
+            // hanya line yang diawali "RM"
+            $rmLines = collect($lines)->filter(fn($l) => str_starts_with($l['ItemCode'] ?? '', 'RM'));
+
+            $totalPlannedQty = $rmLines->sum(fn($l) => (float) ($l['PlannedQty'] ?? 0));
+            $totalIssuedQty  = $rmLines->sum(fn($l) => (float) ($l['IssuedQty'] ?? 0));
+
+            // Hitung total receipt dari header
+            $plannedHeader = (float) ($order['PlannedQty'] ?? 0);
+            $completeQty   = (float) ($order['CmpltQty'] ?? 0);
+            $rejectQty     = (float) ($order['RjctQty'] ?? 0);
+            $totalReceipt  = $completeQty + $rejectQty;
+
+            // Return true jika semua line RM sudah issued dan total receipt < planned header
+            return ($totalIssuedQty >= $totalPlannedQty) && ($totalReceipt < $plannedHeader);
+        })->values()->all();
     }
 }

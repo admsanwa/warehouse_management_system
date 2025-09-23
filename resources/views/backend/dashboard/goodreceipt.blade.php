@@ -6,7 +6,13 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col col-sm-6">
-                        <h1>Purchasing - GRPO</h1>
+                        <h1>Purchasing - Good Receipt</h1>
+                    </div>
+                    <div class="col col-sm-6">
+                        <ol class="breadcrumb justify-content-end">
+                            <a href="{{ url('admin/purchasing/upload') }}" class="btn btn-primary btn-sm"><i
+                                    class="fa fa-upload"> Upload Data</i></a>
+                        </ol>
                     </div>
                 </div>
             </div>
@@ -19,7 +25,7 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">
-                                    Search Purchasing List - GRPO
+                                    Search Purchasing List - Good Receipt
                                 </h3>
                             </div>
                             <form action="" method="get">
@@ -67,7 +73,7 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">
-                                    List of All Purchasing - GRPO
+                                    List of All Purchasing Good Receipt
                                 </h3>
                             </div>
                             <div class="card-body p-0">
@@ -100,14 +106,14 @@
                                                             $itemCode = $order['Lines'][0]['ItemCode'] ?? '';
                                                         @endphp
                                                         @if ($order['DocStatus'] == 'Open' && $itemCode)
-                                                            @if (str_starts_with($itemCode, 'RM'))
-                                                                <a href="{{ url('admin/transaction/stockin?po=' . $order['DocNum'] . '&docEntry=' . $order['DocEntry']) }}"
+                                                            @if (str_contains($itemCode, 'Maklon'))
+                                                                <a href="{{ url('admin/transaction/goodreceipt?po=' . $order['DocNum'] . '&docEntry=' . $order['DocEntry']) }}"
                                                                     class="btn btn-outline-success">
-                                                                    <i class="fa fa-arrow-right"></i> Open GRPO
+                                                                    <i class="fa fa-arrow-right"></i> Open GR
                                                                 </a>
-                                                            @else
-                                                                {{ $order['DocStatus'] }}
                                                             @endif
+                                                        @else
+                                                            {{ $order['DocStatus'] }}
                                                         @endif
                                                     </td>
                                                     <td>

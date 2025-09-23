@@ -101,7 +101,7 @@
                                                 <th>No</th>
                                                 <th>Product No</th>
                                                 <th>Prod Desc</th>
-                                                <th>Remain</th>
+                                                {{-- <th>Remain</th> --}}
                                                 <th>Doc Number</th>
                                                 <th>IO</th>
                                                 <th>Due Date</th>
@@ -110,25 +110,50 @@
                                             </tr>
                                         </thead>
                                         @forelse ($getProds as $production)
+                                            @php
+                                                // Hitung total PlannedQty & IssuedQty untuk semua Lines order ini
+                                                $totalPlannedQty = collect($production['Lines'] ?? [])->sum(function (
+                                                    $l,
+                                                ) {
+                                                    return (float) ($l['PlannedQty'] ?? 0);
+                                                });
+
+                                                $totalIssuedQty = collect($production['Lines'] ?? [])->sum(function (
+                                                    $l,
+                                                ) {
+                                                    return (float) ($l['IssuedQty'] ?? 0);
+                                                });
+                                                $needIssue = $totalIssuedQty < $totalPlannedQty; // true = masih harus issue
+                                            @endphp
+
                                             <tbody>
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $production['ItemCode'] }}</td>
                                                     <td>{{ $production['ItemName'] }}</td>
-                                                    <td>-</td>
+                                                    {{-- <td></td> --}}
                                                     <td>{{ $production['DocNum'] }}</td>
                                                     <td>{{ $production['U_MEB_NO_IO'] }}</td>
                                                     <td>{{ $production['DueDate'] }}</td>
                                                     <td>
                                                         @if ($production['Status'] == 'Released')
-                                                            <a href="{{ url('admin/transaction/stockout?docNum=' . $production['DocNum'] . '&docEntry=' . $production['DocEntry']) }}"
-                                                                class="btn btn-sm btn-outline-success"><i
-                                                                    class="fa fa-arrow-right"></i> Released</a>
+                                                            @if ($needIssue)
+                                                                {{-- Masih harus issue qty --}}
+                                                                <a href="{{ url('admin/transaction/stockout?docNum=' . $production['DocNum'] . '&docEntry=' . $production['DocEntry']) }}"
+                                                                    class="btn btn-sm btn-outline-success">
+                                                                    <i class="fa fa-arrow-right"></i> Release
+                                                                </a>
+                                                            @else
+                                                                {{-- Sudah issue semua --}}
+                                                                <a href="{{ url('admin/transaction/rfp?docNum=' . $production['DocNum'] . '&docEntry=' . $production['DocEntry']) }}"
+                                                                    class="btn btn-sm btn-outline-success">
+                                                                    <i class="fa fa-arrow-right"></i> Receipt
+                                                                </a>
+                                                            @endif
                                                         @else
                                                             {{ $production['Status'] }}
                                                         @endif
                                                     </td>
-
                                                     <td><a href="{{ url('admin/production/view?docEntry=' . $production['DocEntry'] . '&docNum=' . $production['DocNum']) }}"
                                                             class="btn btn-primary"><i class="fa fa-eye"></i></a></td>
                                                 </tr>

@@ -94,7 +94,7 @@
                             class="nav-link @if (Request::segment(2) == 'dashboard-list') active @endif">
                             <i class="nav-icon fa fa-list"></i>
                             <p>
-                                Dashboard List
+                                Dashboard Plan List
                             </p>
                         </a>
                     </li>

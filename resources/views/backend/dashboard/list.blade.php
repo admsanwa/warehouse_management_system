@@ -56,12 +56,12 @@
                                 <div class="inner">
                                     <h3>{{ $prodRelease > 0 ? $prodRelease . '+' : 0 }}</h3>
 
-                                    <p>Production Release</p>
+                                    <p>Issue For Production</p>
                                 </div>
                                 <div class="icon">
                                     <i class="ion ion-ios-cog-outline"></i>
                                 </div>
-                                <a href="{{ url('admin/production/po') }}" class="small-box-footer">More info <i
+                                <a href="{{ url('admin/dashboard/ifp') }}" class="small-box-footer">More info <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -107,14 +107,14 @@
                         <div class="col-lg-3 col-6">
                             <div class="small-box bg-info">
                                 <div class="inner">
-                                    <h3>{{ $purchaseOrder }}</h3>
+                                    <h3>{{ $grpo > 0 ? $grpo . '+' : 0 }}</h3>
 
                                     <p>Good Receipt PO</p>
                                 </div>
                                 <div class="icon">
                                     <i class="ion ion-clipboard"></i>
                                 </div>
-                                <a href="{{ url('admin/listtransaction/stockin') }}" class="small-box-footer">More info <i
+                                <a href="{{ url('admin/dashboard/goodreceiptpo') }}" class="small-box-footer">More info <i
                                         class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -124,14 +124,13 @@
                             <!-- small box -->
                             <div class="small-box bg-success">
                                 <div class="inner">
-                                    <h3>{{ $goodIssued }}</h3>
-
+                                    <h3>{{ $goodIssued > 0 ? $goodIssued . '+' : 0 }}</h3>
                                     <p>Good Issued</p>
                                 </div>
                                 <div class="icon">
                                     <i class="ion ion-log-out"></i>
                                 </div>
-                                <a href="{{ url('admin/listtransaction/goodissued') }}" class="small-box-footer">More info
+                                <a href="{{ url('admin/dashboard/goodissued') }}" class="small-box-footer">More info
                                     <i class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -141,14 +140,13 @@
                             <!-- small box -->
                             <div class="small-box bg-warning">
                                 <div class="inner">
-                                    <h3>{{ $goodReceipt }}</h3>
-
+                                    <h3>{{ $goodReceipt > 0 ? $goodReceipt . '+' : 0 }}</h3>
                                     <p>Good Receipt</p>
                                 </div>
                                 <div class="icon">
                                     <i class="ion ion-android-checkbox-outline"></i>
                                 </div>
-                                <a href="{{ url('admin/listtransaction/goodreceipt') }}" class="small-box-footer">More info
+                                <a href="{{ url('admin/dashboard/goodreceipt') }}" class="small-box-footer">More info
                                     <i class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>
@@ -158,14 +156,14 @@
                             <!-- small box -->
                             <div class="small-box bg-danger">
                                 <div class="inner">
-                                    <h3>{{ $rfp }}</h3>
+                                    <h3>{{ $rfp > 0 ? $rfp . '+' : 0 }}</h3>
 
                                     <p>Receipt from Production</p>
                                 </div>
                                 <div class="icon">
                                     <i class="ion ion-checkmark-circled"></i>
                                 </div>
-                                <a href="{{ url('admin/listtransaction/rfp') }}" class="small-box-footer">More info
+                                <a href="{{ url('admin/dashboard/rfp') }}" class="small-box-footer">More info
                                     <i class="fas fa-arrow-circle-right"></i></a>
                             </div>
                         </div>

@@ -45,7 +45,7 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('admin/dashboard/minstock', [DashboardController::class, 'min_stock']);
     Route::get('admin/dashboard/aftercheck', [DashboardController::class, 'after_check']);
     Route::get('admin/dashboard/delivstatus', [DashboardController::class, 'deliv_status']);
-    Route::get('admin/dashboard/prodrelease', [DashboardController::class, 'prod_release']);
+    Route::get('admin/dashboard/ifp', [DashboardController::class, 'prod_release']);
     Route::get('admin/dashboard/goodreceiptpo', [DashboardController::class, 'grpo']);
     Route::get('admin/dashboard/goodissued', [DashboardController::class, 'good_issued']);
     Route::get('admin/dashboard/goodreceipt', [DashboardController::class, 'good_receipt']);
@@ -89,7 +89,6 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('admin/purchasing/upload', [PurchasingController::class, 'upload_form']);
     Route::post('admin/purchasing/upload', [PurchasingController::class, 'upload']);
 
-    // production
     // bon
     Route::get('admin/production/bon', [ProductionController::class, 'bon']);
     Route::post('admin/production/bon', [ProductionController::class, 'create_bon']);
@@ -130,6 +129,7 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('admin/inventorytf/create', [InventorytfController::class, 'create']);
     Route::get('admin/inventorytf/list', [InventorytfController::class, 'list']);
     Route::get('admin/inventorytf/view', [InventorytfController::class, 'view']);
+
     // transaction
     // stockin
     Route::get('/scanned-barcodes/{grpo}', [TransactionController::class, 'getScannedBarcodes']);

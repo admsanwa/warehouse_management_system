@@ -1,11 +1,11 @@
-@extends("backend.layouts.app")
-@section("content")
+@extends('backend.layouts.app')
+@section('content')
     <div class="content-wrapper">
         <div class="content-header">
             <div class="container-fluid">
-                <div class="row mb-2">
+                <div class="row mb-12">
                     <div class="col col-sm-6">
-                        <h1>Quality Control</h1>
+                        <h1>Production - Receipt For Production</h1>
                     </div>
                 </div>
             </div>
@@ -14,49 +14,63 @@
         <section class="content">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-md-12">
+                    <section class="col-md-12">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title"> 
-                                    Search Quality Control List
+                                <h3 class="card-title">
+                                    Search Production List - Receipt For Production
                                 </h3>
                             </div>
                             <form action="" method="get">
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="form-group col-md-2">
-                                            <label for="">Product No</label>
-                                            <input type="text" name="prod_no" id="prod_no" class="form-control" value="{{ Request()->prod_no }}" placeholder="Enter Product Nomer">
+                                            <label for="">Date</label>
+                                            <input type="date" name="date" class="form-control"
+                                                value="{{ Request()->date }}">
                                         </div>
                                         <div class="form-group col-md-2">
-                                            <label for="">Product Desc</label>  
-                                            <input type="text" name="prod_desc" id="prod_desc" class="form-control" value="{{ Request()->prod_desc }}" placeholder="Enter Product Desc">  
-                                        </div>  
+                                            <label for="">IO No</label>
+                                            <input type="text" name="io_no" class="form-control"
+                                                placeholder="Enter Nomor IO" value="{{ Request()->io_no }}">
+                                        </div>
                                         <div class="form-group col-md-2">
-                                            <label for="">IO</label>   
-                                            <input type="text" name="no_io" id="no_io" class="form-control" value="{{ Request()->no_io }}" placeholder="Enter IO">
-                                        </div> 
+                                            <label for="">Doc Number</label>
+                                            <input type="number" name="doc_num" class="form-control"
+                                                placeholder="Enter Doc Nomor" value="{{ Request()->doc_num }}">
+                                        </div>
                                         <div class="form-group col-md-2">
-                                            <label for="">Result QC</label>
-                                            <select name="result" id="result" class="form-control">
-                                                <option value="">Select Result</option>
-                                                <option value="1" {{ request('result') == 1 ? 'selected' : ''}}>OK</option>
-                                                <option value="2" {{ request('result') == 2 ? 'selected' : ''}}>NG</option>
+                                            <label for="">Product No</label>
+                                            <input type="text" name="prod_no" class="form-control"
+                                                placeholder="Enter Product Nomor" value="{{ Request()->prod_no }}">
+                                        </div>
+                                        <div class="form-group col-md-2">
+                                            <label for="">Product Desc</label>
+                                            <input type="text" name="prod_desc" class="form-control"
+                                                placeholder="Enter Product Description" value="{{ Request()->prod_desc }}">
+                                        </div>
+                                        <div class="form-group col-md-2">
+                                            <label for="series">Series</label>
+                                            <select name="series" class="form-control" id="seriesSelect">
                                             </select>
                                         </div>
-                                        <div class="form-group col-md-2">
-                                            <button type="submit" class="btn btn-success" style="margin-top: 30px"><i class="fa fa-search"></i> Search</button>
-                                            <a href="{{ url("admin/quality/list") }}" class="btn btn-warning" style="margin-top: 30px"><i class="fa fa-eraser"></i> Reset</a>
+                                        <div class="form-group col-md-3">
+                                            <button type="submit" class="btn btn-primary" style="margin-top: 20px"><i
+                                                    class="fa fa-search"></i> Search</button>
+                                            <a href="{{ url('admin/production/po') }}" class="btn btn-warning"
+                                                style="margin-top: 20px"><i class="fa fa-eraser"></i> Reset</a>
                                         </div>
-                                    </div>    
-                                </div>    
-                            </form> 
+                                    </div>
+                                </div>
+                            </form>
                         </div>
 
-                        @include("_message")
+                        @include('_message')
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">List Quality Control</h3>
+                                <h3 class="card-title">
+                                    List of All Production - Receipt For Production
+                                </h3>
                             </div>
                             <div class="card-body p-0">
                                 <div class="table-responsive">
@@ -64,59 +78,168 @@
                                         <thead>
                                             <tr>
                                                 <th>No</th>
-                                                <th>Product Nomer</th>
-                                                <th>Description</th>
+                                                <th>Product No</th>
+                                                <th>Prod Desc</th>
+                                                {{-- <th>Remain</th> --}}
+                                                <th>Doc Number</th>
                                                 <th>IO</th>
-                                                <th>QC</th>
-                                                <th>Remarks</th>
-                                                <th>Scan</th>
+                                                <th>Due Date</th>
+                                                <th>Status</th>
+                                                <th>Details</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            @forelse ($getRecord as $quality)
+                                        @forelse ($getProds as $production)
+                                            @php
+                                                // Hitung total PlannedQty & IssuedQty untuk semua Lines order ini
+                                                $totalPlannedQty = collect($production['Lines'] ?? [])->sum(function (
+                                                    $l,
+                                                ) {
+                                                    return (float) ($l['PlannedQty'] ?? 0);
+                                                });
+
+                                                $totalIssuedQty = collect($production['Lines'] ?? [])->sum(function (
+                                                    $l,
+                                                ) {
+                                                    return (float) ($l['IssuedQty'] ?? 0);
+                                                });
+                                                $needIssue = $totalIssuedQty < $totalPlannedQty; // true = masih harus issue
+                                            @endphp
+
+                                            <tbody>
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
+                                                    <td>{{ $production['ItemCode'] }}</td>
+                                                    <td>{{ $production['ItemName'] }}</td>
+                                                    {{-- <td></td> --}}
+                                                    <td>{{ $production['DocNum'] }}</td>
+                                                    <td>{{ $production['U_MEB_NO_IO'] }}</td>
+                                                    <td>{{ $production['DueDate'] }}</td>
                                                     <td>
-                                                        @if ($quality->prod_no)
-                                                           <a style="background-color: #e9e9ff" href="{{ url("admin/production/" . $quality->prod_no)}}">{{ $quality->prod_no }}</a> 
+                                                        @if ($production['Status'] == 'Released')
+                                                            @if ($needIssue)
+                                                                {{-- Masih harus issue qty --}}
+                                                                <a href="{{ url('admin/transaction/stockout?docNum=' . $production['DocNum'] . '&docEntry=' . $production['DocEntry']) }}"
+                                                                    class="btn btn-sm btn-outline-success">
+                                                                    <i class="fa fa-arrow-right"></i> Release
+                                                                </a>
+                                                            @else
+                                                                {{-- Sudah issue semua --}}
+                                                                <a href="{{ url('admin/transaction/rfp?docNum=' . $production['DocNum'] . '&docEntry=' . $production['DocEntry']) }}"
+                                                                    class="btn btn-sm btn-outline-success">
+                                                                    <i class="fa fa-arrow-right"></i> Receipt
+                                                                </a>
+                                                            @endif
                                                         @else
-                                                            {{ "-" }}
+                                                            {{ $production['Status'] }}
                                                         @endif
                                                     </td>
-                                                    <td>{{ $quality->prod_desc ?? "-"}}</td>
-                                                    <td>{{ $quality->io_no }}</td>
-                                                    <td>
-                                                        @if ($quality->qualityTwo && $quality->qualityTwo->result !== null)
-                                                            {{ $quality->qualityTwo->result === 1 ? "OK" : ($quality->qualityTwo->result === 2 ? "NG" : "-")}}
-                                                        @else
-                                                           -
-                                                        @endif
-                                                    </td>
-                                                    <td>{{ $quality->qualityTwo->remark ?? "-"}}</td>
-                                                    <td><a href="{{ url("admin/transaction/rfp")}}" class="btn btn-sm btn-outline-success"><i class="fa fa-arrow-right"></i> RFP</a></td>
+                                                    <td><a href="{{ url('admin/production/view?docEntry=' . $production['DocEntry'] . '&docNum=' . $production['DocNum']) }}"
+                                                            class="btn btn-primary"><i class="fa fa-eye"></i></a></td>
                                                 </tr>
                                             @empty
                                                 <tr>
                                                     <td colspan="100%">No Record Found</td>
                                                 </tr>
-                                            @endforelse
-                                        </tbody>
+                                            </tbody>
+                                        @endforelse
                                     </table>
                                 </div>
                             </div>
+                            @php
+                                $query = request()->all();
+                            @endphp
                             <div class="card-footer">
-                                <div class="d-flex justify-content-end px-2 py-2">
-                                    <div class="overflow-x:auto; max-width:100px">
-                                        {{-- {!! $getRecord->onEachSide(1)->appends(request()->except('page'))->links() !!} --}}
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>
+                                        Showing page <b class="text-primary">{{ $page }}</b> of
+                                        {{ $totalPages }} (Total {{ $total }} records)
+                                    </span>
+                                    <div class="btn-group">
+                                        @php $query = request()->all(); @endphp
+
+                                        {{-- Previous --}}
+                                        @if ($page > 1)
+                                            <a href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['page' => $page - 1, 'limit' => $limit])) }}"
+                                                class="btn btn-outline-primary btn-sm">Previous</a>
+                                        @endif
+
+                                        {{-- Current --}}
+                                        <span class="btn btn-primary btn-sm disabled">{{ $page }}</span>
+
+                                        {{-- Next --}}
+                                        @if ($page < $totalPages)
+                                            <a href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['page' => $page + 1, 'limit' => $limit])) }}"
+                                                class="btn btn-outline-primary btn-sm">Next</a>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </section>
                 </div>
             </div>
         </section>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        window.addEventListener("load", function() {
+            const selectSeries = $("#seriesSelect");
+            let selectedSeries = "{{ request()->series }}";
+            console.log(selectedSeries);
+            if (selectedSeries) {
+                $.ajax({
+                    url: "/purchasing/seriesSearch",
+                    data: {
+                        Series: selectedSeries,
+                        ObjectCode: "202"
+                    },
+                    dataType: "json"
+                }).then(function(data) {
+                    if (data.results && data.results.length > 0) {
+                        let item = data.results[0]; // ambil hasil pertama
+                        let option = new Option(item.text, item.id, true, true);
+                        selectSeries.append(option).trigger("change");
+                    }
+                });
+            }
+            selectSeries.select2({
+                placeholder: "Ketik kode series...",
+                allowClear: true,
+                width: "100%",
+                language: {
+                    inputTooShort: function() {
+                        return "Ketik kode series untuk mencari...";
+                    },
+                    noResults: function() {
+                        return "Tidak ada data ditemukan";
+                    },
+                    searching: function() {
+                        return "Sedang mencari...";
+                    },
+                },
+                ajax: {
+                    url: "/purchasing/seriesSearch",
+                    dataType: "json",
+                    delay: 250,
+                    data: function(params) {
+                        if (!params) {
+                            return;
+                        }
+                        return {
+                            q: params.term,
+                            ObjectCode: '202'
+                        };
+                    },
+                    processResults: function(data) {
+                        console.log("Response dari server:", data); // cek di console
+                        return {
+                            results: (data.results || []).map(item => ({
+                                id: item.id,
+                                text: item.text
+                            }))
+                        };
+                    }
+                }
+            });
+        });
+    </script>
 @endsection

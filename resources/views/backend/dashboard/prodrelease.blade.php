@@ -5,12 +5,7 @@
             <div class="container-fluid">
                 <div class="row mb-12">
                     <div class="col col-sm-6">
-                        <h1>Production</h1>
-                    </div>
-                    <div class="col col-sm-6">
-                        <ol class="breadcrumb justify-content-end">
-                            <a href="{{ url('admin/production/upload')}}" class="btn btn-primary btn-sm"><i class="fa fa-upload"></i> Upload Data</a>
-                        </ol>
+                        <h1>Production - Issue For Production</h1>
                     </div>
                 </div>
             </div>
@@ -23,43 +18,47 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">
-                                    Search Production List
+                                    Search Production List - Issue For Production
                                 </h3>
                             </div>
                             <form action="" method="get">
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="form-group col-md-2">
+                                            <label for="">Date</label>
+                                            <input type="date" name="date" class="form-control"
+                                                value="{{ Request()->date }}">
+                                        </div>
+                                        <div class="form-group col-md-2">
                                             <label for="">IO No</label>
-                                            <input type="text" name="io_no" class="form-control" placeholder="Enter Nomor IO">
+                                            <input type="text" name="io_no" class="form-control"
+                                                placeholder="Enter Nomor IO" value="{{ Request()->io_no }}">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Doc Number</label>
-                                            <input type="number" name="doc_num" class="form-control" placeholder="Enter Doc Nomor">
+                                            <input type="number" name="doc_num" class="form-control"
+                                                placeholder="Enter Doc Nomor" value="{{ Request()->doc_num }}">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Product No</label>
-                                            <input type="text" name="prod_no" class="form-control" placeholder="Enter Product Nomor">
+                                            <input type="text" name="prod_no" class="form-control"
+                                                placeholder="Enter Product Nomor" value="{{ Request()->prod_no }}">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Product Desc</label>
-                                            <input type="text" name="prod_desc" class="form-control" placeholder="Enter Product Description">
+                                            <input type="text" name="prod_desc" class="form-control"
+                                                placeholder="Enter Product Description" value="{{ Request()->prod_desc }}">
                                         </div>
                                         <div class="form-group col-md-2">
-                                            <label for="">No Series</label>
-                                            <select name="no_series" id="no_series" class="form-control">
-                                                <option value="">Select No Series</option>
-                                                @foreach ($getSeries->unique('no_series') as $series)
-                                                    <option value="{{ $series->no_series }}"
-                                                        {{ Request()->no_series == $series->no_series ? 'selected' : ''}}>
-                                                        {{ $series->no_series }}
-                                                    </option>
-                                                @endforeach
+                                            <label for="series">Series</label>
+                                            <select name="series" class="form-control" id="seriesSelect">
                                             </select>
                                         </div>
-                                         <div class="form-group col-md-3">
-                                            <button type="submit" class="btn btn-primary" style="margin-top: 30px"><i class="fa fa-search"></i> Search</button>
-                                            <a href="{{ url('admin/production/po')}}" class="btn btn-warning" style="margin-top: 30px"><i class="fa fa-eraser"></i> Reset</a>
+                                        <div class="form-group col-md-3">
+                                            <button type="submit" class="btn btn-primary" style="margin-top: 20px"><i
+                                                    class="fa fa-search"></i> Search</button>
+                                            <a href="{{ url('admin/production/po') }}" class="btn btn-warning"
+                                                style="margin-top: 20px"><i class="fa fa-eraser"></i> Reset</a>
                                         </div>
                                     </div>
                                 </div>
@@ -70,7 +69,7 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">
-                                    List of All Production
+                                    List of All Production - Issue For Production
                                 </h3>
                             </div>
                             <div class="card-body p-0">
@@ -81,50 +80,63 @@
                                                 <th>No</th>
                                                 <th>Product No</th>
                                                 <th>Prod Desc</th>
-                                                <th>Remain</th>
+                                                {{-- <th>Remain</th> --}}
                                                 <th>Doc Number</th>
                                                 <th>IO</th>
                                                 <th>Due Date</th>
-                                                <th>No Series</th>
                                                 <th>Status</th>
                                                 <th>Details</th>
                                             </tr>
                                         </thead>
-                                        @forelse ($getData as $production )
+                                        @forelse ($getProds as $production)
                                             @php
-                                                $po = $production->doc_num;
-                                                $result = $productionSummary[$po] ?? ['remain' => 0];
+                                                // Hitung total PlannedQty & IssuedQty untuk semua Lines order ini
+                                                $totalPlannedQty = collect($production['Lines'] ?? [])->sum(function (
+                                                    $l,
+                                                ) {
+                                                    return (float) ($l['PlannedQty'] ?? 0);
+                                                });
+
+                                                $totalIssuedQty = collect($production['Lines'] ?? [])->sum(function (
+                                                    $l,
+                                                ) {
+                                                    return (float) ($l['IssuedQty'] ?? 0);
+                                                });
+                                                $needIssue = $totalIssuedQty < $totalPlannedQty; // true = masih harus issue
                                             @endphp
+
                                             <tbody>
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
-                                                    <td>{{ $production->prod_no }}</td>
-                                                    <td>{{ $production->prod_desc }}</td>
-                                                    <td>{{ $result['remain'] }}</td>
-                                                    <td>{{ $production->doc_num }}</td>
-                                                    <td>{{ $production->io_no }}</td>
-                                                    <td>{{ $production->due_date }}</td>
-                                                    <td>{{ $production->no_series }}</td>
+                                                    <td>{{ $production['ItemCode'] }}</td>
+                                                    <td>{{ $production['ItemName'] }}</td>
+                                                    {{-- <td></td> --}}
+                                                    <td>{{ $production['DocNum'] }}</td>
+                                                    <td>{{ $production['U_MEB_NO_IO'] }}</td>
+                                                    <td>{{ $production['DueDate'] }}</td>
                                                     <td>
-                                                       @if (($user->department == 'Production and Warehouse' && $user->level == 'Manager' || $user->department == 'Production and Warehouse' && $user->level == 'Supervisor') || 
-                                                            $user->department == 'Procurement, Installation and Delivery' && $user->level == 'Manager' || $user->department == 'PPIC')
-                                                            @if ($production->status == "Released")
-                                                                Released
-                                                            @else 
-                                                                Closed
+                                                        @if ($production['Status'] == 'Released')
+                                                            @if ($needIssue)
+                                                                {{-- Masih harus issue qty --}}
+                                                                <a href="{{ url('admin/transaction/stockout?docNum=' . $production['DocNum'] . '&docEntry=' . $production['DocEntry']) }}"
+                                                                    class="btn btn-sm btn-outline-success">
+                                                                    <i class="fa fa-arrow-right"></i> Release
+                                                                </a>
+                                                            @else
+                                                                {{-- Sudah issue semua --}}
+                                                                <a href="{{ url('admin/transaction/rfp?docNum=' . $production['DocNum'] . '&docEntry=' . $production['DocEntry']) }}"
+                                                                    class="btn btn-sm btn-outline-success">
+                                                                    <i class="fa fa-arrow-right"></i> Receipt
+                                                                </a>
                                                             @endif
                                                         @else
-                                                            @if ($production->status == "Released")
-                                                                <a href="{{ url("admin/transaction/stockout", $production->doc_num)}}" class="btn btn-sm btn-outline-success"><i class="fa fa-arrow-right"></i> Released</a>
-                                                            @else 
-                                                                Closed
-                                                            @endif
+                                                            {{ $production['Status'] }}
                                                         @endif
                                                     </td>
-                                                    
-                                                    <td><a href="{{ url('admin/production/view/' . $production->id) }}" class="btn btn-primary"><i class="fa fa-eye"></i></a></td>
+                                                    <td><a href="{{ url('admin/production/view?docEntry=' . $production['DocEntry'] . '&docNum=' . $production['DocNum']) }}"
+                                                            class="btn btn-primary"><i class="fa fa-eye"></i></a></td>
                                                 </tr>
-                                        @empty
+                                            @empty
                                                 <tr>
                                                     <td colspan="100%">No Record Found</td>
                                                 </tr>
@@ -133,17 +145,101 @@
                                     </table>
                                 </div>
                             </div>
+                            @php
+                                $query = request()->all();
+                            @endphp
                             <div class="card-footer">
-                                <div class="d-flex justify-content-end px-2 py-2">
-                                    <div style="overflow-x:auto; max-width:100%">
-                                        {!! $getData->onEachSide(1)->appends(request()->except('page'))->links() !!}
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>
+                                        Showing page <b class="text-primary">{{ $page }}</b> of
+                                        {{ $totalPages }} (Total {{ $total }} records)
+                                    </span>
+                                    <div class="btn-group">
+                                        @php $query = request()->all(); @endphp
+
+                                        {{-- Previous --}}
+                                        @if ($page > 1)
+                                            <a href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['page' => $page - 1, 'limit' => $limit])) }}"
+                                                class="btn btn-outline-primary btn-sm">Previous</a>
+                                        @endif
+
+                                        {{-- Current --}}
+                                        <span class="btn btn-primary btn-sm disabled">{{ $page }}</span>
+
+                                        {{-- Next --}}
+                                        @if ($page < $totalPages)
+                                            <a href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['page' => $page + 1, 'limit' => $limit])) }}"
+                                                class="btn btn-outline-primary btn-sm">Next</a>
+                                        @endif
                                     </div>
                                 </div>
-                            </div>                       
+                            </div>
                         </div>
                     </section>
                 </div>
             </div>
         </section>
     </div>
+    <script>
+        window.addEventListener("load", function() {
+            const selectSeries = $("#seriesSelect");
+            let selectedSeries = "{{ request()->series }}";
+            console.log(selectedSeries);
+            if (selectedSeries) {
+                $.ajax({
+                    url: "/purchasing/seriesSearch",
+                    data: {
+                        Series: selectedSeries,
+                        ObjectCode: "202"
+                    },
+                    dataType: "json"
+                }).then(function(data) {
+                    if (data.results && data.results.length > 0) {
+                        let item = data.results[0]; // ambil hasil pertama
+                        let option = new Option(item.text, item.id, true, true);
+                        selectSeries.append(option).trigger("change");
+                    }
+                });
+            }
+            selectSeries.select2({
+                placeholder: "Ketik kode series...",
+                allowClear: true,
+                width: "100%",
+                language: {
+                    inputTooShort: function() {
+                        return "Ketik kode series untuk mencari...";
+                    },
+                    noResults: function() {
+                        return "Tidak ada data ditemukan";
+                    },
+                    searching: function() {
+                        return "Sedang mencari...";
+                    },
+                },
+                ajax: {
+                    url: "/purchasing/seriesSearch",
+                    dataType: "json",
+                    delay: 250,
+                    data: function(params) {
+                        if (!params) {
+                            return;
+                        }
+                        return {
+                            q: params.term,
+                            ObjectCode: '202'
+                        };
+                    },
+                    processResults: function(data) {
+                        console.log("Response dari server:", data); // cek di console
+                        return {
+                            results: (data.results || []).map(item => ({
+                                id: item.id,
+                                text: item.text
+                            }))
+                        };
+                    }
+                }
+            });
+        });
+    </script>
 @endsection
