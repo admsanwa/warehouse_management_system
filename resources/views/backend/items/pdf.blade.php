@@ -15,9 +15,18 @@
 
         .label {
             width: 80mm;
-            height: 25mm;
+            height: 40mm;
             box-sizing: border-box;
-            padding: 3mm 5mm;
+            padding: 4mm 7mm;
+        }
+
+        .label-frame {
+            width: 90%;
+            height: 90%;
+            border: 0.3mm solid #ffffff;
+            border-radius: 1mm;
+            padding: 1mm 2mm;
+            box-sizing: border-box;
         }
 
         table {
@@ -35,51 +44,60 @@
         }
 
         .qrcode img {
-            width: 28mm;
-            height: 25mm;
+            width: 30mm;
+            height: 30mm;
         }
 
         .text {
             margin-left: 1mm;
-            width: 56mm;
+            width: 57mm;
             /* batasi lebar text agar tidak nempel ke kanan */
             flex-direction: column;
             justify-content: center;
             text-align: center;
             align-items: center;
-            padding-right: 10mm;
+            padding-right: 8mm;
 
         }
 
         .code {
             font-weight: bold;
-            font-size: 12pt;
+            font-size: 13pt;
             text-decoration: underline;
             margin-bottom: 1mm;
+            padding-right: 8mm;
         }
 
         .name {
-            font-size: 10pt;
+            font-size: 11pt;
             line-height: 1.2;
-            max-height: 36pt;
+            max-height: 28pt;
             /* batasi tinggi (≈2 baris) */
             overflow: hidden;
             text-overflow: ellipsis;
             word-break: break-word;
 
             display: block;
-            text-align: left;
+            text-align: center;
             /* rapikan text rata kiri */
             padding-right: 5mm;
             /* beri space ke kanan */
             box-sizing: border-box;
             /* padding dihitung dalam lebar */
-            text-align: center;
             align-items: center;
+            margin-bottom: 2mm;
+            padding-right: 8mm;
+
         }
 
         .date {
-            font-size: 9pt;
+            font-size: 8pt;
+            text-decoration: underline;
+        }
+
+        .po {
+            font-size: 8pt;
+            margin: 2;
         }
     </style>
 </head>
@@ -88,20 +106,22 @@
     @foreach ($addedBarcodes as $barcode)
         @for ($i = 0; $i < $barcode->qty; $i++)
             <div class="label">
-                <table>
-                    <tr>
-                        <!-- QR Code -->
-                        <td class="qrcode">
-                            <img src="data:image/png;base64,{{ DNS2D::getBarcodePNG($barcode->code, 'QRCODE', 5, 5) }}"
-                                alt="QR" />
-                        </td>
-                        <!-- Text -->
-                        <td class="text">
-                            <div class="code">{{ $barcode->code }}</div>
-                            <div class="name">
-                                {{ \Illuminate\Support\Str::limit($barcode->name, 80, '...') }}
-                    </tr>
-                </table>
+                <div class="label-frame">
+                    <table>
+                        <tr>
+                            <!-- QR Code -->
+                            <td class="qrcode">
+                                <img src="data:image/png;base64,{{ DNS2D::getBarcodePNG($barcode->code, 'QRCODE', 5, 5) }}"
+                                    alt="QR" />
+                            </td>
+                            <!-- Text -->
+                            <td class="text">
+                                <div class="code">{{ $barcode->code }}</div>
+                                <div class="name">
+                                    {{ \Illuminate\Support\Str::limit($barcode->name, 80, '...') }}
+                        </tr>
+                    </table>
+                </div>
             </div>
         @endfor
     @endforeach

@@ -62,6 +62,7 @@
                                                 <th>Product Nomer</th>
                                                 <th>Description</th>
                                                 <th>IO</th>
+                                                <th>Due Date</th>
                                                 <th>Qty</th>
                                                 <th>Action</th>
                                             </tr>
@@ -84,6 +85,10 @@
                                                                 value="{{ $barcode['ItemName'] }}">
                                                         </td>
                                                         <td>{{ $barcode['U_MEB_NO_IO'] }}</td>
+                                                        <td>{{ $barcode['DueDate'] }}
+                                                            <input type="hidden" name="duedate"
+                                                                value="{{ $barcode['DueDate'] }}">
+                                                        </td>
                                                         <td>
                                                             <input type="number" name="qty" style="width: 70px;"
                                                                 class="form-control" required>

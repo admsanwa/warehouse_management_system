@@ -10,12 +10,12 @@ class BarcodeProductionModel extends Model
 {
     use HasFactory;
 
-    protected $table = 'barcodeqc';
+    protected $table = 'barcode_prod';
 
     static public function getRecord()
     {
         $user = Auth::user()->username;
-        $return = self::where('barcodeqc.username', $user)
+        $return = self::where('barcode_prod.username', $user)
             ->select('prod_no', 'prod_desc', 'qty')
             ->get();
 

@@ -14,15 +14,24 @@
         }
 
         .label {
-            width: 80mm;
-            height: 30mm;
+            width: 35mm;
+            height: 15mm;
             box-sizing: border-box;
-            padding: 3mm 5mm;
+            padding: 3mm 2.5mm;
+        }
+
+        .label-frame {
+            width: 100%;
+            height: 100%;
+            border: 0.3mm solid #ffffff;
+            border-radius: 1mm;
+            padding: 1.5mm;
+            box-sizing: border-box;
         }
 
         table {
-            width: 90%;
-            height: 90%;
+            width: 100%;
+            height: 100%;
             border-collapse: collapse;
         }
 
@@ -31,63 +40,61 @@
         }
 
         .qrcode {
-            width: 32mm;
+            width: 10mm;
         }
 
         .qrcode img {
-            width: 28mm;
-            height: 28mm;
+            width: 10mm;
+            height: 9mm;
         }
 
         .text {
-            margin-left: 1mm;
-            width: 58mm;
+            margin-left: 0.5mm;
+            width: 33mm;
             /* batasi lebar text agar tidak nempel ke kanan */
             flex-direction: column;
             justify-content: center;
             text-align: center;
             align-items: center;
-            padding-right: 10mm;
+            padding-right: 7mm;
 
         }
 
         .code {
-            font-weight: bold;
-            font-size: 13pt;
+            font-weight: bold;     
+            font-size: 6pt;
             text-decoration: underline;
             margin-bottom: 1mm;
+            padding-right: 7mm;
         }
 
         .name {
-            font-size: 11pt;
+            font-size: 5pt;
             line-height: 1.2;
-            max-height: 28pt;
+            max-height: 36pt;
             /* batasi tinggi (≈2 baris) */
             overflow: hidden;
             text-overflow: ellipsis;
             word-break: break-word;
 
             display: block;
-            text-align: center;
+            text-align: left;
             /* rapikan text rata kiri */
-            padding-right: 5mm;
+            padding-right: 7mm;
             /* beri space ke kanan */
             box-sizing: border-box;
             /* padding dihitung dalam lebar */
+            text-align: center;
             align-items: center;
-            margin-bottom: 2mm;
-            /* ✅ jarak ke bawah */
-
         }
 
         .date {
-            font-size: 8pt;
-            text-decoration: underline;
+            font-size: 3pt;
+            padding-right: 7mm;
         }
 
-        .po {
-            font-size: 8pt;
-            margin: 2;
+        .additional {
+            font-size: 1pt;
         }
     </style>
 </head>
@@ -96,23 +103,25 @@
     @foreach ($addedBarcodes as $barcode)
         @for ($i = 0; $i < $barcode->qty; $i++)
             <div class="label">
-                <table>
-                    <tr>
-                        <!-- QR Code -->
-                        <td class="qrcode">
-                            <img src="data:image/png;base64,{{ DNS2D::getBarcodePNG($barcode->prod_no, 'QRCODE', 5, 5) }}"
-                                alt="QR" />
-                        </td>
-                        <!-- Text -->
-                        <td class="text">
-                            <div class="code">{{ $barcode->prod_no }}</div>
-                            <div class="name">
-                                {{ \Illuminate\Support\Str::limit($barcode->prod_desc, 60, '...') }}</div>
-                            <div class="date ">{{ \Carbon\Carbon::parse($barcode->updated_at)->format('d/m/Y') }}
-                            </div>
-                            <div class="po ">{{ $barcode->doc_num }}</div>
-                    </tr>
-                </table>
+                <div class="label-frame">
+                    <table>
+                        <tr>
+                            <!-- QR Code -->
+                            <td class="qrcode">
+                                <img src="data:image/png;base64,{{ DNS2D::getBarcodePNG($barcode->prod_no, 'QRCODE', 5, 5) }}"
+                                    alt="QR" />
+                            </td>
+                            <!-- Text -->
+                            <td class="text">
+                                <div class="code">{{ $barcode->prod_no }}</div>
+                                <div class="name">
+                                    {{ \Illuminate\Support\Str::limit($barcode->prod_desc, 60, '...') }}</div>
+                                <div class="date">{{ \Carbon\Carbon::parse($barcode->duedate)->format('d/m/Y') }}
+                                </div>
+                                <div class="po">{{ $barcode->doc_num }}</div>
+                        </tr>
+                    </table>
+                </div>
             </div>
         @endfor
     @endforeach

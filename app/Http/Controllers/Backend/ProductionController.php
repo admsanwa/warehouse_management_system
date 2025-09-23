@@ -445,6 +445,7 @@ class ProductionController extends Controller
         $barcode->prod_no   = trim($request->prod_no);
         $barcode->prod_desc = trim($request->prod_desc);
         $barcode->qty       = trim($request->qty);
+        $barcode->duedate   = trim($request->duedate);
         $barcode->username  = $user;
         $barcode->save();
         // dd($barcode);
@@ -476,7 +477,7 @@ class ProductionController extends Controller
         }
 
         $pdf = Pdf::loadView('backend.production.pdf', compact('addedBarcodes'))
-            ->setPaper([0, 0, 283.465, 107.48]); // 100mm x 40mm
+            ->setPaper([0, 0, 121.88, 70.86]); // 43mm x 25mm
 
         return $pdf->stream('barcodes.pdf',);
     }
