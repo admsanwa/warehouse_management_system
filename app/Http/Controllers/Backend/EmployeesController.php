@@ -71,6 +71,7 @@ class EmployeesController extends Controller
             'username'      => 'required',
             'nik'           => 'required|numeric:min:3',
             'department'    => 'required',
+            'warehouse'     => 'nullable',
             'email'         => 'required|unique:users,email,' . $id,
             'sign'          => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Validate signature file
         ]);
@@ -81,6 +82,7 @@ class EmployeesController extends Controller
             $user->fullname     = trim($request->fullname);
             $user->nik          = trim($request->nik);
             $user->department   = trim($request->department);
+            $user->warehouse_access           = trim($request->warehouse ?? '');
             $user->level        = trim($request->level);
             $user->email        = trim($request->email);
             if ($request->hasFile('sign')) {

@@ -37,6 +37,7 @@ class AuthController extends Controller
             'email'             => 'required|unique:users',
             'department'        => 'required',
             'level'             => 'required',
+            'warehouse'     => 'nullable',
             'password'          => 'required|min:6|',
             'confirm_password'  => 'required_with:password|same:password|min:6|'
         ]);
@@ -47,6 +48,7 @@ class AuthController extends Controller
         $user->nik              = trim($request->nik);
         $user->email            = trim($request->email);
         $user->department       = trim($request->department);
+        $user->warehouse_access           = trim($request->warehouse ?? '');
         $user->level            = trim($request->level);
         $user->password         = Hash::make($request->password);
         $user->remember_token   = Str::random(50);
