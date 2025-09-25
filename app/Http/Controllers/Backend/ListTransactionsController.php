@@ -21,6 +21,7 @@ class ListTransactionsController extends Controller
         $param = [
             'item_code' => $request->get('item_code'),
             'item_desc' => $request->get('item_desc'),
+            'no_po' => $request->get('no_po'),
         ];
 
         $getRecord = grpoModel::query()
@@ -32,6 +33,9 @@ class ListTransactionsController extends Controller
             ->when($param['item_desc'], function ($query, $item_desc) {
                 return $query->where('grpo.item_desc', 'like', '%' . $item_desc . '%');
             })
+            ->when($param['no_po'], function ($query, $no_po) {
+                return $query->where('grpo.no_po', 'like', '%' . $no_po . '%');
+            })
             ->paginate(10);
 
         return view('backend.listtransactions.stockin', compact('getRecord'));
@@ -42,6 +46,7 @@ class ListTransactionsController extends Controller
         $param = [
             'item_code' => $request->get('item_code'),
             'item_desc' => $request->get('item_desc'),
+            'no_po' => $request->get('no_po'),
         ];
         $getRecord = IFPModel::query()
             ->select('ifp.*', 'users.fullname')
@@ -51,6 +56,9 @@ class ListTransactionsController extends Controller
             })
             ->when($param['item_desc'], function ($query, $item_desc) {
                 return $query->where('ifp.item_desc', 'like', '%' . $item_desc . '%');
+            })
+            ->when($param['no_po'], function ($query, $no_po) {
+                return $query->where('ifp.no_po', 'like', '%' . $no_po . '%');
             })
             ->paginate(10);
 

@@ -24,22 +24,45 @@
                             </div>
                             <form action="" method="get">
                                 <div class="card-body">
-                                    <div class="row">
-                                        <div class="form-group col-md-2">
-                                            <label for="">Item Code</label>
-                                            <input type="text" name="item_code" class="form-control"
-                                                value="{{ Request()->item_code }}" placeholder="Enter Item Code">
+                                    <div class="row align-items-end">
+                                        <!-- Production Order -->
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="no_po">No Production Order</label>
+                                                <input type="text" name="no_po" id="no_po" class="form-control"
+                                                    value="{{ request()->no_po }}" placeholder="Enter Production Order">
+                                            </div>
                                         </div>
-                                        <div class="form-group col-md-2">
-                                            <label for="">Item Description</label>
-                                            <input type="text" name="item_desc" class="form-control"
-                                                value="{{ Request()->item_desc }}" placeholder="Enter Item Desc">
+
+                                        <!-- Item Code -->
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="item_code">Item Code</label>
+                                                <input type="text" name="item_code" id="item_code" class="form-control"
+                                                    value="{{ request()->item_code }}" placeholder="Enter Item Code">
+                                            </div>
                                         </div>
-                                        <div class="form-group col-md-2">
-                                            <button type="submit" class="btn btn-primary" style="margin-top: 30px"><i
-                                                    class="fa fa-search"></i> Search</button>
-                                            <a href="{{ url('admin/listtransaction/stockout') }}" class="btn btn-warning"
-                                                style="margin-top: 30px"><i class="fa fa-eraser"></i>Reset</a>
+
+                                        <!-- Item Desc -->
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="item_desc">Item Description</label>
+                                                <input type="text" name="item_desc" id="item_desc" class="form-control"
+                                                    value="{{ request()->item_desc }}" placeholder="Enter Item Desc">
+                                            </div>
+                                        </div>
+
+                                        <!-- Buttons -->
+                                        <div class="col-md-4">
+                                            <div class="form-group d-flex" style="gap:10px; margin-top:32px;">
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="fas fa-search"></i> Search
+                                                </button>
+                                                <a href="{{ url('admin/listtransaction/stockout') }}"
+                                                    class="btn btn-warning">
+                                                    <i class="fas fa-eraser"></i> Reset
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
