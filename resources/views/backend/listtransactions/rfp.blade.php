@@ -24,38 +24,58 @@
                             </div>
                             <form action="" method="get">
                                 <div class="card-body">
-                                    <div class="row">
-                                        <div class="form-group col-md-2">
-                                            <label for="">IO</label>
-                                            <input type="text" name="io" class="form-control"
-                                                value="{{ Request()->io }}" placeholder="Enter Item Code">
+                                    <div class="row align-items-end">
+                                        <!-- IO -->
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="io">IO</label>
+                                                <input type="text" name="io" id="io" class="form-control"
+                                                    value="{{ Request()->io }}" placeholder="Enter Item Code">
+                                            </div>
                                         </div>
-                                        <div class="form-group col-md-2">
-                                            <label for="">Production Order</label>
-                                            <input type="text" name="prod_order" class="form-control"
-                                                value="{{ Request()->prod_order }}" placeholder="Enter Item Code">
+
+                                        <!-- Production Order -->
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="prod_order">Production Order</label>
+                                                <input type="text" name="prod_order" id="prod_order" class="form-control"
+                                                    value="{{ Request()->prod_order }}" placeholder="Enter Item Code">
+                                            </div>
                                         </div>
-                                        <div class="form-group col-md-2">
-                                            <label for="">Production Nomor</label>
-                                            <input type="text" name="prod_no" class="form-control"
-                                                value="{{ Request()->prod_no }}" placeholder="Enter Item Code">
+
+                                        <!-- Production Nomor -->
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="prod_no">Production Nomor</label>
+                                                <input type="text" name="prod_no" id="prod_no" class="form-control"
+                                                    value="{{ Request()->prod_no }}" placeholder="Enter Item Code">
+                                            </div>
                                         </div>
-                                        <div class="form-group col-md-2">
-                                            <label for="">Production Description</label>
-                                            <input type="text" name="prod_desc" class="form-control"
-                                                value="{{ Request()->prod_desc }}" placeholder="Enter Item Desc">
+
+                                        <!-- Production Description -->
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label for="prod_desc">Production Description</label>
+                                                <input type="text" name="prod_desc" id="prod_desc" class="form-control"
+                                                    value="{{ Request()->prod_desc }}" placeholder="Enter Item Desc">
+                                            </div>
                                         </div>
-                                        <div class="form-group col-md-2">
-                                            <button type="submit" class="btn btn-primary" style="margin-top: 30px"><i
-                                                    class="fa fa-search"></i> Search</button>
-                                            <a href="{{ url('admin/listtransaction/rfp') }}" class="btn btn-warning"
-                                                style="margin-top: 30px"><i class="fa fa-eraser"></i>Reset</a>
+
+                                        <!-- Buttons -->
+                                        <div class="col-md-3">
+                                            <div class="form-group d-flex gap-2">
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="fa fa-search"></i> Search
+                                                </button>
+                                                <a href="{{ url('admin/listtransaction/rfp') }}" class="btn btn-warning">
+                                                    <i class="fa fa-eraser"></i> Reset
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </form>
                         </div>
-
                         @include('_message')
                         <div class="card">
                             <div class="card-header">

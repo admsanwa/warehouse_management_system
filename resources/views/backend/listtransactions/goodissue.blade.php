@@ -25,18 +25,21 @@
                             <form action="" method="get">
                                 <div class="card-body">
                                     <div class="row">
-                                        {{-- <div class="form-group col-md-2">
+                                        <div class="form-group col-md-2">
                                             <label for="">IO</label>
-                                            <input type="text" name="io" class="form-control" value="{{ Request()->io }}" placeholder="Enter IO">
+                                            <input type="text" name="io" class="form-control"
+                                                value="{{ Request()->io }}" placeholder="Enter IO">
                                         </div>
                                         <div class="form-group col-md-2">
-                                            <label for="">Purchase Order</label>
-                                            <input type="text" name="po" class="form-control" value="{{ Request()->po }}" placeholder="Enter Purchase Order">
+                                            <label for="">PO Maklon</label>
+                                            <input type="text" name="po" class="form-control"
+                                                value="{{ Request()->po }}" placeholder="Enter Purchase Order">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Internal No</label>
-                                            <input type="text" name="internal_no" class="form-control" value="{{ Request()->internal_no }}" placeholder="Enter Internal No">
-                                        </div> --}}
+                                            <input type="text" name="internal_no" class="form-control"
+                                                value="{{ Request()->internal_no }}" placeholder="Enter Internal No">
+                                        </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Item Code</label>
                                             <input type="text" name="code" class="form-control"
@@ -50,7 +53,7 @@
                                         <div class="form-group col-md-2">
                                             <button type="submit" class="btn btn-primary" style="margin-top: 30px"><i
                                                     class="fa fa-search"></i> Search</button>
-                                            <a href="{{ url('admin/listtransaction/stockin') }}" class="btn btn-warning"
+                                            <a href="{{ url('admin/listtransaction/goodissued') }}" class="btn btn-warning"
                                                 style="margin-top: 30px"><i class="fa fa-eraser"></i>Reset</a>
                                         </div>
                                     </div>
@@ -85,9 +88,9 @@
                                         @forelse ($getRecord as $gi)
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $gi->io ?? 'N/A' }}</td>
+                                                <td>{{ $gi->io ?? '-' }}</td>
                                                 <td>{{ $gi->po ?? '-' }}</td>
-                                                <td>{{ $gi->internal_no ?? 'N/A' }}</td>
+                                                <td>{{ $gi->internal_no ?? '-' }}</td>
                                                 <td>{{ $gi->item_code }}</td>
                                                 <td>{{ $gi->item_desc }}</td>
                                                 <td>{{ formatDecimalsSAP($gi->qty) }}</td>
