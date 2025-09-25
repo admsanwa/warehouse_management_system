@@ -171,8 +171,8 @@
                     @if (
                         $authDept == 'IT' ||
                             $authDept == 'PPIC' ||
-                            $authDept == 'Purchasing' ||
-                            $authDept == 'Procurement, Installation and Delivery')
+                            $authDept == 'Procurement, Installation and Delivery' ||
+                            $authDept == 'Production')
                         <div class="col-lg-3 col-6">
                             <!-- small box -->
                             <div class="small-box bg-info">

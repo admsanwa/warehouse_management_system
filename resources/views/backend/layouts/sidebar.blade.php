@@ -268,7 +268,11 @@
                                     </a>
                                 </li>
                             @endif
-                            @if ($authDept == 'IT' || $authDept == 'PPIC' || $authDept == 'Procurement, Installation and Delivery')
+                            @if (
+                                $authDept == 'IT' ||
+                                    $authDept == 'PPIC' ||
+                                    $authDept == 'Procurement, Installation and Delivery' ||
+                                    $authDept == 'Production')
                                 <li class="nav-item">
                                     <a href="{{ url('admin/production/listmemo') }}"
                                         class="nav-link @if (Request::is('admin/production/listmemo')) active @endif">
