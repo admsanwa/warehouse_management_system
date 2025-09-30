@@ -40,22 +40,32 @@ class ProgressHelper
         $from = strtoupper($row['FromWhsCode'] ?? '');
         $to   = strtoupper($row['ToWhsCode'] ?? '');
 
-        $result = [
-            'stage'            => 'Belum Dimulai',
-            'status'           => 'Not Started',
-            'progress_percent' => 0,
-        ];
+        // Kondisi 1: kalau kosong → belum dimulai
+        if (empty($from) && empty($to)) {
+            return [
+                'stage'            => 'Belum Dimulai',
+                'status'           => 'Not Started',
+                'progress_percent' => 0,
+            ];
+        }
 
+        // Cari di rules
         foreach (self::rules() as $rule) {
             if ($from === $rule['from'] && $to === $rule['to']) {
-                $result['stage']            = $rule['stage'];
-                $result['status']           = $rule['status'];
-                $result['progress_percent'] = $rule['percent'];
-                return $result;
+                return [
+                    'stage'            => $rule['stage'],
+                    'status'           => $rule['status'],
+                    'progress_percent' => $rule['percent'],
+                ];
             }
         }
 
-        return $result;
+        // Kondisi 2: ada value tapi gak ada di rules
+        return [
+            'stage'            => 'Tidak Masuk Prosedur',
+            'status'           => 'Forbidden',
+            'progress_percent' => 0,
+        ];
     }
 
     /**
@@ -67,6 +77,10 @@ class ProgressHelper
         foreach (self::rules() as $rule) {
             $statuses[$rule['status']] = $rule['status'];
         }
+        // Tambah status khusus
+        $statuses['Not Started'] = 'Not Started';
+        $statuses['Forbidden']   = 'Forbidden';
+
         return array_values($statuses);
     }
 
@@ -79,6 +93,10 @@ class ProgressHelper
         foreach (self::rules() as $rule) {
             $stages[$rule['stage']] = $rule['stage'];
         }
+        // Tambah stage khusus
+        $stages['Belum Dimulai']        = 'Belum Dimulai';
+        $stages['Tidak Masuk Prosedur'] = 'Tidak Masuk Prosedur';
+
         return array_values($stages);
     }
 }
