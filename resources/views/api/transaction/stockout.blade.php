@@ -407,7 +407,8 @@
                 }
             });
             // Set default series sesuai tahun
-            setDefaultSeries("#seriesSelect", "202");
+            const prefix = {!! json_encode(Auth::user()->default_series_prefix) !!};
+            setDefaultSeries("#seriesSelect", "22", prefix);
         });
 
         // Event untuk fokuskan ke #scannerInput saat klik floating button

@@ -57,10 +57,10 @@ function hideLoadingOverlay() {
     document.body.style.overflow = "";
 }
 
-function setDefaultSeries(selector, objectCode) {
+function setDefaultSeries(selector, objectCode, prefix = "BKS") {
     const year = new Date().getFullYear().toString().slice(-2);
-    const defaultSeriesText = `BKS-${year}`;
-
+    const defaultSeriesText = `${prefix}-${year}`;
+    console.log("Default Series: ", defaultSeriesText);
     // Cari data series dari server
     $.ajax({
         url: "/purchasing/seriesSearch",

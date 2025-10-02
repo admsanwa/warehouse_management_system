@@ -299,6 +299,7 @@
                 placeholder: "Pilih Series",
                 allowClear: true,
                 width: "100%",
+                minimumInputLength: 1,
                 language: {
                     inputTooShort: function() {
                         return "Ketik kode series untuk mencari...";
@@ -334,7 +335,8 @@
                     }
                 }
             });
-            setDefaultSeries("#seriesSelect", "22");
+            const prefix = {!! json_encode(Auth::user()->default_series_prefix) !!};
+            setDefaultSeries("#seriesSelect", "22", prefix);
         });
         // Event untuk fokuskan ke #scannerInput saat klik floating button
         document.getElementById("focusScannerBtn").addEventListener("click", function() {
