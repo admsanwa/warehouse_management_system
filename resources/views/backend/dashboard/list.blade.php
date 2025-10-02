@@ -23,6 +23,7 @@
 
         @php
             $authDept = Auth::user()->department;
+            $authLevel = Auth::user()->level;
         @endphp
 
         <!-- Main content -->
@@ -30,7 +31,8 @@
             <div class="container-fluid">
                 <!-- Small boxes (Stat box) -->
                 <div class="row">
-                    @if ($authDept == 'PPIC' || $authDept == 'IT' || $authDept == 'Purchasing' || $authDept == 'Production and Warehouse')
+                    @if ($authDept == 'PPIC' || $authDept == 'IT' || $authDept == 'Purchasing' || ($authDept == 'Production and Warehouse' && $authLevel == 'Manager' || $authLevel == 'Supervisor') || 
+                    $authDept == 'Quality Control' && $authLevel == 'Manager')
                         <div class="col-lg-3 col-6">
                             <!-- small box -->
                             <div class="small-box bg-info">
@@ -48,7 +50,8 @@
                             </div>
                         </div>
                     @endif
-                    @if ($authDept == 'PPIC' || $authDept == 'IT' || $authDept == 'Production and Warehouse' || $authDept == 'Production')
+                    @if ($authDept == 'PPIC' || $authDept == 'IT' || ($authDept == 'Production and Warehouse' && $authLevel == 'Manager' || $authLevel == 'Supervisor') || 
+                    $authDept == 'Production' || $authDept == 'Quality Control' && $authLevel == 'Manager')
                         <!-- ./col -->
                         <div class="col-lg-3 col-6">
                             <!-- small box -->
@@ -67,7 +70,8 @@
                         </div>
                     @endif
                     <!-- ./col -->
-                    @if ($authDept == 'IT' || $authDept == 'Quality Control')
+                    @if ($authDept == 'IT' || $authDept == 'Quality Control' || ($authDept == 'Production and Warehouse' && $authLevel == 'Manager' || $authLevel == 'Supervisor') ||
+                    $authDept == 'Production' || $authDept == 'Quality Control' && $authLevel == 'Manager' || $authDept == 'PPIC')
                         <div class="col-lg-3 col-6">
                             <!-- small box -->
                             <div class="small-box bg-warning">
@@ -85,7 +89,8 @@
                         </div>
                     @endif
                     <!-- ./col -->
-                    @if ($authDept == 'IT' || $authDept == 'Procurement, Installation and Delivery')
+                    @if ($authDept == 'IT' || $authDept == 'Procurement, Installation and Delivery' || ($authDept == 'Production and Warehouse' && $authLevel == 'Manager' || $authLevel == 'Supervisor')
+                     || $authDept == 'Production' || $authDept == 'Quality Control' && $authLevel == 'Manager' || $authDept == 'PPIC')
                         <div class="col-lg-3 col-6">
                             <!-- small box -->
                             <div class="small-box bg-danger">
@@ -103,7 +108,8 @@
                             </div>
                         </div>
                     @endif
-                    @if ($authDept == 'IT' || $authDept == 'Production and Warehouse')
+                    @if ($authDept == 'IT' || ($authDept == 'Production and Warehouse' && $authLevel == 'Manager' || $authLevel == 'Supervisor') || $authDept == 'Quality Control' && 
+                    $authLevel == 'Manager' || $authDept == 'PPIC')
                         <div class="col-lg-3 col-6">
                             <div class="small-box bg-info">
                                 <div class="inner">
@@ -119,7 +125,8 @@
                             </div>
                         </div>
                     @endif
-                    @if ($authDept == 'IT' || $authDept == 'Production and Warehouse')
+                    @if ($authDept == 'IT' || ($authDept == 'Production and Warehouse' && $authLevel == 'Manager' || $authLevel == 'Supervisor') || $authDept == 'Quality Control' && 
+                    $authLevel == 'Manager' || $authDept == 'PPIC')
                         <div class="col-lg-3 col-6">
                             <!-- small box -->
                             <div class="small-box bg-success">
@@ -135,7 +142,8 @@
                             </div>
                         </div>
                     @endif
-                    @if ($authDept == 'IT' || $authDept == 'Production and Warehouse')
+                    @if ($authDept == 'IT' || ($authDept == 'Production and Warehouse' && $authLevel == 'Manager' || $authLevel == 'Supervisor') || $authDept == 'Quality Control' && 
+                    $authLevel == 'Manager' || $authDept == 'PPIC')
                         <div class="col-lg-3 col-6">
                             <!-- small box -->
                             <div class="small-box bg-warning">
@@ -151,7 +159,8 @@
                             </div>
                         </div>
                     @endif
-                    @if ($authDept == 'IT' || $authDept == 'Production and Warehouse')
+                    @if ($authDept == 'IT' || ($authDept == 'Production and Warehouse' && $authLevel == 'Manager' || $authLevel == 'Supervisor') || $authDept == 'Production' || 
+                    $authDept == 'Quality Control' && $authLevel == 'Manager' || $authDept == 'PPIC')
                         <div class="col-lg-3 col-6">
                             <!-- small box -->
                             <div class="small-box bg-danger">
@@ -170,9 +179,12 @@
                     @endif
                     @if (
                         $authDept == 'IT' ||
-                            $authDept == 'PPIC' ||
-                            $authDept == 'Procurement, Installation and Delivery' ||
-                            $authDept == 'Production')
+                        $authDept == 'PPIC' ||
+                        $authDept == 'Procurement, Installation and Delivery' ||
+                        $authDept == 'Production'|| 
+                        ($authDept == 'Production and Warehouse' && $authLevel == 'Manager' || $authLevel == 'Supervisor') ||
+                        $authDept == 'Quality Control' && $authLevel == 'Manager'
+                        )
                         <div class="col-lg-3 col-6">
                             <!-- small box -->
                             <div class="small-box bg-info">
@@ -190,12 +202,14 @@
                     @endif
                     @if (
                         $authDept == 'IT' ||
-                            $authDept == 'PPIC' ||
-                            $authDept == 'Purchasing' ||
-                            $authDept == 'Procurement, Installation and Delivery')
+                        $authDept == 'PPIC' ||
+                        $authDept == 'Purchasing' ||
+                        $authDept == 'Procurement, Installation and Delivery' ||
+                        ($authDept == 'Production and Warehouse' && $authLevel == 'Manager' || $authLevel == 'Supervisor') || 
+                        $authDept == 'Quality Control' && $authLevel == 'Manager')
                         <div class="col-lg-3 col-6">
                             <!-- small box -->
-                            <diiv class="small-box bg-success">
+                            <diiv class="small-box bg-success"> 
                                 <div class="inner">
                                     <h3>{{ $bons }}</h3>
                                     <p>Bon Pembelian Barang</p>
