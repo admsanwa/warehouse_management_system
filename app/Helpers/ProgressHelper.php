@@ -63,7 +63,7 @@ class ProgressHelper
         // Kondisi 2: ada value tapi gak ada di rules
         return [
             'stage'            => 'Tidak Masuk Prosedur',
-            'status'           => 'Forbidden / Tidak Masuk Prosedur',
+            'status'           => 'Forbidden / Harap Hub Tim IT',
             'progress_percent' => 0,
         ];
     }
