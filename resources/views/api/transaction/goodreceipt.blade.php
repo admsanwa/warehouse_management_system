@@ -311,7 +311,7 @@
                         delay: 250,
                         data: function(params) {
                             let searchData = {
-                                q: params.term,
+                                q: params.term ?? 'SB',
                                 limit: 10,
                             }
                             return searchData;
