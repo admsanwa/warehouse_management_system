@@ -37,20 +37,46 @@ class AuthController extends Controller
             'email'             => 'required|unique:users',
             'department'        => 'required',
             'level'             => 'required',
-            'warehouse'     => 'nullable',
+            'warehouse'         => 'nullable',
             'password'          => 'required|min:6|',
             'confirm_password'  => 'required_with:password|same:password|min:6|'
         ]);
-
+       
         $user                   = new User;
         $user->username         = trim($request->username);
         $user->fullname         = trim($request->fullname);
         $user->nik              = trim($request->nik);
         $user->email            = trim($request->email);
         $user->department       = trim($request->department);
-        $user->warehouse_access           = trim($request->warehouse ?? '');
         $user->level            = trim($request->level);
+        $user->warehouse_access = trim($request->warehouse ?? '');
         $user->password         = Hash::make($request->password);
+        $signatureData = $request->input('signature');
+
+        // convert base64 to image
+        $image = str_replace('data:image/png;base64,', '', $signatureData);
+        $image = str_replace(' ', '+', $image);
+
+        // remove old signature if exists
+        if ($user->sign && file_exists(public_path('assets/images/sign/' . $user->sign))) {
+            unlink(public_path('assets/images/sign/' . $user->sign));
+        }
+
+        // generate new filename
+        $username   = Str::slug($user->username, '_'); 
+        $timestamp  = now()->setTimezone('Asia/Jakarta')->format('Ymd'); 
+        $filename   = $timestamp . '_' . $username . '.png'; 
+
+        // ensure directory exists
+        $directory = public_path('assets/images/sign/');
+        if (!file_exists($directory)) {
+            mkdir($directory, 0777, true);
+        }
+
+        // save new file
+        file_put_contents($directory . $filename, base64_decode($image));
+
+        $user->sign             = $filename;
         $user->remember_token   = Str::random(50);
         $user->save();
 

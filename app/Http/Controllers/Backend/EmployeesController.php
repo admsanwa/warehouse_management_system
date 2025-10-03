@@ -82,26 +82,32 @@ class EmployeesController extends Controller
             $user->fullname     = trim($request->fullname);
             $user->nik          = trim($request->nik);
             $user->department   = trim($request->department);
-            $user->warehouse_access           = trim($request->warehouse ?? '');
             $user->level        = trim($request->level);
+            $user->warehouse_access = trim($request->warehouse ?? '');
             $user->email        = trim($request->email);
-            if ($request->hasFile('sign')) {
-                // Delete old file if exists
-                if ($user->sign && file_exists(public_path('assets/images/sign/' . $user->sign))) {
-                    unlink(public_path('assets/images/sign/' . $user->sign));
-                }
+            $signatureData = $request->input('signature');
 
-                // Save new file
-                $file      = $request->file('sign');
-                $username   = Str::slug($user->username, '_'); // Safe for filename
-                $timestamp  = now()->setTimezone('Asia/Jakarta')->format('Ymd'); // e.g. 20250801_153045
-                $filename  = $timestamp . '_' . $username . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('assets/images/sign/'), $filename);
+            // convert base64 to image
+            $image = str_replace('data:image/png;base64,', '', $signatureData);
+            $image = str_replace(' ', '+', $image);
 
-                $user->sign = $filename;
+            // remove old signature if exists
+            if ($user->sign && file_exists(public_path('assets/images/sign/' . $user->sign))) {
+                unlink(public_path('assets/images/sign/' . $user->sign));
             }
-            // dd($user);
 
+            // generate new filename
+            $username   = Str::slug($user->username, '_'); 
+            $timestamp  = now()->setTimezone('Asia/Jakarta')->format('Ymd'); 
+            $filename   = $timestamp . '_' . $username . '.png'; 
+
+            // ensure directory exists
+            $directory = public_path('assets/images/sign/');
+            if (!file_exists($directory)) {
+                mkdir($directory, 0777, true);
+            }
+            file_put_contents($directory . $filename, base64_decode($image));
+            $user->sign             = $filename;
             $user->save();
 
             return redirect('admin/employees')->with('success', 'Employees succesfully update');
