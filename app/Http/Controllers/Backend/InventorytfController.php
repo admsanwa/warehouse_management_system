@@ -7,6 +7,8 @@ use Http;
 use Illuminate\Http\Request;
 use App\Services\SapService;
 use Illuminate\Support\Arr;
+use App\Models\SapReasonModel as SapReason;
+use App\Models\BuyerModel;
 
 class InventorytfController extends Controller
 {
@@ -17,7 +19,15 @@ class InventorytfController extends Controller
         $this->sap = $sap;
     }
 
-    public function create() {}
+    public function create()
+    {
+        $inv_trans_reasons = SapReason::where('type', 'inv-trans')
+            ->orderBy('reason_code')
+            ->pluck('reason_desc', 'reason_code')
+            ->toArray();
+        $buyers = BuyerModel::all();
+        return view("api.inventorytf.create", compact("inv_trans_reasons", "buyers"));
+    }
 
     public function list(Request $request)
     {
@@ -30,6 +40,7 @@ class InventorytfController extends Controller
             "DocStatus" =>  $request->get('status', 'O'),
             "Series" =>  $request->get('series'),
         ];
+
         $getInvtf = $this->sap->getInventoryTransfers($param);
         if (empty($getInvtf) || $getInvtf['success'] !== true) {
             return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
@@ -55,7 +66,6 @@ class InventorytfController extends Controller
             'totalPages'  => $totalPages,
         ]);
     }
-
 
     public function view(Request $request)
     {
@@ -86,5 +96,112 @@ class InventorytfController extends Controller
                 'series' => $series,
             ]
         );
+    }
+
+    public function transfer(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'docNum' => 'nullable|string',
+                'cardName' => 'nullable|string',
+                'FromWhsCode' => 'required|string',
+                'ToWhsCode' => 'required|string|different:FromWhsCode',
+                'U_MEB_Default_Whse' => 'nullable|string',
+                'U_SI_No_Surat_Jalan' => 'nullable|string',
+                'Ref2' => 'nullable|string',
+                'U_MEB_NO_IO' => 'nullable|string',
+                'U_MEB_No_SO' => 'nullable|string',
+                'U_MEB_ProjectDetail' => 'nullable|string',
+                'U_MEB_Internal_No' => 'nullable|string',
+                'U_MEB_Project_Code' => 'nullable|string',
+                'U_MEB_NO_GI' => 'nullable|string',
+                'U_MEB_No_Inv_Trf_Asa' => 'nullable|string',
+                'U_MEB_Type_Inv_Trans' => 'nullable|string',
+                'U_MEB_Dist_Rule' => 'nullable|string',
+                'U_SI_No_Produksi' => 'nullable|string',
+                'U_MEB_No_Prod_Order' => 'nullable|string',
+                'U_SI_HARI_TGL_KIRIM' => 'nullable|date',
+                'U_SI_Lokasi' => 'nullable|string',
+                'U_SI_KMPN_TMBHN' => 'nullable|string',
+                'remarks' => 'required|string',
+                'Comments' => 'nullable|string',
+                'stocks' => 'required|array|min:1',
+                'stocks.*.ItemCode' => 'required|string',
+                'stocks.*.qty' => 'required|numeric|min:0.01',
+                'stocks.*.UnitMsr' => 'nullable|string',
+            ]);
+
+            $postData = [
+                // 'DocDate'    => now()->format('Y/m/d'),
+                'DocDate'    => "2025/09/30",
+                'Comment'    => $validated['Comments'] ?? null,
+                'Ref2'       => $validated['Ref2'] ?? null,
+                'FromWhsCode' => $validated['FromWhsCode'],
+                'ToWhsCode'   => $validated['ToWhsCode'],
+                'Ext' => [
+                    "U_MEB_Default_Whse" => $validated['U_MEB_Default_Whse'] ?? null,
+                    "U_MEB_Internal_No" => $validated['U_MEB_Internal_No'] ?? null,
+                    "U_SI_No_Surat_Jalan" => $validated['U_SI_No_Surat_Jalan'] ?? null,
+                    "U_MEB_NO_IO" => $validated['U_MEB_NO_IO'] ?? null,
+                    "U_MEB_No_SO" => $validated['U_MEB_No_SO'] ?? null,
+                    "U_MEB_Project_Code" => $validated['U_MEB_Project_Code'] ?? null,
+                    "U_MEB_Type_Inv_Trans" => $validated['U_MEB_Type_Inv_Trans'] ?? null,
+                    "U_MEB_PONo_Maklon" => $validated['docNum'] ?? null,
+                    "U_MEB_DIST_RULE" => $validated['U_MEB_Dist_Rule'] ?? null,
+                    "U_MEB_Vendor_Maklon" => $validated['cardName'] ?? null,
+                    "U_MEB_NO_GI" => $validated['U_MEB_NO_GI'] ?? null,
+                    "U_MEB_ProjectDetail" => $validated['U_MEB_ProjectDetail'] ?? null,
+                    "U_MEB_No_Inv_Trf_Asa" => $validated['U_MEB_No_Inv_Trf_Asa'] ?? null,
+                    "U_SI_No_Produksi" => $validated['U_SI_No_Produksi'] ?? null,
+                    "U_MEB_No_Prod_Order" => $validated['U_MEB_No_Prod_Order'] ?? null,
+                    "U_SI_HARI_TGL_KIRIM" => $validated['U_SI_HARI_TGL_KIRIM'] ?? null,
+                    "U_SI_Lokasi" => $validated['U_SI_Lokasi'] ?? null,
+                    "U_SI_KMPN_TMBHN" => $validated['U_SI_KMPN_TMBHN'] ?? null,
+                    "JournalMemo" => $validated['remarks'],
+                ],
+                'Lines' => [],
+            ];
+
+            $lines = [];
+            foreach ($validated['stocks'] as $row) {
+                $entryQty = (float) str_replace(',', '.', str_replace('.', '', $row['qty']));                // Qty baru yang diinput
+                $lines[] = [
+                    'ItemCode'    => $row['ItemCode'] ?? null,
+                    'Quantity'    => $entryQty,
+                    'FromWhsCode'  => $validated['FromWhsCode'],
+                    'ToWhsCode'    =>  $validated['ToWhsCode'],
+                    'OcrCode'    => $validated['U_MEB_DIST_RULE'] ?? null,
+                    'ProjectCode'    => $validated['U_MEB_Project_Code'],
+                ];
+            }
+
+            $postData['Lines'] = $lines;
+
+            // 4️⃣ Kirim ke SAP
+            $post_transfer = $this->sap->postInventoryTransfer($postData);
+
+            if (empty($post_transfer['success'])) {
+                throw new \Exception($post_transfer['message'] ?? 'SAP Inventory Transfer failed without message');
+            }
+
+            // 5️⃣ Response sukses
+            return response()->json([
+                'success' => true,
+                'message' => 'Inventory transfer berhasil dikirim ke SAP',
+                'data' => $postData,
+                'response' => $post_transfer ?? [],
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyimpan inventory transfer: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }

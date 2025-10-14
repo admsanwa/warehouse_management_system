@@ -127,6 +127,7 @@ Route::group(['middleware' => 'admin'], function () {
 
     // inventorytf
     Route::get('admin/inventorytf/create', [InventorytfController::class, 'create']);
+    Route::post('admin/inventorytf/transfer', [InventorytfController::class, 'transfer']);
     Route::get('admin/inventorytf/list', [InventorytfController::class, 'list']);
     Route::get('admin/inventorytf/view', [InventorytfController::class, 'view']);
 

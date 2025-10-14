@@ -244,4 +244,22 @@ class SapService
         }
         return $response->json();
     }
+
+    public function postInventoryTransfer($param)
+    {
+        $response = Http::withHeaders([
+            'Accept'     => 'application/json',
+            'X-API-Key'  => $this->apiKey,
+        ])->post("{$this->baseUrl}/api/outbound/transfer", $param);
+
+        if ($response->failed()) {
+            \Log::error('Production Receipt API Error', [
+                'url'      => "{$this->baseUrl}/api/outbound/transfer",
+                'status'   => $response->status(),
+                'response' => $response->body(),
+                'payload'  => $param,
+            ]);
+        }
+        return $response->json();
+    }
 }
