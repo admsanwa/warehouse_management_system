@@ -196,11 +196,15 @@ class InventorytfController extends Controller
                 'success' => false,
                 'message' => 'Validasi gagal',
                 'errors' => $e->errors(),
+                'data' => $postData,
+                'response' => $post_transfer ?? [],
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal menyimpan inventory transfer: ' . $e->getMessage(),
+                'data' => $postData,
+                'response' => $post_transfer ?? [],
             ], 500);
         }
     }
