@@ -136,9 +136,9 @@ class InventorytfController extends Controller
                 'DocDate'    => "2025/09/30",
                 'Comment'    => $validated['Comments'] ?? null,
                 'Ref2'       => $validated['Ref2'] ?? null,
-                'FromWhsCode' => $validated['FromWhsCode'],
-                'ToWhsCode'   => $validated['ToWhsCode'],
                 'Ext' => [
+                    'FromWhsCode' => $validated['FromWhsCode'],
+                    'ToWhsCode'   => $validated['ToWhsCode'],
                     "U_MEB_Default_Whse" => $validated['U_MEB_Default_Whse'] ?? null,
                     "U_MEB_Internal_No" => $validated['U_MEB_Internal_No'] ?? null,
                     "U_SI_No_Surat_Jalan" => $validated['U_SI_No_Surat_Jalan'] ?? null,
