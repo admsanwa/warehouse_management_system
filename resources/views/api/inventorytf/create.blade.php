@@ -146,7 +146,7 @@
                                     <input type="text" name="U_MEB_ProjectDetail" id="U_MEB_ProjectDetail"
                                         value="" class="form-control mt-2" readonly>
                                 </div>
-                                <label class="col-sm-4 col-form-label">No Internal Production :</label>
+                                <label class="col-sm-4 col-form-label">Internal No :</label>
                                 <div class="col-sm-8 mb-2">
                                     <input type="text" name="U_MEB_Internal_No" id="U_MEB_Internal_No" value=""
                                         class="form-control mt-2" placeholder="Masukan Nomor Internal Production">
