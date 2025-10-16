@@ -172,6 +172,9 @@ class InventorytfController extends Controller
                     'ToWhsCode'    =>  $validated['ToWhsCode'],
                     'OcrCode'    => $validated['U_MEB_DIST_RULE'] ?? null,
                     'ProjectCode'    => $validated['U_MEB_Project_Code'],
+                    "Ext" => [
+                        "U_MEB_DIST_RULE" => $validated['U_MEB_Dist_Rule'] ?? null,
+                    ]
                 ];
             }
 
