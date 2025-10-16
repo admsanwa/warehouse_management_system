@@ -170,10 +170,11 @@ class InventorytfController extends Controller
                     'Quantity'    => $entryQty,
                     'FromWhsCode'  => $validated['FromWhsCode'],
                     'ToWhsCode'    =>  $validated['ToWhsCode'],
-                    'OcrCode'    => $validated['U_MEB_DIST_RULE'] ?? null,
-                    'ProjectCode'    => $validated['U_MEB_Project_Code'],
-                    "U_MEB_DIST_RULE" => $validated['U_MEB_Dist_Rule'] ?? null,
-                    "Ext" => []
+                    // "U_MEB_DIST_RULE" => $validated['U_MEB_Dist_Rule'] ?? null,
+                    "Ext" => [
+                        'OcrCode'    => $validated['U_MEB_DIST_RULE'] ?? null,
+                        'ProjectCode'    => $validated['U_MEB_Project_Code'],
+                    ]
                 ];
             }
 
