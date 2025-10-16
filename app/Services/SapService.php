@@ -15,8 +15,26 @@ class SapService
         $this->apiKey  = env('SAP_API_KEY');
     }
 
+    protected function formatGetParams($params)
+    {
+        if (!is_array($params)) {
+            return $params;
+        }
+
+        return collect($params)->map(function ($value) {
+            // hanya untuk string yang tidak kosong
+            if (is_string($value) && trim($value) !== '') {
+                // hindari double asterisk
+                $value = trim($value, '*');
+                return "*{$value}*";
+            }
+            return $value;
+        })->toArray();
+    }
+
     public function getPurchaseOrders($param)
     {
+        $param = $this->formatGetParams($param);
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
@@ -31,6 +49,7 @@ class SapService
 
     public function getStockItems($param)
     {
+        $param = $this->formatGetParams($param);
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
@@ -44,6 +63,7 @@ class SapService
 
     public function getProductionOrders($param)
     {
+        $param = $this->formatGetParams($param);
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
@@ -58,6 +78,7 @@ class SapService
 
     public function getSeries($param)
     {
+        $param = $this->formatGetParams($param);
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
@@ -72,6 +93,7 @@ class SapService
 
     public function getWarehouses($param)
     {
+        $param = $this->formatGetParams($param);
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
@@ -86,6 +108,7 @@ class SapService
 
     public function getCostCenters($param)
     {
+        $param = $this->formatGetParams($param);
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
@@ -100,6 +123,7 @@ class SapService
 
     public function getItems($param)
     {
+        $param = $this->formatGetParams($param);
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
@@ -114,6 +138,7 @@ class SapService
 
     public function getProjects($param)
     {
+        $param = $this->formatGetParams($param);
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
@@ -128,6 +153,7 @@ class SapService
 
     public function getInventoryTransfers($param)
     {
+        $param = $this->formatGetParams($param);
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
@@ -142,6 +168,7 @@ class SapService
 
     public function getSalesOrders($param)
     {
+        $param = $this->formatGetParams($param);
         $response = Http::withHeaders([
             'Accept'     => 'application/json',
             'X-API-Key'  => $this->apiKey,
