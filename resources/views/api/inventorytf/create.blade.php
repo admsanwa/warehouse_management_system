@@ -544,6 +544,7 @@
                     }
                 });
             }
+            setDefaultDistRules("#U_MEB_Dist_Rule", "BK-FIN")
             // $('#SlpCode').select2();
         });
 
