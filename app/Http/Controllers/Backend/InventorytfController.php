@@ -108,6 +108,7 @@ class InventorytfController extends Controller
                 'ToWhsCode' => 'required|string|different:FromWhsCode',
                 'U_MEB_Default_Whse' => 'nullable|string',
                 'U_SI_No_Surat_Jalan' => 'nullable|string',
+                'SlpCode' => 'nullable|string',
                 'Ref2' => 'nullable|string',
                 'U_MEB_NO_IO' => 'nullable|string',
                 'U_MEB_No_SO' => 'nullable|string',
@@ -137,6 +138,7 @@ class InventorytfController extends Controller
                 'Comment'    => $validated['Comments'] ?? null,
                 'Ref2'       => $validated['Ref2'] ?? null,
                 'Ext' => [
+                    "SalesPersonCode" => $validated["SlpCode"],
                     'FromWhsCode' => $validated['FromWhsCode'],
                     'ToWhsCode'   => $validated['ToWhsCode'],
                     "U_MEB_Default_Whse" => $validated['U_MEB_Default_Whse'] ?? null,
@@ -170,17 +172,16 @@ class InventorytfController extends Controller
                     'Quantity'    => $entryQty,
                     'FromWhsCode'  => $validated['FromWhsCode'],
                     'ToWhsCode'    =>  $validated['ToWhsCode'],
-                    // "U_MEB_DIST_RULE" => $validated['U_MEB_Dist_Rule'] ?? null,
+                    'OcrCode'    => $validated['U_MEB_Dist_Rule'] ?? null,
+                    'ProjectCode'    => $validated['U_MEB_Project_Code'],
                     "Ext" => [
-                        'OcrCode'    => $validated['U_MEB_DIST_RULE'] ?? null,
-                        'ProjectCode'    => $validated['U_MEB_Project_Code'],
+                        "U_MEB_DIST_RULE" => $validated['U_MEB_Dist_Rule'] ?? null,
                     ]
                 ];
             }
 
             $postData['Lines'] = $lines;
 
-            // 4️⃣ Kirim ke SAP
             $post_transfer = $this->sap->postInventoryTransfer($postData);
 
             if (empty($post_transfer['success'])) {

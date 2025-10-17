@@ -589,7 +589,7 @@
                 return;
             }
             const lines = selectedPo['Lines'] || [];
-            console.log("🔍 Semua ItemCode dalam PO:", lines.map(l => l.ItemCode));
+        console.log("🔍 Semua ItemCode dalam PO:", lines.map(l => l.ItemCode));
             let matchingLines = lines.filter(item =>
                 item.ItemCode === itemCode && item.IssuedQty < item.PlannedQty
             );

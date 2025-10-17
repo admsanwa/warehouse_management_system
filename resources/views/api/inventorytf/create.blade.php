@@ -71,6 +71,18 @@
                         </div>
                         <div class="card-body">
                             <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">No Production Order :</label>
+                                <div class="col-sm-8">
+                                    <select name="U_MEB_No_Prod_Order" id="U_MEB_No_Prod_Order" class="form-control"
+                                        required>
+                                        <option value="">Select No Production Order</option>
+                                    </select>
+                                </div>
+                                <label class="col-sm-4 col-form-label">No Produksi :</label>
+                                <div class="col-sm-8 mb-3">
+                                    <input type="text" name="U_SI_No_Produksi" id="U_SI_No_Produksi" value=""
+                                        class="form-control mt-2" placeholder="Input No Produksi" required>
+                                </div>
                                 <label class="col-sm-4 col-form-label">Nomor PO :</label>
                                 <div class="col-sm-8 row">
                                     <div class="col-lg-4 col-sm-12 mb-2">
@@ -92,16 +104,6 @@
                                     <input type="text" name="cardName" id="cardName" value=""
                                         class="form-control mt-2" readonly required>
                                 </div>
-                                {{-- <label class="col-sm-4 col-form-label">Kode Vendor :</label>
-                                <div class="col-sm-8 mb-2">
-                                    <input type="text" name="cardCode" id="cardCode" value=""
-                                        class="form-control mt-2" readonly required>
-                                </div> --}}
-                                {{-- <label class="col-sm-4 col-form-label">Posting Date :</label>
-                                <div class="col-sm-8 mb-2">
-                                    <input type="date" name="PostingDate" id="PostingDate" value=""
-                                        class="form-control mt-2" readonly required>
-                                </div> --}}
                                 <label class="col-sm-4 col-form-label mb-2">From Warehouse :</label>
                                 <div class="col-sm-8">
                                     <select name="FromWhsCode" id="FromWhsCode" class="form-control mt-2" required>
@@ -181,21 +183,10 @@
                                     </select>
                                 </div>
                                 <label class="col-sm-4 col-form-label">OCR / Distribution Rule :</label>
-                                <div class="col-sm-8">
+                                <div class="col-sm-8 mb-3">
                                     <select name="U_MEB_Dist_Rule" id="U_MEB_Dist_Rule" class="form-control mt-2"
                                         required>
                                     </select>
-                                </div>
-                                <label class="col-sm-4 col-form-label">No Produksi :</label>
-                                <div class="col-sm-8">
-                                    <input type="text" name="U_SI_No_Produksi" id="U_SI_No_Produksi" value=""
-                                        class="form-control mt-2" placeholder="Input No Produksi" required>
-                                </div>
-                                <label class="col-sm-4 col-form-label">No Production Order :</label>
-                                <div class="col-sm-8">
-                                    <input type="text" name="U_MEB_No_Prod_Order" id="U_MEB_No_Prod_Order"
-                                        value="" placeholder="Input No Production Order" class="form-control mt-2"
-                                        required>
                                 </div>
                                 <label class="col-sm-4 col-form-label">Hari & Tanggal Kirim :</label>
                                 <div class="col-sm-8">
@@ -217,11 +208,87 @@
                                 <label class="col-sm-4 col-form-label">Sales Employee :</label>
                                 <div class="col-sm-8">
                                     <select name="SlpCode" id="SlpCode" class="form-control mt-2">
-                                        <option value="">Select Sales Employee</option>
-                                        {{-- @foreach ($buyers as $key => $buyer)
-                                            <option value="{{ $buyer->code }}">{{ $buyer->code }} - {{ $buyer->name }}
-                                            </option>
-                                        @endforeach --}}
+                                        <option value="" selected disabled>Select Sales Employee</option>
+                                        <option value="-1">-No Sales Employee-</option>
+                                        <option value="61">POBK- Atika Damayanti</option>
+                                        <option value="55">POBK-Adam Bahfen</option>
+                                        <option value="75">POBK-Alfadonisio Rickyelfino Z</option>
+                                        <option value="21">POBK-Dwi Ratnaningsih</option>
+                                        <option value="32">POBK-Harry</option>
+                                        <option value="38">POBK-Ilham Septian</option>
+                                        <option value="4">POBK-Indra Ricky</option>
+                                        <option value="54">POBK-Irnia Setiawan</option>
+                                        <option value="6">POBK-Johan</option>
+                                        <option value="5">POBK-Nico Widjaja</option>
+                                        <option value="17">POBK-Nita</option>
+                                        <option value="59">POBK-Pratiwi Anggar Kasih</option>
+                                        <option value="28">POBK-Ranti</option>
+                                        <option value="46">POBK-Risyana</option>
+                                        <option value="19">POBK-Suparyono</option>
+                                        <option value="23">POBK-Swara Monika</option>
+                                        <option value="39">POBK-Tegar Triatmaja</option>
+                                        <option value="14">POJK-Office</option>
+                                        <option value="7">POSB-Feronica</option>
+                                        <option value="35">POSB-Lieany</option>
+                                        <option value="44">POSB-Office</option>
+                                        <option value="18">SOJK- Bendy</option>
+                                        <option value="12">SOJK-Ahin</option>
+                                        <option value="43">SOJK-Aji Hidayat</option>
+                                        <option value="27">SOJK-Aji Putra Salim</option>
+                                        <option value="70">SOJK-Ali Sunandar</option>
+                                        <option value="50">SOJK-Anna</option>
+                                        <option value="33">SOJK-Anto</option>
+                                        <option value="56">SOJK-Arief Teguh</option>
+                                        <option value="69">SOJK-Asdi Astoba</option>
+                                        <option value="51">SOJK-Atikah</option>
+                                        <option value="60">SOJK-Bendri</option>
+                                        <option value="53">SOJK-Benny Tobing</option>
+                                        <option value="52">SOJK-Chika</option>
+                                        <option value="47">SOJK-Dani Roberto Ginting</option>
+                                        <option value="63">SOJK-Dedy Riyanto</option>
+                                        <option value="71">SOJK-Doddy Arvian</option>
+                                        <option value="68">SOJK-Eka B Pertiwi</option>
+                                        <option value="77">SOJK-Elyzabet Halim (Office)</option>
+                                        <option value="73">SOJK-Indra Wahyu Saputra</option>
+                                        <option value="79">SOJK-Khalid (Office)</option>
+                                        <option value="58">SOJK-Lim Koman</option>
+                                        <option value="48">SOJK-Meliana</option>
+                                        <option value="36">SOJK-Michael Tanuwijaya</option>
+                                        <option value="40">SOJK-Mohamad Permadi Sudjana</option>
+                                        <option value="66">SOJK-Monica Tiominar</option>
+                                        <option value="67">SOJK-Muh Saleh Kurdin</option>
+                                        <option value="65">SOJK-Muhamad Saman</option>
+                                        <option value="29">SOJK-Muhammad Farid Fajar</option>
+                                        <option value="64">SOJK-Nico Agustiawan</option>
+                                        <option value="13">SOJK-Office</option>
+                                        <option value="57">SOJK-Prio Utomo</option>
+                                        <option value="42">SOJK-Rudy A Budiman</option>
+                                        <option value="25">SOJK-Santy Hartoyo</option>
+                                        <option value="10">SOJK-Slamet Supriyadi</option>
+                                        <option value="41">SOJK-Stanley Fujiarto</option>
+                                        <option value="78">SOJK-Stefanie</option>
+                                        <option value="76">SOJK-Stievano Timoty Fredrik</option>
+                                        <option value="1">SOJK-Suhardi</option>
+                                        <option value="37">SOJK-Toni Wijaya</option>
+                                        <option value="74">SOJK-Wigrha Rizky</option>
+                                        <option value="11">SOJK-Wisnu</option>
+                                        <option value="34">SOJK-Wisnu Aji Baswara</option>
+                                        <option value="45">SOJK-Yoga Wirawan</option>
+                                        <option value="22">SOJK-Yudha Eka Mayang</option>
+                                        <option value="72">SOSB-Dedy Riyanto</option>
+                                        <option value="20">SOSB-Huda</option>
+                                        <option value="26">SOSB-Joseph</option>
+                                        <option value="49">SOSB-Marianus</option>
+                                        <option value="62">SOSB-Misbahul Munir</option>
+                                        <option value="15">SOSB-Nensey</option>
+                                        <option value="9">SOSB-Office</option>
+                                        <option value="8">SOSB-Prastiono</option>
+                                        <option value="31">SOSB-Rubben</option>
+                                        <option value="16">SOSB-Setiawan</option>
+                                        <option value="30">SOSB-Willy</option>
+                                        <option value="2">SOSB-Windy</option>
+                                        <option value="24">SOSB-Yusuf</option>
+                                        <option value="3">SOSM-Indra Djaya</option>
                                     </select>
                                 </div>
                                 <label class="col-sm-4 col-form-label">Journal Remarks :</label>
@@ -248,9 +315,9 @@
                                         <th>Item Desc</th>
                                         <th>From WH</th>
                                         <th>To WH</th>
+                                        <th>Plan Qty</th>
                                         <th>Qty</th>
                                         <th>Uom</th>
-                                        {{-- <th>Jumlah Kemasan</th> --}}
                                         <th>Delete</th>
                                     </tr>
                                 </thead>
@@ -295,11 +362,12 @@
     <script>
         let tempPoData = [];
         let selectedPo = [];
+        let tempProdData = [];
+        let selectedProd = [];
         window.addEventListener("load", function() {
             formatInputDecimals(document.getElementById("on_hand"));
             const poSelect = $("#no_po");
 
-            const tBody = document.getElementById('itemRows');
             const docNum = poSelect.data("docnum");
             const docEntry = poSelect.data("docentry");
 
@@ -443,6 +511,94 @@
                     }
                 }
             });
+
+            const prodSelect = $("#U_MEB_No_Prod_Order");
+
+            const tBody = document.getElementById('itemRows');
+            const prodNum = prodSelect.data("docnum");
+            const prodEntry = prodSelect.data("docentry");
+            prodSelect.on("change", function(e) {
+                clearProdData();
+                const selectedData = $(this).select2('data')[0];
+                // console.log(selectedData);
+                tBody.innerHTML = "";
+                if (!selectedData) {
+                    return;
+                }
+                const selectedDocEntry = selectedData.docentry;
+                const selectedDocNum = selectedData.docnum;
+                const found = tempProdData.find(item => item.DocNum == selectedDocNum && item.DocEntry ==
+                    selectedDocEntry);
+                selectedProd = found;
+                if (!selectedProd) {
+                    console.log("❌ Data tidak ditemukan untuk DocNum:", selectedDocNum);
+                    clearProdData();
+                    return;
+                }
+                console.log("Prod dipilih:", selectedProd);
+                // appendProdData(found);
+                loadScannedBarcodes();
+            });
+
+            prodSelect.select2({
+                placeholder: "Pilih No. Production Number",
+                allowClear: true,
+                width: "100%",
+                minimumInputLength: 3,
+                language: {
+                    inputTooShort: function() {
+                        return "Ketik 3 karakter atau lebih";
+                    },
+                    noResults: () => "Tidak ada data ditemukan",
+                    searching: () => "Mohon ditunggu, sedang mencari...",
+                },
+                ajax: {
+                    url: "/productionOrderSearch",
+                    dataType: "json",
+                    delay: 600,
+                    data: function(params) {
+                        const item_code = document.getElementById("item_code").value;
+
+                        // const seriesData = $("#seriesSelect").select2('data');
+                        // const series = seriesData.length > 0 ? seriesData[0].id : null;
+
+                        if (docNum && docEntry) {
+                            return {
+                                q: docNum,
+                                docEntry: docEntry,
+                                // series: series,
+                                limit: 1,
+                            };
+                        }
+                        return {
+                            q: params.term,
+                            // series: series,
+                            limit: 5,
+                        };
+                    },
+                    processResults: function(data) {
+                        tempProdData = data.prods || [];
+                        // console.log(tempProdData);
+                        return {
+                            results: (data.results || []).map(item => ({
+                                id: item.docnum,
+                                text: item.text,
+                                docentry: item.id,
+                                docnum: item.docnum,
+                            }))
+                        };
+                    },
+                    cache: true
+                }
+            });
+
+            prodSelect.on("select2:open", function() {
+                let searchField = document.querySelector(".select2-container .select2-search__field");
+                if (searchField) {
+                    searchField.placeholder = "Ketik disini untuk cari production order";
+                }
+            });
+
             const prefix = {!! json_encode(Auth::user()->default_series_prefix) !!};
             const defaultWhs = {!! json_encode(Auth::user()->warehouse_access) !!};
             setDefaultSeries("#seriesSelect", "22", prefix);
@@ -700,7 +856,7 @@
 
 
                         hideLoadingOverlay();
-                        const loadScan = loadScannedBarcodes(data.warehouseStock);
+                        const loadScan = loadScannedBarcodes();
                         if (loadScan === false) {
                             return;
                         }
@@ -737,7 +893,7 @@
             document.getElementById("U_MEB_No_SO").value = data.U_MEB_No_SO;
             document.getElementById("U_MEB_NO_IO").value = data.U_MEB_NO_IO;
             document.getElementById("U_MEB_ProjectDetail").value = data.CntctCode;
-            document.getElementById("remarks").value = "Based On Purchase Order " + data.DocNum;
+            // document.getElementById("remarks").value = "Based On Purchase Order " + data.DocNum;
         }
 
         function cleanDataOnPo() {
@@ -752,29 +908,54 @@
             return;
         }
 
-        function loadScannedBarcodes(item) {
+        function loadScannedBarcodes() {
             const fileInput = document.querySelector('#fileInput input[type="file"]');
             if (fileInput) fileInput.value = "";
 
             const tBody = document.getElementById("itemRows");
-            const itemCode = document.getElementById("item_code").value;
+            const itemCode = document.getElementById("item_code").value?.trim();
 
             if (!itemCode) {
                 showToast("⚠️ Harap scan barcode terlebih dahulu!", "error");
                 return false;
             }
 
-            const fromWhsCode = document.getElementById('FromWhsCode').value;
-            const toWhsCode = document.getElementById('ToWhsCode').value;
+            // Ambil data Production Order
+            if (!selectedProd || !Array.isArray(selectedProd.Lines) || selectedProd.Lines.length === 0) {
+                showToast("⚠️ Harap pilih Production Order terlebih dahulu!", "error");
+                document.getElementById("item_code").value = "";
+                document.getElementById("item_desc").value = "";
+                document.getElementById("onhand").value = "";
+                return false;
+            }
 
+            // Cari line item yang sesuai
+            const lines = selectedProd.Lines;
+            const matchingLines = lines.filter(line =>
+                line.ItemCode === itemCode
+            );
+
+            // Jika tidak ditemukan item yang valid
+            if (matchingLines.length === 0) {
+                showToast(`${itemCode} tidak ada di production order.`, "error");
+                return false;
+            }
+
+            const item = matchingLines[0];
+
+            // Cek apakah item sudah pernah ditambahkan
             const existing = Array.from(tBody.querySelectorAll('input[name^="stocks"][name$="[ItemCode]"]'))
                 .some(input => input.value === item.ItemCode);
-            if (existing === true) {
+
+            if (existing) {
                 showToast(`❌ Barcode ${item.ItemCode} sudah ditambahkan sebelumnya.`, "error");
                 return false;
             }
 
+            const fromWhsCode = document.getElementById("FromWhsCode").value || "";
+            const toWhsCode = document.getElementById("ToWhsCode").value || "";
             const idx = tBody.rows.length;
+
             const row = `
                 <tr>
                     <td>${idx + 1}</td>
@@ -782,17 +963,18 @@
                         ${item.ItemCode}
                         <input type="hidden" name="stocks[${idx}][ItemCode]" value="${item.ItemCode}">
                     </td>
-                    <td>${item.ItemName}</td>
+                    <td>${item.ItemName || ""}</td>
                     <td>${fromWhsCode}</td>
                     <td>${toWhsCode}</td>
+                    <td>${formatDecimalsSAP(item.PlannedQty)}</td>
                     <td>
                         <input type="hidden" name="stocks[${idx}][FromWhsCode]" value="${fromWhsCode}">
                         <input type="hidden" name="stocks[${idx}][ToWhsCode]" value="${toWhsCode}">
                         <input type="text" name="stocks[${idx}][qty]" class="form-control format-sap" step="0.01" style="min-width:80px !important;" value="0">
                     </td>
                     <td>
-                        ${item.UnitMsr ?? ""}
-                        <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${item.UnitMsr ?? ""}">
+                        ${item.InvntryUoM ?? ""}
+                        <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${item.InvntryUoM ?? ""}">
                     </td>
                     <td>
                         <button type="button" onclick="deleteItem(this)" class="btn btn-danger btn-sm">
@@ -806,11 +988,15 @@
             reorderTableRows();
 
             const newInput = tBody.querySelector(`input[name="stocks[${idx}][qty]"]`);
-            if (newInput) {
-                formatInputDecimals(newInput);
-            }
+            if (newInput) formatInputDecimals(newInput);
         }
 
+        function clearProdData() {
+            const tBody = document.getElementById("itemRows");
+            if (!tBody) return;
+
+            tBody.innerHTML = "";
+        }
 
         function deleteItem(button) {
             if (!confirm("Yakin ingin menghapus item ini?")) return;
