@@ -180,10 +180,11 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <label class="col-sm-4 col-form-label">Distribution Rule :</label>
+                                <label class="col-sm-4 col-form-label">OCR / Distribution Rule :</label>
                                 <div class="col-sm-8">
-                                    <input type="text" name="U_MEB_Dist_Rule" id="U_MEB_Dist_Rule" value="BK-FIN"
-                                        class="form-control mt-2" readonly required>
+                                    <select name="U_MEB_Dist_Rule" id="U_MEB_Dist_Rule" class="form-control mt-2"
+                                        required>
+                                    </select>
                                 </div>
                                 <label class="col-sm-4 col-form-label">No Produksi :</label>
                                 <div class="col-sm-8">
@@ -502,6 +503,47 @@
                 // Update warehouse default
                 $("#U_MEB_Default_Whse").val(toWhsCode);
             });
+
+            const ocrSelect = $("#U_MEB_Dist_Rule");
+            if (ocrSelect.length) {
+                ocrSelect.select2({
+                    placeholder: "Pilih Ocr Code",
+                    allowClear: true,
+                    width: "100%",
+                    language: {
+                        inputTooShort: function() {
+                            return "Ketik untuk mencari...";
+                        },
+                        noResults: function() {
+                            return "Tidak ada data ditemukan";
+                        },
+                        searching: function() {
+                            return "Sedang mencari...";
+                        }
+                    },
+                    ajax: {
+                        url: "/costCenterSearch",
+                        dataType: "json",
+                        delay: 250,
+                        data: function(params) {
+                            let searchData = {
+                                q: params.term,
+                                limit: 10,
+                            }
+                            return searchData;
+                        },
+                        processResults: function(data) {
+                            console.log("Response dari server:", data); // cek di console
+                            return {
+                                results: (data.results || []).map(item => ({
+                                    id: item.id,
+                                    text: item.text
+                                }))
+                            };
+                        }
+                    }
+                });
+            }
             // $('#SlpCode').select2();
         });
 
