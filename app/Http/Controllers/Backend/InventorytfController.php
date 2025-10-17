@@ -164,7 +164,7 @@ class InventorytfController extends Controller
 
             $lines = [];
             foreach ($validated['stocks'] as $row) {
-                $entryQty = (float) str_replace(',', '.', str_replace('.', '', $row['qty']));                // Qty baru yang diinput
+                $entryQty = (float) str_replace(',', '.', str_replace('.', '', $row['qty']));
                 $lines[] = [
                     'ItemCode'    => $row['ItemCode'] ?? null,
                     'Quantity'    => $entryQty,
@@ -199,14 +199,14 @@ class InventorytfController extends Controller
                 'success' => false,
                 'message' => 'Validasi gagal',
                 'errors' => $e->errors(),
-                'data' => $postData,
+                'data' => $postData ?? '',
                 'response' => $post_transfer ?? [],
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal menyimpan inventory transfer: ' . $e->getMessage(),
-                'data' => $postData,
+                'data' => $postData ?? '',
                 'response' => $post_transfer ?? [],
             ], 500);
         }
