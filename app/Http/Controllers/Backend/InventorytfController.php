@@ -127,7 +127,7 @@ class InventorytfController extends Controller
                 'Comments' => 'nullable|string',
                 'stocks' => 'required|array|min:1',
                 'stocks.*.ItemCode' => 'required|string',
-                'stocks.*.qty' => 'required|numeric|min:0.01',
+                'stocks.*.qty' => 'required|string',
                 'stocks.*.UnitMsr' => 'nullable|string',
             ]);
 
