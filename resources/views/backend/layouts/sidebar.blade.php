@@ -69,14 +69,13 @@
         {{-- Dashboard --}}
         @if (
             $authDept == 'IT' ||
-            $authDept == 'Production and Warehouse' && $authLevel == 'Manager' ||
-            $authDept == 'Production and Warehouse' && $authLevel == 'Supervisor' ||
-            $authDept == 'PPIC' ||
-            $authDept == 'Purchasing' ||
-            $authDept == 'Production' ||
-            $authDept == 'Quality Control' && $authLevel != 'Operator' && $authLevel != 'Magang' ||
-            $authDept == 'Procurement, Installation and Delivery')
-
+                ($authDept == 'Production and Warehouse' && $authLevel == 'Manager') ||
+                ($authDept == 'Production and Warehouse' && $authLevel == 'Supervisor') ||
+                $authDept == 'PPIC' ||
+                $authDept == 'Purchasing' ||
+                $authDept == 'Production' ||
+                ($authDept == 'Quality Control' && $authLevel != 'Operator' && $authLevel != 'Magang') ||
+                $authDept == 'Procurement, Installation and Delivery')
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                     data-accordion="false">
@@ -106,12 +105,12 @@
         {{-- Items --}}
         @if (
             $authDept == 'IT' ||
-            $authDept == 'Production and Warehouse' ||
-            $authDept == 'Fabrication' ||
-            $authDept == 'PPIC' ||
-            $authDept == 'Purchasing' ||
-            ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager') || 
-            $authDept == 'Quality Control' && $authLevel == 'Manager')
+                $authDept == 'Production and Warehouse' ||
+                $authDept == 'Fabrication' ||
+                $authDept == 'PPIC' ||
+                $authDept == 'Purchasing' ||
+                ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager') ||
+                ($authDept == 'Quality Control' && $authLevel == 'Manager'))
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                     data-accordion="false">
@@ -136,12 +135,12 @@
                             @endif
                             @if (
                                 $authDept == 'IT' ||
-                                $authDept == 'PPIC' ||
-                                $authDept == 'Purchasing' ||
-                                $authDept == 'Production and Warehouse' ||
-                                $authDept == 'Fabrication' ||
-                                $authDept == 'Procurement, Installation and Delivery' || 
-                                $authDept == 'Quality Control' && $authLevel == 'Manager')
+                                    $authDept == 'PPIC' ||
+                                    $authDept == 'Purchasing' ||
+                                    $authDept == 'Production and Warehouse' ||
+                                    $authDept == 'Fabrication' ||
+                                    $authDept == 'Procurement, Installation and Delivery' ||
+                                    ($authDept == 'Quality Control' && $authLevel == 'Manager'))
                                 <li class="nav-item">
                                     <a href="{{ url('admin/items/list') }}"
                                         class="nav-link @if (Request::is('admin/items/list')) active @endif">
@@ -151,7 +150,7 @@
                             @endif
                             @if (
                                 $authDept == 'IT' ||
-                                ($authDept == 'Production and Warehouse' && $authLevel != 'Manager' && $authLevel != 'Supervisor'))
+                                    ($authDept == 'Production and Warehouse' && $authLevel != 'Manager' && $authLevel != 'Supervisor'))
                                 <li class="nav-item">
                                     <a href="{{ url('admin/items/barcode') }}"
                                         class="nav-link @if (Request::is('admin/items/barcode')) active @endif">
@@ -208,14 +207,14 @@
         {{-- Production --}}
         @if (
             $authDept == 'IT' ||
-            $authDept == 'Production and Warehouse' && $authLevel == 'Manager' ||
-            $authDept == 'Production and Warehouse' && $authLevel == 'Supervisor' ||
-            $authDept == 'Fabrication' ||
-            $authDept == 'PPIC' ||
-            $authDept == 'Purchasing' ||
-            ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager') ||
-            $authDept == 'Production' || 
-            $authDept == 'Quality Control' && $authLevel == 'Manager')
+                ($authDept == 'Production and Warehouse' && $authLevel == 'Manager') ||
+                ($authDept == 'Production and Warehouse' && $authLevel == 'Supervisor') ||
+                $authDept == 'Fabrication' ||
+                $authDept == 'PPIC' ||
+                $authDept == 'Purchasing' ||
+                ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager') ||
+                $authDept == 'Production' ||
+                ($authDept == 'Quality Control' && $authLevel == 'Manager'))
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                     data-accordion="false">
@@ -236,10 +235,9 @@
                             id="prodSubMenu">
                             @if (
                                 $authDept == 'PPIC' ||
-                                $authDept == 'IT' ||
-                                $authDept == 'Production' ||
-                                ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager'))
-
+                                    $authDept == 'IT' ||
+                                    $authDept == 'Production' ||
+                                    ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager'))
                                 <li class="nav-item">
                                     <a href="{{ url('admin/production/po') }}"
                                         class="nav-link @if (Request::is('admin/production/po')) active @endif">
@@ -267,8 +265,11 @@
                                     </a>
                                 </li>
                             @endif
-                            @if ($authDept == 'IT' || $authDept == 'PPIC' || $authDept == 'Fabrication' || $authDept == 'Production and Warehouse' && 
-                            $authLevel == 'Supervisor')
+                            @if (
+                                $authDept == 'IT' ||
+                                    $authDept == 'PPIC' ||
+                                    $authDept == 'Fabrication' ||
+                                    ($authDept == 'Production and Warehouse' && $authLevel == 'Supervisor'))
                                 <li class="nav-item">
                                     <a href="{{ url('admin/production/memo') }}"
                                         class="nav-link @if (Request::is('admin/production/memo')) active @endif">
@@ -282,8 +283,8 @@
                                     $authDept == 'Fabrication' ||
                                     $authDept == 'Procurement, Installation and Delivery' ||
                                     $authDept == 'Production' ||
-                                    $authDept == 'Production and Warehouse' && $authLevel == 'Manager' ||
-                                    $authDept == 'Quality Control' && $authLevel == 'Manager')
+                                    ($authDept == 'Production and Warehouse' && $authLevel == 'Manager') ||
+                                    ($authDept == 'Quality Control' && $authLevel == 'Manager'))
                                 <li class="nav-item">
                                     <a href="{{ url('admin/production/listmemo') }}"
                                         class="nav-link @if (Request::is('admin/production/listmemo')) active @endif">
@@ -308,7 +309,7 @@
         {{-- Stocks --}}
         @if (
             $authDept == 'IT' ||
-                $authDept == 'Production and Warehouse' && !$authLevel == 'Manager' ||
+                ($authDept == 'Production and Warehouse' && !$authLevel == 'Manager') ||
                 $authDept == 'PPIC' ||
                 ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager'))
             <nav class="mt-2">
@@ -331,11 +332,11 @@
 
         {{-- Inventory Tf --}}
         @if (
-            $authDept == 'Quality Control' && $authLevel != 'Operator' && $authLevel != 'Magang' ||
-            $authDept == 'IT' ||
-            $authDept == 'Production and Warehouse' ||
-            $authDept == 'Production' ||
-            $authDept == 'PPIC')
+            ($authDept == 'Quality Control' && $authLevel != 'Operator' && $authLevel != 'Magang') ||
+                $authDept == 'IT' ||
+                $authDept == 'Production and Warehouse' ||
+                $authDept == 'Production' ||
+                $authDept == 'PPIC')
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                     data-accordion="false">
@@ -353,8 +354,10 @@
                         <ul class="collapse list-unstyled {{ Request::is('admin/inventorytf/*') ? 'show' : '' }} itemSubMenu"
                             id="inventorytfSubMenu">
                             @if (
-                                $authDept == 'IT'
-                                )
+                                $authDept == 'IT' ||
+                                    ($authDept == 'Quality Control' && $authLevel == 'Staff') ||
+                                    $authDept == 'Production and Warehouse' ||
+                                    ($authDept == 'Production' && $authLevel == 'Staff'))
                                 <li class="nav-item">
                                     <a href="{{ url('admin/inventorytf/create') }}"
                                         class="nav-link @if (Request::is('admin/inventorytf/create')) active @endif">
@@ -362,7 +365,11 @@
                                     </a>
                                 </li>
                             @endif
-                            @if ($authDept == 'IT' || $authDept == 'Quality Control' || $authDept == 'Production and Warehouse' || $authDept == 'Production' || $authDept == 'PPIC')
+                            @if (
+                                $authDept == 'IT' ||
+                                    ($authDept == 'Quality Control' && $authLevel == 'Staff') ||
+                                    $authDept == 'Production and Warehouse' ||
+                                    ($authDept == 'Production' && $authLevel == 'Staff'))
                                 <li class="nav-item">
                                     <a href="{{ url('admin/inventorytf/list') }}"
                                         class="nav-link @if (Request::is('admin/inventorytf/list')) active @endif">
@@ -379,8 +386,8 @@
         {{-- Transactions --}}
         @if (
             $authDept == 'IT' ||
-            ($authDept == 'Production and Warehouse' && $authLevel != 'Manager' && $authLevel != 'Supervisor') ||
-            $authDept == 'Production')
+                ($authDept == 'Production and Warehouse' && $authLevel != 'Manager' && $authLevel != 'Supervisor') ||
+                $authDept == 'Production')
 
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
@@ -461,44 +468,44 @@
                         <ul class="collapse list-unstyled {{ Request::is('admin/listtransaction/*') ? 'show' : '' }} itemSubMenu"
                             id="listtransactionSubMenu">
                             @if ($authDept == 'Purchasing')
-                            <li class="nav-item">
-                                <a href="{{ url('admin/listtransaction/stockin') }}"
-                                    class="nav-link @if (Request::is('admin/listtransaction/stockin') || Request::is('admin/listtransaction/stockin/*')) active @endif">
-                                    <p>List Stock In</p>
-                                </a>
-                            </li>
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/listtransaction/stockin') }}"
+                                        class="nav-link @if (Request::is('admin/listtransaction/stockin') || Request::is('admin/listtransaction/stockin/*')) active @endif">
+                                        <p>List Stock In</p>
+                                    </a>
+                                </li>
                             @endif
                             @if ($authDept == 'IT')
-                            <li class="nav-item">
-                                <a href="{{ url('admin/listtransaction/stockout') }}"
-                                    class="nav-link @if (Request::is('admin/listtransaction/stockout/*') || Request::is('admin/listtransaction/stockout')) active @endif">
-                                    <p>List Stock Out</p>
-                                </a>
-                            </li>
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/listtransaction/stockout') }}"
+                                        class="nav-link @if (Request::is('admin/listtransaction/stockout/*') || Request::is('admin/listtransaction/stockout')) active @endif">
+                                        <p>List Stock Out</p>
+                                    </a>
+                                </li>
                             @endif
                             @if ($authDept == 'IT')
-                            <li class="nav-item">
-                                <a href="{{ url('admin/listtransaction/rfp') }}"
-                                    class="nav-link @if (Request::is(' admin/listtransaction/rfp')) active @endif">
-                                    <p>List Receipt From Prod</p>
-                                </a>
-                            </li>
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/listtransaction/rfp') }}"
+                                        class="nav-link @if (Request::is(' admin/listtransaction/rfp')) active @endif">
+                                        <p>List Receipt From Prod</p>
+                                    </a>
+                                </li>
                             @endif
                             @if ($authDept == 'IT')
-                            <li class="nav-item">
-                                <a href="{{ url('admin/listtransaction/goodissued') }}"
-                                    class="nav-link @if (Request::is(' admin/listtransaction/goodissued')) active @endif">
-                                    <p>List Good Issue</p>
-                                </a>
-                            </li>
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/listtransaction/goodissued') }}"
+                                        class="nav-link @if (Request::is(' admin/listtransaction/goodissued')) active @endif">
+                                        <p>List Good Issue</p>
+                                    </a>
+                                </li>
                             @endif
                             @if ($authDept == 'IT')
-                            <li class="nav-item">
-                                <a href="{{ url('admin/listtransaction/goodreceipt') }}"
-                                    class="nav-link @if (Request::is(' admin/listtransaction/goodreceipt')) active @endif">
-                                    <p>List Good Receipt</p>
-                                </a>
-                            </li>
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/listtransaction/goodreceipt') }}"
+                                        class="nav-link @if (Request::is(' admin/listtransaction/goodreceipt')) active @endif">
+                                        <p>List Good Receipt</p>
+                                    </a>
+                                </li>
                             @endif
                         </ul>
 
@@ -510,11 +517,11 @@
         {{-- Quality --}}
         @if (
             $authDept == 'Quality Control' ||
-            $authDept == 'IT' ||
-            ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager') ||
-            ($authDept == 'Production and Warehouse' && $authLevel != 'Operator' && $authLevel != 'Leader') ||
-            $authDept == 'Production' ||
-            $authDept == 'PPIC')
+                $authDept == 'IT' ||
+                ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager') ||
+                ($authDept == 'Production and Warehouse' && $authLevel != 'Operator' && $authLevel != 'Leader') ||
+                $authDept == 'Production' ||
+                $authDept == 'PPIC')
 
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
@@ -533,11 +540,11 @@
                             id="qualitySubMenu">
                             @if (
                                 $authDept == 'Procurement, Installation and Delivery' ||
-                                $authDept == 'IT' ||
-                                $authDept == 'Quality Control' ||
-                                $authDept == 'Production and Warehouse' ||
-                                $authDept == 'Production' ||
-                                $authDept == 'PPIC')
+                                    $authDept == 'IT' ||
+                                    $authDept == 'Quality Control' ||
+                                    $authDept == 'Production and Warehouse' ||
+                                    $authDept == 'Production' ||
+                                    $authDept == 'PPIC')
                                 <li class="nav-item">
                                     <a href="{{ url('admin/quality/list') }}"
                                         class="nav-link @if (Request::is('admin/quality/list')) active @endif">
@@ -545,7 +552,12 @@
                                     </a>
                                 </li>
                             @endif
-                            @if ($authDept == 'IT' || $authDept == 'Quality Control' || $authDept == 'Production and Warehouse' || $authDept == 'PPIC' || $authDept == 'Production' )
+                            @if (
+                                $authDept == 'IT' ||
+                                    $authDept == 'Quality Control' ||
+                                    $authDept == 'Production and Warehouse' ||
+                                    $authDept == 'PPIC' ||
+                                    $authDept == 'Production')
                                 <li class="nav-item">
                                     <a href="{{ url('admin/quality/history') }}"
                                         class="nav-link @if (Request::is('admin/quality/history')) active @endif">
@@ -562,12 +574,12 @@
         {{-- Reports --}}
         @if (
             $authDept == 'IT' ||
-            (($authDept == 'Production and Warehouse' && $authLevel == 'Manager') ||
-            ($authDept == 'Production and Warehouse' && $authLevel == 'Supervisor')) ||
-            $authDept == 'PPIC' ||
-            $authDept == 'Quality Control' ||
-            $authDept == 'Procurement, Installation and Delivery' ||
-            $authDept == 'Production')
+                (($authDept == 'Production and Warehouse' && $authLevel == 'Manager') ||
+                    ($authDept == 'Production and Warehouse' && $authLevel == 'Supervisor')) ||
+                $authDept == 'PPIC' ||
+                $authDept == 'Quality Control' ||
+                $authDept == 'Procurement, Installation and Delivery' ||
+                $authDept == 'Production')
 
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
@@ -588,13 +600,11 @@
                             id="reportSubMenu">
                             @if (
                                 $authDept == 'Quality Control' ||
-                                $authDept == 'IT' ||
-                                $authDept == 'Procurement, Installation and Delivery' ||
-                                $authDept == 'PPIC' ||
-                                $authDept == 'Production and Warehouse' || 
-                                $authDept == 'Production'
-                                )
-
+                                    $authDept == 'IT' ||
+                                    $authDept == 'Procurement, Installation and Delivery' ||
+                                    $authDept == 'PPIC' ||
+                                    $authDept == 'Production and Warehouse' ||
+                                    $authDept == 'Production')
                                 <li class="nav-item">
                                     <a href="{{ url('admin/reports/semifg') }}"
                                         class="nav-link @if (Request::is('admin/reports/semifg')) active @endif">
@@ -605,11 +615,11 @@
 
                             @if (
                                 $authDept == 'Quality Control' ||
-                                $authDept == 'Procurement, Installation and Delivery' ||
-                                $authDept == 'IT' ||
-                                $authDept == 'PPIC' ||
-                                $authDept == 'Production and Warehouse' || 
-                                $authDept == 'Production')
+                                    $authDept == 'Procurement, Installation and Delivery' ||
+                                    $authDept == 'IT' ||
+                                    $authDept == 'PPIC' ||
+                                    $authDept == 'Production and Warehouse' ||
+                                    $authDept == 'Production')
                                 <li class="nav-item">
                                     <a href="{{ url('admin/reports/finishgoods') }}"
                                         class="nav-link @if (Request::is('admin/reports/finishgoods')) active @endif">
@@ -626,12 +636,13 @@
         {{-- Delivery --}}
         @if (
             $authDept == 'IT' ||
-            (($authDept == 'Production and Warehouse' && $authLevel == 'Manager') ||
-            ($authDept == 'Production and Warehouse' && $authLevel == 'Supervisor')) ||
-            $authDept == 'Procurement, Installation and Delivery' ||
-            $authDept == 'PPIC' || $authDept == 'Production' || $authDept == 'Quality Control' 
-            )
-            
+                (($authDept == 'Production and Warehouse' && $authLevel == 'Manager') ||
+                    ($authDept == 'Production and Warehouse' && $authLevel == 'Supervisor')) ||
+                $authDept == 'Procurement, Installation and Delivery' ||
+                $authDept == 'PPIC' ||
+                $authDept == 'Production' ||
+                $authDept == 'Quality Control')
+
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                     data-accordion="false">
@@ -649,8 +660,13 @@
 
                         <ul class="collapse list-unstyled {{ Request::is('admin/delivery/*') ? 'show' : '' }} itemSubMenu"
                             id="deliverySubMenu">
-                            @if ($authDept == 'IT' || $authDept == 'Production and Warehouse' || $authLevel == 'Leader' || $authDept == 'PPIC' || $authDept == 'Quality Control' || 
-                            $authDept == 'Production')
+                            @if (
+                                $authDept == 'IT' ||
+                                    $authDept == 'Production and Warehouse' ||
+                                    $authLevel == 'Leader' ||
+                                    $authDept == 'PPIC' ||
+                                    $authDept == 'Quality Control' ||
+                                    $authDept == 'Production')
                                 <li class="nav-item">
                                     <a href="{{ url('admin/delivery/list') }}"
                                         class="nav-link @if (Request::is('admin/delivery/list')) active @endif">
@@ -658,16 +674,13 @@
                                     </a>
                                 </li>
                             @endif
-                            @if (
-                                $authDept == 'IT'
-                                || $authDept == 'Procurement, Installation and Delivery'
-                            )
-                            <li class="nav-item">
-                                <a href="{{ url('admin/delivery/history') }}"
-                                    class="nav-link @if (Request::is('admin/delivery/history')) active @endif">
-                                    <p>History Delivery</p>
-                                </a>
-                            </li>
+                            @if ($authDept == 'IT' || $authDept == 'Procurement, Installation and Delivery')
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/delivery/history') }}"
+                                        class="nav-link @if (Request::is('admin/delivery/history')) active @endif">
+                                        <p>History Delivery</p>
+                                    </a>
+                                </li>
                             @endif
                         </ul>
 
