@@ -152,18 +152,18 @@
                                                         placeholder="Masukkan Uom" readonly>
                                                 </div>
 
-                                                <!-- Qty -->
-                                                <div class="form-group col-md-2">
-                                                    <label>Qty</label>
-                                                    <input type="number" name="qty[]" class="form-control"
-                                                        placeholder="Masukkan Qty">
-                                                </div>
-
                                                 <!-- UOM -->
                                                 <div class="form-group col-md-2">
                                                     <label>Uom</label>
                                                     <input type="text" name="uom[]" class="form-control"
                                                         placeholder="Masukkan Uom" readonly>
+                                                </div>
+
+                                                <!-- Qty -->
+                                                <div class="form-group col-md-2">
+                                                    <label>Qty</label>
+                                                    <input type="number" name="qty[]" class="form-control"
+                                                        placeholder="Masukkan Qty">
                                                 </div>
 
                                                 <!-- Keterangan -->
@@ -185,7 +185,6 @@
                                             </div>
                                         </div>
                                     </template>
-
                                 </div>
                                 <div class="card-footer">
                                     <button type="submit" class="btn btn-primary"><i
