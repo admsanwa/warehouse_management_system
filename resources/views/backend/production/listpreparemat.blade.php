@@ -44,7 +44,7 @@
                                             <label for="">Series :</label>
                                             <select name="series" id="series" class="form-control">
                                                 <option value="">Select Series</option>
-                                                @foreach($seriesList as $series)
+                                                @foreach ($seriesList as $series)
                                                     <option value="{{ $series->series }}"
                                                         {{ $series->series == $currentSeries ? 'selected' : '' }}>
                                                         {{ $series->series }}
@@ -56,8 +56,9 @@
                                             <label for="">Status</label>
                                             <select name="status" id="status" class="form-control">
                                                 <option value="">Select Status</option>
-                                                <option value="0" @selected(Request::get('status') === "0")>Prepare Material Done</option>
-                                                <option value="1" @selected(Request::get('status') === "1")>Transfer Done</option>
+                                                <option value="0" @selected(Request::get('status') === '0')>Prepare Material Done
+                                                </option>
+                                                <option value="1" @selected(Request::get('status') === '1')>Transfer Done</option>
                                             </select>
                                         </div>
                                         <div class="form-group col-md-3">
@@ -92,23 +93,25 @@
                                         </thead>
                                         @forelse ($getRecord as $preparemat)
                                             <tbody>
-                                                <tr class="{{ $preparemat->status != 1 ? 'table-primary' : '' }}">
+                                                <tr class="{{ $preparemat->status == 0 ? 'table-primary' : '' }}">
                                                     <td>
-                                                        @if ($preparemat->status != 1)
+                                                        @if ($preparemat->status == 0)
                                                             <i class="fa fa-circle text-primary ms-2"
                                                                 style="font-size:10px; margin-right:10px;"
                                                                 title="Recommended"></i>
                                                         @endif
                                                         {{ $loop->iteration }}
                                                     </td>
-                                                    <td>{{ $preparemat->io ?? '-'}}</td>
+                                                    <td>{{ $preparemat->io ?? '-' }}</td>
                                                     <td>{{ $preparemat->doc_num ?? '-' }}</td>
                                                     <td>{{ $preparemat->prod_no ?? '-' }}</td>
                                                     <td>{{ $preparemat->series }}</td>
                                                     <td>
-                                                        @if ($preparemat->status)
+                                                        @if ($preparemat->status == 1)
                                                             Transfer Done
-                                                        @else 
+                                                        @elseif($preparemat->status == 2)
+                                                            Accept Production
+                                                        @else
                                                             Prepare Material Done
                                                         @endif
                                                     </td>
@@ -125,6 +128,7 @@
                                                 </tr>
                                             </tbody>
                                         @endforelse
+
                                     </table>
                                 </div>
                             </div>

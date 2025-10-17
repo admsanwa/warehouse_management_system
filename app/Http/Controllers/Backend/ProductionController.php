@@ -774,17 +774,26 @@ class ProductionController extends Controller
         $get_series = $this->sap->getSeries(['page' => 1, 'limit' => 1, 'Series' => (int) $prod['Series']]);
         $series =   Arr::get($get_series, 'data.0', []);
 
+        $user = Auth::user();
         return view('backend.production.preparematdetails', [
             'getRecord'    => $prod,
             'lines' => $lines,
             'series' => $series,
-            'preparemat' => $preparemat
+            'preparemat' => $preparemat,
+            'user'  => $user
         ]);
     }
 
     public function update_preparemat($docEntry)
     {
-        PrepareMatModel::where('doc_entry', $docEntry)->update(['status' => 1]);
+        $user = Auth::user();
+
+        if ($user->department == "Production and Warehouse" && $user->level == "Leader") {
+            PrepareMatModel::where('doc_entry', $docEntry)->update(['status' => 1]);
+        } else if ($user->department == "Production" && $user->level == "Staff") {
+            PrepareMatModel::where('doc_entry', $docEntry)->update(['status' => 2]);
+        }
+
         return redirect('/listpreparemat')->with('success', "Succesfully transfer prepare material data");
     }
 }

@@ -408,7 +408,7 @@
             });
             // Set default series sesuai tahun
             const prefix = {!! json_encode(Auth::user()->default_series_prefix) !!};
-            setDefaultSeries("#seriesSelect", "22", prefix);
+            setDefaultSeries("#seriesSelect", "202", prefix);
         });
 
         // Event untuk fokuskan ke #scannerInput saat klik floating button
@@ -589,7 +589,7 @@
                 return;
             }
             const lines = selectedPo['Lines'] || [];
-        console.log("🔍 Semua ItemCode dalam PO:", lines.map(l => l.ItemCode));
+            console.log("🔍 Semua ItemCode dalam PO:", lines.map(l => l.ItemCode));
             let matchingLines = lines.filter(item =>
                 item.ItemCode === itemCode && item.IssuedQty < item.PlannedQty
             );

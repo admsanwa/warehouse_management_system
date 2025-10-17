@@ -404,7 +404,7 @@
                 }
             });
             const prefix = {!! json_encode(Auth::user()->default_series_prefix) !!};
-            setDefaultSeries("#seriesSelect", "22", prefix);
+            setDefaultSeries("#seriesSelect", "202", prefix);
 
             // $("#reason").on("change", function() {
             //     const selected = $(this).find(":selected");
