@@ -785,6 +785,6 @@ class ProductionController extends Controller
     public function update_preparemat($docEntry)
     {
         PrepareMatModel::where('doc_entry', $docEntry)->update(['status' => 1]);
-        return view('backend.production.listpreparemat')->with('success', "Succesfully transfer prepare material data");
+        return redirect('/listpreparemat')->with('success', "Succesfully transfer prepare material data");
     }
 }
