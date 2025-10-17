@@ -173,6 +173,10 @@
                                 @else
                                     {{ $getRecord['Status'] }}
                                 @endif
+                                @if ($user->department === "Production and Warehouse" && $user->level === "Leader" || $user->department === "IT")
+                                    <a href="{{ url('/preparematerial?docNum=' . $getRecord['DocNum'] . '&docEntry=' . $getRecord['DocEntry']) }}" 
+                                    class="btn btn-sm btn-outline-success"><i class="fa fa-arrow-right"></i> Form Prepare Material</a>
+                                @endif
                                 <button onclick="history.back()" class="btn btn-default">Back</button>
                             </div>
                         </div>

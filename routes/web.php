@@ -63,6 +63,7 @@ Route::group(['middleware' => 'admin'], function () {
     Route::post('admin/employees/edit/{id}', [EmployeesController::class, 'update']);
     Route::get('admin/employees/delete/{id}', [EmployeesController::class, 'delete']);
 
+
     // JobsController
     Route::get('admin/jobs', [JobsController::class, 'index']);
     Route::get('admin/jobs_export', [JobsController::class, 'jobs_export']);
@@ -89,6 +90,7 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('admin/purchasing/upload', [PurchasingController::class, 'upload_form']);
     Route::post('admin/purchasing/upload', [PurchasingController::class, 'upload']);
 
+    // production
     // bon
     Route::get('admin/production/bon', [ProductionController::class, 'bon']);
     Route::post('admin/production/bon', [ProductionController::class, 'create_bon']);
@@ -114,8 +116,11 @@ Route::group(['middleware' => 'admin'], function () {
     Route::post('admin/production/upload', [ProductionController::class, 'upload']);
     Route::get('admin/production/{prod_no}', [ProductionController::class, 'view_prod']);
     Route::get('/print/barcodes/prod', [ProductionController::class, 'printBarcodeWithPdf']);
-
-
+    Route::get('/preparematerial', [ProductionController::class, 'preparemat_form']);
+    Route::post('/preparematerial', [ProductionController::class, 'create_preparemat']);
+    Route::get("/listpreparemat", [ProductionController::class, 'list_preparemat']);
+    Route::get("preparematdetails/{docEntry}", [ProductionController::class, 'preparemat_details']);
+    Route::post("preparematdetails/{docEntry}", [ProductionController::class, 'update_preparemat']);
     // qc
     Route::get("admin/quality/list", [QualityController::class, "index"]);
     Route::post("admin/quality/{docentry}", [QualityController::class, "result"]);

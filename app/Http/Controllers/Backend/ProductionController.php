@@ -9,6 +9,7 @@ use App\Models\BonModel;
 use App\Models\DeliveryModel;
 use App\Models\ItemsModel;
 use App\Models\MemoModel;
+use App\Models\PrepareMatModel;
 use App\Models\ProductionModel;
 use App\Models\ProductionOrderDetailsModel;
 use App\Models\QualityModel;
@@ -651,5 +652,139 @@ class ProductionController extends Controller
             'success' => true,
             'message' => "Successfully approve bon"
         ]);
+    }
+
+    public function preparemat_form(Request $request)
+    {
+        $param = [
+            "DocNum" =>  $request->query('docNum'),
+            "DocEntry" => $request->query('docEntry'),
+        ];
+
+        $prods = $this->sap->getProductionOrders($param);
+
+        if (empty($prods) || !Arr::get($prods, 'success')) {
+            return back()->with(
+                'error',
+                Arr::get($prods, 'message', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.')
+            );
+        }
+
+        $prod = Arr::get($prods, 'data.0', []);
+        $lines = Arr::get($prod, 'Lines', []);
+
+        $get_series = $this->sap->getSeries(['page' => 1, 'limit' => 1, 'Series' => (int) $prod['Series']]);
+        $series =   Arr::get($get_series, 'data.0', []);
+
+        $qualities = QualityModel::where('doc_entry', $prod['DocEntry'])
+            ->orderByDesc('id')
+            ->get()
+            ->unique('prod_no')   // ambil yang terbaru per item
+            ->keyBy('prod_no');
+        $user = Auth::user();
+
+        return view('backend.production.prepareform', [
+            'getRecord'    => $prod,
+            'lines' => $lines,
+            'series' => $series,
+            'qualities' => $qualities,
+            'user'  => $user
+        ]);
+    }
+
+    public function create_preparemat(Request $request)
+    {
+        // dd($request->all());
+        // dd('controller hit');
+
+        try {
+            $validated = $request->validate([
+                'DocEntry'  => 'required|integer',
+                'U_MEB_NO_IO'   => 'required|string',
+                'Series'    => 'required|string',
+                'DocNum'    => 'required|integer',
+                'ItemCode'  => 'required|string',
+                'lines'     => 'required|array',
+                'lines.*.ItemCode'  => 'required|string',
+                'lines.*.PrepareQty' => 'nullable|string'
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            dd($e->errors());
+        }
+
+        // dd('Validation passed', $validated);
+
+        DB::transaction(function () use ($validated) {
+            foreach ($validated['lines'] as $line) {
+                if (in_array($line['ItemCode'], ['Z-DL', 'Z-FOH'])) {
+                    continue;
+                }
+                PrepareMatModel::create([
+                    'doc_entry' => $validated['DocEntry'],
+                    'io'        => $validated['U_MEB_NO_IO'],
+                    'series'    => $validated['Series'],
+                    'doc_num'   => $validated['DocNum'],
+                    'prod_no'   => $validated['ItemCode'],
+                    'item_code' => $line['ItemCode'],
+                    'prepare_qty'   => $line['PrepareQty'],
+                    'status'    => 0
+                ]);
+
+                // dd($insert);
+            }
+        });
+
+        return redirect('/listpreparemat')->with('success', "Succesfully create prepare material data");
+    }
+
+    public function list_preparemat(Request $request)
+    {
+        $getRecord  = PrepareMatModel::getRecord($request);
+        $seriesList = PrepareMatModel::select("series")
+            ->whereNotNull("series")
+            ->distinct()
+            ->orderBy("series", "asc")
+            ->get();
+
+        return view("backend.production.listpreparemat", compact("getRecord", "seriesList"));
+    }
+
+    public function preparemat_details($docEntry)
+    {
+        $param = [
+            "DocEntry" => $docEntry,
+        ];
+
+        $prods = $this->sap->getProductionOrders($param);
+
+        if (empty($prods) || !Arr::get($prods, 'success')) {
+            return back()->with(
+                'error',
+                Arr::get($prods, 'message', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.')
+            );
+        }
+
+        $prod = Arr::get($prods, 'data.0', []);
+        $lines = Arr::get($prod, 'Lines', []);
+        $preparemat = PrepareMatModel::where('doc_entry', $param)
+            ->get()
+            ->keyBy('item_code');
+
+
+        $get_series = $this->sap->getSeries(['page' => 1, 'limit' => 1, 'Series' => (int) $prod['Series']]);
+        $series =   Arr::get($get_series, 'data.0', []);
+
+        return view('backend.production.preparematdetails', [
+            'getRecord'    => $prod,
+            'lines' => $lines,
+            'series' => $series,
+            'preparemat' => $preparemat
+        ]);
+    }
+
+    public function update_preparemat($docEntry)
+    {
+        PrepareMatModel::where('doc_entry', $docEntry)->update(['status' => 1]);
+        return view('backend.production.listpreparemat')->with('success', "Succesfully transfer prepare material data");
     }
 }
