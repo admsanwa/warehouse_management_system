@@ -702,7 +702,6 @@
             }
             setDefaultDistRules("#U_MEB_Dist_Rule", "BK-FIN")
             $('#SlpCode').select2();
-            /
         });
 
         document.getElementById("focusScannerBtn").addEventListener("click", function() {
@@ -808,107 +807,6 @@
                 });
         }
 
-        function sendScannedCode(code) {
-            const fromWhsInput = document.getElementById('FromWhsCode');
-            const toWhsInput = document.getElementById('ToWhsCode');
-            const itemInput = document.getElementById('item_code');
-            const fromWhs = fromWhsInput.value.trim();
-            const toWhs = toWhsInput.value.trim();
-            const fileInputWrapper = document.getElementById("fileInput");
-            const fileInput = fileInputWrapper.querySelector("input[type='file']");
-            if (!fromWhs) {
-                itemInput.value = "";
-
-                showToast("❌ Warning: From Warehouse tidak boleh kosong, isi dulu", "error");
-                return;
-            }
-            if (!toWhs) {
-                itemInput.value = "";
-                fileInput.value = "";
-                showToast("❌ Warning: To Warehouse tidak boleh kosong, isi dulu", "error");
-                return;
-            }
-
-
-            fileInput.disabled = true;
-            document.getElementById("item_desc").value = "";
-            document.getElementById("on_hand").value = "";
-            showLoadingOverlay("Scanning Barcode...");
-            fetch("/stockin-add", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json",
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify({
-                        item_code: code,
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    const poSelect = document.getElementById('no_po');
-                    const tBody = document.getElementById('tBody');
-                    if (data.success) {
-                        // console.log("data", data);
-                        document.getElementById("id").value = data.id;
-                        document.getElementById("item_desc").value = data.ItemName;
-                        document.getElementById("on_hand").value = data.warehouseStock.OnHand;
-
-
-                        hideLoadingOverlay();
-                        const loadScan = loadScannedBarcodes();
-                        if (loadScan === false) {
-                            return;
-                        }
-                        showToast("✅ Success Scan: " + data.ItemName, 'success');
-                    } else {
-                        // console.log("grpo", data.grpo);
-                        hideLoadingOverlay();
-                        showToast("❌ Error: " + data.message, 'error');
-                        document.getElementById("scannerInput").focus();
-                    }
-                })
-                .finally(() => {
-                    if (fileInput) fileInput.disabled = false;
-                    document.getElementById("scannerInput").focus();
-                })
-                .catch(error => {
-                    hideLoadingOverlay();
-                    if (fileInput) fileInput.disabled = false;
-                    console.error("Fetch error: ", error);
-                    document.getElementById("scannerInput").focus();
-                })
-        }
-
-        function appendDataOnPo(data) {
-            document.getElementById("docNum").value = data.DocNum;
-            document.getElementById("docEntry").value = data.DocEntry;
-            document.getElementById("cardName").value = data.CardName;
-            // document.getElementById("cardCode").value = data.CardCode;
-            // const postingDateInput = document.getElementById("PostingDate");
-            // if (postingDateInput && data.DocDate) {
-            //     const formattedDate = data.DocDate.replace(/\//g, "-");
-            //     postingDateInput.value = formattedDate;
-            // }
-            document.getElementById("U_MEB_No_SO").value = data.U_MEB_No_SO;
-            document.getElementById("U_MEB_NO_IO").value = data.U_MEB_NO_IO;
-            document.getElementById("U_MEB_ProjectDetail").value = data.CntctCode;
-            // document.getElementById("remarks").value = "Based On Purchase Order " + data.DocNum;
-        }
-
-        function cleanDataOnPo() {
-            document.getElementById("docNum").value = "";
-            document.getElementById("docEntry").value = "";
-            document.getElementById("cardName").value = "";
-            // document.getElementById("cardCode").value = "";
-            // document.getElementById("PostingDate").value = "";
-            document.getElementById("U_MEB_No_SO").value = "";
-            document.getElementById("U_MEB_NO_IO").value = "";
-            document.getElementById("remarks").value = "";
-            return;
-        }
-
         function loadScannedBarcodes() {
             const fileInput = document.querySelector('#fileInput input[type="file"]');
             if (fileInput) fileInput.value = "";
@@ -967,11 +865,123 @@
             const labelClass = isHeaderItem ? "bg-green-600" : "bg-blue-600";
 
             const row = `
-                <tr style="background-color: ${rowColor};">
+        <tr style="background-color: ${rowColor};">
+            <td>${idx + 1}</td>
+            <td>
+                ${item.ItemCode}
+                <span class="text-white text-xs px-2 py-1 rounded ${labelClass}" style="margin-left: 6px;">${label}</span>
+                <input type="hidden" name="stocks[${idx}][ItemCode]" value="${item.ItemCode}">
+            </td>
+            <td>${item.ItemName || ""}</td>
+            <td>${fromWhsCode}</td>
+            <td>${toWhsCode}</td>
+            <td>${formatDecimalsSAP(item.PlannedQty)}</td>
+            <td>
+                <input type="hidden" name="stocks[${idx}][FromWhsCode]" value="${fromWhsCode}">
+                <input type="hidden" name="stocks[${idx}][ToWhsCode]" value="${toWhsCode}">
+                <input type="text" name="stocks[${idx}][qty]" class="form-control format-sap" step="0.01" style="min-width:80px !important;" value="0">
+            </td>
+            <td>
+                ${item.InvntryUoM ?? ""}
+                <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${item.InvntryUoM ?? ""}">
+            </td>
+            <td>
+                <button type="button" onclick="deleteItem(this)" class="btn btn-danger btn-sm">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `;
+
+            tBody.insertAdjacentHTML("beforeend", row);
+            reorderTableRows();
+
+            const newInput = tBody.querySelector(`input[name="stocks[${idx}][qty]"]`);
+            if (newInput) formatInputDecimals(newInput);
+        }
+
+
+        function appendDataOnPo(data) {
+            document.getElementById("docNum").value = data.DocNum;
+            document.getElementById("docEntry").value = data.DocEntry;
+            document.getElementById("cardName").value = data.CardName;
+            // document.getElementById("cardCode").value = data.CardCode;
+            // const postingDateInput = document.getElementById("PostingDate");
+            // if (postingDateInput && data.DocDate) {
+            //     const formattedDate = data.DocDate.replace(/\//g, "-");
+            //     postingDateInput.value = formattedDate;
+            // }
+            document.getElementById("U_MEB_No_SO").value = data.U_MEB_No_SO;
+            document.getElementById("U_MEB_NO_IO").value = data.U_MEB_NO_IO;
+            document.getElementById("U_MEB_ProjectDetail").value = data.CntctCode;
+            // document.getElementById("remarks").value = "Based On Purchase Order " + data.DocNum;
+        }
+
+        function cleanDataOnPo() {
+            document.getElementById("docNum").value = "";
+            document.getElementById("docEntry").value = "";
+            document.getElementById("cardName").value = "";
+            // document.getElementById("cardCode").value = "";
+            // document.getElementById("PostingDate").value = "";
+            document.getElementById("U_MEB_No_SO").value = "";
+            document.getElementById("U_MEB_NO_IO").value = "";
+            document.getElementById("remarks").value = "";
+            return;
+        }
+
+        function loadScannedBarcodes() {
+            const fileInput = document.querySelector('#fileInput input[type="file"]');
+            if (fileInput) fileInput.value = "";
+
+            const tBody = document.getElementById("itemRows");
+            const itemCode = document.getElementById("item_code").value?.trim();
+
+            if (!itemCode) {
+                showToast("⚠️ Harap scan barcode terlebih dahulu!", "error");
+                return false;
+            }
+
+            // Ambil data Production Order
+            if (!selectedProd || !Array.isArray(selectedProd.Lines) || selectedProd.Lines.length === 0) {
+                showToast("⚠️ Harap pilih Production Order terlebih dahulu!", "error");
+                document.getElementById("item_code").value = "";
+                document.getElementById("item_desc").value = "";
+                document.getElementById("onhand").value = "";
+                return false;
+            }
+
+            // Cari line item yang sesuai
+            const lines = selectedProd.Lines;
+            const matchingLines = lines.filter(line =>
+                line.ItemCode === itemCode
+            );
+
+            // Jika tidak ditemukan item yang valid
+            if (matchingLines.length === 0) {
+                showToast(`${itemCode} tidak ada di production order.`, "error");
+                return false;
+            }
+
+            const item = matchingLines[0];
+
+            // Cek apakah item sudah pernah ditambahkan
+            const existing = Array.from(tBody.querySelectorAll('input[name^="stocks"][name$="[ItemCode]"]'))
+                .some(input => input.value === item.ItemCode);
+
+            if (existing) {
+                showToast(`❌ Barcode ${item.ItemCode} sudah ditambahkan sebelumnya.`, "error");
+                return false;
+            }
+
+            const fromWhsCode = document.getElementById("FromWhsCode").value || "";
+            const toWhsCode = document.getElementById("ToWhsCode").value || "";
+            const idx = tBody.rows.length;
+
+            const row = `
+                <tr>
                     <td>${idx + 1}</td>
                     <td>
                         ${item.ItemCode}
-                        <span class="text-white text-xs px-2 py-1 rounded ${labelClass}" style="margin-left: 6px;">${label}</span>
                         <input type="hidden" name="stocks[${idx}][ItemCode]" value="${item.ItemCode}">
                     </td>
                     <td>${item.ItemName || ""}</td>
@@ -1001,7 +1011,6 @@
             const newInput = tBody.querySelector(`input[name="stocks[${idx}][qty]"]`);
             if (newInput) formatInputDecimals(newInput);
         }
-
 
         function clearProdData() {
             const tBody = document.getElementById("itemRows");
