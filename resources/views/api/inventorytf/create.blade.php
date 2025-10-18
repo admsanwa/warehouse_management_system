@@ -701,7 +701,8 @@
                 });
             }
             setDefaultDistRules("#U_MEB_Dist_Rule", "BK-FIN")
-            // $('#SlpCode').select2();
+            $('#SlpCode').select2();
+            /
         });
 
         document.getElementById("focusScannerBtn").addEventListener("click", function() {
@@ -920,30 +921,34 @@
                 return false;
             }
 
-            // Ambil data Production Order
-            if (!selectedProd || !Array.isArray(selectedProd.Lines) || selectedProd.Lines.length === 0) {
+            // Pastikan Production Order valid
+            if (!selectedProd) {
                 showToast("⚠️ Harap pilih Production Order terlebih dahulu!", "error");
-                document.getElementById("item_code").value = "";
-                document.getElementById("item_desc").value = "";
-                document.getElementById("onhand").value = "";
                 return false;
             }
 
-            // Cari line item yang sesuai
-            const lines = selectedProd.Lines;
-            const matchingLines = lines.filter(line =>
-                line.ItemCode === itemCode
-            );
+            const lines = Array.isArray(selectedProd.Lines) ? selectedProd.Lines : [];
+            let item = lines.find(line => line.ItemCode === itemCode);
+            let isHeaderItem = false;
 
-            // Jika tidak ditemukan item yang valid
-            if (matchingLines.length === 0) {
+            // Jika tidak ditemukan di line, cek di header
+            if (!item && selectedProd.ItemCode === itemCode) {
+                item = {
+                    ItemCode: selectedProd.ItemCode,
+                    ItemName: selectedProd.ItemName,
+                    PlannedQty: selectedProd.PlannedQty ?? 0,
+                    InvntryUoM: selectedProd.InvntryUoM ?? "",
+                };
+                isHeaderItem = true;
+            }
+
+            // Jika tetap tidak ditemukan
+            if (!item) {
                 showToast(`${itemCode} tidak ada di production order.`, "error");
                 return false;
             }
 
-            const item = matchingLines[0];
-
-            // Cek apakah item sudah pernah ditambahkan
+            // Cek apakah sudah pernah ditambahkan
             const existing = Array.from(tBody.querySelectorAll('input[name^="stocks"][name$="[ItemCode]"]'))
                 .some(input => input.value === item.ItemCode);
 
@@ -956,11 +961,17 @@
             const toWhsCode = document.getElementById("ToWhsCode").value || "";
             const idx = tBody.rows.length;
 
+            // Warna baris berdasarkan sumber item
+            const rowColor = isHeaderItem ? "#e6ffed" : "#e6f0ff"; // hijau muda vs biru muda
+            const label = isHeaderItem ? "HEADER ITEM" : "DETAIL ITEM";
+            const labelClass = isHeaderItem ? "bg-green-600" : "bg-blue-600";
+
             const row = `
-                <tr>
+                <tr style="background-color: ${rowColor};">
                     <td>${idx + 1}</td>
                     <td>
                         ${item.ItemCode}
+                        <span class="text-white text-xs px-2 py-1 rounded ${labelClass}" style="margin-left: 6px;">${label}</span>
                         <input type="hidden" name="stocks[${idx}][ItemCode]" value="${item.ItemCode}">
                     </td>
                     <td>${item.ItemName || ""}</td>
@@ -990,6 +1001,7 @@
             const newInput = tBody.querySelector(`input[name="stocks[${idx}][qty]"]`);
             if (newInput) formatInputDecimals(newInput);
         }
+
 
         function clearProdData() {
             const tBody = document.getElementById("itemRows");
