@@ -223,10 +223,21 @@
 
                                 {{-- ================= FOOTER ================= --}}
                                 <div class="card-footer text-end">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fa fa-check"> Transfer Done</i>
-                                    </button>
+                                    @if ($user->department == 'Production and Warehouse' && $user->level == 'Leader')
+                                        @if ($preparemat->first() && $preparemat->first()->status == 0)
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fa fa-check"> Transfer Done</i>
+                                            </button>
+                                        @endif
+                                    @elseif($user->department == 'Production' && $user->level == 'Staff')
+                                        @if ($preparemat->first() && $preparemat->first()->status == 1)
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fa fa-check"> Accept Production</i>
+                                            </button>
+                                        @endif
+                                    @endif
                                 </div>
+
                             </form>
                         </div>
                     </section>
