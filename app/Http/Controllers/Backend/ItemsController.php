@@ -325,6 +325,7 @@ class ItemsController extends Controller
         $results = $results->unique('WhsCode')->values();
 
         $wh = $results->map(function ($val) {
+        
             return [
                 'id'   => $val['WhsCode'],
                 'text' => $val['WhsCode'] . ' ' . $val['WhsName'],

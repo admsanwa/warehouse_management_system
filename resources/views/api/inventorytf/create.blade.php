@@ -100,7 +100,7 @@
                                 <input type="hidden" name="docNum" id="docNum" value="{{ $po ?? '' }}" />
                                 <input type="hidden" name="docEntry" id="docEntry" value="{{ $docEntry ?? '' }}" />
                                 <label class="col-sm-4 col-form-label">Vendor:</label>
-                                <div class="col-sm-8">
+                                <div class="col-sm-8 mb-2">
                                     <input type="text" name="cardName" id="cardName" value=""
                                         class="form-control mt-2" readonly required>
                                 </div>
@@ -364,6 +364,7 @@
         let selectedPo = [];
         let tempProdData = [];
         let selectedProd = [];
+        let fullname = "{{ Auth::user()->fullname }}";
         window.addEventListener("load", function() {
             formatInputDecimals(document.getElementById("on_hand"));
             const poSelect = $("#no_po");
@@ -652,7 +653,7 @@
                 // Jika sama, tampilkan warning dan reset
                 if (toWhsCode && toWhsCode === fromWhsCode) {
                     showToast("❌ Warning: From Warehouse tidak boleh sama dengan To Warehouse", "error");
-                    $toWhs.val("").trigger("change"); // ✅ perbaikan di sini
+                    $toWhs.val("").trigger("change");
                     return;
                 }
 
@@ -1108,10 +1109,11 @@
             warehouseSelect2("ToWhsCode");
 
             function warehouseSelect2(elementId) {
-                const el = $("#" + elementId)
+                const el = $("#" + elementId);
                 if (el.length) {
                     el.select2({
                         allowClear: true,
+                        placeholder: "Select warehouse",
                         width: "100%",
                         language: {
                             inputTooShort: function() {
@@ -1129,16 +1131,35 @@
                             dataType: "json",
                             delay: 250,
                             data: function(params) {
-                                let searchData = {
+                                return {
                                     q: params.term,
-                                    limit: 10,
-                                }
-                                return searchData;
+                                    limit: 10
+                                };
                             },
                             processResults: function(data) {
-                                console.log("Response dari server:", data); // cek di console
+                                let results = Array.isArray(data.results) ? data.results : [];
+
+                                // 🔹 Filter berdasarkan fullname (pastikan hanya item valid yang punya id)
+                                results = results.filter(item => item && item.id && item.text);
+
+                                if (fullname === "Vania") {
+                                    if (elementId === "FromWhsCode") {
+                                        results = results.filter(item => item.id === "BK002");
+                                    } else if (elementId === "ToWhsCode") {
+                                        results = results.filter(item => ["BK001", "BK003"].includes(
+                                            item.id));
+                                    }
+                                } else if (fullname === "Safa Prasista Wardani") {
+                                    if (elementId === "FromWhsCode") {
+                                        results = results.filter(item => item.id === "BK003");
+                                    } else if (elementId === "ToWhsCode") {
+                                        results = results.filter(item => ["BK001", "BK002"].includes(
+                                            item.id));
+                                    }
+                                }
+
                                 return {
-                                    results: (data.results || []).map(item => ({
+                                    results: results.map(item => ({
                                         id: item.id,
                                         text: item.text
                                     }))
