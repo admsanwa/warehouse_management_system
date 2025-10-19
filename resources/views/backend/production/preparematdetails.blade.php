@@ -235,8 +235,15 @@
                                                 <i class="fa fa-check"> Accept Production</i>
                                             </button>
                                         @endif
+                                    @elseif($user->department == 'Quality Control' && $user->level == 'Staff')
+                                        @if ($preparemat->first() && $preparemat->first()->status == 1)
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fa fa-check"> Accept QC</i>
+                                            </button>
+                                        @endif
                                     @endif
                                 </div>
+
 
                             </form>
                         </div>

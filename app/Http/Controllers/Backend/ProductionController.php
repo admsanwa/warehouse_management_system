@@ -792,6 +792,8 @@ class ProductionController extends Controller
             PrepareMatModel::where('doc_entry', $docEntry)->update(['status' => 1]);
         } else if ($user->department == "Production" && $user->level == "Staff") {
             PrepareMatModel::where('doc_entry', $docEntry)->update(['status' => 2]);
+        } else if ($user->department == "Quality Control" && $user->level == "Staff") {
+            PrepareMatModel::where('doc_entry', $docEntry)->update(['status' => 3]);
         }
 
         return redirect('/listpreparemat')->with('success', "Succesfully transfer prepare material data");

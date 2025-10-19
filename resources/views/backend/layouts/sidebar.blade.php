@@ -209,7 +209,8 @@
                 $authDept == 'PPIC' ||
                 $authDept == 'Purchasing' ||
                 ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager') ||
-                $authDept == 'Production')
+                $authDept == 'Production' ||
+                $authDept == 'Quality Control')
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                     data-accordion="false">
@@ -293,7 +294,8 @@
                             @if (
                                 ($authDept == 'Production and Warehouse' && $authLevel === 'Leader') ||
                                     $authDept == 'Production' ||
-                                    $authDept == 'IT')
+                                    $authDept == 'IT' ||
+                                    $authDept == 'Quality Control')
                                 <li class="nav-item">
                                     <a href="{{ url('/listpreparemat') }}"
                                         class="nav-link @if (Request::is('admin/production/listpreparemat')) active @endif">
@@ -301,6 +303,7 @@
                                     </a>
                                 </li>
                             @endif
+
                         </ul>
                     </li>
                 </ul>

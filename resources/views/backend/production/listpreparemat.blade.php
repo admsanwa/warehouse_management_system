@@ -59,6 +59,9 @@
                                                 <option value="0" @selected(Request::get('status') === '0')>Prepare Material Done
                                                 </option>
                                                 <option value="1" @selected(Request::get('status') === '1')>Transfer Done</option>
+                                                <option value="2" @selected(Request::get('status') === '2')>Accept Production
+                                                </option>
+                                                <option value="3" @selected(Request::get('status') === '3')>Accept QC</option>
                                             </select>
                                         </div>
                                         <div class="form-group col-md-3">
@@ -111,6 +114,8 @@
                                                             Transfer Done
                                                         @elseif($preparemat->status == 2)
                                                             Accept Production
+                                                        @elseif($preparemat->status == 3)
+                                                            Accept QC
                                                         @else
                                                             Prepare Material Done
                                                         @endif
