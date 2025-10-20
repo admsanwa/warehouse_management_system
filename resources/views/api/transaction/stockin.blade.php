@@ -457,6 +457,7 @@
                     },
                     body: JSON.stringify({
                         item_code: code,
+                        warehouse: ''
                     })
                 })
                 .then(res => res.json())

@@ -548,6 +548,7 @@
                     },
                     body: JSON.stringify({
                         item_code: code,
+                        warehouse: $("#warehouse").val() ?? ''
                         // docEntry: docEntry,
                         // po: noPo
                     })

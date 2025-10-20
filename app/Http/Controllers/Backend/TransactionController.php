@@ -82,9 +82,10 @@ class TransactionController extends Controller
     {
         $validated = $request->validate([
             'item_code' => 'required|string',
+            'warehouse' => 'nullable|string',
         ]);
 
-        $warehouse =  $this->default_warehouse;
+        $warehouse =   $validated['warehouse'] ? $validated['warehouse'] : $this->default_warehouse;
         $barcode   = $validated['item_code'];
 
         $items = $this->sap->getStockItems([
@@ -504,7 +505,7 @@ class TransactionController extends Controller
             'item_code' => 'required|string',
         ]);
         // $warehouse =  $this->default_warehouse;
-        $warehouse =  "BK002"; //dari gudang produksi
+        $warehouse = 'BK002';
         $barcode   = $validated['item_code'];
         $items = $this->sap->getStockItems([
             'ItemCode' => $barcode,
@@ -852,10 +853,10 @@ class TransactionController extends Controller
     {
         $validated = $request->validate([
             'item_code' => 'required|string',
+            // 'warehouse' => 'nullable|string',
         ]);
 
         $warehouse = "BK002";
-        // $warehouse = $this->default_warehouse;
         $barcode   = $validated['item_code'];
         $items = $this->sap->getStockItems([
             'ItemCode' => $barcode,
@@ -1177,11 +1178,12 @@ class TransactionController extends Controller
     {
         $validated = $request->validate([
             'item_code' => 'required|string',
+            'warehouse' => 'nullable|string',
             'po'        => 'nullable|string',
             'docEntry'  => 'nullable|string',
         ]);
 
-        $warehouse = $this->default_warehouse;
+        $warehouse =   $validated['warehouse'] ? $validated['warehouse'] : $this->default_warehouse;
         $barcode   = $validated['item_code'];
 
         $items = $this->sap->getStockItems([
@@ -1544,11 +1546,12 @@ class TransactionController extends Controller
     {
         $validated = $request->validate([
             'item_code' => 'required|string',
+            'warehouse' => 'nullable|string',
             'po'        => 'nullable|string',
             'docEntry'  => 'nullable|string',
         ]);
 
-        $warehouse =  $this->default_warehouse;
+        $warehouse =   $validated['warehouse'] ? $validated['warehouse'] : $this->default_warehouse;
         $barcode   = $validated['item_code'];
 
         $items = $this->sap->getStockItems([

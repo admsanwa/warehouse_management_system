@@ -364,6 +364,7 @@
         let selectedPo = [];
         let tempProdData = [];
         let selectedProd = [];
+        let scannedItem = [];
         let fullname = "{{ Auth::user()->fullname }}";
         window.addEventListener("load", function() {
             formatInputDecimals(document.getElementById("on_hand"));
@@ -818,7 +819,6 @@
             const fileInput = fileInputWrapper.querySelector("input[type='file']");
             if (!fromWhs) {
                 itemInput.value = "";
-
                 showToast("❌ Warning: From Warehouse tidak boleh kosong, isi dulu", "error");
                 return;
             }
@@ -843,6 +843,7 @@
                     },
                     body: JSON.stringify({
                         item_code: code,
+                        warehouse: fromWhs
                     })
                 })
                 .then(res => res.json())
@@ -854,7 +855,7 @@
                         document.getElementById("id").value = data.id;
                         document.getElementById("item_desc").value = data.ItemName;
                         document.getElementById("on_hand").value = data.warehouseStock.OnHand;
-
+                        scannedItem = data.warehouseStock;
 
                         hideLoadingOverlay();
                         const loadScan = loadScannedBarcodes();
@@ -921,34 +922,56 @@
                 return false;
             }
 
-            // Pastikan Production Order valid
-            if (!selectedProd) {
-                showToast("⚠️ Harap pilih Production Order terlebih dahulu!", "error");
-                return false;
-            }
-
-            const lines = Array.isArray(selectedProd.Lines) ? selectedProd.Lines : [];
-            let item = lines.find(line => line.ItemCode === itemCode);
+            const toWhsCode = $("#ToWhsCode").val();
+            console.log(toWhsCode);
+            const fromWhsCode = $("#FromWhsCode").val() || "";
+            let item = {
+                ItemCode: scannedItem.ItemCode,
+                ItemName: scannedItem.ItemName,
+                PlannedQty: 0,
+                InvntryUoM: scannedItem.InvntryUom ?? "",
+            };
             let isHeaderItem = false;
 
-            // Jika tidak ditemukan di line, cek di header
-            if (!item && selectedProd.ItemCode === itemCode) {
-                item = {
-                    ItemCode: selectedProd.ItemCode,
-                    ItemName: selectedProd.ItemName,
-                    PlannedQty: selectedProd.PlannedQty ?? 0,
-                    InvntryUoM: selectedProd.InvntryUoM ?? "",
-                };
-                isHeaderItem = true;
+            // ==============================
+            // 1️⃣ Jika tujuan BUKAN BK903 → wajib pilih production order
+            // ==============================
+            if (toWhsCode && toWhsCode != "BK903") {
+                console.log("Prod Order Item");
+                if (!selectedProd) {
+                    showToast("⚠️ Harap pilih Production Order terlebih dahulu!", "error");
+                    return false;
+                }
+
+                const lines = Array.isArray(selectedProd.Lines) ? selectedProd.Lines : [];
+
+                // Cek apakah itemCode ada di detail (Lines)
+                item = lines.find(line => line.ItemCode === itemCode);
+
+                // Jika tidak ditemukan di detail, cek apakah dia header item
+                if (!item && selectedProd.ItemCode === itemCode) {
+                    item = {
+                        ItemCode: selectedProd.ItemCode,
+                        ItemName: selectedProd.ItemName,
+                        PlannedQty: selectedProd.PlannedQty ?? 0,
+                    };
+                    isHeaderItem = true;
+                }
+
+                // Jika tetap tidak ditemukan, tolak
+                if (!item) {
+                    showToast(`${itemCode} tidak ada di Production Order.`, "error");
+                    return false;
+                }
+
+                // ==============================
+                // 2️⃣ Jika tujuan BK093 → tidak wajib pilih production order
+                // ==============================
             }
 
-            // Jika tetap tidak ditemukan
-            if (!item) {
-                showToast(`${itemCode} tidak ada di production order.`, "error");
-                return false;
-            }
-
-            // Cek apakah sudah pernah ditambahkan
+            // ==============================
+            // 3️⃣ Cegah duplikasi barcode
+            // ==============================
             const existing = Array.from(tBody.querySelectorAll('input[name^="stocks"][name$="[ItemCode]"]'))
                 .some(input => input.value === item.ItemCode);
 
@@ -957,50 +980,47 @@
                 return false;
             }
 
-            const fromWhsCode = document.getElementById("FromWhsCode").value || "";
-            const toWhsCode = document.getElementById("ToWhsCode").value || "";
+            // ==============================
+            // 4️⃣ Tambah baris ke tabel
+            // ==============================
             const idx = tBody.rows.length;
-
-            // Warna baris berdasarkan sumber item
-            const rowColor = isHeaderItem ? "#e6ffed" : "#e6f0ff"; // hijau muda vs biru muda
+            const rowColor = isHeaderItem ? "#e6ffed" : "#e6f0ff"; // hijau untuk header, biru untuk detail
             const label = isHeaderItem ? "HEADER ITEM" : "DETAIL ITEM";
             const labelClass = isHeaderItem ? "bg-green-600" : "bg-blue-600";
 
             const row = `
-        <tr style="background-color: ${rowColor};">
-            <td>${idx + 1}</td>
-            <td>
-                ${item.ItemCode}
-                <span class="text-white text-xs px-2 py-1 rounded ${labelClass}" style="margin-left: 6px;">${label}</span>
-                <input type="hidden" name="stocks[${idx}][ItemCode]" value="${item.ItemCode}">
-            </td>
-            <td>${item.ItemName || ""}</td>
-            <td>${fromWhsCode}</td>
-            <td>${toWhsCode}</td>
-            <td>${formatDecimalsSAP(item.PlannedQty)}</td>
-            <td>
-                <input type="hidden" name="stocks[${idx}][FromWhsCode]" value="${fromWhsCode}">
-                <input type="hidden" name="stocks[${idx}][ToWhsCode]" value="${toWhsCode}">
-                <input type="text" name="stocks[${idx}][qty]" class="form-control format-sap" step="0.01" style="min-width:80px !important;" value="0">
-            </td>
-            <td>
-                ${item.InvntryUoM ?? ""}
-                <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${item.InvntryUoM ?? ""}">
-            </td>
-            <td>
-                <button type="button" onclick="deleteItem(this)" class="btn btn-danger btn-sm">
-                    <i class="fa fa-trash"></i>
-                </button>
-            </td>
-        </tr>
-    `;
-
+                <tr style="background-color: ${rowColor};">
+                    <td>${idx + 1}</td>
+                    <td>
+                        ${item.ItemCode}
+                        <input type="hidden" name="stocks[${idx}][ItemCode]" value="${item.ItemCode}">
+                    </td>
+                    <td>${item.ItemName || ""}</td>
+                    <td>${fromWhsCode}</td>
+                    <td>${toWhsCode}</td>
+                    <td>${formatDecimalsSAP(item.PlannedQty)}</td>
+                    <td>
+                        <input type="hidden" name="stocks[${idx}][FromWhsCode]" value="${fromWhsCode}">
+                        <input type="hidden" name="stocks[${idx}][ToWhsCode]" value="${toWhsCode}">
+                        <input type="text" name="stocks[${idx}][qty]" class="form-control format-sap" step="0.01" style="min-width:80px !important;" value="0">
+                    </td>
+                    <td>
+                        ${item.InvntryUoM ?? ""}
+                        <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${item.InvntryUoM ?? ""}">
+                    </td>
+                    <td>
+                        <button type="button" onclick="deleteItem(this)" class="btn btn-danger btn-sm">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
             tBody.insertAdjacentHTML("beforeend", row);
             reorderTableRows();
-
             const newInput = tBody.querySelector(`input[name="stocks[${idx}][qty]"]`);
             if (newInput) formatInputDecimals(newInput);
         }
+
 
 
         function clearProdData() {
@@ -1117,10 +1137,10 @@
                         width: "100%",
                         language: {
                             inputTooShort: function() {
-                                return "Type for searching...";
+                                return "Ketika untuk cari...";
                             },
                             noResults: function() {
-                                return "Not Found";
+                                return "Tidak Ditemukan";
                             },
                             searching: function() {
                                 return "Loading...";

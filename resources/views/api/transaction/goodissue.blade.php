@@ -531,6 +531,7 @@
                     },
                     body: JSON.stringify({
                         item_code: code,
+                        warehouse: $("#warehouse").val() ?? ''
                     })
                 })
                 .then(res => res.json())
