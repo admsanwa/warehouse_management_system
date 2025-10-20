@@ -1138,7 +1138,8 @@
                             },
                             processResults: function(data) {
                                 let results = Array.isArray(data.results) ? data.results : [];
-                                x`x`
+
+                                // Filter hanya item valid
                                 results = results.filter(item => item && item.id && item.text);
 
                                 if (fullname === "Vania") {
@@ -1155,14 +1156,17 @@
                                         results = results.filter(item => ["BK001", "BK002"].includes(
                                             item.id));
                                     }
-                                } else if (["Nico Dwi Prih Kusuma", "Hasanudi Basri", "Bagus Hartadi",
+                                } else if (
+                                    ["Nico Dwi Prih Kusuma", "Hasanudi Basri", "Bagus Hartadi",
                                         "Deardho Purba", "Siti Asaroh"
-                                    ].includes(fullname)) {
+                                    ].includes(fullname)
+                                ) {
                                     if (elementId === "FromWhsCode") {
                                         results = results.filter(item => ["BK001", "BK903"].includes(
                                             item.id));
                                     }
                                 }
+
                                 return {
                                     results: results.map(item => ({
                                         id: item.id,
@@ -1174,6 +1178,7 @@
                     });
                 }
             }
+
 
 
             const inputTanggal = document.getElementById('U_SI_HARI_TGL_KIRIM');
