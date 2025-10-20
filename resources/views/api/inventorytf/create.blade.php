@@ -1138,8 +1138,7 @@
                             },
                             processResults: function(data) {
                                 let results = Array.isArray(data.results) ? data.results : [];
-
-                                // 🔹 Filter berdasarkan fullname (pastikan hanya item valid yang punya id)
+                                x`x`
                                 results = results.filter(item => item && item.id && item.text);
 
                                 if (fullname === "Vania") {
@@ -1156,8 +1155,14 @@
                                         results = results.filter(item => ["BK001", "BK002"].includes(
                                             item.id));
                                     }
+                                } else if (["Nico Dwi Prih Kusuma", "Hasanudi Basri", "Bagus Hartadi",
+                                        "Deardho Purba", "Siti Asaroh"
+                                    ].includes(fullname)) {
+                                    if (elementId === "FromWhsCode") {
+                                        results = results.filter(item => ["BK001", "BK903"].includes(
+                                            item.id));
+                                    }
                                 }
-
                                 return {
                                     results: results.map(item => ({
                                         id: item.id,
