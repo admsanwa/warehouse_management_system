@@ -210,7 +210,7 @@
                                 </div>
 
                                 {{-- ================= FOOTER ================= --}}
-                                @if ($getRecord->is_closed = 0)
+                                @if ($getRecord->is_posted == 0)
                                     <div class="card-footer text-end">
                                         <button type="submit" class="btn btn-primary"
                                             onclick="return AddGoodReceiptForm();" id="btnSubmit">
