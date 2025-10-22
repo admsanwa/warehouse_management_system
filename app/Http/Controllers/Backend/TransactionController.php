@@ -1594,7 +1594,7 @@ class TransactionController extends Controller
         try {
             DB::beginTransaction();
             $validated = $request->validate([
-                'docEntry'     => 'nullable|integer',
+                'docEntry'     => 'required|integer',
                 'docnum'        => 'nullable',
                 'remarks'      => 'required|string',
                 'no_surat_jalan'      => 'nullable|string',
