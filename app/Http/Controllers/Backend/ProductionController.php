@@ -93,6 +93,7 @@ class ProductionController extends Controller
             "Series" => $request->get('series'),
             "DocEntry" => $request->get('docEntry'),
             "ItemCode" =>  $request->get('code'),
+            "U_MEB_NO_IO" =>  $request->get('no_io'),
             'page'       => 1,
         ];
 

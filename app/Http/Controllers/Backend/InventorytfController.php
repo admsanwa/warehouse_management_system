@@ -212,4 +212,33 @@ class InventorytfController extends Controller
             ], 500);
         }
     }
+
+    public function so_search(Request $request)
+    {
+        $param = [
+            "limit" => (int) $request->get('limit', 5),
+            "DocNum" => $request->get('q'),
+            "U_MEB_NO_IO" => $request->get('no_io'),
+            'page'       => 1,
+        ];
+
+        $getSales = $this->sap->getSalesOrders($param);
+        if (empty($getSales) || $getSales['success'] !== true) {
+            return response()->json([
+                'results' => [],
+            ]);
+        }
+        $soData = collect($getSales['data'] ?? [])->map(function ($item) {
+            return [
+                'id'   => $item['DocEntry'],
+                'docnum'   => $item['DocNum'],
+                'text' => $item['DocNum'],
+            ];
+        });
+
+        return response()->json([
+            'results' => $soData,
+            'sales_orders' => $getSales['data'],
+        ]);
+    }
 }

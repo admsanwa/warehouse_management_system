@@ -71,19 +71,29 @@
                         </div>
                         <div class="card-body">
                             <div class="form-group row">
+                                <label class="col-sm-4 col-form-label">Nomor IO :</label>
+                                <div class="col-sm-8 mb-2">
+                                    <input type="text" name="U_MEB_NO_IO" id="U_MEB_NO_IO" value=""
+                                        class="form-control mt-2">
+                                </div>
                                 <label class="col-sm-4 col-form-label">No Production Order :</label>
-                                <div class="col-sm-8">
-                                    <select name="U_MEB_No_Prod_Order" id="U_MEB_No_Prod_Order" class="form-control"
-                                        required>
-                                        <option value="">Select No Production Order</option>
-                                    </select>
+                                <div class="col-sm-8 row">
+                                    <div class="col-lg-4 col-sm-12 mb-2">
+                                        <select name="series" class="form-control" id="prodSeriesSelect"></select>
+                                    </div>
+                                    <div class="col-lg-8 col-sm-12">
+                                        <select name="U_MEB_No_Prod_Order" id="U_MEB_No_Prod_Order" class="form-control"
+                                            required>
+                                            <option value="">Select No Production Order</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <label class="col-sm-4 col-form-label">No Produksi :</label>
                                 <div class="col-sm-8 mb-3">
                                     <input type="text" name="U_SI_No_Produksi" id="U_SI_No_Produksi" value=""
                                         class="form-control mt-2" placeholder="Input No Produksi" required>
                                 </div>
-                                <label class="col-sm-4 col-form-label">Nomor PO :</label>
+                                <label class="col-sm-4 col-form-label">Purchase Order :</label>
                                 <div class="col-sm-8 row">
                                     <div class="col-lg-4 col-sm-12 mb-2">
                                         <select name="series" class="form-control" id="seriesSelect"></select>
@@ -133,15 +143,10 @@
                                         placeholder="Input Ref 2 (No SJ barang datang)" class="form-control mt-2"
                                         required>
                                 </div>
-                                <label class="col-sm-4 col-form-label">Nomor IO :</label>
-                                <div class="col-sm-8">
-                                    <input type="text" name="U_MEB_NO_IO" id="U_MEB_NO_IO" value=""
-                                        class="form-control mt-2">
-                                </div>
                                 <label class="col-sm-4 col-form-label">Nomor SO :</label>
                                 <div class="col-sm-8">
                                     <input type="text" name="U_MEB_No_SO" id="U_MEB_No_SO" value=""
-                                        class="form-control mt-2">
+                                        class="form-control mt-2" readonly>
                                 </div>
                                 <label class="col-sm-4 col-form-label">Contract Adendum :</label>
                                 <div class="col-sm-8">
@@ -184,9 +189,24 @@
                                 </div>
                                 <label class="col-sm-4 col-form-label">OCR / Distribution Rule :</label>
                                 <div class="col-sm-8 mb-3">
-                                    <select name="U_MEB_Dist_Rule" id="U_MEB_Dist_Rule" class="form-control mt-2"
-                                        required>
-                                    </select>
+                                    @php
+                                        $specialNames = [
+                                            'Safa Prasista Wardani',
+                                            'Nico Dwi Prih Kusuma',
+                                            'Hasanudi Basri',
+                                            'Bagus Hartadi',
+                                            'Deardho Purba',
+                                            'Siti Asaroh',
+                                        ];
+                                    @endphp
+                                    @if (in_array(Auth::user()->fullname, $specialNames))
+                                        <input type="text" name="U_MEB_Dist_Rule" id="U_MEB_Dist_Rule"
+                                            class="form-control bg-light" value="BK-PRD" readonly>
+                                    @else
+                                        <select name="U_MEB_Dist_Rule" id="U_MEB_Dist_Rule" class="form-control mt-2"
+                                            required>
+                                        </select>
+                                    @endif
                                 </div>
                                 <label class="col-sm-4 col-form-label">Hari & Tanggal Kirim :</label>
                                 <div class="col-sm-8">
@@ -470,7 +490,7 @@
             poSelect.on("select2:open", function() {
                 let searchField = document.querySelector(".select2-container .select2-search__field");
                 if (searchField) {
-                    searchField.placeholder = "Ketik disini untuk cari nomor PO";
+                    searchField.placeholder = "Ketik disini untuk cari purchase order";
                 }
             });
 
@@ -499,7 +519,47 @@
                         }
                         return {
                             q: params.term,
-                            ObjectCode: '67'
+                            ObjectCode: '22'
+                        };
+                    },
+                    processResults: function(data) {
+                        console.log("Response dari server:", data); // cek di console
+                        return {
+                            results: (data.results || []).map(item => ({
+                                id: item.id,
+                                text: item.text
+                            }))
+                        };
+                    }
+                }
+            });
+
+            $("#prodSeriesSelect").select2({
+                placeholder: "Pilih Series",
+                allowClear: true,
+                width: "100%",
+                language: {
+                    inputTooShort: function() {
+                        return "Ketik kode series untuk mencari...";
+                    },
+                    noResults: function() {
+                        return "Tidak ada data ditemukan";
+                    },
+                    searching: function() {
+                        return "Sedang mencari...";
+                    },
+                },
+                ajax: {
+                    url: "/purchasing/seriesSearch",
+                    dataType: "json",
+                    delay: 250,
+                    data: function(params) {
+                        if (!params) {
+                            return;
+                        }
+                        return {
+                            q: params.term,
+                            ObjectCode: '202'
                         };
                     },
                     processResults: function(data) {
@@ -525,6 +585,7 @@
                 // console.log(selectedData);
                 tBody.innerHTML = "";
                 if (!selectedData) {
+                    clearProdData();
                     return;
                 }
                 const selectedDocEntry = selectedData.docentry;
@@ -538,15 +599,15 @@
                     return;
                 }
                 console.log("Prod dipilih:", selectedProd);
-                // appendProdData(found);
-                loadScannedBarcodes();
+                appendProdData(found);
+                // loadScannedBarcodes();
             });
 
             prodSelect.select2({
                 placeholder: "Pilih No. Production Number",
                 allowClear: true,
                 width: "100%",
-                minimumInputLength: 3,
+                minimumInputLength: 0,
                 language: {
                     inputTooShort: function() {
                         return "Ketik 3 karakter atau lebih";
@@ -559,22 +620,13 @@
                     dataType: "json",
                     delay: 600,
                     data: function(params) {
-                        const item_code = document.getElementById("item_code").value;
+                        const seriesData = $("#prodSeriesSelect").select2('data');
+                        const series = seriesData.length > 0 ? seriesData[0].id : null;
 
-                        // const seriesData = $("#seriesSelect").select2('data');
-                        // const series = seriesData.length > 0 ? seriesData[0].id : null;
-
-                        if (docNum && docEntry) {
-                            return {
-                                q: docNum,
-                                docEntry: docEntry,
-                                // series: series,
-                                limit: 1,
-                            };
-                        }
                         return {
                             q: params.term,
-                            // series: series,
+                            series: series,
+                            no_io: $("#U_MEB_NO_IO").val(),
                             limit: 5,
                         };
                     },
@@ -604,6 +656,7 @@
             const prefix = {!! json_encode(Auth::user()->default_series_prefix) !!};
             const defaultWhs = {!! json_encode(Auth::user()->warehouse_access) !!};
             setDefaultSeries("#seriesSelect", "22", prefix);
+            setDefaultSeries("#prodSeriesSelect", "202", prefix);
             setDefaultWarehouse("#FromWhsCode", defaultWhs);
 
             const projectSelect = $("#U_MEB_Project_Code");
@@ -639,13 +692,14 @@
                             return {
                                 results: (data.results || []).map(item => ({
                                     id: item.id,
-                                    text: item.text
+                                    text: item.id
                                 }))
                             };
                         }
                     }
                 });
             }
+
             $("#ToWhsCode").on("change", function() {
                 const $toWhs = $(this);
                 const toWhsCode = ($toWhs.val() || "").trim();
@@ -663,7 +717,7 @@
             });
 
             const ocrSelect = $("#U_MEB_Dist_Rule");
-            if (ocrSelect.length) {
+            if (ocrSelect.length && ocrSelect.is("select")) {
                 ocrSelect.select2({
                     placeholder: "Pilih Ocr Code",
                     allowClear: true,
@@ -701,8 +755,8 @@
                         }
                     }
                 });
+                // setDefaultDistRules("#U_MEB_Dist_Rule", "BK-FIN")
             }
-            setDefaultDistRules("#U_MEB_Dist_Rule", "BK-FIN")
             $('#SlpCode').select2();
         });
 
@@ -882,6 +936,48 @@
                 })
         }
 
+        function appendProdData(data) {
+            if (!data || typeof data !== "object") {
+                console.warn("appendProdData: invalid data", data);
+                return;
+            }
+
+            $("#U_MEB_NO_IO").val(data.U_MEB_NO_IO ?? "");
+            $("#U_MEB_No_SO").val(data.OriginNum ?? "");
+            const $projSelect = $("#U_MEB_Project_Code");
+            if ($projSelect.find(`option[value="${data.Project}"]`).length === 0) {
+                const newOption = new Option(data.Project, data.Project, true, true);
+                $projSelect.append(newOption).trigger("change");
+            } else {
+                $projSelect.val(data.Project).trigger("change");
+            }
+
+            $("#U_MEB_ProjectDetail").val(data.U_MEB_ProjectDetail ?? "");
+            $("#U_MEB_Internal_No").val(data.U_MEB_Internal_Prod ?? "");
+            $("#remarks").val(data.Comments ?? "");
+
+            console.log("✅ Product data appended:", data);
+            if (data.OriginNum || data.U_MEB_NO_IO) {
+                appendSalesOrderData(data.OriginNum, data.U_MEB_NO_IO);
+            }
+        }
+
+        function clearProdData() {
+            $("#U_MEB_NO_IO").val("");
+            $("#U_MEB_No_SO").val("");
+            $("#U_MEB_ProjectDetail").val("");
+            $("#U_MEB_Internal_No").val("");
+            $("#remarks").val("");
+
+            const $projSelect = $("#U_MEB_Project_Code");
+            if ($projSelect.length && $projSelect.is("select")) {
+                $projSelect.val(null).trigger("change"); // reset value
+                $projSelect.find("option").remove();
+            }
+
+        }
+
+
         function appendDataOnPo(data) {
             document.getElementById("docNum").value = data.DocNum;
             document.getElementById("docEntry").value = data.DocEntry;
@@ -1021,15 +1117,6 @@
             if (newInput) formatInputDecimals(newInput);
         }
 
-
-
-        function clearProdData() {
-            const tBody = document.getElementById("itemRows");
-            if (!tBody) return;
-
-            tBody.innerHTML = "";
-        }
-
         function deleteItem(button) {
             if (!confirm("Yakin ingin menghapus item ini?")) return;
             const row = button.closest("tr");
@@ -1070,8 +1157,8 @@
                         showToast("✅ Berhasil" + data.message, "success");
                         btn.disabled = false;
                         setTimeout(() => {
-                            // window.location.reload();
-                        }, 1000)
+                            window.location.reload();
+                        }, 3000)
                     } else {
                         hideLoadingOverlay();
                         if (data.errors) {
@@ -1122,6 +1209,61 @@
                 });
             });
         }
+
+        function appendSalesOrderData(docnum, no_io) {
+            if (!docnum && !no_io) {
+                console.warn("appendSalesOrderData: docnum & no_io kosong, tidak bisa fetch data.");
+                showToast(`❌ Nomor SO atau IO tidak boleh kosong.`,
+                    "error");
+                return;
+            }
+            $.ajax({
+                url: "/salesOrderSearch",
+                type: "GET",
+                dataType: "json",
+                data: {
+                    q: docnum || "",
+                    no_io: no_io || ""
+                },
+                success: function(result) {
+                    console.log("📦 Response dari server:", result);
+
+                    if (!result || !result.sales_orders || result.sales_orders.length === 0) {
+                        showToast(`❌ Sales Order dengan nomor '${docnum}' tidak ditemukan di SAP.`,
+                            "error");
+                        return;
+                    }
+
+                    const firstSalesOrder = result.sales_orders[0];
+                    console.log("✅ First Sales Order:", firstSalesOrder);
+
+                    const slpCode = firstSalesOrder.SlpCode;
+
+                    if (slpCode) {
+                        const $slpSelect = $("#SlpCode");
+                        const optionExists = $slpSelect.find(`option[value="${slpCode}"]`).length > 0;
+
+                        if (optionExists) {
+                            $slpSelect.val(slpCode).trigger("change");
+                            console.log(`✅ SlpCode '${slpCode}' ditemukan dan dipilih di Select2`);
+                        } else {
+                            showToast(`❌ Sales Employee dengan kode '${slpCode}' tidak ditemukan dalam daftar.`,
+                                "error");
+                            return;
+                            // const newOption = new Option(slpCode, slpCode, true, true);
+                            // $slpSelect.append(newOption).trigger("change");
+                        }
+                    } else {
+                        console.warn("⚠️ SlpCode tidak ditemukan dalam data.");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("❌ Gagal mengambil data sales order:", error);
+                    console.log("📄 Response Text:", xhr.responseText);
+                }
+            });
+        }
+
 
         // select wh
         $(document).ready(function() {
