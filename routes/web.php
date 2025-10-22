@@ -177,12 +177,15 @@ Route::group(['middleware' => 'admin'], function () {
     // goodreceipt
     Route::get("admin/transaction/goodreceipt", [TransactionController::class, "good_receipt"]);
     Route::post("/save_gr", [TransactionController::class, 'save_good_receipt']);
+    Route::post("/post_gr", [TransactionController::class, 'post_good_receipt']);
     Route::post("/good-receipt", [TransactionController::class, "scan_and_greceipt"]);
     Route::get("/scanned-barcodes-gr/{gr}", [TransactionController::class, "get_scanned_gr"]);
     Route::post("admin/transaction/grdelone/{id}", [TransactionController::class, "gr_delone"]);
     Route::post("admin/transaction/grupdate", [TransactionController::class, "gr_update"]);
     Route::get("admin/transaction/grdetail/{gr}", [TransactionController::class, "gr_detail"]);
     Route::get("admin/transaction/grdelete/{gr}", [TransactionController::class, "gr_delete"]);
+    Route::get("admin/transaction/listgoodreceipt", [TransactionController::class, "list_gr"]);
+    Route::get("admin/transaction/postgoodreceipt/{doc_entry}", [TransactionController::class, "post_gr"]);
 
     // list transactions
     Route::get("admin/listtransaction/stockin", [ListTransactionsController::class, "stock_in"]);

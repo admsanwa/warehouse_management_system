@@ -1591,12 +1591,10 @@ class TransactionController extends Controller
 
     public function save_good_receipt(Request $request)
     {
-        $post_gi = null;
-        $postData  = [];
-
         try {
             DB::beginTransaction();
             $validated = $request->validate([
+                'docEntry'     => 'nullable|integer',
                 'docnum'        => 'nullable',
                 'remarks'      => 'required|string',
                 'no_surat_jalan'      => 'nullable|string',
@@ -1623,58 +1621,28 @@ class TransactionController extends Controller
             $warehouse = $validated['warehouse'] ?? '';
             $project = $validated['project'] ?? '';
 
-            // Header untuk API
-            $postData = [
-                'DocDate'     => date("Y/m/d"),
-                'Comment'    => $validated['remarks'] ?? '',
-                "Ext" => [
-                    "U_MEB_Alasan_GRceipt" => $validated['reason'] ?? '',
-                    "U_MEB_Default_Whse" =>   $warehouse ?? '',
-                    "U_MEB_Internal_No" =>   $validated['internal_no'] ?? '',
-                    "U_MEB_No_GI" =>   $validated['no_gi'] ?? '',
-                    "U_MEB_NO_IO" =>   $validated['no_io'] ?? '',
-                    "U_MEB_No_SO" =>   $validated['no_so'] ?? '',
-                    "U_MEB_Project_Code" =>   $project ?? '',
-                    "U_SI_No_Surat_Jalan" => $validated['no_surat_jalan'] ?? '',
-                    "Ref2" => $validated['ref_surat_jalan'] ?? '',
-                    "U_SI_IT" => $validated['no_inventory_tf'] ?? '',
-                    "U_MEB_Type_Inv_Trans" => $validated['type_inv_transaction'] ?? '',
-                    "U_MEB_PONo_Maklon" => $validated['docnum'] ?? null,
-                    "U_MEB_DIST_RULE" =>  $ocr
-                ],
-                'Lines'       => []
-            ];
-
-            $lines        = [];
             $insertedData = [];
             $user         = Auth::id();
             foreach ($validated['stocks'] as $row) {
-                // untuk API SAP
                 $entryQty = (float) str_replace(',', '.', str_replace('.', '', $row['qty']));                // Qty baru yang diinput
-                $lines[] = [
-                    'ItemCode'    => $row['ItemCode'] ?? '',
-                    'Dscription'  => $row['Dscription'] ?? null,
-                    'Quantity'    => $entryQty,
-                    'WhsCode'    =>  $warehouse,
-                    'AccountCode'    => $validated['acct_code'],
-                    'Ext' => [
-                        'OcrCode' => $ocr,
-                        'Project' => $project
-                    ]
-                ];
 
                 // untuk DB
                 $insertedData[] = [
-                    'po'        => $validated['docnum'],
-                    'io'        => $validated['no_io'],
-                    'so'        => $validated['no_so'],
-                    'no_gi'        => $validated['no_gi'] ?? '-',
-                    'internal_no'        => $validated['internal_no'],
-                    'no_inventory_tf'        => $validated['no_inventory_tf'],
-                    'type_inv_transaction'        => $validated['type_inv_transaction'],
-                    'project_code'        => $project,
+                    'doc_entry' => $validated['docEntry'] ?? null,
+                    'po'        => $validated['docnum'] ?? null,
+                    'io'        => $validated['no_io'] ?? '',
+                    'so'        => $validated['no_so'] ?? '',
+                    'no_gi'        => $validated['no_gi'] ?? '',
+                    'internal_no'        => $validated['internal_no'] ?? '',
+                    'no_inventory_tf'        => $validated['no_inventory_tf'] ?? '',
+                    'type_inv_transaction'        => $validated['type_inv_transaction'] ?? '',
+                    'project_code'        => $project ?? '',
                     'distr_rule'        => $ocr,
-                    'whse'        => $warehouse,
+                    'whse'        => $warehouse ?? '',
+                    'reason'        => $validated['reason'] ?? '',
+                    'acct_code'     => $validated['acct_code'],
+                    'no_surat_jalan'        => $validated['no_surat_jalan'] ?? '-',
+                    'ref_surat_jalan'      => $validated['ref_surat_jalan'] ?? '-',
                     'item_code'    => $row['ItemCode'] ?? null,
                     'item_desc'    => $row['Dscription'] ?? null,
                     'qty' => $entryQty,
@@ -1685,14 +1653,6 @@ class TransactionController extends Controller
                     'updated_at'   => now(),
                 ];
             }
-            $postData['Lines'] = $lines;
-            // Call API SAP
-            $post_gi = $this->sap->postGoodReceipt($postData);
-            if (empty($post_gi['success'])) {
-                throw new \Exception($post_gi['message'] ?? 'SAP Good Receipt failed without message');
-            }
-
-
             // Insert ke DB
             if (!empty($insertedData)) {
                 goodreceiptModel::insert($insertedData);
@@ -1700,25 +1660,19 @@ class TransactionController extends Controller
             DB::commit();
             return response()->json([
                 'success'  => true,
-                'message'  => 'Telah berhasil Good Receipt item yang sudah di scan',
-                'request'  => $postData,
-                'response' => $post_gi ?? [],
+                'message'  => 'Telah berhasil Good Receipt item yang sudah di scan dan diteruskan ke admin warehouse',
             ], 200);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Validasi gagal',
                 'errors'  => $e->errors(),
-                'request' => $postData,
-                'response' => $post_gi ?? [],
             ], 422);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-                'request' => $postData,
-                'response' => $post_gi ?? [],
             ], 500);
         }
     }
@@ -1891,5 +1845,141 @@ class TransactionController extends Controller
         // dd("prods", $prods, "getPo", $getPo, "gr", $gr);
 
         return redirect("admin/transaction/goodreceipt")->with("warning", "Membatalkan product {$prods}!");
+    }
+
+    public function  list_gr(Request $request)
+    {
+        $getRecord = goodreceiptModel::getRecord($request);
+
+        return view("api.transaction.listgoodreceipt", compact('getRecord'));
+    }
+
+    public function  post_gr($docEntry)
+    {
+        $getRecord = goodreceiptModel::getRecord()->where('doc_entry', $docEntry)->first();
+        $getData = goodreceiptModel::where('doc_entry', $docEntry)->orderBy('id', 'asc')->get();
+        // dd("get record", $getRecord, "docentry", $docEntry);
+
+        return view("api.transaction.postgoodreceipt", compact('getRecord', 'getData'));
+    }
+
+    public function post_good_receipt(Request $request)
+    {
+        $post_gr = null;
+        $postData  = [];
+
+        try {
+            DB::beginTransaction();
+            $validated = $request->validate([
+                'docentry'        => 'nullable',
+                'docnum'          => 'nullable',
+                'warehouse'       => 'nullable|string',
+                'reason'          => 'required|string',
+                'acct_code'       => 'nullable|string',
+                'no_surat_jalan'  => 'nullable|string',
+                'ref_surat_jalan' => 'nullable|string',
+                'internal_no'     => 'nullable|string',
+                'no_io'           => 'nullable|string',
+                'no_so'           => 'nullable|string',
+                'no_gi'           => 'nullable|string',
+                'no_inventory_tf' => 'nullable|string',
+                'type_inv_transaction' => 'nullable|string',
+                'project'         => 'nullable|string',
+                'cost_center'     => 'nullable|string',
+                'remarks'         => 'required|string',
+                'lines'                       => 'required|array|min:1',
+                'lines.*.ItemCode'            => 'required|string',
+                'lines.*.Dscription'          => 'nullable|string',
+                'lines.*.qty'                 => 'required|numeric',
+                'lines.*.UnitMsr'             => 'nullable|string',
+                'lines.*.Price'               => 'nullable|numeric'
+            ]);
+
+            $ocr = $validated['cost_center'] ?? '';
+            $warehouse = $validated['warehouse'] ?? '';
+            $project = $validated['project'] ?? '';
+
+            // Header untuk API SAP
+            $postData = [
+                'DocDate' => date("Y/m/d"),
+                'Comment' => $validated['remarks'] ?? '',
+                "Ext" => [
+                    "U_MEB_Alasan_GRceipt" => $validated['reason'] ?? '',
+                    "U_MEB_Default_Whse" => $warehouse ?? '',
+                    "U_MEB_Internal_No" => $validated['internal_no'] ?? '',
+                    "U_MEB_No_GI" => $validated['no_gi'] ?? '',
+                    "U_MEB_NO_IO" => $validated['no_io'] ?? '',
+                    "U_MEB_No_SO" => $validated['no_so'] ?? '',
+                    "U_MEB_Project_Code" => $project ?? '',
+                    "U_SI_No_Surat_Jalan" => $validated['no_surat_jalan'] ?? '',
+                    "Ref2" => $validated['ref_surat_jalan'] ?? '',
+                    "U_SI_IT" => $validated['no_inventory_tf'] ?? '',
+                    "U_MEB_Type_Inv_Trans" => $validated['type_inv_transaction'] ?? '',
+                    "U_MEB_PONo_Maklon" => $validated['docnum'] ?? null,
+                    "U_MEB_DIST_RULE" => $ocr
+                ],
+                'Lines' => []
+            ];
+
+            $lines = [];
+            foreach ($validated['lines'] as $row) {
+                $lines[] = [
+                    'ItemCode'    => $row['ItemCode'] ?? '',
+                    'Dscription'  => $row['Dscription'] ?? null,
+                    'Quantity'    => (float) $row['qty'],
+                    'WhsCode'     => $warehouse,
+                    'AccountCode' => $validated['acct_code'],
+                    'Price'       => (float) ($row['Price'] ?? 0),
+                    'Ext' => [
+                        'OcrCode' => $ocr,
+                        'Project' => $project
+                    ]
+                ];
+            }
+            $postData['Lines'] = $lines;
+
+            // === POST KE API SAP ===
+            $post_gr = $this->sap->postGoodReceipt($postData);
+            if (empty($post_gr['success'])) {
+                throw new \Exception($post_gr['message'] ?? 'SAP Good Receipt failed without message');
+            }
+
+            foreach ($validated['lines'] as $row) {
+                goodreceiptModel::where('item_code', $row['ItemCode'])
+                    ->where('doc_entry', $validated['docentry'])
+                    ->where('is_posted', 0)
+                    ->update([
+                        'so' => $validated['no_so'],
+                        'io' => $validated['no_io'],
+                        'is_posted'  => 1,
+                        'price'      => (float) ($row['Price'] ?? 0),
+                        'updated_at' => now(),
+                    ]);
+            }
+
+            DB::commit();
+            return response()->json([
+                'success'  => true,
+                'message'  => '✅ Berhasil mem-post Good Receipt dan memperbarui data di database.',
+                'request'  => $postData,
+                'response' => $post_gr ?? [],
+            ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors'  => $e->errors(),
+                'request' => $postData,
+                'response' => $post_gr ?? [],
+            ], 422);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'request' => $postData,
+                'response' => $post_gr ?? [],
+            ], 500);
+        }
     }
 }

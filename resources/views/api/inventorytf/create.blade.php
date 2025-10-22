@@ -954,6 +954,7 @@
 
             $("#U_MEB_ProjectDetail").val(data.U_MEB_ProjectDetail ?? "");
             $("#U_MEB_Internal_No").val(data.U_MEB_Internal_Prod ?? "");
+            $("#U_SI_No_Produksi").val(data.U_MEB_Internal_Prod ?? "");
             $("#remarks").val(data.Comments ?? "");
 
             console.log("✅ Product data appended:", data);
@@ -967,6 +968,7 @@
             $("#U_MEB_No_SO").val("");
             $("#U_MEB_ProjectDetail").val("");
             $("#U_MEB_Internal_No").val("");
+            $("#U_SI_No_Produksi").val("");
             $("#remarks").val("");
 
             const $projSelect = $("#U_MEB_Project_Code");

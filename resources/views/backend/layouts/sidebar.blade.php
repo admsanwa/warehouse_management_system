@@ -443,6 +443,14 @@
                                 <li class="nav-item">
                                     <a href="{{ url('admin/transaction/goodreceipt') }}"
                                         class="nav-link @if (Request::is(' admin/transaction/goodreceipt')) active @endif">
+                                        <p>Prepare Good Receipt</p>
+                                    </a>
+                                </li>
+                            @endif
+                            @if ($authDept == 'IT' || $authDept == 'Production and Warehouse')
+                                <li class="nav-item">
+                                    <a href="{{ url('admin/transaction/listgoodreceipt') }}"
+                                        class="nav-link @if (Request::is('admin/transaction/listgoodreceipt')) active @endif">
                                         <p>Good Receipt</p>
                                     </a>
                                 </li>
