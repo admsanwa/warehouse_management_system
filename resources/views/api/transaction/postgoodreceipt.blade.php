@@ -78,7 +78,7 @@
                                         <div class="col-md-4">
                                             <label class="form-label fw-semibold">Internal No</label>
                                             <input type="text" class="form-control text-end" name="internal_no"
-                                                value="{{ $getRecord->internal_no }}" readonly>
+                                                value="{{ $getRecord->internal_no }}">
                                         </div>
 
                                         <div class="col-md-4">
