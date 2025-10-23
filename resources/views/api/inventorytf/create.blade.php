@@ -190,19 +190,12 @@
                                 <label class="col-sm-4 col-form-label">OCR / Distribution Rule :</label>
                                 <div class="col-sm-8 mb-3">
                                     @php
-                                        $specialNames = [
-                                            'Safa Prasista Wardani',
-                                            'Nico Dwi Prih Kusuma',
-                                            'Hasanudi Basri',
-                                            'Bagus Hartadi',
-                                            'Deardho Purba',
-                                            'Siti Asaroh',
-                                        ];
+                                        $departements = ['Production', 'Quality Control'];
                                     @endphp
-                                    @if (in_array(Auth::user()->fullname, $specialNames))
+                                    @if (in_array(Auth::user()->departement, $departements))
                                         <input type="text" name="U_MEB_Dist_Rule" id="U_MEB_Dist_Rule"
                                             class="form-control bg-light" value="BK-PRD" readonly>
-                                    @else
+                                    @elseif(Auth::user()->departement == 'Production and Warehouse')
                                         <select name="U_MEB_Dist_Rule" id="U_MEB_Dist_Rule" class="form-control mt-2"
                                             required>
                                         </select>
