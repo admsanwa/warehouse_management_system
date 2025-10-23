@@ -199,6 +199,9 @@
                                         <select name="U_MEB_Dist_Rule" id="U_MEB_Dist_Rule" class="form-control mt-2"
                                             required>
                                         </select>
+                                    @else
+                                        <input type="text" name="U_MEB_Dist_Rule" id="U_MEB_Dist_Rule"
+                                            class="form-control bg-light" value="BK-PRD" readonly>
                                     @endif
                                 </div>
                                 <label class="col-sm-4 col-form-label">Hari & Tanggal Kirim :</label>
