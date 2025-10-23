@@ -187,15 +187,16 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <label class="col-sm-4 col-form-label">OCR / Distribution Rule :</label>
+                                <label class="col-sm-4 col-form-label mt-3">OCR / Distribution Rule :</label>
                                 <div class="col-sm-8 mb-3">
                                     @php
-                                        $departements = ['Production', 'Quality Control'];
+                                        $departments = ['Production', 'Quality Control'];
+                                        $userDept = Auth::user()->department;
                                     @endphp
-                                    @if (in_array(Auth::user()->departement, $departements))
+                                    @if (in_array($userDept, $departments))
                                         <input type="text" name="U_MEB_Dist_Rule" id="U_MEB_Dist_Rule"
-                                            class="form-control bg-light" value="BK-PRD" readonly>
-                                    @elseif(Auth::user()->departement == 'Production and Warehouse')
+                                            class="form-control bg-light mt-2" value="BK-PRD" readonly>
+                                    @elseif($userDept == 'Production and Warehouse')
                                         <select name="U_MEB_Dist_Rule" id="U_MEB_Dist_Rule" class="form-control mt-2"
                                             required>
                                         </select>
