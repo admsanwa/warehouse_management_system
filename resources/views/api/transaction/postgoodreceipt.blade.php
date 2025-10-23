@@ -78,19 +78,22 @@
                                         <div class="col-md-4">
                                             <label class="form-label fw-semibold">Internal No</label>
                                             <input type="text" class="form-control text-end" name="internal_no"
-                                                value="{{ $getRecord->internal_no }}">
+                                                value="{{ $getRecord->internal_no }}"
+                                                {{ $getRecord->is_posted == 1 ? 'readonly' : '' }}>
                                         </div>
 
                                         <div class="col-md-4">
                                             <label class="form-label fw-semibold">IO</label>
                                             <input type="text" name="no_io" class="form-control text-end"
-                                                value="{{ $getRecord->io }}">
+                                                value="{{ $getRecord->io }}"
+                                                {{ $getRecord->is_posted == 1 ? 'readonly' : '' }}>
                                         </div>
 
                                         <div class="col-md-4">
                                             <label class="form-label fw-semibold">So</label>
                                             <input type="text" name="no_so" class="form-control text-end"
-                                                value="{{ $getRecord->so }}">
+                                                value="{{ $getRecord->so }}"
+                                                {{ $getRecord->is_posted == 1 ? 'readonly' : '' }}>
                                         </div>
 
                                         <div class="col-md-4">
@@ -176,7 +179,7 @@
                                                             <td>
                                                                 <input type="number" step="0.01"
                                                                     name="lines[{{ $i }}][Price]"
-                                                                    class="form-control price-input text-end {{ $getRecord->is_posted == 1 ? 'bg-light' : '' }}"
+                                                                    class="form-control price-input text-end"
                                                                     style="min-width:60px !important;"
                                                                     value="{{ $line->price ?? 0 }}"
                                                                     {{ $getRecord->is_posted == 1 ? 'readonly' : '' }}>
