@@ -176,10 +176,10 @@
                                                             <td>
                                                                 <input type="number" step="0.01"
                                                                     name="lines[{{ $i }}][Price]"
-                                                                    class="form-control price-input text-end {{ $getRecord->is_closed == 1 ? 'bg-light' : '' }}"
+                                                                    class="form-control price-input text-end {{ $getRecord->is_posted == 1 ? 'bg-light' : '' }}"
                                                                     style="min-width:60px !important;"
                                                                     value="{{ $line->price ?? 0 }}"
-                                                                    {{ $getRecord->is_closed == 1 ? 'readonly' : '' }}>
+                                                                    {{ $getRecord->is_posted == 1 ? 'readonly' : '' }}>
                                                             </td>
                                                             <td class="text-end">
                                                                 <span class="total"></span>
