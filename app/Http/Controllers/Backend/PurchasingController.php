@@ -301,6 +301,8 @@ class PurchasingController extends Controller
         $addedBarcodes  = BarcodeModel::where('username', $user)->latest()->take(5)->get();
 
         return view("api.purchasing.barcode", [
+            'addedBarcodesLast' => [],
+            'docDate' => '',
             'addedBarcodes'  => $addedBarcodes
         ]);
     }
