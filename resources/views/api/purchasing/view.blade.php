@@ -137,7 +137,6 @@
                             </div>
                             <div class="card-footer">
                                 <a href="{{ url('admin/purchasing') }}" class="btn btn-default">Back</a>
-                                {{-- @if ($user->department == 'Production and Warehouse' && $user->level != 'Manager' && $user->level != 'Supervisor' && $user->level != 'staff') --}}
                                 @php
                                     $itemCode = $lines[0]['ItemCode'] ?? '';
                                 @endphp
@@ -162,7 +161,13 @@
                                 @else
                                     {{ $po['DocStatus'] }}
                                 @endif
-                                {{-- @endif --}}
+                                {{-- currently update --}}
+                                @if (($user->department == 'Production and Warehouse' && $user->level == 'Leader') || $user->department == 'IT')
+                                    <a href="{{ url('admin/purchasing/barcode/' . $po['DocEntry']) }}"
+                                        class="btn btn-outline-success">
+                                        <i class="fa fa-arrow-right"></i> Print Barcode
+                                    </a>
+                                @endif
                             </div>
                         </div>
                     </div>

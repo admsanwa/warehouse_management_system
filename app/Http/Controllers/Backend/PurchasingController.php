@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backend;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\BarcodeModel;
 use App\Models\ItemsMaklonModel;
 use App\Models\PurchaseOrderDetailsModel;
 use App\Models\PurchasingModel;
@@ -17,6 +18,8 @@ use Carbon\Carbon;
 use App\Services\SapService;
 use Illuminate\Support\Arr;
 use Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Date;
 
 class PurchasingController extends Controller
 {
@@ -81,6 +84,7 @@ class PurchasingController extends Controller
             "DocNum" =>  $request->query('docNum'),
             "DocEntry" => $request->query('docEntry'),
         ];
+
         $orders = $this->sap->getPurchaseOrders($param);
 
         if (empty($orders) || !Arr::get($orders, 'success')) {
@@ -192,7 +196,6 @@ class PurchasingController extends Controller
         ]);
     }
 
-
     public function old_index(Request $request)
     {
         $getRecord      = PurchasingModel::with("po_details")->get()->values();
@@ -290,5 +293,138 @@ class PurchasingController extends Controller
         }
 
         return back()->with('success', "POs Imported Succesfully");
+    }
+
+    public function barcode()
+    {
+        $user           = Auth::user()->username;
+        $addedBarcodes  = BarcodeModel::where('username', $user)->latest()->take(5)->get();
+
+        return view("api.purchasing.barcode", [
+            'addedBarcodes'  => $addedBarcodes
+        ]);
+    }
+
+    public function barcode_po($docEntry, Request $request)
+    {
+        // delete all data
+        $user = Auth::user()->username;
+        $recordDelete = BarcodeModel::where("username", $user);
+        $recordDelete->delete();
+
+        // get purchase order
+        $param = [
+            "page" => (int) $request->get('page', 1),
+            "limit" => 1,
+            "DocEntry" => $docEntry,
+        ];
+        $orders = $this->sap->getPurchaseOrders($param);
+
+        if (empty($orders) || !Arr::get($orders, 'success')) {
+            return back()->with(
+                'error',
+                Arr::get($orders, 'message', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.')
+            );
+        }
+
+        $po = Arr::get($orders, 'data.0', []);
+        $lines = Arr::get($po, 'Lines', []);
+
+        // save db
+        foreach ($lines as $line) {
+            $barcode        = new BarcodeModel();
+            $barcode->code  = $line['ItemCode'];
+            $barcode->name  = $line['Dscription'];
+            $barcode->username = $user;
+            $barcode->qty   = $line['Quantity'];
+            $barcode->date_po = $po['DocDate'];
+            $barcode->save();
+        }
+
+        $addedBarcodes = BarcodeModel::where('username', $user)->latest()->take(10)->get();
+        $addedBarcodesLast = BarcodeModel::where('username', $user)->latest()->first();
+        return view("api.purchasing.barcode", [
+            'items'      => $getItems['data'] ?? [],
+            'addedBarcodes'  => $addedBarcodes,
+            'addedBarcodesLast' => $addedBarcodesLast,
+            'docDate' => $po['DocDate']
+        ]);
+    }
+
+    public function printBarcodeWithPdf(Request $request)
+    {
+        $user  = Auth::user()->username;
+        $codes = $request->input('codes', []);
+        $qtys  = $request->input('qtys', []);
+
+        if (empty($codes) || empty($qtys)) {
+            return back()->with('error', 'No barcode data received.');
+        }
+
+        foreach ($codes as $index => $code) {
+            $newQty = isset($qtys[$index]) ? (int) $qtys[$index] : 0;
+
+            // Get barcode for this user + code
+            $barcode = BarcodeModel::where('username', $user)
+                ->where('code', $code)
+                ->first();
+
+            if ($barcode && $newQty > 0 && $barcode->qty != $newQty) {
+                $barcode->qty = $newQty;
+                $barcode->save();
+            }
+        }
+
+        $addedBarcodes = BarcodeModel::where("username", $user)->get();
+        if ($addedBarcodes->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada barcodes yang dipilih untuk print');
+        }
+
+        $pdf = Pdf::loadView('backend.purchasing.pdf', compact('addedBarcodes'))
+            ->setPaper([0, 0, 121.88, 70.86]); // 43mm x 25mm
+
+        return $pdf->stream('barcodes.pdf');
+    }
+
+    public function printBarcodeWithPdfMaklon(Request $request)
+    {
+        // delete all data
+        $user = Auth::user()->username;
+        $recordDelete = BarcodeModel::where("username", $user);
+        $recordDelete->delete();
+
+        $validated = $request->validate([
+            'codes'     => 'required|array',
+            'codes.*'   => 'required|string',
+            'names'     => 'required|array',
+            'names.*'   => 'required|string',
+            'qtys'           => 'required|array',
+            'qtys.*'         => 'required|numeric',
+            'docDate'   => 'required'
+        ]);
+        // dd($request->all());
+
+        // save db
+        $user  = Auth::user()->username;
+        foreach ($validated['codes'] as $index => $code) {
+            BarcodeModel::create([
+                'code'      => $code,
+                'name'      => $validated['names'][$index],
+                'qty'       => $validated['qtys'][$index],
+                'username'  => Auth::user()->username,
+                'date_po'   => $validated['docDate'],
+            ]);
+        }
+
+        // get print
+        $addedBarcodes = BarcodeModel::where("username", $user)->get();
+        if ($addedBarcodes->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada barcodes yang dipilih untuk print');
+        }
+
+        $pdf = Pdf::loadView('backend.purchasing.pdf', compact('addedBarcodes'))
+            ->setPaper([0, 0, 121.88, 70.86]); // 43mm x 25mm
+
+        return $pdf->stream('barcodes.pdf');
     }
 }

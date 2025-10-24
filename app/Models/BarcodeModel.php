@@ -11,6 +11,7 @@ class BarcodeModel extends Model
     use HasFactory;
 
     protected $table = 'barcode';
+    protected $fillable = ['code', 'name', 'qty', 'date_po', 'username'];
 
     static public function getRecord()
     {

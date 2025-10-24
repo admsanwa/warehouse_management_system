@@ -89,7 +89,10 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('admin/purchasing/view', [PurchasingController::class, 'view']);
     Route::get('admin/purchasing/upload', [PurchasingController::class, 'upload_form']);
     Route::post('admin/purchasing/upload', [PurchasingController::class, 'upload']);
-
+    Route::get('admin/purchasing/barcode', [PurchasingController::class, 'barcode']);
+    Route::get('admin/purchasing/barcode/{docEntry}', [PurchasingController::class, 'barcode_po']);
+    Route::get('/print/barcodes/pdfpo', [PurchasingController::class, 'printBarcodeWithPdf']);
+    Route::post('/print/pdfmaklon', [PurchasingController::class, 'printBarcodeWithPdfMaklon']);
     // production
     // bon
     Route::get('admin/production/bon', [ProductionController::class, 'bon']);
