@@ -1134,7 +1134,7 @@
             const docEntry = document.getElementById("docEntry").value;
             const remark = document.getElementById("remarks").value;
             if (!remark) {
-                showToast("❌ Error: Pastikan Nomer Purchasing Order dan Remark di isi sebelum submit!")
+                showToast("❌ Error: Pastikan Remark di isi sebelum submit!")
                 btn.disabled = false;
                 return false;
             }
