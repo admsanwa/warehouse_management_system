@@ -1032,7 +1032,7 @@
             // 1️⃣ Jika tujuan BUKAN BK903 → wajib pilih production order
             // ==============================
             console.log(selectedProd)
-            if (toWhsCode && selectedProd) {
+            if (toWhsCode && typeof selectedProd == "object") {
                 console.log("Prod Order Item");
                 // if (!selectedProd) {
                 //     showToast("⚠️ Harap pilih Production Order terlebih dahulu!", "error");
@@ -1061,7 +1061,7 @@
                 }
 
                 // ==============================
-                // 2️⃣ Jika tujuan BK093 → tidak wajib pilih production order
+                // 2️⃣ Jika tujuan tidak ada pilih production order 
                 // ==============================
             }
 
