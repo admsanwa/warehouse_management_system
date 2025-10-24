@@ -1031,12 +1031,12 @@
             // ==============================
             // 1️⃣ Jika tujuan BUKAN BK903 → wajib pilih production order
             // ==============================
-            if (toWhsCode && toWhsCode != "BK903") {
+            if (toWhsCode && selectedProd) {
                 console.log("Prod Order Item");
-                if (!selectedProd) {
-                    showToast("⚠️ Harap pilih Production Order terlebih dahulu!", "error");
-                    return false;
-                }
+                // if (!selectedProd) {
+                //     showToast("⚠️ Harap pilih Production Order terlebih dahulu!", "error");
+                //     return false;
+                // }
 
                 const lines = Array.isArray(selectedProd.Lines) ? selectedProd.Lines : [];
 
@@ -1051,6 +1051,12 @@
                         PlannedQty: selectedProd.PlannedQty ?? 0,
                     };
                     isHeaderItem = true;
+                }
+
+                // Jika tetap tidak ditemukan, tolak
+                if (!item) {
+                    showToast(`${itemCode} tidak ada di Production Order.`, "error");
+                    return false;
                 }
 
                 // ==============================
