@@ -572,42 +572,42 @@
             const description = (stock.Dscription ?? "") + (stock.FreeTxt ? " - " + stock.FreeTxt : "");
 
             const row = `
-        <tr>
-            <td>${idx + 1}</td>
-            <td>
-                ${stock.ItemCode}
-                <input type="hidden" name="stocks[${idx}][LineNum]" value="${stock.LineNum}">
-                <input type="hidden" name="stocks[${idx}][BaseEntry]" value="${stock.DocEntry}">
-                <input type="hidden" name="stocks[${idx}][ItemCode]" value="${stock.ItemCode}">
-            </td>
-            <td>
-                ${description}
-                <input type="hidden" name="stocks[${idx}][Dscription]" value="${stock.Dscription ?? ""}">
-            </td>
-            <td> ${formatDecimalsSAP(stock.Quantity)}</td>
-            <td> ${formatDecimalsSAP(stock.OpenQty)}</td>
-            <td>
-                <input type="hidden" name="stocks[${idx}][PlanQty]" value="${stock.Quantity}">
-                <input type="hidden" name="stocks[${idx}][OpenQty]" value="${stock.OpenQty}">
-                <input type="text" name="stocks[${idx}][qty]" class="form-control format-sap" step="0.01" style="min-width:80px !important;" value="0">
-                <input type="hidden" name="stocks[${idx}][PriceBefDi]" value="${stock.PriceBefDi}">
-                <input type="hidden" name="stocks[${idx}][DiscPrcnt]" value="${stock.DiscPrcnt}">
-                <input type="hidden" name="stocks[${idx}][VatGroup]" value="${stock.VatGroup}">
-                <input type="hidden" name="stocks[${idx}][AcctCode]" value="${stock.AcctCode}">
-                <input type="hidden" name="stocks[${idx}][OcrCode]" value="${stock.OcrCode}">
-                <input type="hidden" name="stocks[${idx}][FreeTxt]" value="${stock.FreeTxt ?? ""}">
-            </td>
-            <td>
-                ${stock.UnitMsr ?? ""}
-                <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${stock.UnitMsr ?? ""}">
-            </td>
-            <td>
-                <button type="button" onclick="deleteItem(this)" class="btn btn-danger btn-sm">
-                    <i class="fa fa-trash"></i>
-                </button>
-            </td>
-        </tr>
-    `;
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td>
+                        ${stock.ItemCode}
+                        <input type="hidden" name="stocks[${idx}][LineNum]" value="${stock.LineNum}">
+                        <input type="hidden" name="stocks[${idx}][BaseEntry]" value="${stock.DocEntry}">
+                        <input type="hidden" name="stocks[${idx}][ItemCode]" value="${stock.ItemCode}">
+                    </td>
+                    <td>
+                        ${description}
+                        <input type="hidden" name="stocks[${idx}][Dscription]" value="${stock.Dscription ?? ""}">
+                    </td>
+                    <td> ${formatDecimalsSAP(stock.Quantity)}</td>
+                    <td> ${formatDecimalsSAP(stock.OpenQty)}</td>
+                    <td>
+                        <input type="hidden" name="stocks[${idx}][PlanQty]" value="${stock.Quantity}">
+                        <input type="hidden" name="stocks[${idx}][OpenQty]" value="${stock.OpenQty}">
+                        <input type="text" name="stocks[${idx}][qty]" class="form-control format-sap" step="0.01" style="min-width:80px !important;" value="0">
+                        <input type="hidden" name="stocks[${idx}][PriceBefDi]" value="${stock.PriceBefDi}">
+                        <input type="hidden" name="stocks[${idx}][DiscPrcnt]" value="${stock.DiscPrcnt}">
+                        <input type="hidden" name="stocks[${idx}][VatGroup]" value="${stock.VatGroup}">
+                        <input type="hidden" name="stocks[${idx}][AcctCode]" value="${stock.AcctCode}">
+                        <input type="hidden" name="stocks[${idx}][OcrCode]" value="${stock.OcrCode}">
+                        <input type="hidden" name="stocks[${idx}][FreeTxt]" value="${stock.FreeTxt ?? ""}">
+                    </td>
+                    <td>
+                        ${stock.UnitMsr ?? ""}
+                        <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${stock.UnitMsr ?? ""}">
+                    </td>
+                    <td>
+                        <button type="button" onclick="deleteItem(this)" class="btn btn-danger btn-sm">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
 
             tBody.insertAdjacentHTML("beforeend", row);
             reorderTableRows();
