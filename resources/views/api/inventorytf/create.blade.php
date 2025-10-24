@@ -952,7 +952,7 @@
             $("#U_MEB_ProjectDetail").val(data.U_MEB_ProjectDetail ?? "");
             $("#U_MEB_Internal_No").val(data.U_MEB_Internal_Prod ?? "");
             $("#U_SI_No_Produksi").val(data.U_MEB_Internal_Prod ?? "");
-            $("#remarks").val(data.Comments ?? "");
+            $("#Comments").val(data.Comments ?? "");
 
             console.log("✅ Product data appended:", data);
             if (data.OriginNum || data.U_MEB_NO_IO) {
