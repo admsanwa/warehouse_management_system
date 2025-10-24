@@ -1031,6 +1031,7 @@
             // ==============================
             // 1️⃣ Jika tujuan BUKAN BK903 → wajib pilih production order
             // ==============================
+            console.log(selectedProd)
             if (toWhsCode && selectedProd) {
                 console.log("Prod Order Item");
                 // if (!selectedProd) {
