@@ -297,12 +297,16 @@ class PurchasingController extends Controller
 
     public function barcode()
     {
-        $user           = Auth::user()->username;
-        $addedBarcodes  = BarcodeModel::where('username', $user)->latest()->take(5)->get();
+        // delete all data
+        $user = Auth::user()->username;
+        $recordDelete = BarcodeModel::where("username", $user);
+        $recordDelete->delete();
 
+        $addedBarcodes  = BarcodeModel::where('username', $user)->latest()->take(5)->get();
+        $addedBarcodesLast = BarcodeModel::where('username', $user)->latest()->first();
         return view("api.purchasing.barcode", [
-            'addedBarcodesLast' => [],
-            'docDate' => '',
+            'addedBarcodesLast' => $addedBarcodesLast,
+            'docDate' => date('Y-m-d'),
             'addedBarcodes'  => $addedBarcodes
         ]);
     }

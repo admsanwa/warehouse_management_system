@@ -34,7 +34,7 @@
                             <div class="card-header">
                                 <h3 class="card-title">Recently Added</h3>
                             </div>
-                            @if ($addedBarcodesLast && $addedBarcodesLast['code'] != 'Z-Biaya Maklon')
+                            @if (isset($addedBarcodesLast['code']) && $addedBarcodesLast['code'] != 'Z-Biaya Maklon')
                                 <form action="{{ url('/print/barcodes/pdfpo') }}" method="GET">
                                     <div class="card-body p-0">
                                         <div class="table-responsive">
