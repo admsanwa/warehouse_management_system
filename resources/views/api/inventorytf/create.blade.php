@@ -1054,7 +1054,7 @@
                 }
 
                 // Jika tetap tidak ditemukan, tolak
-                if (!item) {
+                if (!item && selectedProd) {
                     showToast(`${itemCode} tidak ada di Production Order.`, "error");
                     return false;
                 }
