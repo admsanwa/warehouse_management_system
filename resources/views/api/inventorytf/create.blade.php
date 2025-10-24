@@ -1011,15 +1011,15 @@
 
             const tBody = document.getElementById("itemRows");
             const itemCode = document.getElementById("item_code").value?.trim();
+            const transactionType = document.getElementById("U_MEB_Type_Inv_Trans").value;
+            const toWhsCode = $("#ToWhsCode").val();
+            const fromWhsCode = $("#FromWhsCode").val() || "";
 
             if (!itemCode) {
                 showToast("⚠️ Harap scan barcode terlebih dahulu!", "error");
                 return false;
             }
 
-            const toWhsCode = $("#ToWhsCode").val();
-            console.log(toWhsCode);
-            const fromWhsCode = $("#FromWhsCode").val() || "";
             let item = {
                 ItemCode: scannedItem.ItemCode,
                 ItemName: scannedItem.ItemName,
@@ -1029,15 +1029,14 @@
             let isHeaderItem = false;
 
             // ==============================
-            // 1️⃣ Jika tujuan BUKAN BK903 → wajib pilih production order
+            // 1️⃣ Jika transaction type = "for order" → wajib ada Production Order
             // ==============================
-            console.log(selectedProd)
-            if (toWhsCode && selectedProd.DocNum) {
-                console.log("Prod Order Item");
-                // if (!selectedProd) {
-                //     showToast("⚠️ Harap pilih Production Order terlebih dahulu!", "error");
-                //     return false;
-                // }
+            if (transactionType === "02") {
+                if (!selectedProd || typeof selectedProd !== "object" || Array.isArray(selectedProd) || Object.keys(
+                        selectedProd).length === 0) {
+                    showToast("⚠️ Harap pilih Production Order terlebih dahulu!", "error");
+                    return false;
+                }
 
                 const lines = Array.isArray(selectedProd.Lines) ? selectedProd.Lines : [];
 
@@ -1059,14 +1058,10 @@
                     showToast(`${itemCode} tidak ada di Production Order.`, "error");
                     return false;
                 }
-
-                // ==============================
-                // 2️⃣ Jika tujuan tidak ada pilih production order 
-                // ==============================
             }
 
             // ==============================
-            // 3️⃣ Cegah duplikasi barcode
+            // 2️⃣ Cegah duplikasi barcode
             // ==============================
             const existing = Array.from(tBody.querySelectorAll('input[name^="stocks"][name$="[ItemCode]"]'))
                 .some(input => input.value === item.ItemCode);
@@ -1077,40 +1072,41 @@
             }
 
             // ==============================
-            // 4️⃣ Tambah baris ke tabel
+            // 3️⃣ Tambah baris ke tabel
             // ==============================
             const idx = tBody.rows.length;
-            const rowColor = isHeaderItem ? "#e6ffed" : "#e6f0ff"; // hijau untuk header, biru untuk detail
+            const rowColor = isHeaderItem ? "#e6ffed" : "#e6f0ff";
             const label = isHeaderItem ? "HEADER ITEM" : "DETAIL ITEM";
             const labelClass = isHeaderItem ? "bg-green-600" : "bg-blue-600";
 
             const row = `
-                <tr style="background-color: ${rowColor};">
-                    <td>${idx + 1}</td>
-                    <td>
-                        ${item.ItemCode}
-                        <input type="hidden" name="stocks[${idx}][ItemCode]" value="${item.ItemCode}">
-                    </td>
-                    <td>${item.ItemName || ""}</td>
-                    <td>${fromWhsCode}</td>
-                    <td>${toWhsCode}</td>
-                    <td>${formatDecimalsSAP(item.PlannedQty)}</td>
-                    <td>
-                        <input type="hidden" name="stocks[${idx}][FromWhsCode]" value="${fromWhsCode}">
-                        <input type="hidden" name="stocks[${idx}][ToWhsCode]" value="${toWhsCode}">
-                        <input type="text" name="stocks[${idx}][qty]" class="form-control format-sap" step="0.01" style="min-width:80px !important;" value="0">
-                    </td>
-                    <td>
-                        ${item.InvntryUoM ?? ""}
-                        <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${item.InvntryUoM ?? ""}">
-                    </td>
-                    <td>
-                        <button type="button" onclick="deleteItem(this)" class="btn btn-danger btn-sm">
-                            <i class="fa fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
+        <tr style="background-color: ${rowColor};">
+            <td>${idx + 1}</td>
+            <td>
+                ${item.ItemCode}
+                <input type="hidden" name="stocks[${idx}][ItemCode]" value="${item.ItemCode}">
+            </td>
+            <td>${item.ItemName || ""}</td>
+            <td>${fromWhsCode}</td>
+            <td>${toWhsCode}</td>
+            <td>${formatDecimalsSAP(item.PlannedQty)}</td>
+            <td>
+                <input type="hidden" name="stocks[${idx}][FromWhsCode]" value="${fromWhsCode}">
+                <input type="hidden" name="stocks[${idx}][ToWhsCode]" value="${toWhsCode}">
+                <input type="text" name="stocks[${idx}][qty]" class="form-control format-sap" step="0.01" style="min-width:80px !important;" value="0">
+            </td>
+            <td>
+                ${item.InvntryUoM ?? ""}
+                <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${item.InvntryUoM ?? ""}">
+            </td>
+            <td>
+                <button type="button" onclick="deleteItem(this)" class="btn btn-danger btn-sm">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `;
+
             tBody.insertAdjacentHTML("beforeend", row);
             reorderTableRows();
             const newInput = tBody.querySelector(`input[name="stocks[${idx}][qty]"]`);
