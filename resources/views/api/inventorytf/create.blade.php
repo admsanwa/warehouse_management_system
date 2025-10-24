@@ -1053,12 +1053,6 @@
                     isHeaderItem = true;
                 }
 
-                // Jika tetap tidak ditemukan, tolak
-                if (!item && selectedProd) {
-                    showToast(`${itemCode} tidak ada di Production Order.`, "error");
-                    return false;
-                }
-
                 // ==============================
                 // 2️⃣ Jika tujuan BK093 → tidak wajib pilih production order
                 // ==============================
