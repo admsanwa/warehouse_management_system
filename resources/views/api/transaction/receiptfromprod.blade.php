@@ -752,6 +752,19 @@
         }
 
         function appendProdData(data) {
+            if (data.PostDate) {
+                const parts = data.PostDate.split("/");
+                if (parts.length === 3) {
+                    const year = parseInt(parts[0]);
+                    const month = parseInt(parts[1]);
+
+                    if (year < 2025 || (year === 2025 && month < 10)) {
+                        $("#prod_order").val(null).trigger("change");
+                        showToast("Tidak bisa pilih Production karena < Oktober 2025", "error");
+                        return false;
+                    }
+                }
+            }
             $("#docNum").val(data.DocNum || "");
             $("#docEntry").val(data.DocEntry || "");
             $("#no_io").val(data.U_MEB_NO_IO || "");
