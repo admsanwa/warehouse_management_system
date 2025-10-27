@@ -1,5 +1,5 @@
-@extends("backend.layouts.app")
-@section("content")
+@extends('backend.layouts.app')
+@section('content')
     <div class="content-wrapper">
         <div class="content-header">
             <div class="container-fluid">
@@ -17,7 +17,7 @@
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title"> 
+                                <h3 class="card-title">
                                     Search Delivery List
                                 </h3>
                             </div>
@@ -29,12 +29,12 @@
                                             <input type="text" name="io" class="form-control"
                                                 placeholder="Enter Nomor IO">
                                         </div>
-                                         <div class="form-group col-md-2">
+                                        <div class="form-group col-md-2">
                                             <label for="">Product Order</label>
                                             <input type="text" name="prod_order" class="form-control"
                                                 placeholder="Enter Product Order">
                                         </div>
-                                      <div class="form-group col-md-2">
+                                        <div class="form-group col-md-2">
                                             <label for="">Product No</label>
                                             <input type="text" name="prod_no" id="prod_no" class="form-control"
                                                 placeholder="Enter Product Nomor">
@@ -48,9 +48,13 @@
                                             <label for="status">Status Tracker</label>
                                             <select name="status" id="status" class="form-control">
                                                 <option value="">Select Status Tracker</option>
-                                                <option value="Pick Up" {{ request('status') == 'Pick Up' ? 'selected' : '' }}>Pick Up</option>
-                                                <option value="On Delivery" {{ request('status') == 'On Delivery' ? 'selected' : '' }}>On Delivery</option>
-                                                <option value="Done" {{ request('status') == 'Done' ? 'selected' : '' }}>Done</option>
+                                                <option value="Pick Up"
+                                                    {{ request('status') == 'Pick Up' ? 'selected' : '' }}>Pick Up</option>
+                                                <option value="On Delivery"
+                                                    {{ request('status') == 'On Delivery' ? 'selected' : '' }}>On Delivery
+                                                </option>
+                                                <option value="Done" {{ request('status') == 'Done' ? 'selected' : '' }}>
+                                                    Done</option>
                                             </select>
                                         </div>
                                         {{-- <div class="form-group col-md-2">
@@ -69,7 +73,7 @@
                             </form>
                         </div>
 
-                        @include("_message")
+                        @include('_message')
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">List Delivery</h3>
@@ -96,15 +100,20 @@
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $delivery->io }}</td>
                                                     <td>{{ $delivery->prod_order }}</td>
-                                                    <td><a href="{{ url('admin/production/view?docEntry=' . $delivery->doc_entry . '&docNum=' . $delivery->prod_order) }}">{{ $delivery->prod_no }}</a> 
+                                                    <td><a
+                                                            href="{{ url('admin/production/view?docEntry=' . $delivery->doc_entry . '&docNum=' . $delivery->prod_order) }}">{{ $delivery->prod_no }}</a>
                                                     <td>{{ $delivery->prod_desc }}</td>
-                                                    <td>{{ $delivery->delivery?->status ?? "-" }}</td>
-                                                    <td>{{ $delivery->delivery?->date ?? "-" }}</td>
-                                                    <td>{{ $delivery->delivery?->remark ?? "-" }}</td>
-                                                    <td><a href="#" data-bs-toggle="modal" data-bs-target="#modal_{{ $delivery->doc_entry }}"><i class="fa fa-eye"></i> Estimate</a></td>
+                                                    <td>{{ $delivery->status ?? '-' }}</td>
+                                                    <td>{{ $delivery->date ?? '-' }}</td>
+                                                    <td>{{ $delivery->remark ?? '-' }}</td>
+                                                    <td><a href="#" data-bs-toggle="modal"
+                                                            data-bs-target="#modal_{{ $delivery->doc_entry }}"><i
+                                                                class="fa fa-eye"></i> Estimate</a></td>
                                                 </tr>
-                                                
-                                                @include('partials.modal.tracking', ['delivery' => $delivery])
+
+                                                @include('partials.modal.tracking', [
+                                                    'delivery' => $delivery,
+                                                ])
                                             @empty
                                                 <tr>
                                                     <td colspan="100%">No Record Found</td>
@@ -124,5 +133,5 @@
             </div>
         </section>
     </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 @endsection

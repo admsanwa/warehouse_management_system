@@ -15,11 +15,7 @@ class DeliveryController extends Controller
 {
     public function index(Request $request)
     {
-        $getRecord = QualityModel::getRecord($request)
-            ->with('delivery')
-            ->where('result', 1)
-            ->where('prod_no', 'LIKE', 'SI%')
-            ->paginate(10);
+        $getRecord = DeliveryModel::getRecord($request);
 
         return view('backend.delivery.list', compact('getRecord'));
     }
@@ -30,31 +26,33 @@ class DeliveryController extends Controller
         $request->validate([
             'status'    => "required",
             "date"      => "required|date",
-            "remark"    => "required|string|min:3"
+            "remark"    => "required|string|min:2"
         ]);
-        $quality = QualityModel::where('doc_entry', $docEntry)->first();
         $user   = Auth::user()->username;
+        $deliveryData = DeliveryModel::where('doc_entry', $docEntry)->first();
 
         // save db
         $delivery = new DeliveryModel();
-        $delivery->doc_entry    = $quality->doc_entry;
-        $delivery->io           = $quality->io;
-        $delivery->prod_order   = $quality->prod_order;
-        $delivery->prod_no      = $quality->prod_no;
-        $delivery->prod_desc    = $quality->prod_desc;
-        $delivery->series       = $quality->series;
+        $delivery->doc_entry    = $docEntry;
+        $delivery->io           = $deliveryData->io;
+        $delivery->prod_order   = $deliveryData->prod_order;
+        $delivery->prod_no      = $deliveryData->prod_no;
+        $delivery->prod_desc    = $deliveryData->prod_desc;
+        $delivery->series       = $deliveryData->series;
         $delivery->status       = $request->status;
         $delivery->date         = $request->date;
         $delivery->remark       = $request->remark;
         $delivery->tracker_by   = $user;
         $delivery->save();
+
+
         // dd($request->all());
-        return redirect()->back()->with("success", "Telah berhasil tracking delivery product: {$quality->prod_no} menjadi {$request->status}");
+        return redirect()->back()->with("success", "Telah berhasil tracking delivery product: {$delivery->prod_no} menjadi {$request->status}");
     }
 
     public function history(Request $request)
     {
-        $getRecord = DeliveryModel::getRecord($request)->paginate(10);
+        $getRecord = DeliveryModel::get();
 
         return view('backend.delivery.history', compact('getRecord'));
     }

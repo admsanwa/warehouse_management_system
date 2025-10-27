@@ -9,6 +9,8 @@ use App\Services\SapService;
 use Illuminate\Support\Arr;
 use App\Models\SapReasonModel as SapReason;
 use App\Models\BuyerModel;
+use App\Models\DeliveryModel;
+use Illuminate\Support\Facades\DB;
 
 class InventorytfController extends Controller
 {
@@ -131,6 +133,51 @@ class InventorytfController extends Controller
                 'stocks.*.qty' => 'required|string',
                 'stocks.*.UnitMsr' => 'nullable|string',
             ]);
+
+            // save to db || Currently update
+            if (
+                ($validated['ToWhsCode'] === 'JK001' && $validated['U_MEB_Default_Whse'] === 'JK001') ||
+                ($validated['ToWhsCode'] === 'SB904' && $validated['U_MEB_Default_Whse'] === 'SB904')
+            ) {
+                // get prod order
+                $param = [
+                    "DocEntry" => $request->prodDocEntry,
+                ];
+                $prods = $this->sap->getProductionOrders($param);
+
+                if (empty($prods) || !Arr::get($prods, 'success')) {
+                    return back()->with(
+                        'error',
+                        Arr::get($prods, 'message', 'Gagal mengambil data dari Production Order SAP. Silakan coba lagi nanti.')
+                    );
+                }
+
+                $prod = Arr::get($prods, 'data.0', []);
+
+                DB::transaction(function () use ($request, $validated, $prod) {
+                    $delivery = DeliveryModel::create([
+                        'doc_entry' => $request->prodDocEntry ?? 0,
+                        'io' => $validated['U_MEB_NO_IO'] ?? '-',
+                        'prod_order' => $validated['U_MEB_No_Prod_Order'] ?? 0,
+                        'prod_no' => $prod['ItemCode'] ?? '-',
+                        'prod_desc' => $prod['ItemName'] ?? '-',
+                        'series' => $prod['Series'] ?? 0,
+                        'remark' => '-',
+                        'tracker_by' => '-'
+                    ]);
+
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Inventory transfer berhasil di simpan ke DB WMS',
+                        'data'  => $delivery,
+                    ]);
+                });
+            }
+
+            // dd([
+            //     'ToWhsCode' => $validated['ToWhsCode'],
+            //     'U_MEB_Default_Whse' => $validated['U_MEB_Default_Whse'],
+            // ]);
 
             $postData = [
                 // 'DocDate'    => now()->format('Y/m/d'),

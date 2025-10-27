@@ -16,7 +16,7 @@ class QualityModel extends Model
 
     static public function getRecord()
     {
-        $return = self::select('quality.*'); 
+        $return = self::select('quality.*');
         if (!empty(Request::get('prod_order'))) {
             $return = $return->where('prod_order', 'LIKE', '%' . Request::get('prod_order') . '%');
         }
@@ -33,17 +33,12 @@ class QualityModel extends Model
             $return = $return->where('result', 'LIKE', '%' . Request::get('result') . '%');
         }
         if (!empty(Request::get('status'))) {
-            $return = $return->whereHas('delivery', function($q) {
-                $q->where('status', 'LIKE', '%' . Request::get('status') . '%');                
+            $return = $return->whereHas('delivery', function ($q) {
+                $q->where('status', 'LIKE', '%' . Request::get('status') . '%');
             });
         }
 
         return $return->orderBy('id', 'desc');
-    }
-
-    public function delivery()
-    {
-        return $this->hasOne(DeliveryModel::class, 'doc_entry', 'doc_entry')->latest("id");
     }
 
     public function user()

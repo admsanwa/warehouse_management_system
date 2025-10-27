@@ -11,10 +11,13 @@ class DeliveryModel extends Model
     use HasFactory;
 
     protected $table = "delivery";
+    protected $fillable = ['doc_entry', 'io', 'prod_order', 'prod_no', 'prod_desc', 'series', 'remark', 'tracker_by'];
 
-     static public function getRecord()
+    static public function getRecord()
     {
-        $return = self::select('delivery.*'); 
+        $sub = self::selectRaw('MAX(id) AS id')->groupBy('prod_no');
+        $return = self::whereIn('id', $sub);
+
         if (!empty(Request::get('prod_order'))) {
             $return = $return->where('prod_order', 'LIKE', '%' . Request::get('prod_order') . '%');
         }
@@ -31,6 +34,6 @@ class DeliveryModel extends Model
             $return = $return->where('status', 'LIKE', '%' . Request::get('status') . '%');
         }
 
-        return $return->orderBy('id', 'desc');
+        return $return->orderBy('id', 'desc')->paginate(10);
     }
 }

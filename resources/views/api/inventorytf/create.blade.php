@@ -109,6 +109,7 @@
                                 </div>
                                 <input type="hidden" name="docNum" id="docNum" value="{{ $po ?? '' }}" />
                                 <input type="hidden" name="docEntry" id="docEntry" value="{{ $docEntry ?? '' }}" />
+                                <input type="hidden" name="prodDocEntry" id="prodDocEntry" />
                                 <label class="col-sm-4 col-form-label">Vendor:</label>
                                 <div class="col-sm-8 mb-2">
                                     <input type="text" name="cardName" id="cardName" value=""
@@ -953,6 +954,9 @@
             $("#U_MEB_Internal_No").val(data.U_MEB_Internal_Prod ?? "");
             $("#U_SI_No_Produksi").val(data.U_MEB_Internal_Prod ?? "");
             $("#Comments").val(data.Comments ?? "");
+            // currently update
+            $("#prodDocEntry").val(data.DocEntry ?? "");
+            // console.log("doc entry", data.DocEntry);
 
             console.log("✅ Product data appended:", data);
             if (data.OriginNum || data.U_MEB_NO_IO) {
@@ -1336,8 +1340,6 @@
                     });
                 }
             }
-
-
 
             const inputTanggal = document.getElementById('U_SI_HARI_TGL_KIRIM');
             const display = document.getElementById('tanggal_display');
