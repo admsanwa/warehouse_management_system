@@ -756,19 +756,21 @@
         }
 
         function appendProdData(data) {
-            // if (data.PostDate) {
-            //     const parts = data.PostDate.split("/");
-            //     if (parts.length === 3) {
-            //         const year = parseInt(parts[0]);
-            //         const month = parseInt(parts[1]);
+            if (data.PostDate) {
+                const parts = data.PostDate.split("/");
+                if (parts.length === 3) {
+                    const year = parseInt(parts[0]);
+                    const month = parseInt(parts[1]);
 
-            //         if (year < 2025 || (year === 2025 && month < 10)) {
-            //             $("#prod_order").val(null).trigger("change");
-            //             showToast("Tidak bisa pilih Production karena < Oktober 2025", "error");
-            //             return false;
-            //         }
-            //     }
-            // }
+                    if (year < 2025 || (year === 2025 && month < 09)) {
+                        $("#prod_order").val(null).trigger("change");
+                        showToast(
+                            "Prd. Order tidak bisa dipilih karena sudah dilakukan Issue < Oktober 2025. Harap hubungi Tim IT.",
+                            "error");
+                        return false;
+                    }
+                }
+            }
 
             $("#docnum").val(data.DocNum || "");
             $("#docEntry").val(data.DocEntry || "");
