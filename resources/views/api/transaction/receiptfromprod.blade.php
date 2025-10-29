@@ -761,7 +761,7 @@
                     if (year < 2025 || (year === 2025 && month < 09)) {
                         $("#prod_order").val(null).trigger("change");
                         showToast(
-                            "Prd. Order tidak bisa dipilih karena sudah dilakukan Issue < Oktober 2025. Harap hubungi Tim IT.",
+                            "Prd. Order tidak bisa dipilih karena sudah dilakukan Issue < September 2025. Harap hubungi Tim IT.",
                             "error");
                         return false;
                     }
