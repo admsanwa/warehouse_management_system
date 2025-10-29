@@ -178,6 +178,11 @@
                     }
                 ]
             });
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
 
             $("#filter").click(function() {
                 let startDate = $("#start_date").val();
