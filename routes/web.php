@@ -199,6 +199,8 @@ Route::group(['middleware' => 'admin'], function () {
     // Reports
     Route::get("admin/reports/finishgoods", [ReportsController::class, "finish_goods"]);
     Route::get("admin/reports/semifg", [ReportsController::class, "semifg"]);
+    Route::get("/reports-bon", [ReportsController::class, 'bon']);
+    Route::get('/reports-bon-data', [ReportsController::class, 'data'])->name('report.bon.data');
 
     // delivery
     Route::get("admin/delivery/list", [DeliveryController::class, "index"]);

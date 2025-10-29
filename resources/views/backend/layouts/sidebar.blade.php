@@ -231,8 +231,7 @@
         {{-- Production --}}
         @if (
             $authDept == 'IT' ||
-                ($authDept == 'Production and Warehouse' && $authLevel == 'Manager') ||
-                ($authDept == 'Production and Warehouse' && $authLevel == 'Supervisor') ||
+                $authDept == 'Production and Warehouse' ||
                 $authDept == 'Fabrication' ||
                 $authDept == 'PPIC' ||
                 $authDept == 'Purchasing' ||
@@ -262,7 +261,8 @@
                                     $authDept == 'IT' ||
                                     $authDept == 'Production' ||
                                     ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager') ||
-                                    $authDept == 'Fabrication')
+                                    $authDept == 'Fabrication' ||
+                                    ($authDept == 'Production and Warehouse' && $authLevel === 'Leader'))
                                 <li class="nav-item">
                                     <a href="{{ url('admin/production/po') }}"
                                         class="nav-link @if (Request::is('admin/production/po')) active @endif">
@@ -305,7 +305,7 @@
                                     $authDept == 'Procurement, Installation and Delivery' ||
                                     $authDept == 'Production' ||
                                     $authDept == 'Production and Warehouse' ||
-                                    ($authDept == 'Quality Control' && $authLevel == 'Manager'))
+                                    $authDept == 'Quality Control')
                                 <li class="nav-item">
                                     <a href="{{ url('admin/production/listmemo') }}"
                                         class="nav-link @if (Request::is('admin/production/listmemo')) active @endif">
@@ -668,6 +668,12 @@
                                     </a>
                                 </li>
                             @endif
+                            <li class="nav-item">
+                                <a href="{{ url('/reports-bon') }}"
+                                    class="nav-link @if (Request::is('admin/reports/bon')) active @endif">
+                                    <p>Bon</p>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                 </ul>

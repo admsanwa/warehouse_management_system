@@ -103,4 +103,9 @@ class BonModel extends Model
     {
         return $this->belongsTo(SignBonModel::class, 'no', 'no_bon');
     }
+
+    public function grpo()
+    {
+        return $this->hasOne(grpoModel::class, 'io', 'io');
+    }
 }

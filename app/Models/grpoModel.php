@@ -28,4 +28,9 @@ class grpoModel extends Model
         'note',
         'remarks'
     ];
+
+    public function bon()
+    {
+        return $this->belongsTo(BonModel::class, 'io', 'io');
+    }
 }

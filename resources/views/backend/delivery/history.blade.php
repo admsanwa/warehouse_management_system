@@ -1,5 +1,5 @@
-@extends("backend.layouts.app")
-@section("content")
+@extends('backend.layouts.app')
+@section('content')
     <div class="content-wrapper">
         <div class="content-header">
             <div class="container-fluid">
@@ -17,7 +17,7 @@
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title"> 
+                                <h3 class="card-title">
                                     Search History Delivery List
                                 </h3>
                             </div>
@@ -27,30 +27,34 @@
                                         <div class="form-group col-md-2">
                                             <label for="">IO No</label>
                                             <input type="text" name="io" class="form-control"
-                                                placeholder="Enter Nomor IO">
+                                                value="{{ request('io') }}" placeholder="Enter Nomor IO">
                                         </div>
-                                         <div class="form-group col-md-2">
+                                        <div class="form-group col-md-2">
                                             <label for="">Product Order</label>
                                             <input type="text" name="prod_order" class="form-control"
-                                                placeholder="Enter Product Order">
+                                                value="{{ request('prod_order') }}" placeholder="Enter Product Order">
                                         </div>
-                                      <div class="form-group col-md-2">
+                                        <div class="form-group col-md-2">
                                             <label for="">Product No</label>
                                             <input type="text" name="prod_no" id="prod_no" class="form-control"
-                                                placeholder="Enter Product Nomor">
+                                                value="{{ request('prod_no') }}" placeholder="Enter Product Nomor">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Product Desc</label>
                                             <input type="text" name="prod_desc" class="form-control"
-                                                placeholder="Enter Product Description">
+                                                value="{{ request('prod_desc') }}" placeholder="Enter Product Description">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="status">Status Tracker</label>
                                             <select name="status" id="status" class="form-control">
                                                 <option value="">Select Status Tracker</option>
-                                                <option value="Pick Up" {{ request('status') == 'Pick Up' ? 'selected' : '' }}>Pick Up</option>
-                                                <option value="On Delivery" {{ request('status') == 'On Delivery' ? 'selected' : '' }}>On Delivery</option>
-                                                <option value="Done" {{ request('status') == 'Done' ? 'selected' : '' }}>Done</option>
+                                                <option value="Pick Up"
+                                                    {{ request('status') == 'Pick Up' ? 'selected' : '' }}>Pick Up</option>
+                                                <option value="On Delivery"
+                                                    {{ request('status') == 'On Delivery' ? 'selected' : '' }}>On Delivery
+                                                </option>
+                                                <option value="Done" {{ request('status') == 'Done' ? 'selected' : '' }}>
+                                                    Done</option>
                                             </select>
                                         </div>
                                         {{-- <div class="form-group col-md-2">
@@ -69,7 +73,7 @@
                             </form>
                         </div>
 
-                        @include("_message")
+                        @include('_message')
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">List History Delivery</h3>
@@ -96,14 +100,15 @@
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $delivery->io }}</td>
                                                     <td>{{ $delivery->prod_order }}</td>
-                                                    <td><a href="{{ url('admin/production/view?docEntry=' . $delivery->doc_entry . '&docNum=' . $delivery->prod_order) }}">{{ $delivery->prod_no }}</a> 
+                                                    <td><a
+                                                            href="{{ url('admin/production/view?docEntry=' . $delivery->doc_entry . '&docNum=' . $delivery->prod_order) }}">{{ $delivery->prod_no }}</a>
                                                     <td>{{ $delivery->prod_desc }}</td>
-                                                    <td>{{ $delivery->status ?? "-" }}</td>
-                                                    <td>{{ $delivery->date ?? "-" }}</td>
+                                                    <td>{{ $delivery->status ?? '-' }}</td>
+                                                    <td>{{ $delivery->date ?? '-' }}</td>
                                                     <td>{{ $delivery->tracker_by }}</td>
-                                                    <td>{{ $delivery->remark ?? "-" }}</td>
+                                                    <td>{{ $delivery->remark ?? '-' }}</td>
                                                 </tr>
-                                                
+
                                             @empty
                                                 <tr>
                                                     <td colspan="100%">No Record Found</td>
@@ -115,6 +120,7 @@
                             </div>
                             <div class="card-footer">
                                 <div class="d-flex justify-content-between align-items-center">
+                                    {!! $getRecord->onEachSide(1)->appends(request()->except('page'))->links() !!}
                                 </div>
                             </div>
                         </div>
@@ -123,5 +129,5 @@
             </div>
         </section>
     </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 @endsection

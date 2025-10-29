@@ -27,22 +27,22 @@
                                         <div class="form-group col-md-2">
                                             <label for="">IO No</label>
                                             <input type="text" name="io" class="form-control"
-                                                placeholder="Enter Nomor IO">
+                                                value="{{ request('io') }}" placeholder="Enter Nomor IO">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Product Order</label>
                                             <input type="text" name="prod_order" class="form-control"
-                                                placeholder="Enter Product Order">
+                                                value="{{ request('prod_order') }}" placeholder="Enter Product Order">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Product No</label>
                                             <input type="text" name="prod_no" id="prod_no" class="form-control"
-                                                placeholder="Enter Product Nomor">
+                                                value="{{ request('prod_no') }}" placeholder="Enter Product Nomor">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Product Desc</label>
                                             <input type="text" name="prod_desc" class="form-control"
-                                                placeholder="Enter Product Description">
+                                                value="{{ request('prod_desc') }}" placeholder="Enter Product Description">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="status">Status Tracker</label>
@@ -125,6 +125,7 @@
                             </div>
                             <div class="card-footer">
                                 <div class="d-flex justify-content-between align-items-center">
+                                    {!! $getRecord->onEachSide(1)->appends(request()->except('page'))->links() !!}
                                 </div>
                             </div>
                         </div>

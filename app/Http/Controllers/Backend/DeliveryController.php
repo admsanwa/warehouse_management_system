@@ -15,7 +15,7 @@ class DeliveryController extends Controller
 {
     public function index(Request $request)
     {
-        $getRecord = DeliveryModel::getRecord($request);
+        $getRecord = DeliveryModel::getRecord($request)->paginate('10');
 
         return view('backend.delivery.list', compact('getRecord'));
     }
@@ -52,7 +52,7 @@ class DeliveryController extends Controller
 
     public function history(Request $request)
     {
-        $getRecord = DeliveryModel::get();
+        $getRecord = DeliveryModel::getRecordTwo()->paginate('10');
 
         return view('backend.delivery.history', compact('getRecord'));
     }
