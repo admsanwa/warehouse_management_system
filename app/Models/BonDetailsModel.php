@@ -34,7 +34,7 @@ class BonDetailsModel extends Model
     public function grpo()
     {
         return $this->hasOneThrough(
-            GrpoModel::class,   // Model tujuan
+            grpoModel::class,   // Model tujuan
             BonModel::class,    // Model perantara
             'id',               // Foreign key di bon (ke bon_details.bon_id)
             'io',               // Foreign key di grpo (ke bon.io)
