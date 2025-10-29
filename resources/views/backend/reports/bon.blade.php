@@ -135,7 +135,7 @@
                     [1, "desc"]
                 ],
                 ajax: {
-                    type: "GET",
+                    type: "POST",
                     url: "{{ route('report.bon.data') }}",
                     data: function(d) {
                         d.start_date = $("#start_date").val();
