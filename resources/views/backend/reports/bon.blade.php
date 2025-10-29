@@ -89,6 +89,11 @@
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
     <script>
         $(function() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
             let table = $("#bonTable").DataTable({
                 processing: true,
                 serverSide: true,
@@ -178,11 +183,8 @@
                     }
                 ]
             });
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
+
+
 
             $("#filter").click(function() {
                 let startDate = $("#start_date").val();
