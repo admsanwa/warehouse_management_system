@@ -295,19 +295,20 @@ class PurchasingController extends Controller
         return back()->with('success', "POs Imported Succesfully");
     }
 
+    // currently update
     public function barcode()
     {
-        // delete all data
-        $user = Auth::user()->username;
+        $user         = Auth::user()->username;
         $recordDelete = BarcodeModel::where("username", $user);
         $recordDelete->delete();
 
-        $addedBarcodes  = BarcodeModel::where('username', $user)->latest()->take(5)->get();
-        $addedBarcodesLast = BarcodeModel::where('username', $user)->latest()->first();
+        $addedBarcodes  = BarcodeModel::where('username', $user)->latest()->take(10)->get();
+        $addedBarcodesLast = [];
+
         return view("api.purchasing.barcode", [
+            'addedBarcodes'  => $addedBarcodes,
             'addedBarcodesLast' => $addedBarcodesLast,
-            'docDate' => date('Y-m-d'),
-            'addedBarcodes'  => $addedBarcodes
+            'docDate' => date('Y-m-d')
         ]);
     }
 
@@ -343,7 +344,7 @@ class PurchasingController extends Controller
             $barcode->name  = $line['Dscription'];
             $barcode->username = $user;
             $barcode->qty   = $line['Quantity'];
-            $barcode->date_po = $po['DocDate'];
+            $barcode->date_po = date('Y-m-d');
             $barcode->save();
         }
 

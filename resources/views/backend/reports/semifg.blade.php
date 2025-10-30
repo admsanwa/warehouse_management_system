@@ -1,5 +1,5 @@
-@extends("backend.layouts.app")
-@section("content")
+@extends('backend.layouts.app')
+@section('content')
     <div class="content-wrapper">
         <div class="content-header">
             <div class="container-fluid">
@@ -17,7 +17,7 @@
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title"> 
+                                <h3 class="card-title">
                                     Search List Semi Finish Goods
                                 </h3>
                             </div>
@@ -27,28 +27,28 @@
                                         <div class="form-group col-md-2">
                                             <label for="">IO No</label>
                                             <input type="text" name="io" class="form-control"
-                                                placeholder="Enter Nomor IO">
+                                                value="{{ request('io') }}" placeholder="Enter Nomor IO">
                                         </div>
-                                         <div class="form-group col-md-2">
+                                        <div class="form-group col-md-2">
                                             <label for="">Product Order</label>
                                             <input type="text" name="prod_order" class="form-control"
-                                                placeholder="Enter Product Order">
+                                                value="{{ request('prod_order') }}" placeholder="Enter Product Order">
                                         </div>
-                                      <div class="form-group col-md-2">
+                                        <div class="form-group col-md-2">
                                             <label for="">Product No</label>
                                             <input type="text" name="prod_no" id="prod_no" class="form-control"
-                                                placeholder="Enter Product Nomor">
+                                                value="{{ request('prod_no') }}" placeholder="Enter Product Nomor">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Product Desc</label>
                                             <input type="text" name="prod_desc" class="form-control"
-                                                placeholder="Enter Product Description">
+                                                value="{{ request('prod_desc') }}" placeholder="Enter Product Description">
                                         </div>
-                                        {{-- <div class="form-group col-md-2">
+                                        <div class="form-group col-md-2">
                                             <label for="series">Series</label>
                                             <select name="series" class="form-control" id="seriesSelect">
                                             </select>
-                                        </div> --}}
+                                        </div>
                                         <div class="form-group col-md-3">
                                             <button type="submit" class="btn btn-primary" style="margin-top: 20px"><i
                                                     class="fa fa-search"></i> Search</button>
@@ -60,7 +60,7 @@
                             </form>
                         </div>
 
-                        @include("_message")
+                        @include('_message')
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">List Semi Finish Goods</h3>
@@ -75,7 +75,7 @@
                                                 <th>Prod Order</th>
                                                 <th>Prod Nomor</th>
                                                 <th>Prod Description</th>
-                                                <th>Complete Qty</th>
+                                                <th>Series</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -84,9 +84,17 @@
                                                     <td>{{ $loop->iteration }}</td>
                                                     <td>{{ $semifg->io }}</td>
                                                     <td>{{ $semifg->prod_order }}</td>
-                                                    <td><a href="{{ url('admin/production/view?docEntry=' . $semifg->doc_entry . '&docNum=' . $semifg->prod_order) }}">{{ $semifg->prod_no }}</a> 
+                                                    <td><a
+                                                            href="{{ url('admin/production/view?docEntry=' . $semifg->doc_entry . '&docNum=' . $semifg->prod_order) }}">{{ $semifg->prod_no }}</a>
                                                     <td>{{ $semifg->prod_desc }}</td>
-                                                    <td>{{ formatDecimalsSAP($semifg->qty) }}</div>
+                                                    <td>
+                                                        @if (!empty($series) && isset($series['ObjectCode'], $series['SeriesName']))
+                                                            {{ $series['SeriesName'] }}
+                                                        @else
+                                                            <span class="text-danger">⚠️ Series tidak ditemukan:
+                                                                {{ $getRecord['series'] }}</span>
+                                                        @endif
+                                                    </td>
                                                 </tr>
                                             @empty
                                                 <tr>
@@ -111,4 +119,66 @@
         </section>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        window.addEventListener("load", function() {
+            const selectSeries = $("#seriesSelect");
+            let selectedSeries = "{{ request()->series }}";
+            console.log(selectedSeries);
+            if (selectedSeries) {
+                $.ajax({
+                    url: "/purchasing/seriesSearch",
+                    data: {
+                        Series: selectedSeries,
+                        ObjectCode: "22"
+                    },
+                    dataType: "json"
+                }).then(function(data) {
+                    if (data.results && data.results.length > 0) {
+                        let item = data.results[0]; // ambil hasil pertama
+                        let option = new Option(item.text, item.id, true, true);
+                        selectSeries.append(option).trigger("change");
+                    }
+                });
+            }
+            selectSeries.select2({
+                placeholder: "Ketik kode series...",
+                allowClear: true,
+                width: "100%",
+                language: {
+                    inputTooShort: function() {
+                        return "Ketik kode series untuk mencari...";
+                    },
+                    noResults: function() {
+                        return "Tidak ada data ditemukan";
+                    },
+                    searching: function() {
+                        return "Sedang mencari...";
+                    },
+                },
+                ajax: {
+                    url: "/purchasing/seriesSearch",
+                    dataType: "json",
+                    delay: 250,
+                    data: function(params) {
+                        if (!params) {
+                            return;
+                        }
+                        return {
+                            q: params.term,
+                            ObjectCode: '22'
+                        };
+                    },
+                    processResults: function(data) {
+                        console.log("Response dari server:", data); // cek di console
+                        return {
+                            results: (data.results || []).map(item => ({
+                                id: item.id,
+                                text: item.text
+                            }))
+                        };
+                    }
+                }
+            });
+        });
+    </script>
 @endsection

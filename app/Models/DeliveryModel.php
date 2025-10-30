@@ -33,6 +33,9 @@ class DeliveryModel extends Model
         if (!empty(Request::get('status'))) {
             $return = $return->where('status', 'LIKE', '%' . Request::get('status') . '%');
         }
+        if (!empty(Request::get('series'))) {
+            $return = $return->where('series', '=', Request::get('series'));
+        }
 
         return $return->orderBy('id', 'desc');
     }
