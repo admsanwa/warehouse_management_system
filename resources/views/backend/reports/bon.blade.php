@@ -101,7 +101,7 @@
                 dom: 'Bfrtip', // 👈 Aktifkan button
                 buttons: [{
                         extend: 'excelHtml5',
-                        title: '<h3>Report BON Pembelian</h3>',
+                        title: 'Report BON Pembelian',
                         className: 'btn btn-success btn-sm mr-2',
                         text: '<i class="fa fa-file-excel"</i> Export Excell',
                     },
