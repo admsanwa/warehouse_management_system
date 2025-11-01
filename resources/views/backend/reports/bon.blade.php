@@ -180,7 +180,15 @@
                     {
                         data: 'receipt_date',
                         title: 'Tanggal Terima'
-                    }
+                    },
+                    {
+                        data: 'receipt_qty',
+                        title: 'Qty Terima'
+                    },
+                    {
+                        data: 'remain_qty',
+                        title: 'Qty Sisa'
+                    },
                 ]
             });
 
