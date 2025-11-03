@@ -37,9 +37,9 @@ class BonDetailsModel extends Model
             grpoModel::class,   // Model tujuan
             BonModel::class,    // Model perantara
             'id',               // Foreign key di bon (ke bon_details.bon_id)
-            'io',               // Foreign key di grpo (ke bon.io)
+            'no_po',               // Foreign key di grpo (ke bon.io)
             'bon_id',           // Local key di bon_details
-            'io'                // Local key di bon
+            'no_po'                // Local key di bon
         );
     }
 }

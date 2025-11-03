@@ -31,6 +31,6 @@ class grpoModel extends Model
 
     public function bon()
     {
-        return $this->belongsTo(BonModel::class, 'io', 'io');
+        return $this->belongsTo(BonModel::class, 'no_po', 'po');
     }
 }

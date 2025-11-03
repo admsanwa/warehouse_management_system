@@ -506,6 +506,7 @@ class ProductionController extends Controller
     {
         $user   = Auth::user();
         $number = BonModel::generateNumber();
+
         return view('backend.production.bon', compact('number', 'user'));
     }
 
@@ -599,7 +600,7 @@ class ProductionController extends Controller
     {
         $bon            = BonModel::with(['details', 'createdBy'])->findOrFail($id);
         $user           = Auth::user();
-        $signApprove    = SignBonModel::with('user')->where('no_bon', $bon->no)->where('sign', 1)->first();
+        $signApprove    = SignBonModel::with('user')->where('no_bon', $bon->no)->where('sign', 1)->where('department', 'Procurement, Installation and Delivery')->first();
         $signBuyer      = SignBonModel::with('user')->where('no_bon', $bon->no)->where('sign', 1)->where('department', 'Purchasing')
             ->whereHas('user', function ($q) {
                 $q->where('department', 'Purchasing');
@@ -608,6 +609,7 @@ class ProductionController extends Controller
 
         return view("backend.production.showbon", compact('bon', 'user', 'signApprove', 'signBuyer'));
     }
+
     public function approve_bon(Request $request)
     {
         $no   = $request->input("no_bon");
@@ -651,7 +653,58 @@ class ProductionController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => "Successfully approve bon"
+            'message' => 'PO Approve successfully',
+        ]);
+    }
+
+    public function insert_po($id, Request $request)
+    {
+        $request->validate([
+            'po' => 'required|numeric',
+            'no_bon' => 'required'
+        ]);
+        $user = Auth::user();
+
+        // Simpan sign
+        $sign               = new SignBonModel();
+        $sign->no_bon       = $request->no_bon;
+        $sign->nik          = $user->nik;
+        $sign->department   = $user->department;
+        $sign->sign         = 1;
+        $sign->save();
+
+        $bon = BonModel::where("no", $request->no_bon)->first();
+        BonModel::where('id', $id)->update(['no_po' => $request->po]);
+
+        $recipients = collect();
+
+        if ($bon && $bon->type) {
+            if ($bon->type === "Lokal") {
+                $recipients = collect([new \App\Models\User([
+                    "email" => "purchasing_bks@sanwamas.co.id"
+                ])]);
+            } elseif ($bon->type === "Import") {
+                $recipients = collect([new \App\Models\User([
+                    "email" => "purchasing_staff@sanwamas.co.id"
+                ])]);
+            }
+        }
+
+        if ($recipients->isEmpty()) {
+            $recipients = User::where("department", "Purchasing")->get();
+        }
+
+        $dev_users = User::where('department', 'IT')->get();
+        $recipients = $recipients->merge($dev_users);
+
+        Notification::send($recipients, new MailBonFinal(
+            $request->no_bon,
+            url('admin/production/listbon')
+        ));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Approve Bon successfully',
         ]);
     }
 

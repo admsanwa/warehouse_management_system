@@ -117,18 +117,92 @@
             <button class="btn btn-primary btn-print" onclick="window.print()">
                 <i class="fa fa-print"></i> Print
             </button>
-            <button class="btn btn-success" onclick="approve()"
+
+            <button class="btn btn-success"
+                @if ($user->nik === '250071' || $user->nik === '08517') onclick="approve()"
+        @else
+            onclick="approveBon()" @endif
                 style="display: {{ $user->nik === '250071' || $user->nik === '08517' || $user->nik === '06067' ? 'block' : 'none' }}">
-                <i class="fa fa-check-circle"> Approve</i>
+                <i class="fa fa-check-circle"></i> Approve
             </button>
+
+            <div id="loadingOverlay"
+                style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; text-align:center;">
+                <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:white;">
+                    <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;"></div>
+                    <div class="mt-3">Processing... Please wait</div>
+                </div>
+            </div>
+
+            @include('partials.modal.insertpo', ['bon' => $bon])
         </div>
     </div>
     <script>
-        function approve() {
-            const no_bon = document.getElementById("no_bon").value;
-            // console.log("no", no_bon);
-            if (!confirm("Are you sure approve to bon this?")) return;
+        function showLoading() {
+            document.getElementById("loadingOverlay").style.display = "block";
+        }
 
+        function hideLoading() {
+            document.getElementById("loadingOverlay").style.display = "none";
+        }
+
+        function approve() {
+            console.log("purchase approve");
+            const noBon = document.getElementById("no_bon").value;
+            if (!confirm("Are you sure approve to BON this?")) return;
+
+            const modalEl = document.getElementById("modal_{{ $bon->id }}");
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+
+            const form = document.getElementById("insertPoForm_{{ $bon->id }}");
+            form.onsubmit = async function(e) {
+                e.preventDefault();
+
+                const poValue = document.getElementById("po_{{ $bon->id }}").value;
+                const noBonValue = document.getElementById("nobon_{{ $bon->id }}").value;
+                if (!poValue && !noBonValue) {
+                    alert("Please enter a PO number first");
+                    return;
+                }
+
+                showLoading();
+
+                try {
+                    const insertPoUrl = "{{ route('insert.po', ['id' => $bon->id]) }}";
+                    const res = await fetch(insertPoUrl, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Accept": "application/json",
+                            "X-CSRF-TOKEN": document.querySelector('meta[name=\"csrf-token\"]').content
+                        },
+                        body: JSON.stringify({
+                            po: poValue,
+                            no_bon: noBonValue
+                        })
+                    });
+
+                    const data = await res.json();
+                    alert(data.message || "PO Inserted Successfully");
+
+                    $('#modal_{{ $bon->id }}').modal('hide');
+                } catch (error) {
+                    console.error(error);
+                    alert("Failed to insert PO, Please try again");
+                } finally {
+                    hideLoading();
+                    location.reload();
+                }
+            };
+        }
+
+        function approveBon() {
+            showLoading();
+            const no_bon = document.getElementById("no_bon").value;
+            if (!confirm("Are you sure approve to BON this?")) return;
+
+            console.log("delvi approve");
             fetch("/approve-bon", {
                     method: "POST",
                     headers: {
@@ -137,16 +211,17 @@
                         "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
                     body: JSON.stringify({
-                        no_bon: no_bon
+                        no_bon
                     })
                 })
                 .then(res => res.json())
                 .then(data => {
-                    console.log(data);
                     alert(data.message);
+                    hideLoading();
+                    if (data.success) location.reload();
                 })
                 .catch(error => {
-                    console.error("Fetch Error: ", error);
+                    console.error("Fetch Error:", error);
                     alert("An error occurred. Check console for details.");
                 });
         }

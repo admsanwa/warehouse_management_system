@@ -21,7 +21,7 @@
                         <span id="feedbackMessage"></span>
                     </div>
                     <div class="card-header">
-                        <h3 class="card-title">Stock In</h3>
+                        <h3 class="card-title">GRPO</h3>
                     </div>
                     <form action="{{ url('admin/transaction/stockin') }}" method="post" enctype="multipart/form-data">
                         @csrf

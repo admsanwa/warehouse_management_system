@@ -23,7 +23,7 @@
                         <span id="feedbackMessage"></span>
                     </div>
                     <div class="card-header">
-                        <h3 class="card-title">Stock Out</h3>
+                        <h3 class="card-title">Issue For Prod</h3>
                     </div>
                     <div class="card-body">
                         <div class="form-group row">

@@ -81,6 +81,8 @@
                                                 <th>Stock SAP</th>
                                                 <th>Stock Min</th>
                                                 <th>Available</th>
+                                                <th>On Order</th>
+                                                <th>Commited</th>
                                                 <th>Notes</th>
                                                 <th>Uom</th>
                                             </tr>
@@ -95,6 +97,8 @@
                                                     <td>{{ formatDecimalsSAP($stock['OnHand']) ?? 'N/A' }}</td>
                                                     <td>{{ formatDecimalsSAP($stock['MinStock']) ?? 'N/A' }}</td>
                                                     <td>{{ formatDecimalsSAP($stock['Available']) ?? 'N/A' }}
+                                                    <td>{{ formatDecimalsSAP($stock['OnOrder']) ?? 'N/A' }}
+                                                    <td>{{ formatDecimalsSAP($stock['IsCommited']) ?? 'N/A' }}
                                                     </td>
                                                     <td>
                                                         {{ $stock['Status'] === 1 ? 'Stock harus dibeli' : '' }}

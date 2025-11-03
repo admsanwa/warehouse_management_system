@@ -19,6 +19,7 @@ class BonModel extends Model
         'date',
         'section',
         'io',
+        'no_po',
         'project',
         'make_to',
         'created_by'
@@ -106,6 +107,6 @@ class BonModel extends Model
 
     public function grpo()
     {
-        return $this->hasOne(grpoModel::class, 'io', 'io');
+        return $this->hasOne(grpoModel::class, 'no_po', 'no_po');
     }
 }
