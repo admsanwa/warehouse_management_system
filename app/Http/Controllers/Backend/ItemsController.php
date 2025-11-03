@@ -156,7 +156,7 @@ class ItemsController extends Controller
             "ItemName" => $request->get('item_desc'),
             "page" => (int) $request->get('page', 1),
             "limit" => (int) $request->get('limit', 10),
-            'Status' => $status ? (int)$request->get('stockNotes') : null,
+            'Status' => $status != '' ? (int)$request->get('stockNotes') : null,
             'WhsCode' => $request->get('warehouse', $this->default_warehouse)
         ];
         $getRecord      = $this->sap->getStockItems($param);
