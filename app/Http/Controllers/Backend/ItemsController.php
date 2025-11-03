@@ -150,12 +150,13 @@ class ItemsController extends Controller
 
     public function list(Request $request)
     {
+        $status = $request->get('stockNotes');
         $param = [
             'ItemCode' => $request->get('item_code'),
             "ItemName" => $request->get('item_desc'),
             "page" => (int) $request->get('page', 1),
             "limit" => (int) $request->get('limit', 10),
-            'Status' => (int) $request->get('stockNotes'),
+            'Status' => $status ? (int)$request->get('stockNotes') : null,
             'WhsCode' => $request->get('warehouse', $this->default_warehouse)
         ];
         $getRecord      = $this->sap->getStockItems($param);
@@ -325,7 +326,7 @@ class ItemsController extends Controller
         $results = $results->unique('WhsCode')->values();
 
         $wh = $results->map(function ($val) {
-        
+
             return [
                 'id'   => $val['WhsCode'],
                 'text' => $val['WhsCode'] . ' ' . $val['WhsName'],
