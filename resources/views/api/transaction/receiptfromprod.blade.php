@@ -95,7 +95,7 @@
                                             <option value="">Select No Production Order</option>
                                         </select>
                                     </div>
-                                    <input type="hidden" name="docnum" id="docnum" value="{{ $docNum ?? '' }}" />
+                                    <input type="hidden" name="docNum" id="docNum" value="{{ $docNum ?? '' }}" />
                                     <input type="hidden" name="docEntry" id="docEntry" value="{{ $docEntry ?? '' }}" />
                                 </div>
                                 <label for="" class="col-sm-4 col-form-lable">Production Type:</label>
@@ -190,6 +190,7 @@
                                         <th>Planned Qty</th>
                                         <th>Receipt Qty</th>
                                         <th>Qty</th>
+                                        <th>Reject Qty</th>
                                         <th>Uom</th>
                                         <th>Delete</th>
                                     </tr>
@@ -531,6 +532,8 @@
                 });
         }
 
+        let scannedCode;
+
         function sendScannedCode(code) {
             const fileInputWrapper = document.getElementById("fileInput");
             const fileInput = fileInputWrapper.querySelector("input[type='file']");
@@ -557,6 +560,7 @@
                     }
 
                     // console.log("data", data);
+                    scannedCode = data.warehouseStock;
                     // const pomSelect = document.getElementById("pom");
                     document.getElementById("item_code").value = data.itemCode;
                     document.getElementById("item_desc").value = data.ItemName;
@@ -622,6 +626,8 @@
                 );
                 return false;
             }
+            const uomValue = scannedCode.InvntryUom ?? "-";
+
             let inputQty =
                 `<input type="text" name="stocks[${idx}][qty]" class="form-control" style="min-width:80px !important;" value="0">`;
             const row = `
@@ -641,9 +647,10 @@
                     <td>${formatDecimalsSAP(stocks.PlannedQty)}</td>
                     <td>${formatDecimalsSAP(totalReceiptQty)}</td>
                     <td>${inputQty}</td>
+                    <td><input type="text" name="stocks[${idx}][rjct_qty]" class="form-control" style="min-width:80px !important;" value="0"></td>
                     <td>
-                        ${stocks.InvntryUoM ?? ""}
-                        <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${stocks.InvntryUoM}">
+                        ${uomValue}
+                        <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${uomValue}">
                     </td>
                     <td>
                         <button type="button" onclick="deleteItem(this)" class="btn btn-danger btn-sm">
@@ -656,8 +663,12 @@
             tBody.insertAdjacentHTML("beforeend", row);
             reorderTableRows();
             const newInput = tBody.querySelector(`input[name="stocks[${idx}][qty]"]`);
+            const newRejectInput = tBody.querySelector(`input[name="stocks[${idx}][rjct_qty]"]`);
             if (newInput) {
                 formatInputDecimals(newInput);
+            }
+            if (newRejectInput) {
+                formatInputDecimals(newRejectInput);
             }
             return;
         }
@@ -777,7 +788,7 @@
         }
 
         function clearProdData() {
-            $("#docnum").val();
+            $("#docNum").val();
             $("#docEntry").val("");
             $("#no_io").val("");
             $("#no_so").val("");

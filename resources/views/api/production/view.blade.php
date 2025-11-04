@@ -60,21 +60,49 @@
                                     <div class="col-sm-4">: {{ $getRecord['U_MEB_Contract'] }}</div>
                                 </div>
 
-                                <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">Planned Qty</label>
-                                    <div class="col-sm-4">: {{ formatDecimalsSAP($getRecord['PlannedQty']) }}</div>
-                                    <label class="col-sm-2 col-form-label">Complete Qty</label>
-                                    <div class="col-sm-4">: {{ formatDecimalsSAP($getRecord['CmpltQty']) }}</div>
+                                <div class="row align-items-center mb-2">
+                                    <div class="col-md-6 mb-2 mb-md-0">
+                                        <div class="d-flex justify-content-between border-bottom pb-1">
+                                            <label class="fw-semibold mb-0">
+                                                Planned Qty
+                                            </label>
+                                            <span class="fw-bold">{{ formatDecimalsSAP($getRecord['PlannedQty']) }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex justify-content-between border-bottom pb-1">
+                                            <label class="fw-semibold mb-0">
+                                                Receipt Qty
+                                            </label>
+                                            <span class="fw-bold">{{ formatDecimalsSAP($getRecord['CmpltQty']) }}</span>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div class="form-group row">
-                                    <label class="col-sm-2 col-form-label">Reject Qty</label>
-                                    <div class="col-sm-4">: {{ formatDecimalsSAP($getRecord['RjctQty']) }}</div>
-                                    <label class="col-sm-2 col-form-label">Total Receipt Qty</label>
-                                    <div class="col-sm-4">:
-                                        {{ formatDecimalsSAP($getRecord['CmpltQty'] + $getRecord['RjctQty']) }}</div>
+                                <div class="row align-items-center mb-2">
+                                    <div class="col-md-6 mb-2 mb-md-0">
+                                        <div class="d-flex justify-content-between border-bottom pb-1">
+                                            <label class="fw-semibold text-danger mb-0">
+                                                Reject Qty
+                                            </label>
+                                            <span
+                                                class="text-danger fw-bold">{{ formatDecimalsSAP($totalRejectQty) }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex justify-content-between align-items-start border-bottom pb-1">
+                                            <div>
+                                                <label class="fw-semibold mb-0 d-block">
+                                                    <i class="bi bi-box-seam me-1"></i> Total Complete Qty
+                                                </label>
+                                                <small class="text-muted">(Receipt Qty + Reject Qty)</small>
+                                            </div>
+                                            <span class="fw-bold fs-6 text-end">
+                                                {{ formatDecimalsSAP($getRecord['CmpltQty'] + $totalRejectQty) }}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
-
 
                                 <div class="form-group row">
                                     <label class="col-sm-2 col-form-label">Sales Order</label>
@@ -103,7 +131,45 @@
                                 </div>
                             </div>
                         </div>
-
+                        {{-- <div class="card mt-3 shadow-sm border-0 rounded-2">
+                            <div class="card-header bg-secondary text-white fw-bold">
+                                Reject Quantity
+                            </div>
+                            <div class="card-body">
+                                @if ($rfp->count())
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped align-middle mb-3">
+                                            <thead class="table-light">
+                                                <tr class="text-center">
+                                                    <th style="width: 5%">#</th>
+                                                    <th>Product No</th>
+                                                    <th>Plan Qty</th>
+                                                    <th>Reject Quantity</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($rfp as $index => $item)
+                                                    <tr>
+                                                        <td class="text-center">{{ $index + 1 }}</td>
+                                                        <td>{{ $item->prod_no }}</td>
+                                                        <td>{{ $getRecord['PlannedQty'] }}</td>
+                                                        <td class="text-end">{{ formatDecimalsSAP($item->rjct_qty) }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                            <tfoot class="fw-bold">
+                                                <tr>
+                                                    <td colspan="2" class="text-end">Total Reject Qty</td>
+                                                    <td class="text-end">{{ formatDecimalsSAP($totalRejectQty) }}</td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                @else
+                                    <p class="text-muted mb-0">Tidak ada data reject quantity.</p>
+                                @endif
+                            </div>
+                        </div> --}}
                         <div class="card">
                             <div class="card-body">
                                 <div class="table table-responsive">
@@ -117,9 +183,9 @@
                                                     <th>Plan Qty</th>
                                                     <th>Issued Qty</th>
                                                     <th>Uom</th>
-                                                    @if ($user->department == "Quality Control" || $user->department == "IT")
+                                                    @if ($user->department == 'Quality Control' || $user->department == 'IT')
                                                         <th>QC</th>
-                                                        <th>Check Qty</th>                               
+                                                        <th>Check Qty</th>
                                                     @endif
                                                 </tr>
                                             </thead>
@@ -133,7 +199,7 @@
                                                             3 => 'Need Approval',
                                                             4 => 'Need Paint',
                                                             5 => 'Painting by Inhouse',
-                                                            6 => 'Painting by Makloon'
+                                                            6 => 'Painting by Makloon',
                                                         ];
                                                     @endphp
                                                     <tr>
@@ -143,15 +209,21 @@
                                                         <td>{{ formatDecimalsSAP($line['PlannedQty']) }}</td>
                                                         <td>{{ formatDecimalsSAP($line['IssuedQty']) }}</td>
                                                         <td>{{ $line['InvntryUoM'] ?? '-' }}</td>
-                                                        @if ($user->department == "Quality Control" || $user->department == "IT")
+                                                        @if ($user->department == 'Quality Control' || $user->department == 'IT')
                                                             @if (str_starts_with(strtoupper($line['ItemCode']), 'RM'))
                                                                 <td>{{ $statusMap[$quality->result ?? 0] ?? '-' }}</td>
                                                                 <td>
-                                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#modal_{{ $line['ItemCode'] }}"><i class="fa fa-eye"></i> Check QC</a>
+                                                                    <a href="#" data-bs-toggle="modal"
+                                                                        data-bs-target="#modal_{{ $line['ItemCode'] }}"><i
+                                                                            class="fa fa-eye"></i> Check QC</a>
                                                                 </td>
                                                             @endif
                                                         @endif
-                                                        @include('partials.modal.assessmentqc', ['quality' => $line, 'getRecord' => $getRecord, 'user' => $user])
+                                                        @include('partials.modal.assessmentqc', [
+                                                            'quality' => $line,
+                                                            'getRecord' => $getRecord,
+                                                            'user' => $user,
+                                                        ])
                                                     </tr>
                                                 @endforeach
                                             </tbody>
@@ -173,9 +245,10 @@
                                 @else
                                     {{ $getRecord['Status'] }}
                                 @endif
-                                @if ($user->department === "Production and Warehouse" && $user->level === "Leader" || $user->department === "IT")
-                                    <a href="{{ url('/preparematerial?docNum=' . $getRecord['DocNum'] . '&docEntry=' . $getRecord['DocEntry']) }}" 
-                                    class="btn btn-sm btn-outline-success"><i class="fa fa-arrow-right"></i> Form Prepare Material</a>
+                                @if (($user->department === 'Production and Warehouse' && $user->level === 'Leader') || $user->department === 'IT')
+                                    <a href="{{ url('/preparematerial?docNum=' . $getRecord['DocNum'] . '&docEntry=' . $getRecord['DocEntry']) }}"
+                                        class="btn btn-sm btn-outline-success"><i class="fa fa-arrow-right"></i> Form
+                                        Prepare Material</a>
                                 @endif
                                 <button onclick="history.back()" class="btn btn-default">Back</button>
                             </div>
@@ -187,6 +260,3 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 @endsection
-<div>
-    <!-- Breathing in, I calm body and mind. Breathing out, I smile. - Thich Nhat Hanh -->
-</div>

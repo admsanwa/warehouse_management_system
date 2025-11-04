@@ -900,10 +900,10 @@ class TransactionController extends Controller
         DB::beginTransaction();
         try {
             $validated = $request->validate([
-                'prod_order'        => 'nullable',
                 'series'        => 'nullable',
                 'remarks'      => 'required|string',
                 'reason'      => 'required|string',
+                'docNum'      => 'required|string',
                 'docEntry'      => 'required|string',
                 'no_io'      => 'nullable|string',
                 'no_so'      => 'nullable|string',
@@ -916,6 +916,7 @@ class TransactionController extends Controller
                 'stocks'                       => 'required|array|min:1',
                 'stocks.*.BaseEntry'            => 'required|string',
                 'stocks.*.qty'                 => 'required|string',
+                'stocks.*.rjct_qty'                 => 'nullable|string',
                 'stocks.*.PlannedQty'                 => 'nullable|numeric',
                 'stocks.*.totalReceiptQty'                 => 'nullable|numeric',
                 'stocks.*.item_code' => 'nullable|string',
@@ -928,7 +929,6 @@ class TransactionController extends Controller
 
             // Header untuk API
             $postData = [
-                // "Series" => ,
                 'DocDate'     => date("Y/m/d"),
                 'Comment'    => $validated['remarks'] ?? '',
                 'ProductionType'    => $validated['prod_type'] ?? '',
@@ -951,6 +951,7 @@ class TransactionController extends Controller
 
             foreach ($validated['stocks'] as $row) {
                 $entryQty = (float) str_replace(',', '.', str_replace('.', '', $row['qty']));
+                $rejectQty = (float) str_replace(',', '.', str_replace('.', '', $row['rjct_qty'] ?? '0'));
                 $planQty = (float) $row['PlannedQty'];
                 $totalRcptQty = (float) $row['totalReceiptQty'];
                 // Hitung sisa qty yang masih boleh diterima
@@ -969,13 +970,14 @@ class TransactionController extends Controller
 
                 $insertedData[] = [
                     'base_entry' => $row['BaseEntry'] ?? null,
-                    'prod_order' => $validated['prod_order'],
+                    'prod_order' => $validated['docNum'],
                     'no_series' => $validated['series'],
                     'io' => $validated['no_io'],
                     'so' => $validated['no_so'],
                     'prod_no' => $row['item_code'] ?? null,
                     'prod_desc' => $row['item_desc'] ?? null,
                     'qty' => $entryQty,
+                    'rjct_qty' => $rejectQty,
                     'uom' => $row['UnitMsr'] ?? null,
                     'whse' => $warehouse,
                     'project_code' => $project,

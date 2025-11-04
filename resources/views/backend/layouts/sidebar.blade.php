@@ -512,7 +512,7 @@
                                 <li class="nav-item">
                                     <a href="{{ url('admin/listtransaction/stockin') }}"
                                         class="nav-link @if (Request::is('admin/listtransaction/stockin') || Request::is('admin/listtransaction/stockin/*')) active @endif">
-                                        <p>List Stock In</p>
+                                        <p>List GRPO</p>
                                     </a>
                                 </li>
                             @endif
@@ -520,7 +520,7 @@
                                 <li class="nav-item">
                                     <a href="{{ url('admin/listtransaction/stockout') }}"
                                         class="nav-link @if (Request::is('admin/listtransaction/stockout/*') || Request::is('admin/listtransaction/stockout')) active @endif">
-                                        <p>List Stock Out</p>
+                                        <p>List Issue For Prod</p>
                                     </a>
                                 </li>
                             @endif

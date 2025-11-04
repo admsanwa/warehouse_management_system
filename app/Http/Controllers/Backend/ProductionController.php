@@ -14,6 +14,7 @@ use App\Models\ProductionModel;
 use App\Models\ProductionOrderDetailsModel;
 use App\Models\QualityModel;
 use App\Models\SignBonModel;
+use App\Models\RFPModel;
 use App\Models\SignModel;
 use App\Models\StockModel;
 use Illuminate\Http\Request;
@@ -160,11 +161,22 @@ class ProductionController extends Controller
             ->keyBy('prod_no');
         $user = Auth::user();
 
+        $rfp = RFPModel::where(function ($q) use ($prod) {
+            $q->where('base_entry', $prod['DocEntry'])
+                ->orWhere('prod_order', $prod['DocNum']);
+        })
+            ->where('prod_no', $prod['ItemCode'])
+            ->orderByDesc('id')
+            ->get();
+
+        $totalRejectQty = $rfp->sum('rjct_qty');
         return view('api.production.view', [
             'getRecord'    => $prod,
             'lines' => $lines,
             'series' => $series,
             'qualities' => $qualities,
+            'rfp'        => $rfp,
+            'totalRejectQty'        => $totalRejectQty,
             'user'  => $user
         ]);
     }
