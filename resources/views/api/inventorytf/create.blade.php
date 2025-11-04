@@ -38,11 +38,17 @@
                                             onclick="startCamera()">Use Camera</button>
                                         <button type="button" class="btn btn-sm btn-outline-secondary"
                                             onclick="showFileInput()">Upload Image</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                                            onclick="showItemSelect()">Select Item</button>
                                     </div>
                                     <div id="reader" style="width:300px; display: none;"></div>
                                     <div id="fileInput" style="display: none;">
                                         <input type="file" accept="image/*" onchange="scanImage(this)"
                                             class="form-control">
+                                    </div>
+                                    <div id="itemSelect" style="display:none; width: 465px;">
+                                        <select name="item_select" id="item_select" class="form-control mt-2" required>
+                                        </select>
                                     </div>
                                 </div>
                                 <label for="" class="col-sm-4 col-form-lable">Item Code :</label>
@@ -384,6 +390,7 @@
         let selectedProd = [];
         let scannedItem = [];
         let fullname = "{{ Auth::user()->fullname }}";
+        const defaultWhs = {!! json_encode(Auth::user()->warehouse_access) !!};
         window.addEventListener("load", function() {
             formatInputDecimals(document.getElementById("on_hand"));
             const poSelect = $("#no_po");
@@ -799,6 +806,7 @@
         function startCamera() {
             document.getElementById("reader").style.display = "block";
             document.getElementById("fileInput").style.display = "none";
+            document.getElementById("itemSelect").style.display = "none";
 
             if (!html5QrCode) {
                 html5QrCode = new Html5Qrcode("reader");
@@ -837,9 +845,67 @@
             });
         }
 
+        function showItemSelect() {
+            document.getElementById("reader").style.display = "none";
+            document.getElementById("fileInput").style.display = "none";
+            document.getElementById("itemSelect").style.display = "block";
+
+            if (typeof html5QrCode !== "undefined" && html5QrCode.isScanning) {
+                html5QrCode.stop().catch(() => {});
+            }
+
+            if (!$("#item_select").hasClass("select2-hidden-accessible")) {
+                $("#item_select").select2({
+                    placeholder: "Pilih Item",
+                    allowClear: true,
+                    width: "100%",
+                    language: {
+                        inputTooShort: () => "Ketik kode atau nama untuk mencari...",
+                        noResults: () => "Tidak ada data ditemukan",
+                        searching: () => "Sedang mencari...",
+                    },
+                    ajax: {
+                        url: "/onhandSearch",
+                        dataType: "json",
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                WhsCode: $("#warehouse").val(),
+                                q: params.term,
+                            };
+                        },
+                        processResults: function(data) {
+                            console.log("Response dari server:", data);
+                            return {
+                                results: (data.results || []).map(item => ({
+                                    id: item.id,
+                                    text: item.text
+                                }))
+                            };
+                        },
+                    },
+                });
+
+                $("#item_select").on("select2:select", function(e) {
+                    const selected = e.params.data;
+                    if (!selected || !selected.id) return;
+                    showLoadingOverlay("Loading item details...");
+
+                    sendScannedCode(selected.id);
+                    $("#item_select").val(null).trigger("change");
+                    setTimeout(() => {
+                        document.getElementById("itemSelect").style.display = "none";
+                        hideLoadingOverlay();
+                    }, 800);
+                });
+            }
+        }
+
         function showFileInput() {
             document.getElementById("reader").style.display = "none";
             document.getElementById("fileInput").style.display = "block";
+            document.getElementById("itemSelect").style.display = "none";
+
             if (html5QrCode) {
                 html5QrCode.stop().catch(err => {});
             }
@@ -862,6 +928,7 @@
         }
 
         function sendScannedCode(code) {
+            console.log("Plih kode", code);
             const fromWhsInput = document.getElementById('FromWhsCode');
             const toWhsInput = document.getElementById('ToWhsCode');
             const itemInput = document.getElementById('item_code');
@@ -903,8 +970,8 @@
                     const poSelect = document.getElementById('no_po');
                     const tBody = document.getElementById('tBody');
                     if (data.success) {
-                        // console.log("data", data);
-                        document.getElementById("id").value = data.id;
+                        console.log("data", data);
+                        document.getElementById("item_code").value = data.itemCode;
                         document.getElementById("item_desc").value = data.ItemName;
                         document.getElementById("on_hand").value = data.warehouseStock.OnHand;
                         scannedItem = data.warehouseStock;
@@ -1014,7 +1081,7 @@
             if (fileInput) fileInput.value = "";
 
             const tBody = document.getElementById("itemRows");
-            const itemCode = document.getElementById("item_code").value?.trim();
+            const itemCode = document.getElementById("item_code").value;
             const transactionType = document.getElementById("U_MEB_Type_Inv_Trans").value;
             const toWhsCode = $("#ToWhsCode").val();
             const fromWhsCode = $("#FromWhsCode").val() || "";
@@ -1084,32 +1151,32 @@
             const labelClass = isHeaderItem ? "bg-green-600" : "bg-blue-600";
 
             const row = `
-        <tr style="background-color: ${rowColor};">
-            <td>${idx + 1}</td>
-            <td>
-                ${item.ItemCode}
-                <input type="hidden" name="stocks[${idx}][ItemCode]" value="${item.ItemCode}">
-            </td>
-            <td>${item.ItemName || ""}</td>
-            <td>${fromWhsCode}</td>
-            <td>${toWhsCode}</td>
-            <td>${formatDecimalsSAP(item.PlannedQty)}</td>
-            <td>
-                <input type="hidden" name="stocks[${idx}][FromWhsCode]" value="${fromWhsCode}">
-                <input type="hidden" name="stocks[${idx}][ToWhsCode]" value="${toWhsCode}">
-                <input type="text" name="stocks[${idx}][qty]" class="form-control format-sap" step="0.01" style="min-width:80px !important;" value="0">
-            </td>
-            <td>
-                ${item.InvntryUoM ?? ""}
-                <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${item.InvntryUoM ?? ""}">
-            </td>
-            <td>
-                <button type="button" onclick="deleteItem(this)" class="btn btn-danger btn-sm">
-                    <i class="fa fa-trash"></i>
-                </button>
-            </td>
-        </tr>
-    `;
+            <tr style="background-color: ${rowColor};">
+                <td>${idx + 1}</td>
+                <td>
+                    ${item.ItemCode}
+                    <input type="hidden" name="stocks[${idx}][ItemCode]" value="${item.ItemCode}">
+                </td>
+                <td>${item.ItemName || ""}</td>
+                <td>${fromWhsCode}</td>
+                <td>${toWhsCode}</td>
+                <td>${formatDecimalsSAP(item.PlannedQty)}</td>
+                <td>
+                    <input type="hidden" name="stocks[${idx}][FromWhsCode]" value="${fromWhsCode}">
+                    <input type="hidden" name="stocks[${idx}][ToWhsCode]" value="${toWhsCode}">
+                    <input type="text" name="stocks[${idx}][qty]" class="form-control format-sap" step="0.01" style="min-width:80px !important;" value="0">
+                </td>
+                <td>
+                    ${item.InvntryUoM ?? ""}
+                    <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${item.InvntryUoM ?? ""}">
+                </td>
+                <td>
+                    <button type="button" onclick="deleteItem(this)" class="btn btn-danger btn-sm">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
 
             tBody.insertAdjacentHTML("beforeend", row);
             reorderTableRows();

@@ -243,16 +243,17 @@ class ItemsController extends Controller
         $q = $request->get('q');
         $page = (int) $request->get('page', 1);
         $limit = (int) $request->get('limit', 10);
-
+        $warehouse = $request->get('warehouse', $this->default_warehouse);
         $results = collect();
 
         // 1. Cari berdasarkan ItemCode
         $paramCode = [
             "page" => $page,
             "limit" => $limit,
-            'WhsCode' => $this->default_warehouse,
+            'WhsCode' => $warehouse,
             "ItemCode" => $q,
         ];
+
         $getCode = $this->sap->getStockItems($paramCode);
 
         if (!empty($getCode) && $getCode['success'] === true) {
@@ -263,7 +264,7 @@ class ItemsController extends Controller
         $paramName = [
             "page" => $page,
             "limit" => $limit,
-            'WhsCode' => $this->default_warehouse,
+            'WhsCode' => $warehouse,
             "ItemName" => $q,
         ];
         $getName = $this->sap->getStockItems($paramName);

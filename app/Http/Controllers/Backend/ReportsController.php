@@ -67,7 +67,7 @@ class ReportsController extends Controller
         return DataTables::of($query)
             ->addIndexColumn()
             ->addColumn('no', fn($row) => $row->bon->no ?? '-')
-            ->addColumn('date', fn($row) => $row->bon->date ? date('d-m-Y', strtotime($row->bon->date)) : '-')
+            ->addColumn('date', fn($row) => $row->bon?->date ? date('d-m-Y', strtotime($row->bon->date)) : '-')
             ->addColumn('item_name', fn($row) => $row->item_name)
             ->addColumn('uom', fn($row) => $row->uom)
             ->addColumn('qty', fn($row) => $row->qty)

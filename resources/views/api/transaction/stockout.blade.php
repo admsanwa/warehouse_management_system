@@ -37,10 +37,16 @@
                                         onclick="startCamera()">Use Camera</button>
                                     <button type="button" class="btn btn-sm btn-outline-secondary"
                                         onclick="showFileInput()">Upload Image</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                                        onclick="showItemSelect()">Select Item</button>
                                 </div>
-                                <div id="reader" style="width: 300px; display:none;"></div>
+                                <div id="reader" style="width: 300px; "></div>
                                 <div id="fileInput" style="display: none;">
                                     <input type="file" accept="image/*" onchange="scanImage(this)" class="form-control">
+                                </div>
+                                <div id="itemSelect" style="display:none; width: 465px;">
+                                    <select name="item_select" id="item_select" class="form-control mt-2" required>
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -110,7 +116,8 @@
                                 <label for="" class="col-sm-4 col-form-lable">Default Warehouse:</label>
                                 <div class="col-sm-6 mb-2">
                                     <input type="text" name="warehouse" id="warehouse" class="form-control mt-2"
-                                        placeholder="Default Warehouse akan terisi otomatis" readonly>
+                                        value="{{ $warehouse }}" placeholder="Default Warehouse akan terisi otomatis"
+                                        readonly>
                                     {{-- <select name="warehouse" id="warehouse" class="form-control mt-2" required >
                                         <option value="" disabled selected>Pilih Warehouse</option>
                                     </select> --}}
@@ -134,7 +141,8 @@
                                         class="form-control mt-2" required>
                                         <option value="" disabled selected>Pilih Inventory Transfer</option>
                                         @foreach ($inv_trans_reasons as $key => $item)
-                                            <option value="{{ $key }}">{{ $key }} - {{ $item }}
+                                            <option value="{{ $key }}">{{ $key }} -
+                                                {{ $item }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -452,6 +460,7 @@
         function startCamera() {
             document.getElementById("reader").style.display = "block";
             document.getElementById("fileInput").style.display = "none";
+            document.getElementById("itemSelect").style.display = "none";
 
             if (!html5QrCode) {
                 html5QrCode = new Html5Qrcode("reader");
@@ -490,9 +499,67 @@
             });
         }
 
+        function showItemSelect() {
+            document.getElementById("reader").style.display = "none";
+            document.getElementById("fileInput").style.display = "none";
+            document.getElementById("itemSelect").style.display = "block";
+
+            if (typeof html5QrCode !== "undefined" && html5QrCode.isScanning) {
+                html5QrCode.stop().catch(() => {});
+            }
+
+            if (!$("#item_select").hasClass("select2-hidden-accessible")) {
+                $("#item_select").select2({
+                    placeholder: "Pilih Item",
+                    allowClear: true,
+                    width: "100%",
+                    language: {
+                        inputTooShort: () => "Ketik kode atau nama untuk mencari...",
+                        noResults: () => "Tidak ada data ditemukan",
+                        searching: () => "Sedang mencari...",
+                    },
+                    ajax: {
+                        url: "/onhandSearch",
+                        dataType: "json",
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                WhsCode: $("#warehouse").val(),
+                                q: params.term,
+                            };
+                        },
+                        processResults: function(data) {
+                            console.log("Response dari server:", data);
+                            return {
+                                results: (data.results || []).map(item => ({
+                                    id: item.id,
+                                    text: item.text
+                                }))
+                            };
+                        },
+                    },
+                });
+
+                $("#item_select").on("select2:select", function(e) {
+                    const selected = e.params.data;
+                    if (!selected || !selected.id) return;
+                    showLoadingOverlay("Loading item details...");
+
+                    sendScannedCode(selected.id);
+
+                    $("#item_select").val(null).trigger("change");
+                    setTimeout(() => {
+                        document.getElementById("itemSelect").style.display = "none";
+                        hideLoadingOverlay();
+                    }, 800);
+                });
+            }
+        }
+
         function showFileInput() {
             document.getElementById("reader").style.display = "none";
             document.getElementById("fileInput").style.display = "block";
+            document.getElementById("itemSelect").style.display = "none";
 
             if (html5QrCode) {
                 html5QrCode.stop().catch(err => {});
