@@ -137,6 +137,8 @@
             @include('partials.modal.insertpo', ['bon' => $bon])
         </div>
     </div>
+    <!-- Include barcode scanner JS -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
         function showLoading() {
             document.getElementById("loadingOverlay").style.display = "block";
@@ -159,9 +161,12 @@
             form.onsubmit = async function(e) {
                 e.preventDefault();
 
-                const poValue = document.getElementById("po_{{ $bon->id }}").value;
-                const noBonValue = document.getElementById("nobon_{{ $bon->id }}").value;
-                if (!poValue && !noBonValue) {
+                const po = document.getElementById("po_{{ $bon->id }}").value;
+                const series = document.getElementById("seriesSelect_{{ $bon->id }}").value;
+                const no_bon = document.getElementById("nobon_{{ $bon->id }}").value;
+                console.log("po", po, "series", series, "nobon", no_bon);
+
+                if (!po && !no_bon && !series) {
                     alert("Please enter a PO number first");
                     return;
                 }
@@ -178,8 +183,9 @@
                             "X-CSRF-TOKEN": document.querySelector('meta[name=\"csrf-token\"]').content
                         },
                         body: JSON.stringify({
-                            po: poValue,
-                            no_bon: noBonValue
+                            po: po,
+                            no_bon: no_bon,
+                            series: series
                         })
                     });
 

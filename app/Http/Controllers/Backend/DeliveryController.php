@@ -58,5 +58,10 @@ class DeliveryController extends Controller
 
         return view('backend.delivery.history', compact('getRecord'));
     }
-}
 
+    public function updateDeliveryTemp()
+    {
+        DeliveryModel::where('is_temp', 0)->update(['is_temp' => 1]);
+        return response()->json(['status' => 'success']);
+    }
+}

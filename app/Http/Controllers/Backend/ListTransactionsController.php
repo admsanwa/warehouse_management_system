@@ -154,4 +154,16 @@ class ListTransactionsController extends Controller
             ->paginate(10);
         return view("backend.listtransactions.goodreceipt", compact('getRecord'));
     }
+
+    public function updateGRPOTemp()
+    {
+        grpoModel::where('is_temp', 0)->update(['is_temp' => 1]);
+        return response()->json(['status' => 'success']);
+    }
+
+    public function updateGRTemp()
+    {
+        goodreceiptModel::where('is_temp', 0)->update(['is_temp' => 1]);
+        return response()->json(['status' => 'success']);
+    }
 }

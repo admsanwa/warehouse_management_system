@@ -37,10 +37,6 @@ class DashboardController extends Controller
 
     public function dashboard(Request $request)
     {
-        // get value
-        // $getQuality     = QualityModel::whereNot("result", 3)->get()->unique('io');
-        // $getDelivery    = DeliveryModel::whereNotNull("status")->get()->unique('io');
-
         // count value
         $getItems = $this->sap->getStockItems([
             'Status' => 1,
@@ -85,13 +81,18 @@ class DashboardController extends Controller
                     ->groupBy('io');
             })
             ->exists();
-
         $hasQcPendingProd   = QualityModel::where('result', 4)
             ->whereIn('id', function ($query) {
                 $query->selectRaw('MAX(id)')
                     ->from('quality')
                     ->groupBy('io');
             })
+            ->exists();
+        $hasGRPOPending = grpoModel::where('is_temp', 0)->exists();
+        $hasGRPending = goodreceiptModel::where('is_temp', 0)->exists();
+        $hasDeliveryPending = DeliveryModel::where('is_temp', 0)
+            ->orWhereNull('status')
+            ->orWhere('status', '')
             ->exists();
 
         if (in_array($user->nik, ["06067", "08517", "250071"]) && $hasPending) {
@@ -105,6 +106,15 @@ class DashboardController extends Controller
         }
         if ($user->nik === "12345" && $hasQcPendingProd) {
             session()->flash('qcPendingProd', true);
+        }
+        if (in_array($user->department, ["Purchasing", "PPIC"]) && $hasGRPOPending) {
+            session()->flash('grpoPending', true);
+        }
+        if (in_array($user->department, ["Purchasing", "PPIC"]) && $hasGRPending) {
+            session()->flash('grPending', true);
+        }
+        if (in_array($user->department, ["Procurement, Installation and Delivery"]) && $hasDeliveryPending) {
+            session()->flash('deliveryPending', true);
         }
 
         return view('backend.dashboard.list', compact(
@@ -228,6 +238,24 @@ class DashboardController extends Controller
         session()->forget('qcPending');
         session()->forget('qcPendingProd');
         return redirect('admin/quality/list');
+    }
+
+    public function clearGrpoNotif()
+    {
+        session()->forget('grpoPending');
+        return redirect('admin/listtransaction/stockin');
+    }
+
+    public function clearGrNotif()
+    {
+        session()->forget('grPending');
+        return redirect('admin/listtransaction/goodreceipt');
+    }
+
+    public function clearDeliveryNotif()
+    {
+        session()->forget('deliveryPending');
+        return redirect('admin/delivery/list');
     }
 
     public function min_stock(Request $request)

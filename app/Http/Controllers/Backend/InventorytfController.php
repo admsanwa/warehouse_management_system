@@ -220,7 +220,8 @@ class InventorytfController extends Controller
                             'prod_desc' => $prod['ItemName'] ?? '-',
                             'series' => $prod['Series'] ?? 0,
                             'remark' => '-',
-                            'tracker_by' => '-'
+                            'tracker_by' => '-',
+                            'is_temp' => 0
                         ]);
 
                         return response()->json([

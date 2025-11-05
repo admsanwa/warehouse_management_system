@@ -34,12 +34,12 @@ class BonDetailsModel extends Model
     public function grpo()
     {
         return $this->hasOneThrough(
-            grpoModel::class,   // Model tujuan
+            GrpoModel::class,   // Model tujuan
             BonModel::class,    // Model perantara
             'id',               // Foreign key di bon (ke bon_details.bon_id)
             'no_po',               // Foreign key di grpo (ke bon.io)
             'bon_id',           // Local key di bon_details
             'no_po'                // Local key di bon
-        );
+        )->whereColumn('bon.no_series', 'grpo.no_series');
     }
 }

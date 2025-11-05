@@ -87,8 +87,15 @@
                                         </thead>
 
                                         @forelse ($getRecord as $gi)
-                                            <tr>
-                                                <td>{{ $loop->iteration }}</td>
+                                            <tr class="{{ $gi->is_temp === 0 ? 'table-primary' : '' }}">
+                                                <td>
+                                                    @if ($gi->is_temp === 0)
+                                                        <i class="fa fa-circle text-primary ms-2"
+                                                            style="font-size:8px; margin-right:10px;"
+                                                            title="Recommended"></i>
+                                                    @endif
+                                                    {{ $loop->iteration }}
+                                                </td>
                                                 <td>{{ $gi->io ?? 'N/A' }}</td>
                                                 <td>{{ $gi->po ?? '-' }}</td>
                                                 <td>{{ $gi->no_gi ?? '-' }}</td>
@@ -120,4 +127,12 @@
             </div>
         </section>
     </div>
+    <script>
+        fetch('/update-gr-temp', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+    </script>
 @endsection

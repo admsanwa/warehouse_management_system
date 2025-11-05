@@ -96,8 +96,15 @@
                                         </thead>
                                         <tbody>
                                             @forelse ($getRecord as $delivery)
-                                                <tr>
-                                                    <td>{{ $loop->iteration }}</td>
+                                                <tr class="{{ $delivery->should_highlight ? 'table-primary' : '' }}">
+                                                    <td>
+                                                        @if ($delivery->should_highlight)
+                                                            <i class="fa fa-circle text-primary ms-2"
+                                                                style="font-size:10px; margin-right:10px;"
+                                                                title="Recommended"></i>
+                                                        @endif
+                                                        {{ $loop->iteration }}
+                                                    </td>
                                                     <td>{{ $delivery->io }}</td>
                                                     <td>{{ $delivery->prod_order }}</td>
                                                     <td><a
@@ -135,4 +142,12 @@
         </section>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        fetch('/update-delivery-temp', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+    </script>
 @endsection

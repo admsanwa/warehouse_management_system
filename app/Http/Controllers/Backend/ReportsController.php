@@ -61,13 +61,14 @@ class ReportsController extends Controller
 
     public function data()
     {
-        $query = BonDetailsModel::with(['bon', 'grpo'])
-            ->filter();
+        $query = BonDetailsModel::with(['bon', 'grpo' => function ($q) {
+            $q->whereColumn('grpo.no_series', 'bon.no_series');
+        }])->filter();
 
         return DataTables::of($query)
             ->addIndexColumn()
             ->addColumn('no', fn($row) => $row->bon->no ?? '-')
-            ->addColumn('date', fn($row) => $row->bon?->date ? date('d-m-Y', strtotime($row->bon->date)) : '-')
+            ->addColumn('date', fn($row) => $row->bon->date ? date('d-m-Y', strtotime($row->bon->date)) : '-')
             ->addColumn('item_name', fn($row) => $row->item_name)
             ->addColumn('uom', fn($row) => $row->uom)
             ->addColumn('qty', fn($row) => $row->qty)

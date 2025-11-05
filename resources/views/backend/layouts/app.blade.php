@@ -31,6 +31,7 @@
     <link rel="stylesheet" href="{{ url('backend/plugins/daterangepicker/daterangepicker.css') }}">
     <!-- summernote -->
     <link rel="stylesheet" href="{{ url('backend/plugins/summernote/summernote-bs4.min.css') }}">
+
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 </head>
@@ -49,7 +50,14 @@
 
         @yield('content')
 
-        @if (session('bonPending') || session('memoPending') || session('qcPending') || session('qcPendingProd'))
+        {{-- Notification Approval --}}
+        @if (session('bonPending') ||
+                session('memoPending') ||
+                session('qcPending') ||
+                session('qcPendingProd') ||
+                session('grpoPending') ||
+                session('grPending') ||
+                session('deliveryPending'))
             <!-- Modal Notifikasi -->
             <div class="modal fade" id="bonPendingModal" tabindex="-1" role="dialog"
                 aria-labelledby="bonPendingModalLabel" aria-hidden="true">
@@ -91,6 +99,33 @@
                                                     Show QC</a></td>
                                         </tr>
                                     @endif
+                                    @if (session('grpoPending'))
+                                        <tr>
+                                            <td>GRPO</td>
+                                            <td><a href="{{ url('admin/listtransaction/clear-grpo-notif') }}"
+                                                    style="background-color: #dfffde"><i class="fa fa-eye"></i> Click
+                                                    Show GRPO
+                                                </a></td>
+                                        </tr>
+                                    @endif
+                                    @if (session('grPending'))
+                                        <tr>
+                                            <td>GR Maklon</td>
+                                            <td><a href="{{ url('admin/listtransaction/clear-gr-notif') }}"
+                                                    style="background-color: #dfffde"><i class="fa fa-eye"></i> Click
+                                                    Show Good Receipt Maklon
+                                                </a></td>
+                                        </tr>
+                                    @endif
+                                    @if (session('deliveryPending'))
+                                        <tr>
+                                            <td>Delivery</td>
+                                            <td><a href="{{ url('admin/delivery/clear-delivery-notif') }}"
+                                                    style="background-color: #dfffde"><i class="fa fa-eye"></i> Click
+                                                    Show Delivery
+                                                </a></td>
+                                        </tr>
+                                    @endif
                                 </tbody>
                             </table>
                         </div>
@@ -110,7 +145,6 @@
                 });
             </script>
         @endif
-
 
         @include('backend.layouts.footer')
 

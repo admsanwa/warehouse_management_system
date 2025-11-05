@@ -11,7 +11,7 @@ class DeliveryModel extends Model
     use HasFactory;
 
     protected $table = "delivery";
-    protected $fillable = ['doc_entry', 'io', 'prod_order', 'prod_no', 'prod_desc', 'series', 'remark', 'tracker_by'];
+    protected $fillable = ['doc_entry', 'io', 'prod_order', 'prod_no', 'prod_desc', 'status', 'series', 'remark', 'tracker_by'];
 
     static public function getRecord()
     {
@@ -61,5 +61,10 @@ class DeliveryModel extends Model
         }
 
         return $return->orderBy('id', 'desc');
+    }
+
+    public function getShouldHighlightAttribute()
+    {
+        return $this->is_temp == 0 || is_null($this->status) || $this->status === '';
     }
 }

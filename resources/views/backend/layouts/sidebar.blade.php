@@ -493,7 +493,7 @@
         @endif
 
         {{-- List Transactions --}}
-        @if ($authDept == 'IT' || $authDept == 'Purchasing')
+        @if ($authDept == 'IT' || $authDept == 'Purchasing' || $authDept == 'PPIC')
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                     data-accordion="false">
@@ -508,7 +508,7 @@
                         </a>
                         <ul class="collapse list-unstyled {{ Request::is('admin/listtransaction/*') ? 'show' : '' }} itemSubMenu"
                             id="listtransactionSubMenu">
-                            @if ($authDept == 'Purchasing')
+                            @if ($authDept == 'IT' || $authDept == 'Purchasing' || $authDept == 'PPIC')
                                 <li class="nav-item">
                                     <a href="{{ url('admin/listtransaction/stockin') }}"
                                         class="nav-link @if (Request::is('admin/listtransaction/stockin') || Request::is('admin/listtransaction/stockin/*')) active @endif">
@@ -540,7 +540,7 @@
                                     </a>
                                 </li>
                             @endif
-                            @if ($authDept == 'IT')
+                            @if ($authDept == 'IT' || $authDept == 'Purchasing' || $authDept == 'PPIC')
                                 <li class="nav-item">
                                     <a href="{{ url('admin/listtransaction/goodreceipt') }}"
                                         class="nav-link @if (Request::is(' admin/listtransaction/goodreceipt')) active @endif">

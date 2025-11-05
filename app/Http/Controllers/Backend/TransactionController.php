@@ -38,6 +38,7 @@ class TransactionController extends Controller
             return $next($request);
         });
     }
+
     // stock in
     public function stock_in(Request $request)
     {
@@ -47,7 +48,6 @@ class TransactionController extends Controller
 
         return view('api.transaction.stockin', compact('po', 'docEntry'));
     }
-
 
     public function stock_in_old(Request $request)
     {
@@ -63,29 +63,13 @@ class TransactionController extends Controller
         return view('backend.transaction.stockin', compact('grpo', 'getPos'));
     }
 
-    public function stockin_po(Request $request, $po)
-    {
-
-        $temp           = StockModel::where('is_temp', true)->orderByDesc('id')->first();
-        $latestStock    = StockModel::whereNotNull('grpo')->orderByDesc('id')->first();
-        if ($temp) {
-            $grpo       = $temp->grpo;
-        } else {
-            $grpo       = $latestStock && $latestStock->grpo ? ((int)$latestStock->grpo + 1) : 1;
-        }
-        $getPos         = null;
-        $getPos = PurchasingModel::where("no_po", $po)->first();
-        return view('backend.transaction.stockin', compact('grpo', 'getPos'));
-    }
-
     public function scan_and_store(Request $request)
     {
         $validated = $request->validate([
             'item_code' => 'required|string',
-            'warehouse' => 'nullable|string',
         ]);
 
-        $warehouse =   $validated['warehouse'] ? $validated['warehouse'] : $this->default_warehouse;
+        $warehouse =  $this->default_warehouse;
         $barcode   = $validated['item_code'];
 
         $items = $this->sap->getStockItems([
@@ -142,48 +126,6 @@ class TransactionController extends Controller
             'success' => true,
             'data'    => $grpo_histories
         ]);
-    }
-
-
-    public function scan_and_store_old(Request $request)
-    {
-        $barcode    = $request->input("item_code");
-        $items      = ItemsModel::where('code', $barcode)->first();
-        if (!$items) {
-            return response()->json([
-                'success' => false,
-                'message' => "Produk tidak ditemukan untuk barcode: " . $barcode . ". Pastikan produk sesuai dan Scan kembali!"
-            ]);
-        }
-        $poDetails      = PurchaseOrderDetailsModel::where("item_code", $barcode)->pluck('nopo')->unique()->toArray();
-        $purchaseOrders = PurchasingModel::select("no_po")->where("status", "Open")->whereIn('no_po', $poDetails)->distinct()->get();
-        $latestStockOut = StockModel::where("item_code", $items->code)->whereNotNull("stock_out")->orderByDesc("id")->value("stock_out") ?? 0;
-        $latestStockIn  = StockModel::where("item_code", $items->code)->whereNotNull("stock_in")->orderByDesc("id")->value("stock_in") ?? 0;
-        $latestOnhand   = ($items->in_stock + $latestStockIn) - $latestStockOut;
-        $user           = Auth::user()->id;
-
-        // save db
-        $stock              = new StockModel();
-        $stock->grpo        = trim($request->input("grpo"));
-        $stock->item_code   = $items->code;
-        $stock->stock       = $items->in_stock ?? 0;
-        $stock->stock_out   = $latestStockOut;
-        $stock->scanned_by  = $user;
-        $stock->is_temp     = true;
-        $stock->save();
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'success'   => true,
-                'id'        => $stock->id,
-                'code'      => $items->code,
-                'name'      => $items->name, // tambahkan ini
-                'no_po'     => $purchaseOrders,
-                'on_hand'   => $latestOnhand,
-                // 'Po_details'    => $poDetails,
-                'message'   => 'Item berhasil di scan!'
-            ]);
-        }
     }
 
     public function getScannedBarcodes($grpo)
@@ -302,6 +244,7 @@ class TransactionController extends Controller
                     'whse'    =>  $this->default_warehouse,
                     'note'    => '-',
                     'remarks'    =>  $validated['remarks'],
+                    'is_temp'   => 0,
                     'user_id'      => $user,
                     'created_at'   => now(),
                     'updated_at'   => now()
@@ -347,59 +290,6 @@ class TransactionController extends Controller
                 'response' => $post_grpo ?? [],
             ], 500);
         }
-    }
-
-
-    public function stock_up_old(Request $request)
-    {
-        $validated = $request->validate([
-            'stocks'        => 'required|array',
-            'stocks.*.id'   => 'required|integer|exists:stocks,id',
-            'stocks.*.item_code'    => 'required|string',
-            'stocks.*.qty'  => 'required|numeric|min:1',
-        ]);
-
-        foreach ($validated['stocks'] as $stockData) {
-            $item = ItemsModel::where('code', $stockData['item_code'])->first();
-            if ($item) {
-                $latestStockin  = StockModel::where("item_code", $item->code)->whereNotNull("stock_in")->orderByDesc("id")->value("stock_in");
-            }
-            $stock  = StockModel::find($stockData["id"]);
-            if ($stock) {
-                $stock->no_po       = trim($request->nopo);
-                $stock->qty         = $stockData["qty"];
-                $stock->stock_in    = ($latestStockin ?? 0) + $stockData["qty"];
-                $stock->is_temp     = false;
-                $stock->save();
-            }
-        }
-
-        // save grpo table
-        $po = PurchasingModel::where('no_po', trim($request->nopo))->first();
-        if (!$po) {
-            throw new \Exception('PO not found');
-        }
-
-        try {
-            $grpo = grpoModel::updateOrCreate(
-                ['no_po' => trim($request->nopo)],
-                [
-                    'vendor_code'   => $po->vendor_code,
-                    'vendor'        => $po->vendor,
-                    'vendor_ref_no' => $po->vendor_ref_no,
-                    'io'            => $po->io,
-                    'so'            => $po->so,
-                    'internal_no'   => $po->internal_no,
-                    'whse'          =>  $this->default_warehouse,
-                    'note'          => $po->note,
-                    'remarks'       => trim($request->remarks)
-                ]
-            );
-        } catch (\Throwable $e) {
-            dd($e->getMessage(), $e->getFile(), $e->getLine(), $e->getTraceAsString());
-        }
-
-        return redirect('admin/transaction/stockdet/' . $request->input("grpo"))->with('success', 'Telah berhasil menambahkan item yang sudah di scan');
     }
 
     public function stock_del($grpo)
@@ -506,7 +396,7 @@ class TransactionController extends Controller
             'item_code' => 'required|string',
         ]);
         // $warehouse =  $this->default_warehouse;
-        $warehouse = 'BK002';
+        $warehouse =  "BK002"; //dari gudang produksi
         $barcode   = $validated['item_code'];
         $items = $this->sap->getStockItems([
             'ItemCode' => $barcode,
@@ -733,7 +623,6 @@ class TransactionController extends Controller
         }
     }
 
-
     public function stockout_up(Request $request)
     {
         $validated = $request->validate([
@@ -854,10 +743,10 @@ class TransactionController extends Controller
     {
         $validated = $request->validate([
             'item_code' => 'required|string',
-            // 'warehouse' => 'nullable|string',
         ]);
 
         $warehouse = "BK002";
+        // $warehouse = $this->default_warehouse;
         $barcode   = $validated['item_code'];
         $items = $this->sap->getStockItems([
             'ItemCode' => $barcode,
@@ -1631,7 +1520,7 @@ class TransactionController extends Controller
 
                 // untuk DB
                 $insertedData[] = [
-                    'doc_entry' => $validated['docEntry'] ?? null,
+                    'doc_entry' => $validated['docEntry'],
                     'po'        => $validated['docnum'] ?? null,
                     'io'        => $validated['no_io'] ?? '',
                     'so'        => $validated['no_so'] ?? '',
@@ -1652,6 +1541,7 @@ class TransactionController extends Controller
                     'uom'    => $row['UnitMsr'] ?? null,
                     'remarks'    =>  $validated['remarks'],
                     'user_id'      => $user,
+                    'is_temp'   => 0,
                     'created_at'   => now(),
                     'updated_at'   => now(),
                 ];
@@ -1850,7 +1740,7 @@ class TransactionController extends Controller
         return redirect("admin/transaction/goodreceipt")->with("warning", "Membatalkan product {$prods}!");
     }
 
-    public function  list_gr(Request $request)
+    public function list_gr(Request $request)
     {
         $getRecord = goodreceiptModel::getRecord($request);
 

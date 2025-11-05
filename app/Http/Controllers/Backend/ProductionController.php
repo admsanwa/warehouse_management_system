@@ -673,7 +673,8 @@ class ProductionController extends Controller
     {
         $request->validate([
             'po' => 'required|numeric',
-            'no_bon' => 'required'
+            'no_bon' => 'required',
+            'series' => 'required'
         ]);
         $user = Auth::user();
 
@@ -686,7 +687,7 @@ class ProductionController extends Controller
         $sign->save();
 
         $bon = BonModel::where("no", $request->no_bon)->first();
-        BonModel::where('id', $id)->update(['no_po' => $request->po]);
+        BonModel::where('id', $id)->update(['no_po' => $request->po, 'no_series' => $request->series]);
 
         $recipients = collect();
 
@@ -863,5 +864,56 @@ class ProductionController extends Controller
         }
 
         return redirect('/listpreparemat')->with('success', "Succesfully transfer prepare material data");
+    }
+
+    public function so_search(Request $request)
+    {
+        try {
+
+            $param = [
+                "limit" => (int) $request->get('limit', 5),
+                "Status" => $request->get('DocStatus', 'Open'),
+                "Series" => $request->get('series'),
+                'page' => 1,
+            ];
+
+            $salesOrders = $this->sap->getSalesOrders($param);
+
+            if (empty($salesOrders) || $salesOrders['success'] !== true) {
+                return response()->json([
+                    'results' => []
+                ]);
+            }
+
+            // Filter ulang kalau ada Series
+            if (!empty($param['Series'])) {
+                $salesOrders['data'] = collect($salesOrders['data'])
+                    ->where('Series', $param['Series'])
+                    ->values()
+                    ->all();
+
+                // update total sesuai hasil filter
+                $salesOrders['total'] = count($salesOrders['data']);
+            }
+
+            $soData = collect($salesOrders['data'] ?? [])->map(function ($item) {
+                return [
+                    'id'   => $item['DocEntry'],
+                    'text'   => $item['U_MEB_NO_IO'],
+                    'CardName' => $item['CardName'],
+                ];
+            });
+
+            return response()->json([
+                'results' => $soData,
+                'prods' => $salesOrders['data'] ?? [],
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('Error in so_search: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

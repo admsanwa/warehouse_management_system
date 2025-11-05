@@ -6,7 +6,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col col-sm-6">
-                        <h1>Stock In</h1>
+                        <h1>Good Receipt PO</h1>
                     </div>
                 </div>
             </div>
@@ -19,7 +19,7 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">
-                                    Search Data Stock In
+                                    Search Data Good Receipt PO
                                 </h3>
                             </div>
                             <form action="" method="get">
@@ -73,7 +73,7 @@
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">
-                                    List of All Stock In
+                                    List of All Good Receipt PO
                                 </h3>
                             </div>
                             <div class="card-body p-0">
@@ -92,8 +92,14 @@
                                         </thead>
                                         <tbody>
                                             @forelse ($getRecord as $grpo)
-                                                <tr>
-                                                    <td>{{ $loop->iteration + ($getRecord->currentPage() - 1) * $getRecord->perPage() }}
+                                                <tr class="{{ $grpo->is_temp === 0 ? 'table-primary' : '' }}">
+                                                    <td>
+                                                        @if ($grpo->is_temp === 0)
+                                                            <i class="fa fa-circle text-primary ms-2"
+                                                                style="font-size:10px; margin-right:10px;"
+                                                                title="Recommended"></i>
+                                                        @endif
+                                                        {{ $loop->iteration + ($getRecord->currentPage() - 1) * $getRecord->perPage() }}
                                                     </td>
                                                     <td>{{ $grpo->no_po ?? 'N/A' }}</td>
                                                     <td>{{ $grpo->item_code ?? 'N/A' }}</td>
@@ -126,4 +132,12 @@
             </div>
         </section>
     </div>
+    <script>
+        fetch('/update-grpo-temp', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        })
+    </script>
 @endsection
