@@ -136,9 +136,6 @@
                         }
                     }
                 ],
-                order: [
-                    [1, "desc"]
-                ],
                 ajax: {
                     type: "POST",
                     url: "{{ route('report.bon.data') }}",
@@ -189,10 +186,12 @@
                         data: 'remain_qty',
                         title: 'Qty Sisa'
                     },
+                    {
+                        data: 'reason_qty',
+                        title: 'Alasan Qty Sisa'
+                    }
                 ]
             });
-
-
 
             $("#filter").click(function() {
                 let startDate = $("#start_date").val();

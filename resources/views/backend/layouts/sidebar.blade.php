@@ -620,7 +620,8 @@
                 $authDept == 'PPIC' ||
                 $authDept == 'Quality Control' ||
                 $authDept == 'Procurement, Installation and Delivery' ||
-                $authDept == 'Production')
+                $authDept == 'Production' ||
+                $authDept == 'Purchasing')
 
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"

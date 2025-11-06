@@ -128,6 +128,21 @@
                                     <input type="text" name="remarks" id="remarks" class="form-control mt-2"
                                         placeholder="Masukkan keterangan proyek disini" required>
                                 </div>
+                                <label for="" class="col-sm-4 col-form-label">Alasan Qty sisa</label>
+                                <div class="col-sm-8">
+                                    <select name="reason_qty" id="reason_qty" class="form-control mt-2"
+                                        onchange="toggleOtherReason(this)">
+                                        <option value="">Select Alasan Qty sisa disini</option>
+                                        <option value="Reject">Reject</option>
+                                        <option value="Vendor Belum Datang">Vendor Belum Datang</option>
+                                        <option value="Others">Others</option>
+                                    </select>
+
+                                    <!-- input tambahan disembunyikan dulu -->
+                                    <input type="text" name="reason_qty_other" id="reason_qty_other"
+                                        class="form-control mt-2" placeholder="Tuliskan alasan lainnya..."
+                                        style="display:none;">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -299,7 +314,6 @@
                 placeholder: "Pilih Series",
                 allowClear: true,
                 width: "100%",
-                minimumInputLength: 1,
                 language: {
                     inputTooShort: function() {
                         return "Ketik kode series untuk mencari...";
@@ -572,42 +586,42 @@
             const description = (stock.Dscription ?? "") + (stock.FreeTxt ? " - " + stock.FreeTxt : "");
 
             const row = `
-                <tr>
-                    <td>${idx + 1}</td>
-                    <td>
-                        ${stock.ItemCode}
-                        <input type="hidden" name="stocks[${idx}][LineNum]" value="${stock.LineNum}">
-                        <input type="hidden" name="stocks[${idx}][BaseEntry]" value="${stock.DocEntry}">
-                        <input type="hidden" name="stocks[${idx}][ItemCode]" value="${stock.ItemCode}">
-                    </td>
-                    <td>
-                        ${description}
-                        <input type="hidden" name="stocks[${idx}][Dscription]" value="${stock.Dscription ?? ""}">
-                    </td>
-                    <td> ${formatDecimalsSAP(stock.Quantity)}</td>
-                    <td> ${formatDecimalsSAP(stock.OpenQty)}</td>
-                    <td>
-                        <input type="hidden" name="stocks[${idx}][PlanQty]" value="${stock.Quantity}">
-                        <input type="hidden" name="stocks[${idx}][OpenQty]" value="${stock.OpenQty}">
-                        <input type="text" name="stocks[${idx}][qty]" class="form-control format-sap" step="0.01" style="min-width:80px !important;" value="0">
-                        <input type="hidden" name="stocks[${idx}][PriceBefDi]" value="${stock.PriceBefDi}">
-                        <input type="hidden" name="stocks[${idx}][DiscPrcnt]" value="${stock.DiscPrcnt}">
-                        <input type="hidden" name="stocks[${idx}][VatGroup]" value="${stock.VatGroup}">
-                        <input type="hidden" name="stocks[${idx}][AcctCode]" value="${stock.AcctCode}">
-                        <input type="hidden" name="stocks[${idx}][OcrCode]" value="${stock.OcrCode}">
-                        <input type="hidden" name="stocks[${idx}][FreeTxt]" value="${stock.FreeTxt ?? ""}">
-                    </td>
-                    <td>
-                        ${stock.UnitMsr ?? ""}
-                        <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${stock.UnitMsr ?? ""}">
-                    </td>
-                    <td>
-                        <button type="button" onclick="deleteItem(this)" class="btn btn-danger btn-sm">
-                            <i class="fa fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
+        <tr class="itemRowsValidation">
+            <td>${idx + 1}</td>
+            <td>
+                ${stock.ItemCode}
+                <input type="hidden" name="stocks[${idx}][LineNum]" value="${stock.LineNum}">
+                <input type="hidden" name="stocks[${idx}][BaseEntry]" value="${stock.DocEntry}">
+                <input type="hidden" name="stocks[${idx}][ItemCode]" value="${stock.ItemCode}">
+            </td>
+            <td>
+                ${description}
+                <input type="hidden" name="stocks[${idx}][Dscription]" value="${stock.Dscription ?? ""}">
+            </td>
+            <td> ${formatDecimalsSAP(stock.Quantity)}</td>
+            <td> ${formatDecimalsSAP(stock.OpenQty)}</td>
+            <td>
+                <input type="hidden" name="stocks[${idx}][PlanQty]" value="${stock.Quantity}">
+                <input type="hidden" name="stocks[${idx}][OpenQty]" id="stocks[${idx}][OpenQty]" value="${stock.OpenQty}">
+                <input type="text" name="stocks[${idx}][qty]" id="stocks[${idx}][qty]" class="form-control format-sap" step="0.01" style="min-width:80px !important;" value="0">
+                <input type="hidden" name="stocks[${idx}][PriceBefDi]" value="${stock.PriceBefDi}">
+                <input type="hidden" name="stocks[${idx}][DiscPrcnt]" value="${stock.DiscPrcnt}">
+                <input type="hidden" name="stocks[${idx}][VatGroup]" value="${stock.VatGroup}">
+                <input type="hidden" name="stocks[${idx}][AcctCode]" value="${stock.AcctCode}">
+                <input type="hidden" name="stocks[${idx}][OcrCode]" value="${stock.OcrCode}">
+                <input type="hidden" name="stocks[${idx}][FreeTxt]" value="${stock.FreeTxt ?? ""}">
+            </td>
+            <td>
+                ${stock.UnitMsr ?? ""}
+                <input type="hidden" name="stocks[${idx}][UnitMsr]" value="${stock.UnitMsr ?? ""}">
+            </td>
+            <td>
+                <button type="button" onclick="deleteItem(this)" class="btn btn-danger btn-sm">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `;
 
             tBody.insertAdjacentHTML("beforeend", row);
             reorderTableRows();
@@ -640,6 +654,20 @@
                 showToast("❌ Error: Pastikan Nomer Purchasing Order dan Remark di isi sebelum submit!")
                 btn.disabled = false;
                 return false;
+            }
+
+            const reasonQty = document.getElementById("reason_qty").value;
+            for (const row of document.querySelectorAll('.itemRowsValidation')) {
+                const openQtyInput = row.querySelector('input[name*="[OpenQty]"]');
+                const qtyInput = row.querySelector('input[name*="[qty]"]');
+                const openQty = parseFloat(openQtyInput?.value || 0);
+                const qty = parseFloat(qtyInput?.value || 0);
+
+                if (openQty > qty && !reasonQty) {
+                    showToast("❌ Error: Pastikan alasan sisa qty di isi sebelum submit!");
+                    btn.disabled = false;
+                    return false;
+                }
             }
 
             let form = document.getElementById("stockupForm");
@@ -752,6 +780,19 @@
                     }
                 });
             });
+        }
+
+        function toggleOtherReason(select) {
+            const otherInput = document.getElementById("reason_qty_other");
+            if (select.value === "Others") {
+                otherInput.removeAttribute("style"); // hapus inline style
+                otherInput.style.display = "block";
+                otherInput.required = true;
+            } else {
+                otherInput.style.display = "none";
+                otherInput.required = false;
+                otherInput.value = "";
+            }
         }
     </script>
 @endsection

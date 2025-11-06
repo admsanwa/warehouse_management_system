@@ -150,6 +150,8 @@ class TransactionController extends Controller
                 'cardCode'     => 'required',
                 'docDate'      => 'required|date',
                 'remarks'      => 'required|string',
+                'reason_qty'       => 'required|string',
+                'reason_qty_other' => 'nullable|string|min:3',
                 'numAtCard'    => 'nullable|string',
                 'U_MEB_NO_IO'  => 'nullable|string',
                 'U_MEB_No_SO'  => 'nullable|string',
@@ -244,6 +246,10 @@ class TransactionController extends Controller
                     'whse'    =>  $this->default_warehouse,
                     'note'    => '-',
                     'remarks'    =>  $validated['remarks'],
+                    'reason_qty'    =>  $validated['reason_qty'] === 'Others'
+                        ? $validated['reason_qty_other']
+                        : $validated['reason_qty'],
+
                     'is_temp'   => 0,
                     'user_id'      => $user,
                     'created_at'   => now(),

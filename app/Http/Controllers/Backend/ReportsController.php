@@ -73,9 +73,15 @@ class ReportsController extends Controller
             ->addColumn('uom', fn($row) => $row->uom)
             ->addColumn('qty', fn($row) => $row->qty)
             ->addColumn('remark', fn($row) => $row->remark)
-            ->addColumn('receipt_date', fn($row) => $row->grpo?->created_at ? date('d-m-Y', strtotime($row->grpo->created_at)) : '-')
-            ->addColumn('receipt_qty', fn($row) => $row->grpo?->qty ? $row->grpo->qty : 0)
-            ->addColumn('remain_qty', fn($row) => $row->grpo?->qty ? $row->qty - $row->grpo->qty : 0)
-            ->make(true);
+            ->addColumn('receipt_date', function ($row) {
+                $latest = $row->grpo->sortByDesc('created_at')->first();
+                return $latest ? date('d-m-Y', strtotime($latest->created_at)) : '-';
+            })
+            ->addColumn('receipt_qty', fn($row) => $row->total_grpo_qty)
+            ->addColumn('remain_qty', fn($row) => $row->qty - $row->total_grpo_qty)
+            ->addColumn('reason_qty', function ($row) {
+                $latest = $row->grpo->sortByDesc('id')->first();
+                return $latest?->reason_qty ?? '-';
+            })->make(true);
     }
 }
