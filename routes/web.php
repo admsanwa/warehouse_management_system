@@ -53,6 +53,9 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('admin/production/clear-bon-notif', [DashboardController::class, 'clearBonNotif']);
     Route::get('admin/production/clear-memo-notif', [DashboardController::class, 'clearMemoNotif']);
     Route::get('admin/production/clear-qc-notif', [DashboardController::class, 'clearQcNotif']);
+    Route::get('admin/listtransaction/clear-grpo-notif', [DashboardController::class, 'clearGrpoNotif']);
+    Route::get('admin/listtransaction/clear-gr-notif', [DashboardController::class, 'clearGrNotif']);
+    Route::get('admin/delivery/clear-delivery-notif', [DashboardController::class, 'clearDeliveryNotif']);
 
     // employee
     Route::get('admin/employees', [EmployeesController::class, 'index']);
@@ -62,7 +65,6 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('admin/employees/edit/{id}', [EmployeesController::class, 'edit']);
     Route::post('admin/employees/edit/{id}', [EmployeesController::class, 'update']);
     Route::get('admin/employees/delete/{id}', [EmployeesController::class, 'delete']);
-
 
     // JobsController
     Route::get('admin/jobs', [JobsController::class, 'index']);
@@ -84,15 +86,17 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('admin/purchasing_old', [PurchasingController::class, 'old_index']);
     Route::get('admin/purchasing/view_old/{id}', [PurchasingController::class, 'old_view']);
 
+
     Route::get('admin/purchasing/purchaseorder', [PurchasingController::class, 'index']);
     Route::get('admin/purchasing/view', [PurchasingController::class, 'view']);
     Route::get('admin/purchasing/upload', [PurchasingController::class, 'upload_form']);
     Route::post('admin/purchasing/upload', [PurchasingController::class, 'upload']);
+    // currently update
     Route::get('admin/purchasing/barcode', [PurchasingController::class, 'barcode']);
     Route::get('admin/purchasing/barcode/{docEntry}', [PurchasingController::class, 'barcode_po']);
     Route::get('/print/barcodes/pdfpo', [PurchasingController::class, 'printBarcodeWithPdf']);
     Route::post('/print/pdfmaklon', [PurchasingController::class, 'printBarcodeWithPdfMaklon']);
-    // production
+
     // bon
     Route::get('admin/production/bon', [ProductionController::class, 'bon']);
     Route::post('admin/production/bon', [ProductionController::class, 'create_bon']);
@@ -197,17 +201,20 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get("admin/listtransaction/rfp", [ListTransactionsController::class, "rfp"]);
     Route::get("admin/listtransaction/goodissued", [ListTransactionsController::class, "goodissue"]);
     Route::get("admin/listtransaction/goodreceipt", [ListTransactionsController::class, "goodreceipt"]);
+    Route::post("/update-grpo-temp", [ListTransactionsController::class, "updateGRPOTemp"]);
+    Route::post("/update-gr-temp", [ListTransactionsController::class, "updateGRTemp"]);
 
     // Reports
     Route::get("admin/reports/finishgoods", [ReportsController::class, "finish_goods"]);
     Route::get("admin/reports/semifg", [ReportsController::class, "semifg"]);
     Route::get("/reports-bon", [ReportsController::class, 'bon']);
-    Route::post('/reports-bon-data', [ReportsController::class, 'data'])->name('report.bon.data');
+    Route::get('/reports-bon-data', [ReportsController::class, 'data'])->name('report.bon.data');
 
     // delivery
     Route::get("admin/delivery/list", [DeliveryController::class, "index"]);
     Route::post("admin/delivery/estimate/{docEntry}", [DeliveryController::class, "estimate"]);
     Route::get("admin/delivery/history", [DeliveryController::class, "history"]);
+    Route::post("/update-delivery-temp", [DeliveryController::class, "updateDeliveryTemp"]);
 
     // get data api
     Route::get('/purchasing/seriesSearch', [PurchasingController::class, 'series_search']);
