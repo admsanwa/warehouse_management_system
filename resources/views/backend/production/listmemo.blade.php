@@ -24,23 +24,29 @@
                                     <div class="row">
                                         <div class="form-group col-md-2">
                                             <label for="">No :</label>
-                                            <input type="text" name="no" id="no" class="form-control" placeholder="Enter Nomer Memo">
+                                            <input type="text" name="no" id="no" class="form-control"
+                                                placeholder="Enter Nomer Memo">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Desc :</label>
-                                            <input type="text" name="description" id="description" class="form-control" placeholder="Enter Description">
+                                            <input type="text" name="description" id="description" class="form-control"
+                                                placeholder="Enter Description">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Project :</label>
-                                            <input type="text" name="project" id="project" class="form-control" placeholder="Enter Project">
+                                            <input type="text" name="project" id="project" class="form-control"
+                                                placeholder="Enter Project">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">IO :</label>
-                                            <input type="text" name="io" id="io" class="form-control" placeholder="Enter IO">
+                                            <input type="text" name="io" id="io" class="form-control"
+                                                placeholder="Enter IO">
                                         </div>
-                                        <div class="form-group col-md-2">
-                                            <button type="submit" class="btn btn-primary" style="margin-top: 30px;"><i class="fa fa-search"></i> Search</button>
-                                            <a href="{{ url('admin/production/listmemo')}}" class="btn btn-warning" style="margin-top: 30px"><i class="fa fa-eraser"></i> Reset</a>
+                                        <div class="form-group col-md-3">
+                                            <button type="submit" class="btn btn-primary" style="margin-top: 30px;"><i
+                                                    class="fa fa-search"></i> Search</button>
+                                            <a href="{{ url('admin/production/listmemo') }}" class="btn btn-warning"
+                                                style="margin-top: 30px"><i class="fa fa-eraser"></i> Reset</a>
                                         </div>
                                     </div>
                                 </div>
@@ -63,28 +69,40 @@
                                                 <th>IO</th>
                                                 <th>Due Date</td>
                                                 <td>Status</td>
-                                                <th>Details</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         @forelse ($getRecord as $memo)
                                             <tbody>
                                                 <tr class="{{ $memo->highlight ? 'table-primary' : '' }}">
                                                     <td>
-                                                        @if($memo->highlight)
-                                                            <i class="fa fa-circle text-primary ms-2" style="font-size:10px; margin-right:10px;" title="Recommended"></i>
+                                                        @if ($memo->highlight)
+                                                            <i class="fa fa-circle text-primary ms-2"
+                                                                style="font-size:10px; margin-right:10px;"
+                                                                title="Recommended"></i>
                                                         @endif
-                                                        {{ $memo->no }}</td>
+                                                        {{ $memo->no }}
+                                                    </td>
                                                     <td>{{ $memo->description }}</td>
                                                     <td>{{ $memo->project }}</td>
                                                     <td>{{ $memo->io }}</td>
                                                     <td>{{ $memo->due_date }}</td>
                                                     <td>{{ $memo->status }}</td>
                                                     <td>
-                                                        <a href="{{ url('admin/production/memodetails/' . $memo->id) }}" class="btn btn-primary"><div class="fa fa-eye"></div></a>
+                                                        <a href="{{ url('admin/production/memodetails/' . $memo->id) }}"
+                                                            class="btn btn-primary">
+                                                            <div class="fa fa-eye"></div>
+                                                        </a>
+                                                        <a
+                                                            href="{{ url('admin/production/memoedit/' . $memo->id) }}"class="btn btn-success">
+                                                            <div class="fa fa-edit"></div>
+                                                        </a>
                                                     </td>
                                                 </tr>
-                                        @empty
-                                                <tr><td colspan="100%">Not Record Found</td></tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="100%">Not Record Found</td>
+                                                </tr>
                                             </tbody>
                                         @endforelse
                                     </table>

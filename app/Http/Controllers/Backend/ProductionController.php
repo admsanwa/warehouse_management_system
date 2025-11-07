@@ -340,6 +340,52 @@ class ProductionController extends Controller
         return redirect()->back()->with('success', "Successfully create memo {$request->description}");
     }
 
+    public function edit_memo($id)
+    {
+        $getRecord = MemoModel::with('details')->findOrFail($id);
+        return view('backend.production.memoedit', compact('getRecord'));
+    }
+
+    public function update_memo($id, Request $request)
+    {
+        $memo = MemoModel::findOrFail($id);
+        $user   = Auth::user();
+
+        $memo->update([
+            'no'    => $request->no,
+            'date'  => $request->date,
+            'description'   => $request->description,
+            'ío'    => $request->io,
+            'project' => $request->project,
+            'due_date' => $request->duedate,
+            'created_by'   => $user->fullname,
+        ]);
+
+        $memo->details()->delete();
+        foreach ($request->unit as $i => $units) {
+            $memo->details()->create([
+                'unit'      => $units,
+                'needs'     => $request->needs[$i] ?? '-',
+                'width'     => $request->width[$i] ?? 0,
+                'height'    => $request->height[$i] ?? 0,
+                'uom'       => $request->uom[$i] ?? '-',
+                'qty'       => $request->qty[$i] ?? 0
+            ]);
+        }
+        $recipients = User::where('department', 'Procurement, Installation and Delivery')
+            ->where('level', 'Manager')
+            ->get();
+        $dev_users = User::where('department', 'IT')->get();
+
+        $recipients = $recipients->merge($dev_users);
+        Notification::send($recipients, new MailMemoApproval(
+            $request->no,
+            url('admin/production/listmemo')
+        ));
+
+        return redirect('admin/production/listmemo')->with('success', 'Memo updated successfully!');
+    }
+
     public function list_memo(Request $request)
     {
         $getRecord = MemoModel::getRecord($request);
@@ -583,6 +629,55 @@ class ProductionController extends Controller
         ));
 
         return redirect()->back()->with('success', "Successfully create bon {$request->no}");
+    }
+
+    public function edit_bon($id)
+    {
+        $getRecord = BonModel::with('details')->findOrFail($id);
+        $user = Auth::user();
+        return view('backend.production.editbon', compact('getRecord', 'user'));
+    }
+
+    public function update_bon($id, Request $request)
+    {
+        $bon = BonModel::findOrFail($id);
+
+        $bon->update([
+            'type'  => $request->type,
+            'no'    => $request->no,
+            'date'  => $request->date,
+            'section'   => $request->section,
+            'ío'    => $request->io,
+            'no_po' => $request->no_po,
+            'no_series' => $request->no_series,
+            'project'   => $request->project,
+            'make_to'   => $request->make_to,
+            'created_by'    => $request->created_by
+        ]);
+
+        $bon->details()->delete();
+        foreach ($request->item_code as $i => $code) {
+            $bon->details()->create([
+                'item_code' => $code,
+                'item_name' => $request->item_desc[$i],
+                'uom'       => $request->uom[$i],
+                'qty'       => $request->qty[$i],
+                'remark'    => $request->remark[$i]
+            ]);
+        }
+        $recipients = User::where('department', 'Procurement, Installation and Delivery')
+            ->where('level', 'Manager')
+            ->get();
+        $dev_users = User::where('department', 'IT')->get();
+
+        // merge collections
+        $recipients = $recipients->merge($dev_users);
+        Notification::send($recipients, new MailBonApproval(
+            $request->no,
+            url('admin/production/listbon')
+        ));
+
+        return redirect('admin/production/listbon')->with('success', 'BON updated successfully!');
     }
 
     public function list_bon(Request $request)

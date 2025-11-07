@@ -100,12 +100,16 @@ Route::group(['middleware' => 'admin'], function () {
     // bon
     Route::get('admin/production/bon', [ProductionController::class, 'bon']);
     Route::post('admin/production/bon', [ProductionController::class, 'create_bon']);
+    Route::get('admin/production/bonedit/{id}', [ProductionController::class, 'edit_bon']);
+    Route::post('admin/production/updatebon/{id}', [ProductionController::class, 'update_bon']);
     Route::get('admin/production/listbon', [ProductionController::class, 'list_bon']);
     Route::get('admin/production/bondetails/{id}', [ProductionController::class, 'bon_details']);
     Route::post('/approve-bon', [ProductionController::class, 'approve_bon']);
     // memo
     Route::get('admin/production/memo', [ProductionController::class, 'memo']);
     Route::post('admin/production/memo', [ProductionController::class, 'create_memo']);
+    Route::get('admin/production/memoedit/{id}', [ProductionController::class, 'edit_memo']);
+    Route::post('admin/production/memoupdate/{id}', [ProductionController::class, 'update_memo']);
     Route::get('admin/production/listmemo', [ProductionController::class, 'list_memo']);
     Route::get('admin/production/memodetails/{id}', [ProductionController::class, 'detail_memo']);
     Route::post('/approve-memo', [ProductionController::class, 'approve']);

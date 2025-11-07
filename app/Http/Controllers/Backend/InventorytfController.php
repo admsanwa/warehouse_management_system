@@ -10,7 +10,11 @@ use Illuminate\Support\Arr;
 use App\Models\SapReasonModel as SapReason;
 use App\Models\BuyerModel;
 use App\Models\DeliveryModel;
+use App\Models\User;
+use App\Notifications\MailDeliveryProduct;
+use Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class InventorytfController extends Controller
 {
@@ -223,6 +227,16 @@ class InventorytfController extends Controller
                             'tracker_by' => '-',
                             'is_temp' => 0
                         ]);
+
+                        $dev_users = User::where('department', 'IT')->get();
+
+                        $recipients = User::where('department', 'Procurement, Installation and Delivery')->where('level', 'Leader')->get();
+                        $recipients = $recipients->merge($dev_users);
+
+                        Notification::send($recipients, new MailDeliveryProduct(
+                            $validated['U_MEB_NO_IO'],
+                            url('admin/delivery/list')
+                        ));
 
                         return response()->json([
                             'success' => true,

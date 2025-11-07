@@ -41,7 +41,7 @@
                                             <label for="">Date :</label>
                                             <input type="date" name="date" id="date" class="form-control">
                                         </div>
-                                        <div class="form-group col-md-2">
+                                        <div class="form-group col-md-3">
                                             <button type="submit" class="btn btn-primary" style="margin-top: 30px;"><i
                                                     class="fa fa-search"></i> Search</button>
                                             <a href="{{ url('admin/production/listbon') }}" class="btn btn-warning"
@@ -68,7 +68,7 @@
                                                 <th>Project</th>
                                                 <th>Date</th>
                                                 <th>Status</th>
-                                                <th>Details</th>
+                                                <th>Action</th>
                                             </tr>
                                         </thead>
                                         @forelse ($getRecord as $bon)
@@ -91,6 +91,10 @@
                                                         <a href="{{ url('admin/production/bondetails/' . $bon->id) }}"
                                                             class="btn btn-primary">
                                                             <div class="fa fa-eye"></div>
+                                                        </a>
+                                                        <a href="{{ url('admin/production/bonedit/' . $bon->id) }}"
+                                                            class="btn btn-success">
+                                                            <div class="fa fa-edit"></div>
                                                         </a>
                                                     </td>
                                                 </tr>
