@@ -405,7 +405,7 @@ class ProductionController extends Controller
             $record->highlight = ($user->nik === "06067" && !$signApprove || $user->nik === "05993" && !$signProd);
         }
 
-        return view('backend.production.listmemo', compact('getRecord'));
+        return view('backend.production.listmemo', compact('getRecord', 'user'));
     }
 
     public function detail_memo(Request $request, $id)

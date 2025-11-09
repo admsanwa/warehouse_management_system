@@ -93,10 +93,12 @@
                                                             class="btn btn-primary">
                                                             <div class="fa fa-eye"></div>
                                                         </a>
-                                                        <a
-                                                            href="{{ url('admin/production/memoedit/' . $memo->id) }}"class="btn btn-success">
-                                                            <div class="fa fa-edit"></div>
-                                                        </a>
+                                                        @if ($user->department === 'PPIC')
+                                                            <a
+                                                                href="{{ url('admin/production/memoedit/' . $memo->id) }}"class="btn btn-success">
+                                                                <div class="fa fa-edit"></div>
+                                                            </a>
+                                                        @endif
                                                     </td>
                                                 </tr>
                                             @empty

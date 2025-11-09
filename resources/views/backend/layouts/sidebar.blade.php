@@ -77,6 +77,7 @@
                 $authDept == 'Production' ||
                 ($authDept == 'Quality Control' && $authLevel != 'Operator' && $authLevel != 'Magang') ||
                 $authDept == 'Procurement, Installation and Delivery')
+
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                     data-accordion="false">
@@ -90,6 +91,14 @@
                                 Dashboard
                             </p>
                         </a>
+                        @if (
+                            $authDept == 'IT' ||
+                                ($authDept == 'Production and Warehouse' && $authLevel == 'Manager') ||
+                                ($authDept == 'Production and Warehouse' && $authLevel == 'Supervisor') ||
+                                $authDept == 'PPIC' ||
+                                $authDept == 'Production' ||
+                                ($authDept == 'Quality Control' && $authLevel != 'Operator' && $authLevel != 'Magang') ||
+                                $authDept == 'Procurement, Installation and Delivery')
                     <li class="nav-item">
                         <a href="{{ url('admin/dashboard-list') }}"
                             class="nav-link @if (Request::segment(2) == 'dashboard-list') active @endif">
@@ -99,8 +108,9 @@
                             </p>
                         </a>
                     </li>
-                </ul>
-            </nav>
+        @endif
+        </ul>
+        </nav>
         @endif
 
         {{-- Items --}}
@@ -232,7 +242,6 @@
         @if (
             $authDept == 'IT' ||
                 $authDept == 'Production and Warehouse' ||
-                $authDept == 'Fabrication' ||
                 $authDept == 'PPIC' ||
                 $authDept == 'Purchasing' ||
                 ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager') ||
@@ -323,7 +332,6 @@
                             @endif
                             @if (
                                 ($authDept == 'Production and Warehouse' && $authLevel === 'Leader') ||
-                                    $authDept == 'Production' ||
                                     $authDept == 'IT' ||
                                     $authDept == 'Quality Control')
                                 <li class="nav-item">
@@ -340,11 +348,7 @@
         @endif
 
         {{-- Stocks --}}
-        @if (
-            $authDept == 'IT' ||
-                ($authDept == 'Production and Warehouse' && !$authLevel == 'Manager') ||
-                $authDept == 'PPIC' ||
-                ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager'))
+        @if ($authDept == 'IT' || ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager'))
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                     data-accordion="false">
@@ -368,8 +372,7 @@
             ($authDept == 'Quality Control' && $authLevel != 'Operator' && $authLevel != 'Magang') ||
                 $authDept == 'IT' ||
                 $authDept == 'Production and Warehouse' ||
-                $authDept == 'Production' ||
-                $authDept == 'PPIC')
+                $authDept == 'Production')
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                     data-accordion="false">
@@ -561,8 +564,7 @@
                 $authDept == 'IT' ||
                 ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager') ||
                 ($authDept == 'Production and Warehouse' && $authLevel != 'Operator' && $authLevel != 'Leader') ||
-                $authDept == 'Production' ||
-                $authDept == 'PPIC')
+                $authDept == 'Production')
 
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
@@ -615,8 +617,7 @@
         {{-- Reports --}}
         @if (
             $authDept == 'IT' ||
-                (($authDept == 'Production and Warehouse' && $authLevel == 'Manager') ||
-                    ($authDept == 'Production and Warehouse' && $authLevel == 'Supervisor')) ||
+                $authDept == 'Production and Warehouse' ||
                 $authDept == 'PPIC' ||
                 $authDept == 'Quality Control' ||
                 $authDept == 'Procurement, Installation and Delivery' ||
@@ -669,6 +670,14 @@
                                     </a>
                                 </li>
                             @endif
+                            @if (
+                                $authDept == 'IT' ||
+                                    $authDept == 'Production and Warehouse' ||
+                                    $authDept == 'PPIC' ||
+                                    $authDept == 'Quality Control' ||
+                                    $authDept == 'Procurement, Installation and Delivery' ||
+                                    $authDept == 'Purchasing')
+                            @endif
                             <li class="nav-item">
                                 <a href="{{ url('/reports-bon') }}"
                                     class="nav-link @if (Request::is('admin/reports/bon')) active @endif">
@@ -684,10 +693,8 @@
         {{-- Delivery --}}
         @if (
             $authDept == 'IT' ||
-                (($authDept == 'Production and Warehouse' && $authLevel == 'Manager') ||
-                    ($authDept == 'Production and Warehouse' && $authLevel == 'Supervisor')) ||
+                $authDept == 'Production and Warehouse' ||
                 $authDept == 'Procurement, Installation and Delivery' ||
-                $authDept == 'PPIC' ||
                 $authDept == 'Production' ||
                 $authDept == 'Quality Control')
 
@@ -711,7 +718,6 @@
                             @if (
                                 $authDept == 'IT' ||
                                     $authDept == 'Production and Warehouse' ||
-                                    $authLevel == 'Leader' ||
                                     $authDept == 'PPIC' ||
                                     $authDept == 'Quality Control' ||
                                     $authDept == 'Production')
