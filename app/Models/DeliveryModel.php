@@ -11,7 +11,7 @@ class DeliveryModel extends Model
     use HasFactory;
 
     protected $table = "delivery";
-    protected $fillable = ['doc_entry', 'io', 'prod_order', 'prod_no', 'prod_desc', 'status', 'series', 'remark', 'tracker_by'];
+    protected $fillable = ['doc_entry', 'io', 'prod_order', 'prod_no', 'prod_desc', 'status', 'series', 'remark', 'tracker_by', 'is_temp'];
 
     static public function getRecord()
     {
