@@ -158,8 +158,9 @@
 
             const whSelect = $("#warehouse");
             if (whSelect.length) {
-                let selectedSeries = "{{ request()->warehouse ?? 'BK001' }}";
-                let option = new Option(selectedSeries, selectedSeries, true, true);
+                let selectedWh = "{{ request()->warehouse_access ?? 'BK001' }}";
+                console.log(selectedWh);
+                let option = new Option(selectedWh, selectedWh, true, true);
                 whSelect.append(option).trigger("change");
                 whSelect.select2({
                     placeholder: "Pilih Kode Warehouse",
