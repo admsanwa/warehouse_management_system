@@ -158,7 +158,7 @@
 
             const whSelect = $("#warehouse");
             if (whSelect.length) {
-                let selectedWh = "{{ request()->warehouse_access ?? 'BK001' }}";
+                let selectedWh = "{{ request()->warehouse_access }}";
                 console.log(selectedWh);
                 let option = new Option(selectedWh, selectedWh, true, true);
                 whSelect.append(option).trigger("change");
