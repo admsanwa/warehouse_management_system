@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Backend;
 use App\Http\Controllers\Controller;
 use App\Models\BonDetailsModel;
 use App\Models\DeliveryModel;
+use App\Models\grpoModel;
+use App\Models\MemoDetailModel;
 use App\Models\QualityModel;
 use App\Services\SapService;
 use Arr;
@@ -83,5 +85,34 @@ class ReportsController extends Controller
                 $latest = $row->grpo->sortByDesc('id')->first();
                 return $latest?->reason_qty ?? '-';
             })->make(true);
+    }
+
+    public function memo()
+    {
+        return view("backend.reports.memo");
+    }
+
+    public function memo_data()
+    {
+        $query = MemoDetailModel::with(['memo'])->filter();
+
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->addColumn('no', fn($row) => $row->memo->no ?? '-')
+            ->addColumn('date', fn($row) => $row->memo->date ? date('d-m-Y', strtotime($row->memo->date)) : '-')
+            ->addColumn('unit', fn($row) => $row->unit)
+            ->addColumn('uom', fn($row) => $row->uom)
+            ->addColumn('qty', fn($row) => $row->qty)
+            // ->addColumn('remark', fn($row) => $row->remark)
+            // ->addColumn('receipt_date', function ($row) {
+            //     $latest = $row->gr->sortByDesc('created_at')->first();
+            //     return $latest ? date('d-m-Y', strtotime($latest->created_at)) : '-';
+            // });
+            // ->addColumn('receipt_qty', fn($row) => $row->total_grpo_qty)
+            // ->addColumn('remain_qty', fn($row) => $row->qty - $row->total_grpo_qty)
+            // ->addColumn('reason_qty', function ($row) {
+            //     $latest = $row->grpo->sortByDesc('id')->first();
+            //     return $latest?->reason_qty ?? '-';)}
+            ->make(true);
     }
 }

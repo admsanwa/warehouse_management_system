@@ -137,18 +137,26 @@
                                                     <td>{{ $production['DueDate'] }}</td>
                                                     <td>
                                                         @if ($production['Status'] == 'Released')
-                                                            @if ($needIssue)
-                                                                {{-- Masih harus issue qty --}}
-                                                                <a href="{{ url('admin/transaction/stockout?docNum=' . $production['DocNum'] . '&docEntry=' . $production['DocEntry']) }}"
-                                                                    class="btn btn-sm btn-outline-success">
-                                                                    <i class="fa fa-arrow-right"></i> Release
-                                                                </a>
+                                                            @if ($user->department === 'Production')
+                                                                @if ($needIssue)
+                                                                    {{-- Masih harus issue qty --}}
+                                                                    <a href="{{ url('admin/transaction/stockout?docNum=' . $production['DocNum'] . '&docEntry=' . $production['DocEntry']) }}"
+                                                                        class="btn btn-sm btn-outline-success">
+                                                                        <i class="fa fa-arrow-right"></i> Release
+                                                                    </a>
+                                                                @else
+                                                                    {{-- Sudah issue semua --}}
+                                                                    <a href="{{ url('admin/transaction/rfp?docNum=' . $production['DocNum'] . '&docEntry=' . $production['DocEntry']) }}"
+                                                                        class="btn btn-sm btn-outline-success">
+                                                                        <i class="fa fa-arrow-right"></i> Receipt
+                                                                    </a>
+                                                                @endif
                                                             @else
-                                                                {{-- Sudah issue semua --}}
-                                                                <a href="{{ url('admin/transaction/rfp?docNum=' . $production['DocNum'] . '&docEntry=' . $production['DocEntry']) }}"
-                                                                    class="btn btn-sm btn-outline-success">
-                                                                    <i class="fa fa-arrow-right"></i> Receipt
-                                                                </a>
+                                                                @if ($needIssue)
+                                                                    Release
+                                                                @else
+                                                                    Receipt
+                                                                @endif
                                                             @endif
                                                         @else
                                                             {{ $production['Status'] }}

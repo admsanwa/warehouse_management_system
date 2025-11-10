@@ -452,7 +452,7 @@
                                 <li class="nav-item">
                                     <a href="{{ url('admin/transaction/stockout') }}"
                                         class="nav-link @if (Request::is('admin/transaction/stockout/*') || Request::is('admin/transaction/stockout')) active @endif">
-                                        <p>Issue For Prod</p>
+                                        <p>Issue For Prod</p>
                                     </a>
                                 </li>
                             @endif
@@ -511,7 +511,7 @@
                         </a>
                         <ul class="collapse list-unstyled {{ Request::is('admin/listtransaction/*') ? 'show' : '' }} itemSubMenu"
                             id="listtransactionSubMenu">
-                            @if ($authDept == 'IT' || $authDept == 'Purchasing' || $authDept == 'PPIC')
+                            @if ($authDept == 'IT')
                                 <li class="nav-item">
                                     <a href="{{ url('admin/listtransaction/stockin') }}"
                                         class="nav-link @if (Request::is('admin/listtransaction/stockin') || Request::is('admin/listtransaction/stockin/*')) active @endif">
@@ -682,6 +682,20 @@
                                 <a href="{{ url('/reports-bon') }}"
                                     class="nav-link @if (Request::is('admin/reports/bon')) active @endif">
                                     <p>Bon</p>
+                                </a>
+                            </li>
+                            @if (
+                                $authDept == 'IT' ||
+                                    $authDept == 'Production and Warehouse' ||
+                                    $authDept == 'PPIC' ||
+                                    $authDept == 'Quality Control' ||
+                                    $authDept == 'Procurement, Installation and Delivery' ||
+                                    $authDept == 'Purchasing')
+                            @endif
+                            <li class="nav-item">
+                                <a href="{{ url('/reports-memo') }}"
+                                    class="nav-link @if (Request::is('admin/reports/memo')) active @endif">
+                                    <p>Memo</p>
                                 </a>
                             </li>
                         </ul>

@@ -183,6 +183,7 @@
                                                     <th>Plan Qty</th>
                                                     <th>Issued Qty</th>
                                                     <th>Uom</th>
+                                                    <th>Status</th>
                                                     @if ($user->department == 'Quality Control' || $user->department == 'IT')
                                                         <th>QC</th>
                                                         <th>Check Qty</th>
@@ -201,6 +202,21 @@
                                                             5 => 'Painting by Inhouse',
                                                             6 => 'Painting by Makloon',
                                                         ];
+
+                                                        // Hitung total PlannedQty & IssuedQty untuk semua Lines order ini
+                                                        $totalPlannedQty = collect($production['Lines'] ?? [])->sum(
+                                                            function ($l) {
+                                                                return (float) ($l['PlannedQty'] ?? 0);
+                                                            },
+                                                        );
+
+                                                        $totalIssuedQty = collect($production['Lines'] ?? [])->sum(
+                                                            function ($l) {
+                                                                return (float) ($l['IssuedQty'] ?? 0);
+                                                            },
+                                                        );
+                                                        $needIssue = $totalIssuedQty < $totalPlannedQty; // true = masih harus issue
+
                                                     @endphp
                                                     <tr>
                                                         <td>{{ $loop->iteration }}</td>
@@ -209,6 +225,13 @@
                                                         <td>{{ formatDecimalsSAP($line['PlannedQty']) }}</td>
                                                         <td>{{ formatDecimalsSAP($line['IssuedQty']) }}</td>
                                                         <td>{{ $line['InvntryUoM'] ?? '-' }}</td>
+                                                        <td>
+                                                            @if ($needIssue)
+                                                                Release
+                                                            @else
+                                                                Receipt
+                                                            @endif
+                                                        </td>
                                                         @if ($user->department == 'Quality Control' || $user->department == 'IT')
                                                             @if (str_starts_with(strtoupper($line['ItemCode']), 'RM'))
                                                                 <td>{{ $statusMap[$quality->result ?? 0] ?? '-' }}</td>
@@ -239,12 +262,23 @@
                             </div>
                             <div class="card-footer">
                                 @if ($getRecord['Status'] == 'Released')
-                                    <a href="{{ url('admin/transaction/stockout?docNum=' . $getRecord['DocNum'] . '&docEntry=' . $getRecord['DocEntry']) }}"
-                                        class="btn btn-sm btn-outline-success"><i class="fa fa-arrow-right"></i>
-                                        Released</a>
+                                    @if ($user->department === 'Production')
+                                        @if ($needIssue)
+                                            <a href="{{ url('admin/transaction/stockout?docNum=' . $getRecord['DocNum'] . '&docEntry=' . $getRecord['DocEntry']) }}"
+                                                class="btn btn-sm btn-outline-success"><i class="fa fa-arrow-right"></i>
+                                                Released</a>
+                                        @else
+                                            <a href="{{ url('admin/transaction/rfp?docNum=' . $getRecord['DocNum'] . '&docEntry=' . $getRecord['DocEntry']) }}"
+                                                class="btn btn-sm btn-outline-success">
+                                                <i class="fa fa-arrow-right"></i> Receipt
+                                            </a>
+                                        @endif
+                                    @else
+                                    @endif
                                 @else
                                     {{ $getRecord['Status'] }}
                                 @endif
+
                                 @if (($user->department === 'Production and Warehouse' && $user->level === 'Leader') || $user->department === 'IT')
                                     <a href="{{ url('/preparematerial?docNum=' . $getRecord['DocNum'] . '&docEntry=' . $getRecord['DocEntry']) }}"
                                         class="btn btn-sm btn-outline-success"><i class="fa fa-arrow-right"></i> Form

@@ -13,8 +13,8 @@ use App\Models\PrepareMatModel;
 use App\Models\ProductionModel;
 use App\Models\ProductionOrderDetailsModel;
 use App\Models\QualityModel;
-use App\Models\SignBonModel;
 use App\Models\RFPModel;
+use App\Models\SignBonModel;
 use App\Models\SignModel;
 use App\Models\StockModel;
 use Illuminate\Http\Request;
@@ -75,6 +75,7 @@ class ProductionController extends Controller
         // $totalPages = ceil($getProds['total'] / $param['limit']);
         $currentCount = $getProds['total'] ?? count($getProds['data'] ?? []);
         $totalPages = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
+        $user = Auth::user();
 
         return view('api.production.list', [
             'getProds'      => $getProds['data'] ?? [],
@@ -82,6 +83,7 @@ class ProductionController extends Controller
             'limit'       => $getProds['limit'],
             'total'       => $getProds['total'],
             'totalPages'  => $totalPages,
+            'user'        => $user
         ]);
     }
 
