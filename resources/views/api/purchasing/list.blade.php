@@ -8,12 +8,12 @@
                     <div class="col col-sm-6">
                         <h1>Purchasing</h1>
                     </div>
-                    <div class="col col-sm-6">
+                    {{-- <div class="col col-sm-6">
                         <ol class="breadcrumb justify-content-end">
                             <a href="{{ url('admin/purchasing/upload') }}" class="btn btn-primary btn-sm"><i
                                     class="fa fa-upload"> Upload Data</i></a>
                         </ol>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </div>
@@ -107,6 +107,17 @@
                                             </tr>
                                         </thead>
                                         @forelse ($orders as $order)
+                                            @php
+                                                // Hitung total PlannedQty & IssuedQty untuk semua Lines order ini
+                                                $totalPlannedQty = collect($order['Lines'] ?? [])->sum(function ($l) {
+                                                    return (float) ($l['PlannedQty'] ?? 0);
+                                                });
+
+                                                $totalIssuedQty = collect($order['Lines'] ?? [])->sum(function ($l) {
+                                                    return (float) ($l['IssuedQty'] ?? 0);
+                                                });
+                                                $needIssue = $totalIssuedQty < $totalPlannedQty; // true = masih harus issue
+                                            @endphp
                                             <tbody>
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
@@ -120,26 +131,40 @@
                                                         @php
                                                             $itemCode = $order['Lines'][0]['ItemCode'] ?? '';
                                                         @endphp
-                                                        @if ($order['DocStatus'] == 'Open' && $itemCode)
-                                                            @if (str_contains($itemCode, 'Maklon'))
-                                                                <a href="{{ url('admin/transaction/goodissued?po=' . $order['DocNum'] . '&docEntry=' . $order['DocEntry']) }}"
-                                                                    class="btn btn-outline-success">
-                                                                    <i class="fa fa-arrow-right"></i> Open GI
-                                                                </a>
-                                                                <a href="{{ url('admin/transaction/goodreceipt?po=' . $order['DocNum'] . '&docEntry=' . $order['DocEntry']) }}"
-                                                                    class="btn btn-outline-success">
-                                                                    <i class="fa fa-arrow-right"></i> Open GR
-                                                                </a>
-                                                            @elseif (str_starts_with($itemCode, 'RM'))
-                                                                <a href="{{ url('admin/transaction/stockin?po=' . $order['DocNum'] . '&docEntry=' . $order['DocEntry']) }}"
-                                                                    class="btn btn-outline-success">
-                                                                    <i class="fa fa-arrow-right"></i> Open GRPO
-                                                                </a>
+                                                        @if ($user->department === 'Production and Warehouse')
+                                                            @if ($order['DocStatus'] == 'Open' && $itemCode)
+                                                                @if (str_contains($itemCode, 'Maklon'))
+                                                                    <a href="{{ url('admin/transaction/goodissued?po=' . $order['DocNum'] . '&docEntry=' . $order['DocEntry']) }}"
+                                                                        class="btn btn-outline-success">
+                                                                        <i class="fa fa-arrow-right"></i> Open GI
+                                                                    </a>
+                                                                    <a href="{{ url('admin/transaction/goodreceipt?po=' . $order['DocNum'] . '&docEntry=' . $order['DocEntry']) }}"
+                                                                        class="btn btn-outline-success">
+                                                                        <i class="fa fa-arrow-right"></i> Open GR
+                                                                    </a>
+                                                                @elseif (str_starts_with($itemCode, 'RM'))
+                                                                    <a href="{{ url('admin/transaction/stockin?po=' . $order['DocNum'] . '&docEntry=' . $order['DocEntry']) }}"
+                                                                        class="btn btn-outline-success">
+                                                                        <i class="fa fa-arrow-right"></i> Open GRPO
+                                                                    </a>
+                                                                @else
+                                                                    Open
+                                                                @endif
                                                             @else
-                                                                Open
+                                                                {{ $order['DocStatus'] }}
                                                             @endif
                                                         @else
-                                                            {{ $order['DocStatus'] }}
+                                                            @if ($order['DocStatus'] == 'Open' && $itemCode)
+                                                                @if (str_contains($itemCode, 'Maklon'))
+                                                                    GI/GR
+                                                                @elseif (str_starts_with($itemCode, 'RM'))
+                                                                    Open GRPO
+                                                                @else
+                                                                    Open
+                                                                @endif
+                                                            @else
+                                                                {{ $order['DocStatus'] }}
+                                                            @endif
                                                         @endif
                                                     </td>
                                                     <td>

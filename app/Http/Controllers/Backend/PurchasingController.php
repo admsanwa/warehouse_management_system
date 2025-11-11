@@ -62,13 +62,13 @@ class PurchasingController extends Controller
         $currentCount = $orders['total'] ?? count($orders['data'] ?? []);
         $totalPages = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
 
-
         return view('api.purchasing.list', [
             'orders'      => $orders['data'] ?? [],
             'page'        => $orders['page'],
             'limit'       => $orders['limit'],
             'total'       => $orders['total'],
             'totalPages'  => $totalPages,
+            'user'        => Auth::user(),
             'statuses' => [
                 'Open',
                 'Close',

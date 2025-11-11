@@ -22,7 +22,7 @@
                     <div class="col col-md-12">
                         <div class="card card-info">
                             <div class="card-header">
-                                <h3 class="card-title">View Purchase Order</h3>
+                                <h3 class="card-title">View Purchase Line</h3>
                             </div>
                             <div class="card-body">
                                 <div class="form-group row">
@@ -113,6 +113,22 @@
                                             </thead>
                                             <tbody>
                                                 @foreach ($lines as $line)
+                                                    @php
+                                                        // Hitung total PlannedQty & IssuedQty untuk semua Lines line ini
+                                                        $totalPlannedQty = collect($line['Lines'] ?? [])->sum(function (
+                                                            $l,
+                                                        ) {
+                                                            return (float) ($l['PlannedQty'] ?? 0);
+                                                        });
+
+                                                        $totalIssuedQty = collect($line['Lines'] ?? [])->sum(function (
+                                                            $l,
+                                                        ) {
+                                                            return (float) ($l['IssuedQty'] ?? 0);
+                                                        });
+                                                        $needIssue = $totalIssuedQty < $totalPlannedQty; // true = masih harus issue
+                                                    @endphp
+
                                                     <tr>
                                                         <td>{{ $loop->iteration }}</td>
                                                         <td>{{ $line['ItemCode'] ?? '-' }}</td>
@@ -136,30 +152,44 @@
                                 </div>
                             </div>
                             <div class="card-footer">
-                                <a href="{{ url('admin/purchasing') }}" class="btn btn-default">Back</a>
+                                <button onclick="history.back()" class="btn btn-default">Back</button>
                                 @php
                                     $itemCode = $lines[0]['ItemCode'] ?? '';
                                 @endphp
-                                @if ($po['DocStatus'] == 'Open')
-                                    @if (stripos($itemCode, 'Maklon') !== false)
-                                        <a href="{{ url('admin/transaction/goodissued') }}"
-                                            class="btn btn-outline-success">
-                                            <i class="fa fa-arrow-right"></i> Open GI
-                                        </a>
-                                        <a href="{{ url('admin/transaction/goodreceipt') }}"
-                                            class="btn btn-outline-success">
-                                            <i class="fa fa-arrow-right"></i> Open GR
-                                        </a>
-                                    @elseif (strpos($itemCode, 'RM') === 0)
-                                        <a href="{{ url('admin/transaction/stockin?po=' . $po['DocNum'] . '&docEntry=' . $po['DocEntry']) }}"
-                                            class="btn btn-outline-success">
-                                            <i class="fa fa-arrow-right"></i> Open GRPO
-                                        </a>
+                                @if ($user->department === 'Production and Warehouse')
+                                    @if ($po['DocStatus'] == 'Open')
+                                        @if (stripos($itemCode, 'Maklon') !== false)
+                                            <a href="{{ url('admin/transaction/goodissued') }}"
+                                                class="btn btn-outline-success">
+                                                <i class="fa fa-arrow-right"></i> Open GI
+                                            </a>
+                                            <a href="{{ url('admin/transaction/goodreceipt') }}"
+                                                class="btn btn-outline-success">
+                                                <i class="fa fa-arrow-right"></i> Open GR
+                                            </a>
+                                        @elseif (strpos($itemCode, 'RM') === 0)
+                                            <a href="{{ url('admin/transaction/stockin?po=' . $po['DocNum'] . '&docEntry=' . $po['DocEntry']) }}"
+                                                class="btn btn-outline-success">
+                                                <i class="fa fa-arrow-right"></i> Open GRPO
+                                            </a>
+                                        @else
+                                            {{ $po['DocStatus'] }}
+                                        @endif
                                     @else
                                         {{ $po['DocStatus'] }}
                                     @endif
                                 @else
-                                    {{ $po['DocStatus'] }}
+                                    @if ($po['DocStatus'] == 'Open' && $itemCode)
+                                        @if (str_contains($itemCode, 'Maklon'))
+                                            GI/GR
+                                        @elseif (str_starts_with($itemCode, 'RM'))
+                                            Open GRPO
+                                        @else
+                                            Open
+                                        @endif
+                                    @else
+                                        {{ $po['DocStatus'] }}
+                                    @endif
                                 @endif
                                 {{-- currently update --}}
                                 @if (($user->department == 'Production and Warehouse' && $user->level == 'Leader') || $user->department == 'IT')
