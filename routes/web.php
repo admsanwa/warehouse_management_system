@@ -214,7 +214,7 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get("/reports-bon", [ReportsController::class, 'bon']);
     Route::post('/reports-bon-data', [ReportsController::class, 'data'])->name('report.bon.data');
     Route::get("/reports-memo", [ReportsController::class, 'memo']);
-    Route::get('/reports-memo-data', [ReportsController::class, 'memo_data'])->name('report.memo.data');
+    Route::post('/reports-memo-data', [ReportsController::class, 'memo_data'])->name('report.memo.data');
 
     // delivery
     Route::get("admin/delivery/list", [DeliveryController::class, "index"]);

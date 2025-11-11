@@ -137,7 +137,7 @@
                     }
                 ],
                 ajax: {
-                    type: "GET",
+                    type: "POST",
                     url: "{{ route('report.memo.data') }}",
                     data: function(d) {
                         d.start_date = $("#start_date").val();
