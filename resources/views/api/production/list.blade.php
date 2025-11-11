@@ -112,17 +112,26 @@
                                         @forelse ($getProds as $production)
                                             @php
                                                 // Hitung total PlannedQty & IssuedQty untuk semua Lines order ini
-                                                $totalPlannedQty = collect($production['Lines'] ?? [])->sum(function (
-                                                    $l,
-                                                ) {
-                                                    return (float) ($l['PlannedQty'] ?? 0);
-                                                });
+                                                $totalPlannedQty = collect($production['Lines'] ?? [])
+                                                    ->filter(function ($l) {
+                                                        $code = $l['ItemCode'] ?? '';
+                                                        $prefix = substr($code, 0, 2);
+                                                        return in_array($prefix, ['RM', 'SI', 'SF']);
+                                                    })
+                                                    ->sum(function ($l) {
+                                                        return (float) ($l['PlannedQty'] ?? 0);
+                                                    });
 
-                                                $totalIssuedQty = collect($production['Lines'] ?? [])->sum(function (
-                                                    $l,
-                                                ) {
-                                                    return (float) ($l['IssuedQty'] ?? 0);
-                                                });
+                                                $totalIssuedQty = collect($production['Lines'] ?? [])
+                                                    ->filter(function ($l) {
+                                                        $code = $l['ItemCode'] ?? '';
+                                                        $prefix = substr($code, 0, 2);
+                                                        return in_array($prefix, ['RM', 'SI', 'SF']);
+                                                    })
+                                                    ->sum(function ($l) {
+                                                        return (float) ($l['IssuedQty'] ?? 0);
+                                                    });
+
                                                 $needIssue = $totalIssuedQty < $totalPlannedQty; // true = masih harus issue
                                             @endphp
 
