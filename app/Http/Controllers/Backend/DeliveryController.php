@@ -43,6 +43,7 @@ class DeliveryController extends Controller
         $delivery->status       = $request->status;
         $delivery->date         = $request->date;
         $delivery->remark       = $request->remark;
+        $delivery->is_temp       = 1;
         $delivery->tracker_by   = $user;
         $delivery->save();
 
