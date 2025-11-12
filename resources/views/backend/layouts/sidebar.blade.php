@@ -71,8 +71,10 @@
         {{-- Dashboard --}}
         @if (
             $authDept == 'IT' ||
-                ($authDept == 'Production and Warehouse' && $authLevel == 'Manager') ||
-                ($authDept == 'Production and Warehouse' && $authLevel == 'Supervisor') ||
+                ($authDept == 'Production and Warehouse' ||
+                    $authLevel == 'Manager' ||
+                    $authLevel == 'Supervisor' ||
+                    $authLevel == 'Leader') ||
                 $authDept == 'PPIC' ||
                 $authDept == 'Purchasing' ||
                 $authDept == 'Production' ||
@@ -318,7 +320,8 @@
                                     $authDept == 'Procurement, Installation and Delivery' ||
                                     $authDept == 'Production' ||
                                     ($authDept == 'Production and Warehouse' && $authEmail != 'warehouse_sby@sanwamas.co.id') ||
-                                    $authDept == 'Quality Control')
+                                    $authDept == 'Quality Control' ||
+                                    $authDept == 'Purchasing')
                                 <li class="nav-item">
                                     <a href="{{ url('admin/production/listmemo') }}"
                                         class="nav-link @if (Request::is('admin/production/listmemo')) active @endif">
@@ -511,7 +514,7 @@
         @endif
 
         {{-- List Transactions --}}
-        @if ($authDept == 'IT' || $authDept == 'Purchasing' || $authDept == 'PPIC')
+        @if ($authDept == 'IT')
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                     data-accordion="false">
