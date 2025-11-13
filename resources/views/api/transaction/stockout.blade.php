@@ -81,6 +81,18 @@
                     </div>
                 </div>
 
+                @php
+                    $user = Auth::user();
+
+                    if ($user->default_series_prefix === 'SBY') {
+                        $warehouseOptions = ['SB001', 'SB901', 'SB902'];
+                        $canSelect = true;
+                    } else {
+                        $warehouseOptions = ['BK002'];
+                        $canSelect = false;
+                    }
+                @endphp
+
                 <form id="prodIssueForm">
                     <div class="card">
                         <div class="card-header">
@@ -113,14 +125,25 @@
                                         {{-- <option value="Disassembly">Disassembly</option> --}}
                                     </select>
                                 </div>
-                                <label for="" class="col-sm-4 col-form-lable">Default Warehouse:</label>
+                                <label for="warehouse" class="col-sm-4 col-form-label">Default Warehouse:</label>
                                 <div class="col-sm-6 mb-2">
-                                    <input type="text" name="warehouse" id="warehouse" class="form-control mt-2"
-                                        value="{{ $warehouse }}" placeholder="Default Warehouse akan terisi otomatis"
-                                        readonly>
-                                    {{-- <select name="warehouse" id="warehouse" class="form-control mt-2" required >
-                                        <option value="" disabled selected>Pilih Warehouse</option>
-                                    </select> --}}
+                                    @if ($canSelect)
+                                        <select name="warehouse" id="warehouse" class="form-control mt-2" required>
+                                            <option value="" disabled selected>Pilih Warehouse</option>
+                                            @foreach ($warehouseOptions as $wh)
+                                                <option value="{{ $wh }}"
+                                                    {{ old('warehouse') == $wh ? 'selected' : '' }}>
+                                                    {{ $wh }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    @else
+                                        <input type="text" name="warehouse" id="warehouse"
+                                            class="form-control mt-2"
+                                            value="{{ $warehouseOptions[0] }}"
+                                            placeholder="Default Warehouse akan terisi otomatis"
+                                            readonly>
+                                    @endif
                                 </div>
                                 <label for="" class="col-sm-4 col-form-lable">Alasan Goods Issue :</label>
                                 <div class="col-sm-6 mb-2">

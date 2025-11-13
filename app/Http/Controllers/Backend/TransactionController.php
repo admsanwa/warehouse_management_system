@@ -386,7 +386,9 @@ class TransactionController extends Controller
             ->orderBy('reason_code')
             ->pluck('reason_desc', 'reason_code')
             ->toArray();
+
         $warehouse =  "BK002";
+
         return view('api.transaction.stockout', compact(
             'po',
             'docEntry',

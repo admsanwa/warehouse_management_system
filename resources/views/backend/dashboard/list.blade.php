@@ -61,8 +61,7 @@
                     @if (
                         $authDept == 'PPIC' ||
                             $authDept == 'IT' ||
-                            (($authDept == 'Production and Warehouse' && $authLevel == 'Manager') ||
-                                ($authLevel == 'Supervisor' && $authEmail != 'warehouse_sby@sanwamas.co.id')) ||
+                            ($authDept == 'Production and Warehouse' && $authLevel == 'Manager' || $authEmail == 'warehouse_sby@sanwamas.co.id') ||
                             $authDept == 'Production')
                         <!-- ./col -->
                         <div class="col-lg-3 col-6">
@@ -183,8 +182,7 @@
                     {{-- receipt from prod --}}
                     @if (
                         $authDept == 'IT' ||
-                            (($authDept == 'Production and Warehouse' && $authLevel == 'Manager') ||
-                                ($authLevel == 'Supervisor' && $authEmail != 'warehouse_sby@sanwamas.co.id')) ||
+                            ($authDept == 'Production and Warehouse' && $authLevel == 'Manager' || $authEmail == 'warehouse_sby@sanwamas.co.id') ||
                             $authDept == 'Production')
                         <div class="col-lg-3 col-6">
                             <!-- small box -->

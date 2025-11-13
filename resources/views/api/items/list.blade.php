@@ -157,6 +157,7 @@
         window.addEventListener("load", function() {
 
             const whSelect = $("#warehouse");
+            console.log("wh", whSelect);
             if (whSelect.length) {
                 let selectedWh = "{{ request()->warehouse ?? Auth::user()->warehouse_access }}";
                 let option = new Option(selectedWh, selectedWh, true, true);
@@ -199,6 +200,9 @@
                     }
                 });
             }
+
+            const prefix = {!! json_encode(Auth::user()->warehouse_access) !!};
+            setDefaultWarehouse("#warehouse", prefix);
         });
     </script>
 @endsection

@@ -326,6 +326,12 @@ class ItemsController extends Controller
 
         $results = $results->unique('WhsCode')->values();
 
+        if (Auth::user()->default_series_prefix === 'SBY') {
+            $results = $results->filter(function ($val) {
+                return str_starts_with($val['WhsCode'], 'SB');
+            });
+        }
+
         $wh = $results->map(function ($val) {
 
             return [

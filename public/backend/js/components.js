@@ -79,6 +79,28 @@ function setDefaultSeries(selector, objectCode, prefix = "BKS") {
     });
 }
 
+function setDefaultSeriesSBY(selector, objectCode, prefix = "SBY") {
+    const year = new Date().getFullYear().toString().slice(-2);
+    const defaultSeriesText = `${prefix}-${year}`;
+    console.log("Default Series: ", defaultSeriesText);
+    // Cari data series dari server
+    $.ajax({
+        url: "/purchasing/seriesSearch",
+        data: { q: defaultSeriesText, ObjectCode: objectCode },
+        dataType: "json",
+    }).done(function (data) {
+        if (data.results && data.results.length > 0) {
+            let found = data.results.find(
+                (item) => item.text === defaultSeriesText
+            );
+            if (found) {
+                let option = new Option(found.text, found.id, true, true);
+                $(selector).append(option).trigger("change");
+            }
+        }
+    });
+}
+
 function setDefaultWarehouse(selector, whsCode) {
     $.ajax({
         url: "/warehouseSearch",

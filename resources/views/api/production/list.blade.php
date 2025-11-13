@@ -228,6 +228,7 @@
     </div>
     <script>
         window.addEventListener("load", function() {
+            
             const selectSeries = $("#seriesSelect");
             let selectedSeries = "{{ request()->series }}";
             console.log(selectedSeries);
@@ -286,6 +287,9 @@
                     }
                 }
             });
+            
+            const prefix = {!! json_encode(Auth::user()->default_series_prefix) !!};
+            setDefaultSeriesSBY("#seriesSelect", "202", prefix);
         });
     </script>
 @endsection

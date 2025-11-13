@@ -184,7 +184,15 @@ class PurchasingController extends Controller
             ]);
         }
 
-        $series = collect($getSeries['data'] ?? [])->map(function ($item) {
+        $getSeries = collect($getSeries['results'] ?? $getSeries['data'] ?? []); // pastikan jadi Collection
+
+        if (Auth::user()->default_series_prefix === 'SBY') {
+            $getSeries = $getSeries->filter(function ($val) {
+                return isset($val['SeriesName']) && str_starts_with($val['SeriesName'], 'SBY');
+            });
+        }
+
+        $series = $getSeries->map(function ($item) {
             return [
                 'id'   => $item['Series'],
                 'text' => $item['SeriesName'],
@@ -192,7 +200,7 @@ class PurchasingController extends Controller
         });
 
         return response()->json([
-            'results' => $series
+            'results' => $series->values()
         ]);
     }
 
