@@ -37,9 +37,9 @@
                         $authDept == 'PPIC' ||
                             $authDept == 'IT' ||
                             $authDept == 'Purchasing' ||
+                            $authDept == 'Fabrication' ||
                             (($authDept == 'Production and Warehouse' && $authLevel == 'Manager') ||
-                                ($authLevel == 'Supervisor' && $authEmail != 'warehouse_sby@sanwamas.co.id')) ||
-                            ($authDept == 'Quality Control' && $authLevel == 'Manager'))
+                                ($authLevel == 'Supervisor' && $authEmail != 'warehouse_sby@sanwamas.co.id')))
                         <div class="col-lg-3 col-6">
                             <!-- small box -->
                             <div class="small-box bg-info">
@@ -59,9 +59,8 @@
                     @endif
                     {{-- Issue for Prod --}}
                     @if (
-                        $authDept == 'PPIC' ||
                             $authDept == 'IT' ||
-                            ($authDept == 'Production and Warehouse' && $authLevel == 'Manager' || $authEmail == 'warehouse_sby@sanwamas.co.id') ||
+                            ($authDept == 'Production and Warehouse' && ($authLevel == 'Manager' || $authEmail == 'warehouse_sby@sanwamas.co.id')) ||
                             $authDept == 'Production')
                         <!-- ./col -->
                         <div class="col-lg-3 col-6">
@@ -107,10 +106,10 @@
                     {{-- delivery status --}}
                     @if (
                         $authDept == 'IT' ||
-                            $authDept == 'Procurement, Installation and Delivery' ||
-                            $authDept == 'Production and Warehouse' ||
-                            $authDept == 'Production' ||
-                            ($authDept == 'Quality Control' || $authLevel == 'Manager' || $authLevel == 'Staff'))
+                        $authDept == 'Procurement, Installation and Delivery' ||
+                        $authDept == 'Production and Warehouse' ||
+                        $authDept == 'Production' ||
+                        ($authDept == 'Quality Control' && ($authLevel == 'Manager' || $authLevel == 'Staff')))
                         <div class="col-lg-3 col-6">
                             <!-- small box -->
                             <div class="small-box bg-danger">

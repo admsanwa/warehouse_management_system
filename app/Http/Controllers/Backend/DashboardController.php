@@ -113,7 +113,7 @@ class DashboardController extends Controller
         if (in_array($user->department, ["Purchasing", "PPIC"]) && $hasGRPending) {
             session()->flash('grPending', true);
         }
-        if (in_array($user->department, ["Procurement, Installation and Delivery"]) && $hasDeliveryPending) {
+        if (in_array($user->department, ["Procurement, Installation and Delivery"]) && $user->level === "Leader" && $hasDeliveryPending) {
             session()->flash('deliveryPending', true);
         }
 

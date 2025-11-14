@@ -358,7 +358,7 @@
         @endif
 
         {{-- Stocks --}}
-        @if ($authDept == 'IT' || ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager'))
+        @if ($authDept == 'IT')
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                     data-accordion="false">
@@ -694,6 +694,7 @@
                             @if (
                                 $authDept == 'IT' ||
                                     ($authDept == 'Production and Warehouse' && $authEmail !== 'warehouse_sby@sanwamas.co.id') ||
+                                    ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager') ||
                                     $authDept == 'PPIC' ||
                                     $authDept == 'Purchasing')
                                 <li class="nav-item">
@@ -706,6 +707,7 @@
                             @if (
                                 $authDept == 'IT' ||
                                     ($authDept == 'Production and Warehouse' && $authEmail !== 'warehouse_sby@sanwamas.co.id') ||
+                                    ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager') ||
                                     $authDept == 'PPIC' ||
                                     $authDept == 'Quality Control' ||
                                     $authDept == 'Purchasing')
