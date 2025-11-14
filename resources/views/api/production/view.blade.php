@@ -203,17 +203,25 @@
                                                             6 => 'Painting by Makloon',
                                                         ];
 
+                                                        $prefix = ['RM', 'SI', 'SF'];
                                                         // Hitung total PlannedQty & IssuedQty untuk semua Lines order ini
-                                                        $totalPlannedQty = collect($lines)->sum(
-                                                            function ($l) {
+                                                        $totalPlannedQty = collect($lines)
+                                                            ->filter(function ($l) use ($prefix) {
+                                                                return in_array(substr($l['ItemCode'], 0, 2), $prefix);
+                                                            })
+                                                            ->sum(function ($l) {
                                                                 return (float) ($l['PlannedQty'] ?? 0);
                                                             },
                                                         );
 
-                                                        $totalIssuedQty = collect($lines)->sum(
-                                                            function ($l) {
+                                                        $totalIssuedQty = collect($lines)
+                                                            ->filter(function ($l) use ($prefix) {
+                                                                return in_array(substr($l['ItemCode'], 0, 2), $prefix);
+                                                            })
+                                                            ->sum(function ($l) {
                                                                 return (float) ($l['IssuedQty'] ?? 0);
                                                             },
+
                                                         );
                                                         $needIssue = $totalIssuedQty < $totalPlannedQty; // true = masih harus issue
                                                         // @dd(['need issue' => $needIssue, 'total issue' => $totalIssuedQty, 'total plan' => $totalPlannedQty, 'line' => $lines]);
@@ -274,7 +282,6 @@
                                                 <i class="fa fa-arrow-right"></i> Receipt
                                             </a>
                                         @endif
-                                    @else
                                     @endif
                                 @else
                                     {{ $getRecord['Status'] }}

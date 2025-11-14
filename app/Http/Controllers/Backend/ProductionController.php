@@ -197,35 +197,6 @@ class ProductionController extends Controller
         ]);
     }
 
-    public function index_old(Request $request)
-    {
-        $getData    = ProductionModel::withCount("stocks")->orderBy("id", "desc")->paginate(10);
-        $getRecord  = ProductionOrderDetailsModel::with("stocks")->get()->unique("doc_num")->values();
-
-        $productionSummary = [];
-        foreach ($getRecord as $record) {
-            $po = $record->doc_num;
-
-            $productionQty  = ProductionOrderDetailsModel::where("doc_num", $po)->sum("qty");
-            $stockOutQty    = StockModel::where("prod_order", $po)->sum("qty");
-
-            $productionSummary[$po] = [
-                "remain" => $productionQty - $stockOutQty
-            ];
-        }
-        return view('backend.production.list', compact('getData', 'productionSummary', 'getRecord'));
-    }
-
-    public function view_old(Request $request, $id)
-    {
-        $getRecord   = ProductionModel::find($id);
-        $getDocnum   = ProductionModel::where("id", $id)->value("doc_num");
-        $getData     = ProductionOrderDetailsModel::where("doc_num", $getDocnum)->get();
-
-        // dd($getData);
-        return view('backend.production.view', compact("getRecord", "getData"));
-    }
-
     public function upload_form()
     {
         return view('backend.production.upload');
