@@ -220,8 +220,9 @@
                     }
                 }
             });
+            
             const prefix = {!! json_encode(Auth::user()->default_series_prefix) !!};
-            setDefaultSeries("#seriesSelect", "202", prefix);
+            setDefaultSeries("#seriesSelect", "67", prefix);
         });
     </script>
 @endsection

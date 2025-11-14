@@ -44,6 +44,20 @@ class ProductionController extends Controller
 
     public function index(Request $request)
     {
+        // get series based on user
+        $getYear = now()->year;
+        $year = substr($getYear, -2);
+
+        if (Auth::user()->default_series_prefix === 'SBY') {
+            $series = 'SBY-' . $year;
+
+            $getSeries = $this->sap->getSeries(['page' => 1, 'limit' => 1, 'ObjectCode' => 202, 'SeriesName' => $series]);
+            if (!empty($getSeries['data'][0]['Series'])) {
+                $series = $getSeries['data'][0]['Series'];
+            }
+        }
+        // dd(['series' => $series, "getSeries" => $getSeries]);
+
         $param = [
             "page" => (int) $request->get('page', 1),
             "limit" => (int) $request->get('limit', 50),
@@ -52,7 +66,7 @@ class ProductionController extends Controller
             "U_MEB_NO_IO" => $request->get('io_no'),
             "ItemCode" =>  $request->get('prod_no'),
             "ItemName" =>  $request->get('prod_desc'),
-            "Series" =>  $request->get('series'),
+            "Series" =>  $series ?? $request->get('series'),
             "Status" =>  $request->get('status', 'Released'),
         ];
 

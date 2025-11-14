@@ -204,18 +204,19 @@
                                                         ];
 
                                                         // Hitung total PlannedQty & IssuedQty untuk semua Lines order ini
-                                                        $totalPlannedQty = collect($production['Lines'] ?? [])->sum(
+                                                        $totalPlannedQty = collect($lines)->sum(
                                                             function ($l) {
                                                                 return (float) ($l['PlannedQty'] ?? 0);
                                                             },
                                                         );
 
-                                                        $totalIssuedQty = collect($production['Lines'] ?? [])->sum(
+                                                        $totalIssuedQty = collect($lines)->sum(
                                                             function ($l) {
                                                                 return (float) ($l['IssuedQty'] ?? 0);
                                                             },
                                                         );
                                                         $needIssue = $totalIssuedQty < $totalPlannedQty; // true = masih harus issue
+                                                        // @dd(['need issue' => $needIssue, 'total issue' => $totalIssuedQty, 'total plan' => $totalPlannedQty, 'line' => $lines]);
 
                                                     @endphp
                                                     <tr>

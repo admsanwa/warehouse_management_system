@@ -603,12 +603,11 @@
                         <ul class="collapse list-unstyled {{ Request::is('admin/quality/*') ? 'show' : '' }} itemSubMenu"
                             id="qualitySubMenu">
                             @if (
-                                $authDept == 'Procurement, Installation and Delivery' ||
+                                    $authDept == 'Procurement, Installation and Delivery' ||
                                     $authDept == 'IT' ||
                                     $authDept == 'Quality Control' ||
-                                    $authDept == 'Production and Warehouse' ||
-                                    $authDept == 'Production' ||
-                                    $authDept == 'PPIC')
+                                    $authDept == 'Production'
+                                )
                                 <li class="nav-item">
                                     <a href="{{ url('admin/quality/list') }}"
                                         class="nav-link @if (Request::is('admin/quality/list')) active @endif">

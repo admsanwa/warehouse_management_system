@@ -133,6 +133,8 @@
                                                     });
 
                                                 $needIssue = $totalIssuedQty < $totalPlannedQty; // true = masih harus issue
+                                                // @dd(['need issue' => $needIssue, 'total issue' => $totalIssuedQty, 'total plan' => $totalPlannedQty, 'line' => $production]);
+
                                             @endphp
 
                                             <tbody>

@@ -8,11 +8,11 @@
                     <div class="col col-sm-6">
                         <h1>Barcode Print</h1>
                     </div><!-- /.col -->
-                    <div class="col col-sm-6">
+                    {{-- <div class="col col-sm-6">
                         <ol class="breadcrumb justify-content-end">
                             <a href="{{ url('admin/items/additem') }}" class="btn btn-primary btn-sm">Add Item</a>
                         </ol>
-                    </div><!-- /.col -->
+                    </div><!-- /.col --> --}}
                 </div><!-- /.row -->
             </div><!-- /.container-fluid -->
         </div>
@@ -39,7 +39,7 @@
                                                 class="form-control" placeholder="Enter Item Name">
                                         </div>
 
-                                        <div class="form-group col-md-2">
+                                        <div class="form-group col-md-3">
                                             <button class="btn btn-primary" type="submit" style="margin-top: 30px"><i
                                                     class="fa fa-search"></i> Search</button>
                                             <a href="{{ url('admin/items/barcode') }}" class="btn btn-warning"

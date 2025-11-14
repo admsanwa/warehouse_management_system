@@ -51,15 +51,6 @@ class ItemsController extends Controller
         ]);
     }
 
-    public function index_old(Request $request)
-    {
-        $user           = Auth::user()->username;
-        $getRecord      = ItemsModel::getRecord($request);
-        $addedBarcodes  = BarcodeModel::where('username', $user)->latest()->take(5)->get();
-
-        return view("backend.items.barcode", compact('getRecord', 'addedBarcodes'));
-    }
-
     public function print(Request $request)
     {
         $user = Auth::user()->username;

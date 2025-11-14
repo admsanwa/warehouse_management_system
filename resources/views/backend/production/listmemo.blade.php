@@ -67,8 +67,8 @@
                                                 <th>Description</th>
                                                 <th>Project</th>
                                                 <th>IO</th>
-                                                <th>Due Date</td>
-                                                <td>Status</td>
+                                                <th>Due Date</th>
+                                                <th>Status</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>

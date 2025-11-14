@@ -37,6 +37,19 @@ class InventorytfController extends Controller
 
     public function list(Request $request)
     {
+        // get series based on user
+        $getYear = now()->year;
+        $year = substr($getYear, -2);
+
+        if (Auth::user()->default_series_prefix === 'SBY') {
+            $series = 'SBY-' . $year;
+
+            $getSeries = $this->sap->getSeries(['page' => 1, 'limit' => 1, 'ObjectCode' => 67, 'SeriesName' => $series]);
+            if (!empty($getSeries['data'][0]['Series'])) {
+                $series = $getSeries['data'][0]['Series'];
+            }
+        }
+
         $param = [
             "page" => (int) $request->get('page', 1),
             "limit" => (int) $request->get('limit', 5),
@@ -44,7 +57,7 @@ class InventorytfController extends Controller
             "U_MEB_NO_IO" => $request->get('U_MEB_NO_IO'),
             "DocDate" => $request->get('date'),
             "DocStatus" =>  $request->get('status', 'O'),
-            "Series" =>  $request->get('series'),
+            "Series" =>  $series ?? $request->get('series')
         ];
 
         $getInvtf = $this->sap->getInventoryTransfers($param);

@@ -157,9 +157,10 @@
         window.addEventListener("load", function() {
 
             const whSelect = $("#warehouse");
-            console.log("wh", whSelect);
+            // console.log("wh", whSelect);
             if (whSelect.length) {
                 let selectedWh = "{{ request()->warehouse ?? Auth::user()->warehouse_access }}";
+                console.log(selectedWh);
                 let option = new Option(selectedWh, selectedWh, true, true);
                 whSelect.append(option).trigger("change");
                 whSelect.select2({
