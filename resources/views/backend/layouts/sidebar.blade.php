@@ -72,20 +72,32 @@
         @if (
             $authDept == 'IT' ||
                 ($authDept == 'Production and Warehouse' ||
-                    $authLevel == 'Manager' ||
-                    $authLevel == 'Supervisor' ||
-                    $authLevel == 'Leader') ||
+                $authLevel == 'Manager' ||
+                $authLevel == 'Supervisor' ||
+                $authLevel == 'Leader') ||
                 $authDept == 'PPIC' ||
                 $authDept == 'Purchasing' ||
                 $authDept == 'Production' ||
                 ($authDept == 'Quality Control' && $authLevel != 'Operator' && $authLevel != 'Magang') ||
-                $authDept == 'Procurement, Installation and Delivery')
+                $authDept == 'Procurement, Installation and Delivery'
+                ($authDept == 'Sales' & $authLevel == 'Manager'))
 
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                     data-accordion="false">
                     <!-- Add icons to the links using the .nav-icon class
              with font-awesome or any other icon font library -->
+                     @if (
+            $authDept == 'IT' ||
+                ($authDept == 'Production and Warehouse' ||
+                $authLevel == 'Supervisor' ||
+                $authLevel == 'Leader') ||
+                $authDept == 'PPIC' ||
+                $authDept == 'Purchasing' ||
+                $authDept == 'Production' ||
+                ($authDept == 'Quality Control' && $authLevel != 'Operator' && $authLevel != 'Magang') ||
+                $authDept == 'Procurement, Installation and Delivery')
+
                     <li class="nav-item">
                         <a href="{{ url('admin/dashboard') }}"
                             class="nav-link @if (Request::segment(2) == 'dashboard') active @endif">
@@ -94,14 +106,17 @@
                                 Dashboard
                             </p>
                         </a>
-                        @if (
-                            $authDept == 'IT' ||
-                                ($authDept == 'Production and Warehouse' && $authLevel == 'Manager') ||
-                                ($authDept == 'Production and Warehouse' && $authLevel == 'Supervisor') ||
-                                $authDept == 'PPIC' ||
-                                $authDept == 'Production' ||
-                                ($authDept == 'Quality Control' && $authLevel != 'Operator' && $authLevel != 'Magang') ||
-                                $authDept == 'Procurement, Installation and Delivery')
+                    </li>
+                    @endif
+                    @if (
+                        $authDept == 'IT' ||
+                            ($authDept == 'Production and Warehouse' && $authLevel == 'Manager') ||
+                            ($authDept == 'Production and Warehouse' && $authLevel == 'Supervisor') ||
+                            $authDept == 'PPIC' ||
+                            $authDept == 'Production' ||
+                            ($authDept == 'Quality Control' && $authLevel != 'Operator' && $authLevel != 'Magang') ||
+                            $authDept == 'Procurement, Installation and Delivery' ||
+                            $authDept == 'Sales')
                     <li class="nav-item">
                         <a href="{{ url('admin/dashboard-list') }}"
                             class="nav-link @if (Request::segment(2) == 'dashboard-list') active @endif">

@@ -207,7 +207,7 @@
                             $authDept == 'Production' ||
                             (($authDept == 'Production and Warehouse' && $authLevel == 'Manager') ||
                                 ($authDept == 'Production and Warehouse' && $authEmail != 'warehouse_sby@sanwamas.co.id')) ||
-                            ($authDept == 'Quality Control' || $authLevel == 'Manager' || $authLevel == 'Staff'))
+                            ($authDept == 'Quality Control' && $authLevel == 'Manager' || $authLevel == 'Staff'))
                         <div class="col-lg-3 col-6">
                             <!-- small box -->
                             <div class="small-box bg-info">
