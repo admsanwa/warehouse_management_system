@@ -212,7 +212,7 @@
         </nav>
 
         {{-- Purchasing --}}
-        @if (
+        @if (   
             $authDept == 'IT' ||
                 $authDept == 'Purchasing' ||
                 ($authDept == 'Production and Warehouse' &&

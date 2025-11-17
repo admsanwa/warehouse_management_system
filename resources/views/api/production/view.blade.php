@@ -1,5 +1,21 @@
 @extends('backend.layouts.app')
 @section('content')
+<style>
+    @media print {
+        @page {
+            margin: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .btn, button {
+            display: none !important;
+        }
+    }
+</style>
     <div class="content-wrapper">
         <div class="content-header">
             <div class="container-fluid">
@@ -293,6 +309,7 @@
                                         Prepare Material</a>
                                 @endif
                                 <button onclick="history.back()" class="btn btn-default">Back</button>
+                                <button id="print" onclick="Print()" class="btn btn-outline-primary"><i class="fa fa-print"></i> Print Doc</button>
                             </div>
                         </div>
                     </div>
@@ -301,4 +318,9 @@
         </section>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function Print() {
+            window.print();
+        }
+    </script>
 @endsection
