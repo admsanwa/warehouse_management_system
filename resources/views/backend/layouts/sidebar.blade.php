@@ -194,24 +194,22 @@
         @endif
 
         {{-- Employees --}}
-        @if ($authDept == 'IT')
-            <nav class="mt-2">
-                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
-                    data-accordion="false">
-                    <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
-                    <li class="nav-item">
-                        <a href="{{ url('admin/employees') }}"
-                            class="nav-link @if (Request::segment(2) == 'employees') active @endif">
-                            <i class="nav-icon fa fa-users"></i>
-                            <p>
-                                Employees
-                            </p>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        @endif
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                data-accordion="false">
+                <!-- Add icons to the links using the .nav-icon class
+            with font-awesome or any other icon font library -->
+                <li class="nav-item">
+                    <a href="{{ url('admin/employees') }}"
+                        class="nav-link @if (Request::segment(2) == 'employees') active @endif">
+                        <i class="nav-icon fa fa-users"></i>
+                        <p>
+                            Employees
+                        </p>
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
         {{-- Purchasing --}}
         @if (

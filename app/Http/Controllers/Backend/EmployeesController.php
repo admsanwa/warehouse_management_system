@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\JobsModel;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Monolog\Handler\RedisHandler;
 use Str;
 
@@ -13,8 +15,14 @@ class EmployeesController extends Controller
 {
     public function index(Request $request)
     {
-        $data['getRecord'] = User::getRecord($request);
-        return view('backend.employees.list', $data);
+        $user = Auth::user();
+
+        if ($user->department === 'IT') {
+            $getRecord = User::getRecord($request);
+        } else {
+            $getRecord = User::where('id', $user->id)->paginate(1);
+        }
+        return view('backend.employees.list', compact('getRecord', 'user'));
     }
 
     public function add(Request $request)
@@ -67,16 +75,24 @@ class EmployeesController extends Controller
 
     public function update($id, Request $request)
     {
-        $user = $request->validate([
+        $rules = [
             'username'      => 'required',
             'nik'           => 'required|numeric:min:3',
             'department'    => 'required',
             'warehouse'     => 'nullable',
             'email'         => 'required|unique:users,email,' . $id,
             'sign'          => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Validate signature file
-        ]);
+        ];
 
+        if ($request->filled('password')) {
+            $rules['password'] = 'min:6';
+            $rules['comfirm_password'] = 'same:password|min:6';
+        }
+
+        $validated              = $request->validate($rules);
         $user                   = User::find($id);
+        $auth                   = Auth::user();
+
         if ($user) {
             $user->username     = trim($request->username);
             $user->fullname     = trim($request->fullname);
@@ -85,29 +101,36 @@ class EmployeesController extends Controller
             $user->level        = trim($request->level);
             $user->warehouse_access = trim($request->warehouse ?? '');
             $user->email        = trim($request->email);
-            $signatureData = $request->input('signature');
+            $user->updated_by   = $auth->fullname;
+            if (!empty($request->password)) {
+                $user->password     = Hash::make($request->password);
+            }
+            if (!empty($request->input('signature'))) {
+                $signatureData = $request->input('signature');
 
-            // convert base64 to image
-            $image = str_replace('data:image/png;base64,', '', $signatureData);
-            $image = str_replace(' ', '+', $image);
+                // convert base64 to image
+                $image = str_replace('data:image/png;base64,', '', $signatureData);
+                $image = str_replace(' ', '+', $image);
 
-            // remove old signature if exists
-            if ($user->sign && file_exists(public_path('assets/images/sign/' . $user->sign))) {
-                unlink(public_path('assets/images/sign/' . $user->sign));
+                // remove old signature if exists
+                if ($user->sign && file_exists(public_path('assets/images/sign/' . $user->sign))) {
+                    unlink(public_path('assets/images/sign/' . $user->sign));
+                }
+
+                // generate new filename
+                $username   = Str::slug($user->username, '_');
+                $timestamp  = now()->setTimezone('Asia/Jakarta')->format('Ymd');
+                $filename   = $timestamp . '_' . $username . '.png';
+
+                // ensure directory exists
+                $directory = public_path('assets/images/sign/');
+                if (!file_exists($directory)) {
+                    mkdir($directory, 0777, true);
+                }
+                file_put_contents($directory . $filename, base64_decode($image));
+                $user->sign             = $filename;
             }
 
-            // generate new filename
-            $username   = Str::slug($user->username, '_'); 
-            $timestamp  = now()->setTimezone('Asia/Jakarta')->format('Ymd'); 
-            $filename   = $timestamp . '_' . $username . '.png'; 
-
-            // ensure directory exists
-            $directory = public_path('assets/images/sign/');
-            if (!file_exists($directory)) {
-                mkdir($directory, 0777, true);
-            }
-            file_put_contents($directory . $filename, base64_decode($image));
-            $user->sign             = $filename;
             $user->save();
 
             return redirect('admin/employees')->with('success', 'Employees succesfully update');

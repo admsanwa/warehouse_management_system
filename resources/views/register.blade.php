@@ -14,6 +14,14 @@
   <link rel="stylesheet" href="{{ url('backend/plugins/icheck-bootstrap/icheck-bootstrap.min.css')}}">
   <!-- Theme style -->
   <link rel="stylesheet" href="{{ url('backend/dist/css/adminlte.min.css')}}">
+  <style>
+    .required-field {
+      border-left: 5px solid red;
+    }
+    .optional-field {
+      border-left: 5px solid green;
+    }
+  </style>
 </head>
 
 <body class="hold-transition login-page">
@@ -31,7 +39,7 @@
           {{ csrf_field() }}
           <span style="color: red">{{ $errors->first('username')}}</span>
           <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Username" name="username" required value="{{ old('username')}}">
+            <input type="text" class="form-control required-field" placeholder="Username" name="username" required value="{{ old('username')}}">
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-user"></span>
@@ -40,7 +48,7 @@
           </div>
           <span style="color: red">{{ $errors->first("fullname")}}</span>
           <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Fullname" name="fullname" required value="{{ old('fullname')}}">
+            <input type="text" class="form-control required-field" placeholder="Fullname" name="fullname" required value="{{ old('fullname')}}">
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-user"></span>
@@ -49,7 +57,7 @@
           </div>
            <span style="color: red">{{ $errors->first("nik")}}</span>
           <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="NIK" name="nik" required value="{{ old('nik')}}">
+            <input type="text" class="form-control required-field" placeholder="NIK" name="nik" required value="{{ old('nik')}}">
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-address-card"></span>
@@ -58,7 +66,7 @@
           </div>
           <span style="color: red" class="duplicate_message">{{ $errors->first('email')}}</span>
           <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Email" name="email" required value="{{ old('email')}}" onblur="duplicateEmail(this)">
+            <input type="text" class="form-control required-field" placeholder="Email" name="email" required value="{{ old('email')}}" onblur="duplicateEmail(this)">
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-envelope"></span>
@@ -67,7 +75,7 @@
           </div>
           <span style="color: red">{{ $errors->first('department')}}</span>
           <div class="input-group mb-3">
-            <select name="department" id="department" class="form-control" required>
+            <select name="department" id="department" class="form-control required-field" required>
               <option value="">Select Department</option>
               <option value="IT">IT</option>
               <option value="Procurement, Installation and Delivery">Procurement, Installation and Delivery</option>
@@ -85,7 +93,7 @@
           </div>
           <span style="color: red">{{ $errors->first('level')}}</span>
           <div class="input-group mb-3">
-            <select name="level" id="level" class="form-control" required>
+            <select name="level" id="level" class="form-control required-field" required>
               <option value="">Select Level</option>
               <option value="Operator">Operator</option>
               <option value="Staff">Staff</option>
@@ -100,10 +108,17 @@
             </div>
           </div>
           <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="" name="warehouse" value="BK001">
-            <div class="input-group-append">
+           <select name="warehouse" id="warehouse" class="form-control optional-field">
+            <option value="">Select Warehouse Access</option>
+            <option value="BK001">BK001</option>
+            <option value="BK002">BK002</option>
+            <option value="BK003">BK003</option>
+            <option value="SB001">SB001</option>
+           </select>
+
+           <div class="input-group-append">
                 <div class="input-group-text">
-                    <span class="fas fa-address-card"></span>
+                  <span class="fa fa-warehouse"></span>
                 </div>
             </div>
           </div>
@@ -117,7 +132,7 @@
           </div>
           <span style="color: red">{{ $errors->first('password')}}</span>
           <div class="input-group mb-3">
-            <input type="password" class="form-control" placeholder="Password" name="password" required>
+            <input type="password" class="form-control required-field" placeholder="Password" name="password" required>
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-lock"></span>
@@ -126,7 +141,7 @@
           </div>
           <span style="color: red">{{ $errors->first('confirm_password')}}</span>
           <div class="input-group mb-3">
-            <input type="password" class="form-control" placeholder="Confirm Password" name="confirm_password" required>
+            <input type="password" class="form-control required-field" placeholder="Confirm Password" name="confirm_password" required>
             <div class="input-group-append">
               <div class="input-group-text">
                 <span class="fas fa-lock"></span>
