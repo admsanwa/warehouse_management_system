@@ -667,6 +667,14 @@ class ProductionController extends Controller
         return redirect('admin/production/listbon')->with('success', 'BON updated successfully!');
     }
 
+    public function bon_delete($id)
+    {
+        $recordDelete = BonModel::find($id);
+        $recordDelete->delete();
+
+        return redirect()->back()->with('error', 'Berhasil hapus bon');
+    }
+
     public function list_bon(Request $request)
     {
         $getRecord   = BonModel::getRecord($request);

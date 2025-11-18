@@ -102,6 +102,7 @@ Route::group(['middleware' => 'admin'], function () {
     Route::post('admin/production/bon', [ProductionController::class, 'create_bon']);
     Route::get('admin/production/bonedit/{id}', [ProductionController::class, 'edit_bon']);
     Route::post('admin/production/updatebon/{id}', [ProductionController::class, 'update_bon']);
+    Route::get('admin/production/bondelete/{id}', [ProductionController::class, 'bon_delete']);
     Route::get('admin/production/listbon', [ProductionController::class, 'list_bon']);
     Route::get('admin/production/bondetails/{id}', [ProductionController::class, 'bon_details']);
     Route::post('/approve-bon', [ProductionController::class, 'approve_bon']);

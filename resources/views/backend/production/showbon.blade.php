@@ -117,12 +117,18 @@
             <button class="btn btn-primary btn-print" onclick="window.print()">
                 <i class="fa fa-print"></i> Print
             </button>
+            <button onclick="history.back()" class="btn btn-secondary">
+                <i class="fa fa-arrow-left"></i> Back
+            </button>
 
             <button class="btn btn-success"
-                @if ($user->nik === '250071' || $user->nik === '08517') onclick="approve()"
-        @else
-            onclick="approveBon()" @endif
-                style="display: {{ $user->nik === '250071' || $user->nik === '08517' || $user->nik === '06067' ? 'block' : 'none' }}">
+                @if ($user->department === 'Purchasing') 
+                    onclick="approve()"
+                @else
+                    onclick="approveBon()"
+                @endif
+                style="display: {{ $user->department === 'Purchasing' || ($user->department === 'Procurement, Installation and Delivery' && $user->level === 'Manager') 
+                    ? 'block' : 'none' }}">
                 <i class="fa fa-check-circle"></i> Approve
             </button>
 

@@ -203,7 +203,11 @@
                                 </div>
                                 <div class="card-footer">
                                     <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i>
-                                        Update</button>
+                                        Update
+                                    </button>
+                                    <button onclick="history.back()" class="btn btn-secondary">
+                                        <i class="fa fa-arrow-left"></i> Back
+                                    </button>
                                 </div>
                             </form>
                         </div>

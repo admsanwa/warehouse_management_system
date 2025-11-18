@@ -99,6 +99,7 @@
                 serverSide: true,
                 searching: false,
                 dom: 'Bfrtip', // 👈 Aktifkan button
+                order: [[3, 'desc']],
                 buttons: [{
                         extend: 'excelHtml5',
                         title: 'Report BON Pembelian',
@@ -152,43 +153,59 @@
                     },
                     {
                         data: 'no',
-                        title: 'No Bon'
+                        title: 'No Bon',
+                        name: 'bon.no'
                     },
                     {
                         data: 'date',
-                        title: 'Tanggal Bon'
+                        title: 'Tanggal Bon',
+                        order: [3],
+                        name: 'bon.date'
+                    },
+                    {
+                        data: 'raw_date',
+                        name: 'bon.date',
+                        visible: false
                     },
                     {
                         data: 'item_name',
-                        title: 'Komponen'
+                        title: 'Komponen',
+                        orderable: false
                     },
                     {
                         data: 'uom',
-                        title: 'Satuan'
+                        title: 'Satuan',
+                        orderable: false
                     },
                     {
                         data: 'qty',
-                        title: 'Qty'
+                        title: 'Qty',
+                        orderable: false
                     },
                     {
                         data: 'remark',
-                        title: 'Keterangan'
+                        title: 'Keterangan',
+                        orderable: false
                     },
                     {
                         data: 'receipt_date',
-                        title: 'Tanggal Terima'
+                        title: 'Tanggal Terima',
+                        orderable: false
                     },
                     {
                         data: 'receipt_qty',
-                        title: 'Qty Terima'
+                        title: 'Qty Terima',
+                        orderable: false
                     },
                     {
                         data: 'remain_qty',
-                        title: 'Qty Sisa'
+                        title: 'Qty Sisa',
+                        orderable: false
                     },
                     {
                         data: 'reason_qty',
-                        title: 'Alasan Qty Sisa'
+                        title: 'Alasan Qty Sisa',
+                        orderable: false
                     }
                 ]
             });

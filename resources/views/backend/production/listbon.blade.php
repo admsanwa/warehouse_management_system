@@ -25,21 +25,21 @@
                                         <div class="form-group col-md-2">
                                             <label for="">No :</label>
                                             <input type="text" name="no" id="no" class="form-control"
-                                                placeholder="Enter Nomor Bon">
+                                                value="{{ Request()->no}}" placeholder="Enter Nomor Bon">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">IO :</label>
                                             <input type="text" name="io" id="io" class="form-control"
-                                                placeholder="Enter IO">
+                                                value="{{ Request()->io}}" placeholder="Enter IO">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Project :</label>
                                             <input type="text" name="project" id="project" class="form-control"
-                                                placeholder="Enter Project">
+                                                value="{{ Request()->project}}" placeholder="Enter Project">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Date :</label>
-                                            <input type="date" name="date" id="date" class="form-control">
+                                            <input type="date" name="date" id="date" class="form-control" value="{{ Request()->date}}">
                                         </div>
                                         <div class="form-group col-md-3">
                                             <button type="submit" class="btn btn-primary" style="margin-top: 30px;"><i
@@ -92,10 +92,16 @@
                                                             class="btn btn-primary">
                                                             <div class="fa fa-eye"></div>
                                                         </a>
-                                                        @if ($user->department === 'PPIC')
+                                                        @if ($user->department === 'PPIC' || $user->department === 'IT')
                                                             <a href="{{ url('admin/production/bonedit/' . $bon->id) }}"
                                                                 class="btn btn-success">
                                                                 <div class="fa fa-edit"></div>
+                                                            </a>
+                                                        @endif
+                                                        @if ($user->department === 'IT')
+                                                            <a href="{{ url('admin/production/bondelete/' . $bon->id) }}" 
+                                                                class="btn btn-danger">
+                                                                <div class="fa fa-trash"></div>
                                                             </a>
                                                         @endif
                                                     </td>
