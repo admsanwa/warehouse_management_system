@@ -42,6 +42,7 @@
                                         <div class="form-group col-md-3">
                                             <button type="submit" class="btn btn-primary" style="margin-top: 30px;"><i class="fa fa-search"></i> Search</button>
                                             <a href="{{ url('admin/items/list')}}" class="btn btn-warning" style="margin-top: 30px;"><i class="fa fa-eraser"></i> Reset</a>
+                                            
                                         </div>
                                     </div>
                                 </div>
