@@ -99,7 +99,7 @@
                 serverSide: true,
                 searching: false,
                 dom: 'Bfrtip', // 👈 Aktifkan button
-                order: [[3, 'desc']],
+                order: [[2, 'desc']],
                 buttons: [{
                         extend: 'excelHtml5',
                         title: 'Report BON Pembelian',
@@ -159,13 +159,8 @@
                     {
                         data: 'date',
                         title: 'Tanggal Bon',
-                        order: [3],
+                        order: [2],
                         name: 'bon.date'
-                    },
-                    {
-                        data: 'raw_date',
-                        name: 'bon.date',
-                        visible: false
                     },
                     {
                         data: 'item_name',
