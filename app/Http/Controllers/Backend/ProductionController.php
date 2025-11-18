@@ -669,8 +669,9 @@ class ProductionController extends Controller
 
     public function bon_delete($id)
     {
-        $recordDelete = BonModel::find($id);
-        $recordDelete->delete();
+        $BonDelete = BonModel::find($id);
+        $BonDelete->details()->delete();
+        $BonDelete->delete();
 
         return redirect()->back()->with('error', 'Berhasil hapus bon');
     }
