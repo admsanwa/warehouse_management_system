@@ -49,20 +49,6 @@ class TransactionController extends Controller
         return view('api.transaction.stockin', compact('po', 'docEntry'));
     }
 
-    public function stock_in_old(Request $request)
-    {
-        $temp           = StockModel::where('is_temp', true)->orderByDesc('id')->first();
-        $latestStock    = StockModel::whereNotNull('grpo')->orderByDesc('id')->first();
-        if ($temp) {
-            $grpo       = $temp->grpo;
-        } else {
-            $grpo       = $latestStock && $latestStock->grpo ? ((int)$latestStock->grpo + 1) : 1;
-        }
-        $getPos         = null;
-
-        return view('backend.transaction.stockin', compact('grpo', 'getPos'));
-    }
-
     public function scan_and_store(Request $request)
     {
         $validated = $request->validate([
@@ -150,7 +136,7 @@ class TransactionController extends Controller
                 'cardCode'     => 'required',
                 'docDate'      => 'required|date',
                 'remarks'      => 'required|string',
-                'reason_qty'       => 'required|string',
+                'reason_qty'       => 'nullable|string',
                 'reason_qty_other' => 'nullable|string|min:3',
                 'numAtCard'    => 'nullable|string',
                 'U_MEB_NO_IO'  => 'nullable|string',

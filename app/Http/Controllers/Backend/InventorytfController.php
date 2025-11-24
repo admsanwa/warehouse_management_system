@@ -213,50 +213,57 @@ class InventorytfController extends Controller
                     ($validated['ToWhsCode'] === 'JK001' && $validated['U_MEB_Default_Whse'] === 'JK001') ||
                     ($validated['ToWhsCode'] === 'SB904' && $validated['U_MEB_Default_Whse'] === 'SB904')
                 ) {
-                    // get prod order
-                    $param = [
-                        "DocEntry" => $request->prodDocEntry,
-                    ];
-                    $prods = $this->sap->getProductionOrders($param);
+                    foreach ($validated['stocks'] as $row) {
+                        if (!preg_match('/^SI/i', $row['ItemCode'])) {
+                            // skip
+                            continue;
+                        }
 
-                    if (empty($prods) || !Arr::get($prods, 'success')) {
-                        return back()->with(
-                            'error',
-                            Arr::get($prods, 'message', 'Gagal mengambil data dari Production Order SAP. Silakan coba lagi nanti.')
-                        );
+                        // get prod order
+                        $param = [
+                            "DocEntry" => $request->prodDocEntry,
+                        ];
+                        $prods = $this->sap->getProductionOrders($param);
+
+                        if (empty($prods) || !Arr::get($prods, 'success')) {
+                            return back()->with(
+                                'error',
+                                Arr::get($prods, 'message', 'Gagal mengambil data dari Production Order SAP. Silakan coba lagi nanti.')
+                            );
+                        }
+
+                        $prod = Arr::get($prods, 'data.0', []);
+
+                        DB::transaction(function () use ($request, $validated, $prod) {
+                            $delivery = DeliveryModel::create([
+                                'doc_entry' => $request->prodDocEntry ?? 0,
+                                'io' => $validated['U_MEB_NO_IO'] ?? '-',
+                                'prod_order' => $validated['U_MEB_No_Prod_Order'] ?? 0,
+                                'prod_no' => $prod['ItemCode'] ?? '-',
+                                'prod_desc' => $prod['ItemName'] ?? '-',
+                                'series' => $prod['Series'] ?? 0,
+                                'remark' => '-',
+                                'tracker_by' => '-',
+                                'is_temp' => 0
+                            ]);
+
+                            $dev_users = User::where('department', 'IT')->get();
+
+                            $recipients = User::where('department', 'Procurement, Installation and Delivery')->where('level', 'Leader')->get();
+                            $recipients = $recipients->merge($dev_users);
+
+                            Notification::send($recipients, new MailDeliveryProduct(
+                                $validated['U_MEB_NO_IO'],
+                                url('admin/delivery/list')
+                            ));
+
+                            return response()->json([
+                                'success' => true,
+                                'message' => 'Inventory transfer berhasil di simpan ke DB WMS',
+                                'data'  => $delivery,
+                            ]);
+                        });
                     }
-
-                    $prod = Arr::get($prods, 'data.0', []);
-
-                    DB::transaction(function () use ($request, $validated, $prod) {
-                        $delivery = DeliveryModel::create([
-                            'doc_entry' => $request->prodDocEntry ?? 0,
-                            'io' => $validated['U_MEB_NO_IO'] ?? '-',
-                            'prod_order' => $validated['U_MEB_No_Prod_Order'] ?? 0,
-                            'prod_no' => $prod['ItemCode'] ?? '-',
-                            'prod_desc' => $prod['ItemName'] ?? '-',
-                            'series' => $prod['Series'] ?? 0,
-                            'remark' => '-',
-                            'tracker_by' => '-',
-                            'is_temp' => 0
-                        ]);
-
-                        $dev_users = User::where('department', 'IT')->get();
-
-                        $recipients = User::where('department', 'Procurement, Installation and Delivery')->where('level', 'Leader')->get();
-                        $recipients = $recipients->merge($dev_users);
-
-                        Notification::send($recipients, new MailDeliveryProduct(
-                            $validated['U_MEB_NO_IO'],
-                            url('admin/delivery/list')
-                        ));
-
-                        return response()->json([
-                            'success' => true,
-                            'message' => 'Inventory transfer berhasil di simpan ke DB WMS',
-                            'data'  => $delivery,
-                        ]);
-                    });
                 }
             }
 

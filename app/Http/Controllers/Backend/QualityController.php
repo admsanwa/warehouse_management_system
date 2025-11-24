@@ -31,13 +31,13 @@ class QualityController extends Controller
     {
         $param = [
             "page" => (int) $request->get('page', 1),
-            "limit" => (int) $request->get('limit', 50),
+            "limit" => (int) $request->get('limit', 20),
             "DocNum" => $request->get('doc_num'),
             "DueDate" => formatDateSlash($request->get('date')),
             "U_MEB_NO_IO" => $request->get('io_no'),
             "ItemCode" =>  $request->get('prod_no'),
             "ItemName" =>  $request->get('prod_desc'),
-            "Series" =>  $request->get('series', 701),
+            "Series" =>  $request->get('series'),
             "Status" =>  $request->get('status', 'Released'),
         ];
 

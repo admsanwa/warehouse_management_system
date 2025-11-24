@@ -642,6 +642,14 @@
             }
         }
 
+        function cleanQty(str) {
+            if (!str) return 0;
+            str = str.replace(/\./g, '');
+            str = str.replace(/,/g, '.');
+
+            return parseFloat(str);
+        }
+
         function AddStockupForm() {
             event.preventDefault();
             const btn = document.getElementById("btnSubmitStock");
@@ -655,13 +663,14 @@
                 btn.disabled = false;
                 return false;
             }
-
             const reasonQty = document.getElementById("reason_qty").value;
             for (const row of document.querySelectorAll('.itemRowsValidation')) {
                 const openQtyInput = row.querySelector('input[name*="[OpenQty]"]');
                 const qtyInput = row.querySelector('input[name*="[qty]"]');
-                const openQty = parseFloat(openQtyInput?.value || 0);
-                const qty = parseFloat(qtyInput?.value || 0);
+
+                const openQty = cleanQty(openQtyInput?.value);
+                const qty = cleanQty(qtyInput?.value);
+                // console.log("open", openQty, "qty", qty);
 
                 if (openQty > qty && !reasonQty) {
                     showToast("❌ Error: Pastikan alasan sisa qty di isi sebelum submit!");

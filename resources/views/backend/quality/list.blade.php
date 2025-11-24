@@ -224,10 +224,6 @@
     <script>
         window.addEventListener("load", function() {
             const selectSeries = $("#seriesSelect");
-            const defaultId = 701;
-            const defaultText = "BKS-25";
-            let option = new Option(defaultText, defaultId, true, true);
-
             let selectedSeries = "{{ request()->series }}";
             console.log(selectedSeries);
             if (selectedSeries) {
@@ -245,9 +241,6 @@
                         selectSeries.append(option).trigger("change");
                     }
                 });
-            } else {
-                let option = new Option(defaultText, defaultId, true, true);
-                selectSeries.append(option).trigger("change");
             }
 
             selectSeries.select2({
@@ -289,6 +282,9 @@
                     }
                 }
             });
+
+            const prefix = {!! json_encode(Auth::user()->default_series_prefix) !!};
+            setDefaultSeries("#seriesSelect", "202", prefix);
         });
     </script>
 @endsection
