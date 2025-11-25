@@ -1305,10 +1305,13 @@
                     console.log("✅ First Sales Order:", firstSalesOrder);
 
                     const slpCode = firstSalesOrder.SlpCode;
+                    console.log("slp Code", slpCode);
 
                     if (slpCode) {
                         const $slpSelect = $("#SlpCode");
+                        console.log("slpSelect", $slpSelect);
                         const optionExists = $slpSelect.find(`option[value="${slpCode}"]`).length > 0;
+                        console.log("option exists", optionExists);
 
                         if (optionExists) {
                             $slpSelect.val(slpCode).trigger("change");

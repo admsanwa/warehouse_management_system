@@ -84,6 +84,7 @@
               <option value="Purchasing">Purchasing</option>
               <option value="Quality Control">Quality Control</option>
               <option value="Production">Production</option>
+              <option value="Accounting and Finance">Accounting and Finance</option>
             </select>
             <div class="input-group-append">
               <div class="input-group-text">

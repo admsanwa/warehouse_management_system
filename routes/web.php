@@ -111,6 +111,7 @@ Route::group(['middleware' => 'admin'], function () {
     Route::post('admin/production/memo', [ProductionController::class, 'create_memo']);
     Route::get('admin/production/memoedit/{id}', [ProductionController::class, 'edit_memo']);
     Route::post('admin/production/memoupdate/{id}', [ProductionController::class, 'update_memo']);
+    Route::get('admin/production/memodelete/{id}', [ProductionController::class, 'delete_memo']);
     Route::get('admin/production/listmemo', [ProductionController::class, 'list_memo']);
     Route::get('admin/production/memodetails/{id}', [ProductionController::class, 'detail_memo']);
     Route::post('/approve-memo', [ProductionController::class, 'approve']);

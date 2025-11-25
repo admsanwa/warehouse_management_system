@@ -373,6 +373,15 @@ class ProductionController extends Controller
         return redirect('admin/production/listmemo')->with('success', 'Memo updated successfully!');
     }
 
+    public function delete_memo($id)
+    {
+        $memodelete = MemoModel::find($id);
+        $memodelete->details()->delete();
+        $memodelete->delete();
+
+        return redirect()->back()->with('error', 'Berhasil hapus memo');
+    }
+
     public function list_memo(Request $request)
     {
         $getRecord = MemoModel::getRecord($request);

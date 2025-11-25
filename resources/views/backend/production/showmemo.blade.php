@@ -64,7 +64,8 @@
             @foreach ($memo->details as $index => $detail)
                 <tr>
                     <td class="text-center">{{ $index + 1 }}</td>
-                    <td>{{ $detail->unit . ($detail->width ? (" Width " . $detail->width) : "") . ($detail->height ? (" Height " . $detail->height) : "") }}</td>
+                    <td>{{  ($detail->needs ? $detail->needs : "")  . ($detail->unit ? " - Unit " . $detail->unit : "") . ($detail->width ? (" Width " . $detail->width) : "") . 
+                    ($detail->height ? (" Height " . $detail->height) : "") }}</td>
                     <td class="text-center">{{ $detail->qty ?? "-" }}</td>
                     <td class="text-center">{{ $detail->uom }}</td>
                 </tr>
@@ -101,9 +102,13 @@
     
     <div id="no-print">
         <button class="btn btn-primary btn-print" onclick="window.print()">
-            <i class="fa fa-print"></i> Print Memo
+            <i class="fa fa-print"></i> Print
         </button>
-        <button class="btn btn-success" onclick="approve()" style="display: {{ ($user->nik === '05993' || $user->nik === '06067') ? 'block' : 'none'}}">
+        <button class="btn btn-secondary" onclick="history.back()">
+            <i class="fa fa-arrow-left"></i> Back
+        </button>
+        <button class="btn btn-success" onclick="approve()" style="display: {{ ($user->department === 'Production and Warehouse' && $user->level === 'Manager') || 
+            ($user->department === 'Procurement, Installation and Delivery' && $user->level === 'Manager') ? 'block' : 'none'}}">
             <i class="fa fa-check-circle"> Approve</i>
         </button>
     </div>
