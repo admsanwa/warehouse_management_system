@@ -192,6 +192,8 @@ class DashboardController extends Controller
                     'limit'       => 50,
                 ]);
 
+                // dd(['get inventory tf' => $get_invtf]);
+
                 $latestTransfer = collect($get_invtf['data'])
                     ->sortByDesc(fn($x) => $x['DocEntry'] ?? '')
                     ->first();

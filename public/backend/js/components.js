@@ -33,6 +33,19 @@ function formatInputDecimals(target) {
     }).mask(target);
 }
 
+function formatInputDecimalsWMS(target) {
+    Inputmask({
+        alias: "numeric",
+        groupSeparator: ".",
+        radixPoint: ",",
+        autoGroup: true,
+        digits: 3,
+        digitsOptional: true,
+        rightAlign: false,
+        removeMaskOnSubmit: false,
+    }).mask(target);
+}
+
 function formatTimestamp(dateString) {
     if (!dateString) return "-";
     const date = new Date(dateString);

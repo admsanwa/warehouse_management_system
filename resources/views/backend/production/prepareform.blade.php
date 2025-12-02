@@ -180,7 +180,7 @@
                                                             <td>{{ formatDecimalsSAP($line['IssuedQty']) }}</td>
                                                             <td>
                                                                 @if (!in_array($line['ItemCode'], ['Z-DL', 'Z-FOH']))
-                                                                    <input type="text" step="0.01" name="lines[{{ $i }}][PrepareQty]" class="form-control format-sap form-control-sm text-end" value="0">
+                                                                    <input type="text" step="0.01" name="lines[{{ $i }}][PrepareQty]" class="form-control format-wms form-control-sm text-end" value="0">
                                                                 @endif
                                                             </td>
                                                             <td>{{ $line['InvntryUoM'] ?? '-' }}</td>
@@ -347,6 +347,9 @@
                     });
                 }
             }
+
+            // format sap
+            document.querySelectorAll('.format-wms').forEach(el => formatInputDecimalsWMS(el));     
         });
 
     </script>

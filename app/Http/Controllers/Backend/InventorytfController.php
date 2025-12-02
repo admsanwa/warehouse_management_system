@@ -152,8 +152,8 @@ class InventorytfController extends Controller
             ]);
 
             $postData = [
-                // 'DocDate'    => now()->format('Y/m/d'),
-                'DocDate'    => "2025/09/30",
+                'DocDate'    => now()->format('Y/m/d'),
+                // 'DocDate'    => "2025/09/30",
                 'Comment'    => $validated['Comments'] ?? null,
                 'Ref2'       => $validated['Ref2'] ?? null,
                 'Ext' => [

@@ -27,7 +27,7 @@
                     {{-- <input type="number" name="po" id="po_{{ $bon->id }}" class="form-control mt-2" placeholder="Enter No Purchase Order here" required> --}}
                 </div>
                 <div class="modal-footer">
-                    <a type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Save</button>
                 </div>
             </div>
@@ -35,6 +35,7 @@
     </div>
 </div>
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         $("#seriesSelect_{{ $bon->id }}").select2({
             placeholder: "Choose Series",
