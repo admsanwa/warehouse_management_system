@@ -204,12 +204,12 @@
                     {{-- memo --}}
                     @if (
                         $authDept == 'IT' ||
-                            $authDept == 'PPIC' ||
-                            ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manage') ||
-                            $authDept == 'Production' ||
-                            (($authDept == 'Production and Warehouse' && $authLevel == 'Manager') ||
-                                ($authDept == 'Production and Warehouse' && $authEmail != 'warehouse_sby@sanwamas.co.id')) ||
-                            ($authDept == 'Quality Control' && $authLevel == 'Manager' || $authLevel == 'Staff'))
+                        $authDept == 'PPIC' ||
+                        ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager') ||
+                        $authDept == 'Production' ||
+                        ($authDept == 'Production and Warehouse' && $authLevel == 'Manager') ||
+                        ($authDept == 'Production and Warehouse' && $authEmail != 'warehouse_sby@sanwamas.co.id') ||
+                        ($authDept == 'Quality Control' && ($authLevel == 'Manager' || $authLevel == 'Staff')))
                         <div class="col-lg-3 col-6">
                             <!-- small box -->
                             <div class="small-box bg-info">

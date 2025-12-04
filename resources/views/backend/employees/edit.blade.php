@@ -93,6 +93,7 @@
                                             <option value="Quality Control" {{ $getRecord->department == 'Quality Control' ? 'selected' : ''}}>Quality Control</option>
                                             <option value="Production" {{ $getRecord->department == 'Production' ? 'selected' : ''}}>Production</option>
                                             <option value="Accounting and Finance" {{ $getRecord->department == 'Accounting and Finance' ? 'selected' : ''}}>Accounting and Finance</option>
+                                            <option value="Sales and Marketing" {{ $getRecord->department == 'Sales and Marketing' ? 'selected' : ''}}>Sales and Marketing</option>
                                         </select>
                                     </div>
                                 </div>

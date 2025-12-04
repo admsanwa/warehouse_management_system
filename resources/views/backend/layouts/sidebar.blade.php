@@ -79,7 +79,7 @@
                 $authDept == 'Purchasing' ||
                 $authDept == 'Production' ||
                 ($authDept == 'Quality Control' && $authLevel != 'Operator' && $authLevel != 'Magang') ||
-                $authDept == 'Procurement, Installation and Delivery'
+                $authDept == 'Procurement, Installation and Delivery' ||
                 ($authDept == 'Sales' & $authLevel == 'Manager') ||
                 ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor'))
 
@@ -760,7 +760,8 @@
             $authDept == 'Production' ||
             $authDept == 'Quality Control' ||
             $authDept == 'Sales' ||
-            ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor')
+            ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor') ||
+            $authDept == 'Sales and Marketing'
             )
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
@@ -789,13 +790,14 @@
                             @endif
                             @if (
                                 $authDept == 'IT' ||
-                                    $authDept == 'Production and Warehouse' ||
-                                    $authDept == 'PPIC' ||
-                                    $authDept == 'Production' ||
-                                    $authDept == 'Procurement, Installation and Delivery' ||
-                                    $authDept == 'Quality Control' ||
-                                    $authDept == 'Sales' ||
-                                    ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor'))
+                                $authDept == 'Production and Warehouse' ||
+                                $authDept == 'PPIC' ||
+                                $authDept == 'Production' ||
+                                $authDept == 'Procurement, Installation and Delivery' ||
+                                $authDept == 'Quality Control' ||
+                                $authDept == 'Sales' ||
+                                ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor') ||
+                                $authDept == 'Sales and Marketing')
                                 <li class="nav-item">
                                     <a href="{{ url('admin/delivery/history') }}"
                                         class="nav-link @if (Request::is('admin/delivery/history')) active @endif">

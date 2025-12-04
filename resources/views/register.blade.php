@@ -85,6 +85,7 @@
               <option value="Quality Control">Quality Control</option>
               <option value="Production">Production</option>
               <option value="Accounting and Finance">Accounting and Finance</option>
+              <option value="Sales and Marketing">Sales and Marketing</option>
             </select>
             <div class="input-group-append">
               <div class="input-group-text">
