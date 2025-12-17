@@ -130,7 +130,9 @@
                         </div>
                     @endif
                     {{-- good receipt po --}}
-                    @if ($authDept == 'IT' || ($authDept == 'Production and Warehouse' && $authEmail != 'warehouse_sby@sanwamas.co.id'))
+                    @if (
+                        $authDept == 'IT' || ($authDept == 'Production and Warehouse' && $authEmail != 'warehouse_sby@sanwamas.co.id')
+                        )
                         <div class="col-lg-3 col-6">
                             <div class="small-box bg-info">
                                 <div class="inner">
@@ -147,7 +149,8 @@
                         </div>
                     @endif
                     {{-- good issued --}}
-                    @if ($authDept == 'IT' || ($authDept == 'Production and Warehouse' && $authEmail != 'warehouse_sby@sanwamas.co.id'))
+                    @if (
+                        $authDept == 'IT' || ($authDept == 'Production and Warehouse' && $authEmail != 'warehouse_sby@sanwamas.co.id'))
                         <div class="col-lg-3 col-6">
                             <!-- small box -->
                             <div class="small-box bg-success">
@@ -164,7 +167,9 @@
                         </div>
                     @endif
                     {{-- good receipt --}}
-                    @if ($authDept == 'IT' || ($authDept == 'Production and Warehouse' && $authEmail != 'warehouse_sby@sanwamas.co.id'))
+                    @if (
+                        $authDept == 'IT' || ($authDept == 'Production and Warehouse' && $authEmail != 'warehouse_sby@sanwamas.co.id')
+                        )
                         <div class="col-lg-3 col-6">
                             <!-- small box -->
                             <div class="small-box bg-warning">

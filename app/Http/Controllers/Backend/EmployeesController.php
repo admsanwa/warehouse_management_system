@@ -86,7 +86,7 @@ class EmployeesController extends Controller
 
         if ($request->filled('password')) {
             $rules['password'] = 'min:6';
-            $rules['comfirm_password'] = 'same:password|min:6';
+            $rules['confirm_password'] = 'same:password|min:6';
         }
 
         $validated              = $request->validate($rules);

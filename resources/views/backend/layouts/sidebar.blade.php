@@ -183,7 +183,7 @@
                             @endif
                             @if (
                                 $authDept == 'IT' ||
-                                    ($authDept == 'Production and Warehouse' && $authLevel != 'Manager' && $authLevel != 'Supervisor'))
+                                ($authDept == 'Production and Warehouse' && $authLevel != 'Manager'))
                                 <li class="nav-item">
                                     <a href="{{ url('admin/items/barcode') }}"
                                         class="nav-link @if (Request::is('admin/items/barcode')) active @endif">
@@ -454,7 +454,7 @@
         @if (
             $authDept == 'IT' ||
                 ($authDept == 'Production and Warehouse' &&
-                    $authLevel != 'Manager' &&
+                $authLevel != 'Manager' &&
                     $authEmail != 'spv-gudang@sanwamas.co.id') ||
                 $authDept == 'Production')
 
