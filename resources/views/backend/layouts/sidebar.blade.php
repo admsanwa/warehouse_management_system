@@ -78,7 +78,7 @@
                 $authDept == 'PPIC' ||
                 $authDept == 'Purchasing' ||
                 $authDept == 'Production' ||
-                ($authDept == 'Quality Control' && $authLevel != 'Operator' && $authLevel != 'Magang') ||
+                ($authDept == 'Quality Control' && $authLevel != 'Magang') ||
                 $authDept == 'Procurement, Installation and Delivery' ||
                 ($authDept == 'Sales' & $authLevel == 'Manager') ||
                 ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor'))
@@ -94,7 +94,7 @@
                 $authDept == 'PPIC' ||
                 $authDept == 'Purchasing' ||
                 $authDept == 'Production' ||
-                ($authDept == 'Quality Control' && $authLevel != 'Operator' && $authLevel != 'Magang') ||
+                ($authDept == 'Quality Control' && $authLevel != 'Magang') ||
                 $authDept == 'Procurement, Installation and Delivery' ||
                 $authDept == 'Sales' ||
                 ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor'))
@@ -115,7 +115,7 @@
                             ($authDept == 'Production and Warehouse' && $authLevel == 'Supervisor') ||
                             $authDept == 'PPIC' ||
                             $authDept == 'Production' ||
-                            ($authDept == 'Quality Control' && $authLevel != 'Operator' && $authLevel != 'Magang') ||
+                            ($authDept == 'Quality Control' && $authLevel != 'Magang') ||
                             $authDept == 'Procurement, Installation and Delivery' ||
                             $authDept == 'Sales' ||
                             ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor'))
@@ -398,7 +398,7 @@
 
         {{-- Inventory Tf --}}
         @if (
-            ($authDept == 'Quality Control' && $authLevel != 'Operator' && $authLevel != 'Magang') ||
+            ($authDept == 'Quality Control' && $authLevel != 'Magang') ||
             $authDept == 'IT' ||
             $authDept == 'Production and Warehouse' ||
             $authDept == 'Production' ||
@@ -420,7 +420,7 @@
                             id="inventorytfSubMenu">
                             @if (
                                 $authDept == 'IT' ||
-                                ($authDept == 'Quality Control' && $authLevel == 'Staff') ||
+                                ($authDept == 'Quality Control' && $authLevel != 'Magang'   ) ||
                                 ($authDept == 'Production and Warehouse' && $authLevel != 'Manager') ||
                                 ($authDept == 'Production' && $authLevel == 'Staff'))
                                 <li class="nav-item">

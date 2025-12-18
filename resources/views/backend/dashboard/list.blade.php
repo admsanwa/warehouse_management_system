@@ -109,7 +109,7 @@
                         $authDept == 'Procurement, Installation and Delivery' ||
                         $authDept == 'Production and Warehouse' ||
                         $authDept == 'Production' ||
-                        ($authDept == 'Quality Control' && ($authLevel == 'Manager' || $authLevel == 'Staff')) ||
+                        ($authDept == 'Quality Control' && ($authLevel == 'Manager' || $authLevel == 'Staff' || $authLevel == 'Operator')) ||
                         $authDept == 'Sales' ||
                         ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor'))
                         <div class="col-lg-3 col-6">
@@ -214,7 +214,7 @@
                         $authDept == 'Production' ||
                         ($authDept == 'Production and Warehouse' && $authLevel == 'Manager') ||
                         ($authDept == 'Production and Warehouse' && $authEmail != 'warehouse_sby@sanwamas.co.id') ||
-                        ($authDept == 'Quality Control' && ($authLevel == 'Manager' || $authLevel == 'Staff')))
+                        ($authDept == 'Quality Control' && ($authLevel == 'Manager' || $authLevel == 'Staff' || $authLevel == 'Operator')))
                         <div class="col-lg-3 col-6">
                             <!-- small box -->
                             <div class="small-box bg-info">
