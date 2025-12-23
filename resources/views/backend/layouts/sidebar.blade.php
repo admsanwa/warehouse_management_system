@@ -137,6 +137,7 @@
         @if (
             $authDept == 'IT' ||
             $authDept == 'Production and Warehouse' ||
+            $authDept == 'Production' ||
             $authDept == 'Fabrication' ||
             $authDept == 'PPIC' ||
             $authDept == 'Purchasing' ||
@@ -183,6 +184,7 @@
                             @endif
                             @if (
                                 $authDept == 'IT' ||
+                                $authDept == 'Production' ||
                                 ($authDept == 'Production and Warehouse' && $authLevel != 'Manager'))
                                 <li class="nav-item">
                                     <a href="{{ url('admin/items/barcode') }}"

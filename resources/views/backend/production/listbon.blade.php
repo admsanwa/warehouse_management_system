@@ -92,7 +92,7 @@
                                                             class="btn btn-primary">
                                                             <div class="fa fa-eye"></div>
                                                         </a>
-                                                        @if ($user->department === 'PPIC' || $user->department === 'IT')
+                                                        @if ($user->department === 'PPIC' || $user->department === 'IT' || $user->department === 'Purchasing')
                                                             <a href="{{ url('admin/production/bonedit/' . $bon->id) }}"
                                                                 class="btn btn-success">
                                                                 <div class="fa fa-edit"></div>

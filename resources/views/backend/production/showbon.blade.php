@@ -14,6 +14,16 @@
             display: flex;
             justify-content: space-between;
         }
+
+        .fixed-table {
+    table-layout: fixed;
+}
+
+.fixed-table td,
+.fixed-table th {
+    word-wrap: break-word;
+}
+
     </style>
 
     <div class="memo-container">
@@ -60,7 +70,7 @@
             </tr>
         </table>
 
-        <table class="table table-bordered details-table">
+        <table class="table table-bordered details-table fixed-table">
             <thead>
                 <tr>
                     <th style="width: 50px;">No</th>
@@ -68,6 +78,9 @@
                     <th>Nama Barang</th>
                     <th style="width: 100px;">Qty</th>
                     <th>Keterangan</th>
+                    @if ($signBuyer)
+                        <th style="width: 250px;">PO</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -78,6 +91,21 @@
                         <td>{{ $detail->item_name }}</td>
                         <td>{{ $detail->qty . ' ' . $detail->uom }}</td>
                         <td class="text-center">{{ $detail->remark }}</td>
+                        @if ($signBuyer)
+                        <td>
+                            <div>
+                                <select name="series" class="form-control" id="seriesSelect_{{ $bon->id }}"
+                                    required></select>
+                            </div>
+                            <div>
+                                <select name="po" id="po_{{ $bon->id }}" class="form-control"
+                                    data-docnum="{{ $po ?? '' }}" data-docentry="{{ $docEntry ?? '' }}" required>
+                                </select>
+                                <small class="text-muted">Memilih series akan mempermudah pencarian data PO yang
+                                    sesuai.</small>
+                            </div>
+                        </td>
+                        @endif
                     </tr>
                 @endforeach
             </tbody>
@@ -144,8 +172,100 @@
         </div>
     </div>
     <!-- Include barcode scanner JS -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script>
+        $(document).ready(function () {
+
+        $("#seriesSelect_{{ $bon->id }}").select2({
+            placeholder: "Choose Series",
+            allowClear: true,
+            width: "100%",
+            dropdownParent: $("#modal_{{ $bon->id }}"), // 👈 tambahkan ini
+            language: {
+                inputTooShort: function() {
+                    return "Type series for searching...";
+                },
+                noResults: function() {
+                    return "Data not found";
+                },
+                searching: function() {
+                    return "Stiil searching...";
+                },
+            },
+            ajax: {
+                url: "/purchasing/seriesSearch",
+                dataType: "json",
+                delay: 250,
+                data: function(params) {
+                    return {
+                        q: params.term,
+                        ObjectCode: '22'
+                    };
+                },
+                processResults: function(data) {
+                    console.log("Response dari server:", data);
+                    return {
+                        results: (data.results || []).map(item => ({
+                            id: item.id,
+                            text: item.text
+                        }))
+                    };
+                }
+            }
+        });
+
+        $("#po_{{ $bon->id }}").select2({
+            placeholder: "Select No Purchase Order",
+            allowClear: true,
+            width: "100%",
+            dropdownParent: $("#modal_{{ $bon->id }}"), // 👈 ini juga penting
+            minimumInputLength: 3,
+            language: {
+                inputTooShort: function() {
+                    return "Type min 3 character";
+                },
+                noResults: function() {
+                    return "Data not found";
+                },
+                searching: function() {
+                    return "Still searching...";
+                }
+            },
+            ajax: {
+                url: "/purchaseOrderSearch",
+                dataType: "json",
+                delay: 600,
+                data: function(params) {
+                    const seriesData = $("#seriesSelect_{{ $bon->id }}").select2('data');
+                    const series = seriesData.length > 0 ? seriesData[0].id : null;
+
+                    return {
+                        q: params.term,
+                        limit: 5,
+                        series: series,
+                        status: "Open",
+                    };
+                },
+                processResults: function(data) {
+                    tempPoData = data.po || [];
+                    return {
+                        results: (data.results || []).map(item => ({
+                            id: item.docnum,
+                            text: item.text,
+                        }))
+                    };
+                },
+                cache: true
+            }
+        });
+    });
+
         function showLoading() {
             document.getElementById("loadingOverlay").style.display = "block";
         }
