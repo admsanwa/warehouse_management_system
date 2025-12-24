@@ -67,7 +67,11 @@ class ReportsController extends Controller
             ->withSum(['grpo as receipt_qty' => function ($q) {
                 $q->whereColumn('grpo.no_po', 'bon_details.no_po')
                     ->whereColumn('grpo.item_code', 'bon_details.item_code');
-            }], 'qty');
+            }], 'qty')
+            ->withMax(['grpo as latest_grpo_id' => function ($q) {
+                $q->whereColumn('grpo.no_po', 'bon_details.no_po')
+                    ->whereColumn('grpo.item_code', 'bon_details.item_code');
+            }], 'id');
 
         return DataTables::of($query)
             ->addIndexColumn()
@@ -84,9 +88,9 @@ class ReportsController extends Controller
             ->addColumn('receipt_qty', fn($row) => $row->receipt_qty ?? 0)
             ->addColumn('remain_qty', fn($row) => $row->qty - $row->receipt_qty ?? 0)
             ->addColumn('reason_qty', function ($row) {
-                $latest = $row->grpo->sortByDesc('id')->first();
-                return $latest?->reason_qty ?? '-';
-            })->make(true);
+                return GrpoModel::find($row->latest_grpo_id)?->reason_qty ?? '-';
+            })
+            ->make(true);
     }
 
     public function memo()
