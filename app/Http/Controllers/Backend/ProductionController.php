@@ -769,26 +769,36 @@ class ProductionController extends Controller
         ]);
     }
 
-    public function insert_po($id, Request $request)
+    public function insert_po(Request $request)
     {
-        $request->validate([
-            'po' => 'required|numeric',
-            'no_bon' => 'required',
-            'series' => 'required'
-        ]);
         $user = Auth::user();
+        $request->validate([
+            'results.*.bon_id' => 'required|integer',
+            'results.*.po_no'  => 'required',
+            'results.*.series' => 'required',
+            'results.*.no_bon' => 'required'
+        ]);
 
-        // Simpan sign
-        $sign               = new SignBonModel();
-        $sign->no_bon       = $request->no_bon;
-        $sign->nik          = $user->nik;
-        $sign->department   = $user->department;
-        $sign->sign         = 1;
-        $sign->save();
+        DB::transaction(function () use ($request, $user) {
+            // update bon detail
+            foreach ($request->results as $result) {
+                BonDetailsModel::where('id', $result['bon_id'])->update([
+                    'no_series' => $result['series'],
+                    'no_po'     => $result['po_no']
+                ]);
+            }
 
+            // Simpan sign
+            $sign               = new SignBonModel();
+            $sign->no_bon       = $request->results[0]["no_bon"];
+            $sign->nik          = $user->nik;
+            $sign->department   = $user->department;
+            $sign->sign         = 1;
+            $sign->save();
+        });
+
+        // send notif email
         $bon = BonModel::where("no", $request->no_bon)->first();
-        BonModel::where('id', $id)->update(['no_po' => $request->po, 'no_series' => $request->series]);
-
         $recipients = collect();
 
         if ($bon && $bon->type) {

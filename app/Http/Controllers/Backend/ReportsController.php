@@ -63,9 +63,11 @@ class ReportsController extends Controller
 
     public function data()
     {
-        $query = BonDetailsModel::with(['bon', 'grpo' => function ($q) {
-            $q->whereColumn('grpo.no_series', 'bon.no_series');
-        }])->filter();
+        $query = BonDetailsModel::with('bon')
+            ->withSum(['grpo as receipt_qty' => function ($q) {
+                $q->whereColumn('grpo.no_po', 'bon_details.no_po')
+                    ->whereColumn('grpo.item_code', 'bon_details.item_code');
+            }], 'qty');
 
         return DataTables::of($query)
             ->addIndexColumn()
@@ -79,8 +81,8 @@ class ReportsController extends Controller
                 $latest = $row->grpo->sortByDesc('created_at')->first();
                 return $latest ? date('d-m-Y', strtotime($latest->created_at)) : '-';
             })
-            ->addColumn('receipt_qty', fn($row) => $row->total_grpo_qty)
-            ->addColumn('remain_qty', fn($row) => $row->qty - $row->total_grpo_qty)
+            ->addColumn('receipt_qty', fn($row) => $row->receipt_qty ?? 0)
+            ->addColumn('remain_qty', fn($row) => $row->qty - $row->receipt_qty ?? 0)
             ->addColumn('reason_qty', function ($row) {
                 $latest = $row->grpo->sortByDesc('id')->first();
                 return $latest?->reason_qty ?? '-';

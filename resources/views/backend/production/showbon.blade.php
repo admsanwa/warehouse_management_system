@@ -93,17 +93,20 @@
                         <td class="text-center">{{ $detail->remark }}</td>
                         @if ($signBuyer)
                         <td>
-                            <div>
-                                <select name="series" class="form-control" id="seriesSelect_{{ $bon->id }}"
-                                    required></select>
-                            </div>
-                            <div>
-                                <select name="po" id="po_{{ $bon->id }}" class="form-control"
-                                    data-docnum="{{ $po ?? '' }}" data-docentry="{{ $docEntry ?? '' }}" required>
-                                </select>
-                                <small class="text-muted">Memilih series akan mempermudah pencarian data PO yang
-                                    sesuai.</small>
-                            </div>
+                            <form id="insertPoForm_{{ $bon->id }}" method="post">
+                            @csrf
+                                <div>
+                                    <select name="series" class="form-control series-select" data-bon-id="{{ $detail->id }}" data-object-code="22"
+                                       data-selected-id={{ $detail->no_series }} data-selected-text={{ $detail->no_series }} required></select>
+                                </div>
+                                <div>
+                                    <select name="po" data-bon-id="{{ $detail->id }}" class="form-control po-select" value="{{ $detail->no_po }}"
+                                        data-selected-id={{ $detail->no_po }} data-selected-text={{ $detail->no_po }} required>
+                                    </select>
+                                    <small class="text-muted">Memilih series akan mempermudah pencarian data PO yang
+                                        sesuai.</small>
+                                </div>
+                            </form>
                         </td>
                         @endif
                     </tr>
@@ -173,98 +176,119 @@
     </div>
     <!-- Include barcode scanner JS -->
     <!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- Select2 -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
         $(document).ready(function () {
+            $(".series-select").each(function () {
+                const $series = $(this);
+                const bonId = $series.data("bon-id");
+                const objectCode = $series.data("object-code")
+        
+                $series.select2({
+                    placeholder: "Choose Series",
+                    allowClear: true,
+                    width: "100%",
+                    language: {
+                        inputTooShort: function() {
+                            return "Type series for searching...";
+                        },
+                        noResults: function() {
+                            return "Data not found";
+                        },
+                        searching: function() {
+                            return "Stiil searching...";
+                        },
+                    },
+                    ajax: {
+                        url: "/purchasing/seriesSearch",
+                        dataType: "json",
+                        delay: 250,
+                        data: function(params) {
+                            return {
+                                q: params.term,
+                                ObjectCode: objectCode
+                            };
+                        },
+                        processResults: function(data) {
+                            console.log("Response dari server:", data);
+                            return {
+                                results: data.results || []
+                            };
+                        }
+                    }
+                });
 
-        $("#seriesSelect_{{ $bon->id }}").select2({
-            placeholder: "Choose Series",
-            allowClear: true,
-            width: "100%",
-            dropdownParent: $("#modal_{{ $bon->id }}"), // 👈 tambahkan ini
-            language: {
-                inputTooShort: function() {
-                    return "Type series for searching...";
-                },
-                noResults: function() {
-                    return "Data not found";
-                },
-                searching: function() {
-                    return "Stiil searching...";
-                },
-            },
-            ajax: {
-                url: "/purchasing/seriesSearch",
-                dataType: "json",
-                delay: 250,
-                data: function(params) {
-                    return {
-                        q: params.term,
-                        ObjectCode: '22'
-                    };
-                },
-                processResults: function(data) {
-                    console.log("Response dari server:", data);
-                    return {
-                        results: (data.results || []).map(item => ({
-                            id: item.id,
-                            text: item.text
-                        }))
-                    };
-                }
-            }
+                // default series
+                const prefix = {!! json_encode(Auth::user()->default_series_prefix) !!};
+                setDefaultSeries($series, objectCode, prefix);
+
+                setSelect2Value(
+                    $series,
+                    $series.data("selected-id"),
+                    $series.data("selected-text")
+                )
+            });
+
+            $(".po-select").each(function() {
+                const $po = $(this);
+                const bonId = $po.data("bon-id");
+                const $series = $(".series-select[data-bon-id='" + bonId + "']");
+                $po.select2({
+                    placeholder: "Select No Purchase Order",
+                    allowClear: true,
+                    width: "100%",
+                    minimumInputLength: 3,
+                    language: {
+                        inputTooShort: function() {
+                            return "Type min 3 character";
+                        },
+                        noResults: function() {
+                            return "Data not found";
+                        },
+                        searching: function() {
+                            return "Still searching...";
+                        }
+                    },
+                    ajax: {
+                        url: "/purchaseOrderSearch",
+                        dataType: "json",
+                        delay: 600,
+                        data: function(params) {
+                            const seriesData = $("#seriesSelect_{{ $bon->id }}").select2('data');
+                            const series = seriesData.length > 0 ? seriesData[0].id : null;
+        
+                            return {
+                                q: params.term,
+                                limit: 5,
+                                series: series,
+                                status: "Open",
+                            };
+                        },
+                        processResults: function(data) {
+                            tempPoData = data.po || [];
+                            return {
+                                results: (data.results || []).map(item => ({
+                                    id: item.docnum,
+                                    text: item.text,
+                                }))
+                            };
+                        },
+                        cache: true
+                    }
+                });
+
+                setSelect2Value(
+                    $po,
+                    $po.data("selected-id"),
+                    $po.data("selected-text")
+                )
+            })
         });
-
-        $("#po_{{ $bon->id }}").select2({
-            placeholder: "Select No Purchase Order",
-            allowClear: true,
-            width: "100%",
-            dropdownParent: $("#modal_{{ $bon->id }}"), // 👈 ini juga penting
-            minimumInputLength: 3,
-            language: {
-                inputTooShort: function() {
-                    return "Type min 3 character";
-                },
-                noResults: function() {
-                    return "Data not found";
-                },
-                searching: function() {
-                    return "Still searching...";
-                }
-            },
-            ajax: {
-                url: "/purchaseOrderSearch",
-                dataType: "json",
-                delay: 600,
-                data: function(params) {
-                    const seriesData = $("#seriesSelect_{{ $bon->id }}").select2('data');
-                    const series = seriesData.length > 0 ? seriesData[0].id : null;
-
-                    return {
-                        q: params.term,
-                        limit: 5,
-                        series: series,
-                        status: "Open",
-                    };
-                },
-                processResults: function(data) {
-                    tempPoData = data.po || [];
-                    return {
-                        results: (data.results || []).map(item => ({
-                            id: item.docnum,
-                            text: item.text,
-                        }))
-                    };
-                },
-                cache: true
-            }
-        });
-    });
 
         function showLoading() {
             document.getElementById("loadingOverlay").style.display = "block";
@@ -274,59 +298,71 @@
             document.getElementById("loadingOverlay").style.display = "none";
         }
 
-        function approve() {
-            console.log("purchase approve");
-            const noBon = document.getElementById("no_bon").value;
+        function setSelect2Value($select, id, text) {
+            if (!id) return;
+
+            const option = new Option(text, id, true, true);
+            $select.append(option).trigger('change');
+        }
+
+        async function approve() {
+            const results = [];
+
+            $('.series-select').each(function () {
+                const $series = $(this);
+                const bonId = $series.data('bon-id');
+
+                const seriesData = $series.select2('data');
+                const series = seriesData.length ? seriesData[0] : null;
+
+                const $po = $('.po-select[data-bon-id="' + bonId + '"]');
+                const poData = $po.select2('data');
+                const po = poData.length ? poData[0] : null;
+                const noBon = document.getElementById("no_bon").value;
+
+                results.push({
+                   bon_id: bonId,
+                   po_no: po ? po.id : null,
+                   series: series ? series.id : null,
+                   no_bon: noBon ? noBon : 0
+                })
+
+                console.log("results", results);
+            });
+
+            if (results.some(r => !r.series || !r.po_no)) {
+                alert("Series and PO must be selected for all rows");
+                return;
+            }
+            
             if (!confirm("Are you sure approve to BON this?")) return;
-
-            const modalEl = document.getElementById("modal_{{ $bon->id }}");
-            const modal = new bootstrap.Modal(modalEl);
-            modal.show();
-
-            const form = document.getElementById("insertPoForm_{{ $bon->id }}");
-            form.onsubmit = async function(e) {
-                e.preventDefault();
-
-                const po = document.getElementById("po_{{ $bon->id }}").value;
-                const series = document.getElementById("seriesSelect_{{ $bon->id }}").value;
-                const no_bon = document.getElementById("nobon_{{ $bon->id }}").value;
-                console.log("po", po, "series", series, "nobon", no_bon);
-
-                if (!po && !no_bon && !series) {
-                    alert("Please enter a PO number first");
-                    return;
-                }
-
                 showLoading();
 
-                try {
-                    const insertPoUrl = "{{ route('insert.po', ['id' => $bon->id]) }}";
-                    const res = await fetch(insertPoUrl, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Accept": "application/json",
-                            "X-CSRF-TOKEN": document.querySelector('meta[name=\"csrf-token\"]').content
-                        },
-                        body: JSON.stringify({
-                            po: po,
-                            no_bon: no_bon,
-                            series: series
-                        })
-                    });
+            try {
+                const insertPoUrl = "{{ route('insert.po') }}";
+                const res = await fetch(insertPoUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name=\"csrf-token\"]').content
+                    },
+                    body: JSON.stringify({
+                        results: results,
+                    })
+                });
 
-                    const data = await res.json();
-                    alert(data.message || "PO Inserted Successfully");
+                const data = await res.json();
+                alert(data.message || "PO Inserted Successfully");
 
-                    $('#modal_{{ $bon->id }}').modal('hide');
-                } catch (error) {
-                    console.error(error);
-                    alert("Failed to insert PO, Please try again");
-                } finally {
-                    hideLoading();
-                    location.reload();
-                }
-            };
+            } catch (error) {
+                console.error(error);
+                alert("Failed to insert PO, Please try again");
+            } finally {
+                hideLoading();
+                location.reload();
+            }
+            
         }
 
         function approveBon() {

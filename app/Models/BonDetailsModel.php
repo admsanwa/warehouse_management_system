@@ -30,28 +30,8 @@ class BonDetailsModel extends Model
         return $this->belongsTo(BonModel::class, 'bon_id', 'id');
     }
 
-    public function getTotalGrpoQtyAttribute()
-    {
-        return GrpoModel::query()
-            ->where('no_series', $this->bon->no_series)
-            ->where('no_po', $this->bon->no_po)
-            ->where('item_code', $this->item_code)
-            ->sum('qty');
-    }
-
-
-    // Relasi ke GRPO lewat BON
     public function grpo()
     {
-        return $this->hasManyThrough(
-            grpoModel::class,   // Model tujuan
-            BonModel::class,    // Model perantara
-            'id',               // Foreign key di bon (ke bon_details.bon_id)
-            'no_po',               // Foreign key di grpo (ke bon.io)
-            'bon_id',           // Local key di bon_details
-            'no_po'                // Local key di bon
-        )
-            ->whereColumn('bon.no_series', 'grpo.no_series')
-            ->whereColumn('bon.no_po', 'grpo.no_po');
+        return $this->hasMany(GrpoModel::class, 'no_series', 'no_series');
     }
 }

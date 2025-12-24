@@ -133,7 +133,7 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get("/listpreparemat", [ProductionController::class, 'list_preparemat']);
     Route::get("preparematdetails/{docEntry}", [ProductionController::class, 'preparemat_details']);
     Route::post("preparematdetails/{docEntry}", [ProductionController::class, 'update_preparemat']);
-    Route::post('insert-po/{id}', [ProductionController::class, 'insert_po'])->name('insert.po');
+    Route::post('insert-po', [ProductionController::class, 'insert_po'])->name('insert.po');
 
     // qc
     Route::get("admin/quality/list", [QualityController::class, "index"]);
