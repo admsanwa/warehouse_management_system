@@ -37,14 +37,26 @@
                                                 value="{{ Request()->number }}">
                                         </div>
                                         <div class="form-group col-md-2">
-                                            <label for="">Posting Date</label>
-                                            <input type="date" name="date" class="form-control"
-                                                value="{{ Request()->date }}">
-                                        </div>
-                                        <div class="form-group col-md-2">
                                             <label for="">IO</label>
                                             <input type="text" name="U_MEB_NO_IO" class="form-control"
                                                 placeholder="Enter IO Nomor" value="{{ Request()->U_MEB_NO_IO }}">
+                                        </div>
+                                        <div class="form-group col-md-2">
+                                            <label for="">Production Order</label>
+                                            <input type="text" name="U_MEB_No_Prod_Order" class="form-control"
+                                                placeholder="Enter Production Order" value="{{ Request()->U_MEB_No_Prod_Order}}">
+                                        </div>
+                                        <div class="form-group col-md-2">
+                                            <label>From Warehouse :</label>
+                                            <select name="FromWhsCode" id="FromWhsCode" class="form-control">
+                                                <option value="" disabled selected>Select From Warehouse</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-md-2">
+                                            <label>To Warehouse :</label>
+                                            <select name="ToWhsCode" id="ToWhsCode" class="form-control">
+                                                <option value="">Select To Warehouse</option>
+                                            </select>
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Status</label>
@@ -89,9 +101,9 @@
                                                 <th>Doc Number</th>
                                                 <th>Posting Date</th>
                                                 <th>IO</th>
+                                                <th>Production Order</th>
                                                 <th>From Warehouse</th>
                                                 <th>To Warehouse</th>
-                                                <th>Status</th>
                                                 <th>Remarks</th>
                                                 <th>View Details</th>
                                             </tr>
@@ -103,9 +115,9 @@
                                                     <td>{{ $inv['DocNum'] }}</td>
                                                     <td>{{ $inv['DocDate'] }}</td>
                                                     <td>{{ $inv['U_MEB_NO_IO'] ?? '-' }}</td>
+                                                    <td>{{ $inv['U_MEB_No_Prod_Order'] ?? '-' }}</td>
                                                     <td>{{ $inv['FromWhsCode'] }}</td>
                                                     <td>{{ $inv['ToWhsCode'] }}</td>
-                                                    <td>{{ $inv['DocStatus'] === 'O' ? 'Open' : 'Close' }}</td>
                                                     <td>{{ $inv['Comments'] }}</td>
                                                     <td>
                                                         <a href="{{ url('admin/inventorytf/view?docEntry=' . $inv['DocEntry'] . '&docNum=' . $inv['DocNum']) }}"
@@ -160,6 +172,11 @@
             </div>
         </section>
     </div>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         window.addEventListener("load", function() {
             const selectSeries = $("#seriesSelect");
@@ -223,6 +240,66 @@
             
             const prefix = {!! json_encode(Auth::user()->default_series_prefix) !!};
             setDefaultSeries("#seriesSelect", "67", prefix);
+        });
+        
+        const selectedFromWhsCode = @json(request()->FromWhsCode ?? null);
+        const selectedToWhsCode   = @json(request()->ToWhsCode ?? null);
+
+        function setWarehouseSelect2(selectId, warehouseCode) {
+        if (!warehouseCode) return;
+
+        const $select = $("#" + selectId);
+
+        $.ajax({
+            url: "/warehouseSearch",
+            dataType: "json",
+            data: {
+                q: warehouseCode,   // 🔥 cari berdasarkan kode
+                limit: 1
+            }
+        }).then(function (data) {
+            if (!data?.results?.length) return;
+
+            const item = data.results.find(r => r.id === warehouseCode)
+                    || data.results[0];
+
+            const option = new Option(item.text, item.id, true, true);
+            $select.append(option).trigger("change");
+        });
+        }
+
+        // select wh
+        $(document).ready(function () {
+            warehouseSelect2("FromWhsCode");
+            warehouseSelect2("ToWhsCode");
+
+            setWarehouseSelect2("FromWhsCode", selectedFromWhsCode);
+            setWarehouseSelect2("ToWhsCode", selectedToWhsCode);
+            function warehouseSelect2(elementId) {
+                const el = $("#" + elementId);
+                if (el.length) {
+                    el.select2({
+                        allowClear: true,
+                        placeholder: "Select warehouse",
+                        width: "100%",
+                        ajax: {
+                            url: "/warehouseSearch",
+                            dataType: "json",
+                            delay: 250,
+                            data: params => ({
+                                q: params.term,
+                                limit: 10
+                            }),
+                            processResults: data => ({
+                                results: (data.results || []).map(item => ({
+                                    id: item.id,
+                                    text: item.text
+                                }))
+                            })
+                        }
+                    });
+                }
+            }
         });
     </script>
 @endsection

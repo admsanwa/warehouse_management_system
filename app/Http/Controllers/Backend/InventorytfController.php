@@ -52,12 +52,14 @@ class InventorytfController extends Controller
 
         $param = [
             "page" => (int) $request->get('page', 1),
-            "limit" => (int) $request->get('limit', 5),
+            "limit" => (int) $request->get('limit', 10),
             "DocNum" => $request->get('number'),
             "U_MEB_NO_IO" => $request->get('U_MEB_NO_IO'),
-            "DocDate" => $request->get('date'),
+            "U_MEB_No_Prod_Order" => $request->get('U_MEB_No_Prod_Order'),
             "DocStatus" =>  $request->get('status', 'O'),
-            "Series" =>  $series ?? $request->get('series')
+            "Series" =>  $series ?? $request->get('series'),
+            "FromWhsCode" => $request->get('FromWhsCode'),
+            "ToWhsCode" => $request->get("ToWhsCode")
         ];
 
         $getInvtf = $this->sap->getInventoryTransfers($param);

@@ -32,6 +32,6 @@ class BonDetailsModel extends Model
 
     public function grpo()
     {
-        return $this->hasMany(GrpoModel::class, 'no_series', 'no_series');
+        return $this->hasMany(grpoModel::class, 'no_series', 'no_series');
     }
 }
