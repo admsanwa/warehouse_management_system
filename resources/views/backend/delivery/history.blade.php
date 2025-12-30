@@ -30,9 +30,9 @@
                                                 value="{{ request('io') }}" placeholder="Enter Nomor IO">
                                         </div>
                                         <div class="form-group col-md-2">
-                                            <label for="">Product Order</label>
-                                            <input type="text" name="prod_order" class="form-control"
-                                                value="{{ request('prod_order') }}" placeholder="Enter Product Order">
+                                            <label for="">Inventory Transfer</label>
+                                            <input type="text" name="inv_transfer" class="form-control"
+                                                value="{{ request('inv_transfer') }}" placeholder="Enter Inventory Transfer">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Product No</label>
@@ -83,9 +83,9 @@
                                     <table class="table table-striped">
                                         <thead>
                                             <tr>
-                                                <th>No</th>
+                                                <th>Doc Entry</th>
                                                 <th>IO</th>
-                                                <th>Prod Order</th>
+                                                <th>Inventory Transfer</th>
                                                 <th>Prod Nomor</th>
                                                 <th>Prod Description</th>
                                                 <th>Status</th>
@@ -97,11 +97,11 @@
                                         <tbody>
                                             @forelse ($getRecord as $delivery)
                                                 <tr>
-                                                    <td>{{ $loop->iteration }}</td>
+                                                    <td>{{ $delivery->doc_entry }}</td>
                                                     <td>{{ $delivery->io }}</td>
-                                                    <td>{{ $delivery->prod_order }}</td>
+                                                    <td>{{ $delivery->inv_transfer }}</td>
                                                     <td><a
-                                                            href="{{ url('admin/production/view?docEntry=' . $delivery->doc_entry . '&docNum=' . $delivery->prod_order) }}">{{ $delivery->prod_no }}</a>
+                                                            href="{{ url('admin/inventorytf/view?docEntry=' . $delivery->doc_entry . '&docNum=' . $delivery->prod_order) }}">{{ $delivery->prod_no }}</a>
                                                     <td>{{ $delivery->prod_desc }}</td>
                                                     <td>{{ $delivery->status ?? '-' }}</td>
                                                     <td>{{ $delivery->date ?? '-' }}</td>

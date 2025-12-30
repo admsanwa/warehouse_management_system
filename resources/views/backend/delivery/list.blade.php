@@ -30,9 +30,9 @@
                                                 value="{{ request('io') }}" placeholder="Enter Nomor IO">
                                         </div>
                                         <div class="form-group col-md-2">
-                                            <label for="">Product Order</label>
-                                            <input type="text" name="prod_order" class="form-control"
-                                                value="{{ request('prod_order') }}" placeholder="Enter Product Order">
+                                            <label for="">Inventory Transfer</label>
+                                            <input type="text" name="inv_transfer" class="form-control"
+                                                value="{{ request('inv_transfer') }}" placeholder="Enter Inventory Transfer">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Product No</label>
@@ -46,14 +46,14 @@
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="status">Status Tracker</label>
-                                            <select name="status" id="status" class="form-control">
+                                            <select name="deliv_status" id="deliv_status" class="form-control">
                                                 <option value="">Select Status Tracker</option>
                                                 <option value="Pick Up"
-                                                    {{ request('status') == 'Pick Up' ? 'selected' : '' }}>Pick Up</option>
+                                                    {{ request('deliv_status') == 'Pick Up' ? 'selected' : '' }}>Pick Up</option>
                                                 <option value="On Delivery"
-                                                    {{ request('status') == 'On Delivery' ? 'selected' : '' }}>On Delivery
+                                                    {{ request('deliv_status') == 'On Delivery' ? 'selected' : '' }}>On Delivery
                                                 </option>
-                                                <option value="Done" {{ request('status') == 'Done' ? 'selected' : '' }}>
+                                                <option value="Done" {{ request('deliv_status') == 'Done' ? 'selected' : '' }}>
                                                     Done</option>
                                             </select>
                                         </div>
@@ -83,11 +83,11 @@
                                     <table class="table table-striped">
                                         <thead>
                                             <tr>
-                                                <th>No</th>
+                                                <th>Doc Entry</th>
                                                 <th>IO</th>
-                                                <th>Prod Order</th>
-                                                <th>Prod Nomor</th>
-                                                <th>Prod Description</th>
+                                                <th>Inventory Transfer</th>
+                                                <th>Production Nomor</th>
+                                                <th>Production Description</th>
                                                 <th>Status</th>
                                                 <th>Status Date</th>
                                                 <th>Remarks</th>
@@ -95,32 +95,30 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse ($getRecord as $delivery)
-                                                <tr class="{{ $delivery->should_highlight ? 'table-primary' : '' }}">
-                                                    <td>
-                                                        @if ($delivery->should_highlight)
-                                                            <i class="fa fa-circle text-primary ms-2"
-                                                                style="font-size:10px; margin-right:10px;"
-                                                                title="Recommended"></i>
-                                                        @endif
-                                                        {{ $loop->iteration }}
-                                                    </td>
-                                                    <td>{{ $delivery->io }}</td>
-                                                    <td>{{ $delivery->prod_order }}</td>
-                                                    <td><a
-                                                            href="{{ url('admin/production/view?docEntry=' . $delivery->doc_entry . '&docNum=' . $delivery->prod_order) }}">{{ $delivery->prod_no }}</a>
-                                                    <td>{{ $delivery->prod_desc }}</td>
+                                            @forelse ($mergedData as $row)
+                                                @php
+                                                    $sap = $row['sap'];
+                                                    $delivery = $row['delivery'];
+                                                @endphp
+                                                @foreach ($sap["Lines"] as $line)
+                                                <tr>
+                                                        <td>{{ $sap['DocEntry'] }}</td>
+                                                        <td>{{ $sap['U_MEB_NO_IO'] }}</td>
+                                                        <td>{{ $sap['DocNum'] }}</td>
+                                                        <td><a href="{{ url('admin/inventorytf/view?docEntry=' . $sap['DocEntry'] . '&docNum=' . $sap['DocNum']) }}">{{ $line['ItemCode'] }}</a>
+                                                        <td>{{ $line['ItemName'] }}</td>
                                                     <td>{{ $delivery->status ?? '-' }}</td>
                                                     <td>{{ $delivery->date ?? '-' }}</td>
                                                     <td>{{ $delivery->remark ?? '-' }}</td>
-                                                    <td><a href="#" data-bs-toggle="modal"
-                                                            data-bs-target="#modal_{{ $delivery->doc_entry }}"><i
-                                                                class="fa fa-eye"></i> Estimate</a></td>
+                                                    <td><a href="#" data-bs-toggle="modal" data-bs-target="#modal_{{ $sap['DocEntry'] }}"><i class="fa fa-eye"></i> Estimate</a></td>
                                                 </tr>
 
                                                 @include('partials.modal.tracking', [
-                                                    'delivery' => $delivery,
+                                                    'sap' => $sap,
+                                                    'sapline' => $line,
+                                                    'delivery' => $delivery
                                                 ])
+                                                @endforeach
                                             @empty
                                                 <tr>
                                                     <td colspan="100%">No Record Found</td>
@@ -130,9 +128,42 @@
                                     </table>
                                 </div>
                             </div>
+
+                            @php
+                                $query = request()->all();
+                            @endphp
                             <div class="card-footer">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    {!! $getRecord->onEachSide(1)->appends(request()->except('page'))->links() !!}
+                                    <span>
+                                        Showing page <b class="text-primary">{{ $page }}</b> of
+                                        {{ $totalPages }} (Total {{ $total }} records)
+                                    </span>
+
+                                    <div class="btn-group">
+                                        {{-- First + Previous --}}
+                                        @if ($page > 1)
+                                            {{-- <a href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['page' => 1, 'limit' => $limit])) }}"
+                                                class="btn btn-outline-primary btn-sm" aria-label="First Page">First</a> --}}
+
+                                            <a href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['page' => $page - 1, 'limit' => $limit])) }}"
+                                                class="btn btn-outline-primary btn-sm"
+                                                aria-label="Previous Page">Previous</a>
+                                        @endif
+
+                                        {{-- Current Page --}}
+                                        <span class="btn btn-primary btn-sm disabled">
+                                            {{ $page }}
+                                        </span>
+
+                                        {{-- Next + Last --}}
+                                        @if ($page < $totalPages)
+                                            <a href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['page' => $page + 1, 'limit' => $limit])) }}"
+                                                class="btn btn-outline-primary btn-sm" aria-label="Next Page">Next</a>
+                                            {{-- 
+                                            <a href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['page' => $totalPages, 'limit' => $limit])) }}"
+                                                class="btn btn-outline-primary btn-sm" aria-label="Last Page">Last</a> --}}
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                         </div>

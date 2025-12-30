@@ -11,6 +11,7 @@ use App\Models\QualityModel;
 use App\Services\SapService;
 use Arr;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 
 class ReportsController extends Controller
@@ -24,36 +25,167 @@ class ReportsController extends Controller
 
     public function semifg(Request $request)
     {
-        $getRecord = DeliveryModel::getRecord($request)
-            ->where('prod_no', 'LIKE', 'SF%')
-            ->paginate(10);
+        // get series based on user
+        $getYear = now()->year;
+        $year = substr($getYear, -2);
 
-        $firstRecord = $getRecord->first();
+        if (Auth::user()->default_series_prefix === 'SBY') {
+            $series = 'SBY-' . $year;
 
-        $series = [];
-        if ($firstRecord) {
-            $get_series = $this->sap->getSeries(['page' => 1, 'limit' => 1, 'Series' => (int) $firstRecord->series]) ?? '0';
-            $series =   Arr::get($get_series, 'data.0', []);
+            $getSeries = $this->sap->getSeries(['page' => 1, 'limit' => 1, 'ObjectCode' => 67, 'SeriesName' => $series]);
+            if (!empty($getSeries['data'][0]['Series'])) {
+                $series = $getSeries['data'][0]['Series'];
+            }
         }
 
-        return view('backend.reports.semifg', compact('getRecord', 'series'));
+        $param = [
+            "page" => (int) $request->get('page', 1),
+            "limit" => (int) $request->get('limit', 2),
+            "U_MEB_NO_IO" => $request->get('io'),
+            "DocNum" => $request->get('inv_transfer'),
+            "DocStatus" =>  $request->get('status', 'O'),
+            "Series" =>  $series ?? $request->get('series'),
+        ];
+
+        // get data SAP
+        $getInvtf = $this->sap->getInventoryTransfers($param);
+        if (empty($getInvtf) || $getInvtf['success'] !== true) {
+            return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
+        }
+
+        // filter 
+        $getInvtf['data'] = collect($getInvtf['data'])
+            ->map(function ($doc) use ($request) {
+
+                $lines = collect($doc['Lines'] ?? []);
+
+                // 🔍 Filter ItemCode (LIKE)
+                if ($request->filled('ItemCode')) {
+                    $keyword = strtolower($request->get('ItemCode'));
+                    $lines = $lines->filter(
+                        fn($line) =>
+                        isset($line['ItemCode']) &&
+                            str_contains(strtolower($line['ItemCode']), $keyword)
+                    );
+                }
+
+                // 🔍 Filter ItemName (LIKE)
+                if ($request->filled('ItemName')) {
+                    $keyword = strtolower($request->get('ItemName'));
+                    $lines = $lines->filter(
+                        fn($line) =>
+                        isset($line['ItemName']) &&
+                            str_contains(strtolower($line['ItemName']), $keyword)
+                    );
+                }
+
+                // 🔥 Filter SEMIFG (SF)
+                $lines = $lines->filter(
+                    fn($line) =>
+                    isset($line['ItemCode']) &&
+                        str_starts_with(strtoupper($line['ItemCode']), 'SF')
+                );
+
+                $doc['Lines'] = $lines->values()->all();
+
+                return $doc;
+            })
+            ->filter(fn($doc) => count($doc['Lines']) > 0)
+            ->values()
+            ->all();
+
+        $currentCount = $getInvtf['total'] ?? count($getInvtf['data'] ?? []);
+        $totalPages = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
+
+        return view('backend.reports.semifg', [
+            'getInvtf'      => $getInvtf['data'],
+            'page'        => $getInvtf['page'],
+            'limit'       => $getInvtf['limit'],
+            'total'       => $getInvtf['total'],
+            'totalPages'  => $totalPages,
+        ]);
     }
 
     public function finish_goods(Request $request)
     {
-        $getRecord = DeliveryModel::getRecord($request)
-            ->where('prod_no', 'LIKE', 'SI%')
-            ->paginate(10);
+        // get series based on user
+        $getYear = now()->year;
+        $year = substr($getYear, -2);
 
-        $firstRecord = $getRecord->first();
+        if (Auth::user()->default_series_prefix === 'SBY') {
+            $series = 'SBY-' . $year;
 
-        $series = [];
-        if ($firstRecord) {
-            $get_series = $this->sap->getSeries(['page' => 1, 'limit' => 1, 'Series' => (int) $firstRecord->series]) ?? '0';
-            $series =   Arr::get($get_series, 'data.0', []);
+            $getSeries = $this->sap->getSeries(['page' => 1, 'limit' => 1, 'ObjectCode' => 67, 'SeriesName' => $series]);
+            if (!empty($getSeries['data'][0]['Series'])) {
+                $series = $getSeries['data'][0]['Series'];
+            }
         }
 
-        return view('backend.reports.finishgoods', compact('getRecord', 'series'));
+        $param = [
+            "page" => (int) $request->get('page', 1),
+            "limit" => (int) $request->get('limit', 5),
+            "U_MEB_NO_IO" => $request->get('io'),
+            "U_MEB_No_Prod_Order" => $request->get('prod_order'),
+            "DocStatus" =>  $request->get('status', 'O'),
+            "Series" =>  $series ?? $request->get('series'),
+        ];
+
+        $getInvtf = $this->sap->getInventoryTransfers($param);
+        if (empty($getInvtf) || $getInvtf['success'] !== true) {
+            return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
+        }
+
+        // filter 
+        $getInvtf['data'] = collect($getInvtf['data'])
+            ->map(function ($doc) use ($request) {
+
+                $lines = collect($doc['Lines'] ?? []);
+
+                // 🔍 Filter ItemCode (LIKE)
+                if ($request->filled('ItemCode')) {
+                    $keyword = strtolower($request->get('ItemCode'));
+                    $lines = $lines->filter(
+                        fn($line) =>
+                        isset($line['ItemCode']) &&
+                            str_contains(strtolower($line['ItemCode']), $keyword)
+                    );
+                }
+
+                // 🔍 Filter ItemName (LIKE)
+                if ($request->filled('ItemName')) {
+                    $keyword = strtolower($request->get('ItemName'));
+                    $lines = $lines->filter(
+                        fn($line) =>
+                        isset($line['ItemName']) &&
+                            str_contains(strtolower($line['ItemName']), $keyword)
+                    );
+                }
+
+                // 🔥 Filter SI
+                $lines = $lines->filter(
+                    fn($line) =>
+                    isset($line['ItemCode']) &&
+                        str_starts_with(strtoupper($line['ItemCode']), 'SI')
+                );
+
+                $doc['Lines'] = $lines->values()->all();
+
+                return $doc;
+            })
+            ->filter(fn($doc) => count($doc['Lines']) > 0)
+            ->values()
+            ->all();
+
+        $currentCount = $getInvtf['total'] ?? count($getInvtf['data'] ?? []);
+        $totalPages = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
+
+        return view('backend.reports.finishgoods', [
+            'getInvtf'      => $getInvtf['data'],
+            'page'        => $getInvtf['page'],
+            'limit'       => $getInvtf['limit'],
+            'total'       => $getInvtf['total'],
+            'totalPages'  => $totalPages,
+        ]);
     }
 
     public function bon()

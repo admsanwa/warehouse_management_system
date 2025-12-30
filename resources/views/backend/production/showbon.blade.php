@@ -78,7 +78,7 @@
                     <th>Nama Barang</th>
                     <th style="width: 100px;">Qty</th>
                     <th>Keterangan</th>
-                    @if ($user->department === 'Purchasing')
+                    @if ($user->department === 'Purchasing' || $user->department === 'IT')
                         <th style="width: 250px;">PO</th>
                     @endif
                 </tr>
@@ -91,7 +91,7 @@
                         <td>{{ $detail->item_name }}</td>
                         <td>{{ $detail->qty . ' ' . $detail->uom }}</td>
                         <td class="text-center">{{ $detail->remark }}</td>
-                        @if ($user->department === 'Purchasing')
+                        @if ($user->department === 'Purchasing' || $user->department === 'IT')
                         <td>
                             <form id="insertPoForm_{{ $bon->id }}" method="post">
                             @csrf

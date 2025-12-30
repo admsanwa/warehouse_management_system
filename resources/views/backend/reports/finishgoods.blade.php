@@ -5,7 +5,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col col-sm-6">
-                        <h1> Finish Goods</h1>
+                        <h1>Finish Goods</h1>
                     </div>
                 </div>
             </div>
@@ -30,19 +30,19 @@
                                                 value="{{ request('io') }}" placeholder="Enter Nomor IO">
                                         </div>
                                         <div class="form-group col-md-2">
-                                            <label for="">Product Order</label>
+                                            <label for="">Production Order</label>
                                             <input type="text" name="prod_order" class="form-control"
-                                                value="{{ request('prod_order') }}" placeholder="Enter Product Order">
+                                                value="{{ request('prod_order') }}" placeholder="Enter Production Order">
                                         </div>
                                         <div class="form-group col-md-2">
-                                            <label for="">Product No</label>
-                                            <input type="text" name="prod_no" id="prod_no" class="form-control"
-                                                value="{{ request('prod_no') }}" placeholder="Enter Product Nomor">
+                                            <label for="">Production No</label>
+                                            <input type="text" name="ItemCode" class="form-control"
+                                                value="{{ request('ItemCode') }}" placeholder="Enter Production Nomor">
                                         </div>
                                         <div class="form-group col-md-2">
-                                            <label for="">Product Desc</label>
-                                            <input type="text" name="prod_desc" class="form-control"
-                                                value="{{ request('prod_desc') }}" placeholder="Enter Product Description">
+                                            <label for="">Production Desc</label>
+                                            <input type="text" name="ItemName" class="form-control"
+                                                value="{{ request('ItemName') }}" placeholder="Enter Production Description">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="series">Series</label>
@@ -71,31 +71,25 @@
                                         <thead>
                                             <tr>
                                                 <th>No</th>
-                                                <th>IO</th>
-                                                <th>Prod Order</th>
-                                                <th>Prod Nomor</th>
-                                                <th>Prod Description</th>
+                                                <th>IO No</th>
+                                                <th>Production Order</th>
+                                                <th>Production Nomor</th>
+                                                <th>Production Description</th>
                                                 <th>Series</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse ($getRecord as $semifg)
-                                                <tr>
-                                                    <td>{{ $loop->iteration }}</td>
-                                                    <td>{{ $semifg->io }}</td>
-                                                    <td>{{ $semifg->prod_order }}</td>
-                                                    <td><a
-                                                            href="{{ url('admin/production/view?docEntry=' . $semifg->doc_entry . '&docNum=' . $semifg->prod_order) }}">{{ $semifg->prod_no }}</a>
-                                                    <td>{{ $semifg->prod_desc }}</td>
-                                                    <td>
-                                                        @if (!empty($series) && isset($series['ObjectCode'], $series['SeriesName']))
-                                                            {{ $series['SeriesName'] }}
-                                                        @else
-                                                            <span class="text-danger">⚠️ Series tidak ditemukan:
-                                                                {{ $getRecord['series'] }}</span>
-                                                        @endif
-                                                    </td>
-                                                </tr>
+                                            @forelse ($getInvtf as $fg)
+                                                @foreach($fg["Lines"] as $line)
+                                                    <tr>
+                                                        <td>{{ $loop->iteration }}</td>
+                                                        <td>{{ $fg['U_MEB_NO_IO'] }}</td>
+                                                        <td>{{ $fg['U_MEB_No_Prod_Order'] }}</td>
+                                                        <td><a href="{{ url('admin/inventorytf/view?docEntry=' . $fg['DocEntry'] . '&docNum=' . $fg['DocNum']) }}">{{ $line['ItemCode'] }}</a>
+                                                        <td>{{ $line['ItemName'] }}</td>
+                                                        <td>{{ $fg['Comments']}}</td>
+                                                    </tr>
+                                                @endforeach
                                             @empty
                                                 <tr>
                                                     <td colspan="100%">No Record Found</td>
@@ -105,10 +99,40 @@
                                     </table>
                                 </div>
                             </div>
+                            @php
+                                $query = request()->all();
+                            @endphp
                             <div class="card-footer">
-                                <div class="d-flex justify-content-end px-2 py-2">
-                                    <div style="overflow-x: auto; max-width:100%">
-                                        {!! $getRecord->onEachSide(1)->appends(request()->except('page'))->links() !!}
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>
+                                        Showing page <b class="text-primary">{{ $page }}</b> of
+                                        {{ $totalPages }} (Total {{ $total }} records)
+                                    </span>
+
+                                    <div class="btn-group">
+                                        {{-- First + Previous --}}
+                                        @if ($page > 1)
+                                            {{-- <a href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['page' => 1, 'limit' => $limit])) }}"
+                                                class="btn btn-outline-primary btn-sm" aria-label="First Page">First</a> --}}
+
+                                            <a href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['page' => $page - 1, 'limit' => $limit])) }}"
+                                                class="btn btn-outline-primary btn-sm"
+                                                aria-label="Previous Page">Previous</a>
+                                        @endif
+
+                                        {{-- Current Page --}}
+                                        <span class="btn btn-primary btn-sm disabled">
+                                            {{ $page }}
+                                        </span>
+
+                                        {{-- Next + Last --}}
+                                        @if ($page < $totalPages)
+                                            <a href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['page' => $page + 1, 'limit' => $limit])) }}"
+                                                class="btn btn-outline-primary btn-sm" aria-label="Next Page">Next</a>
+                                            {{-- 
+                                            <a href="{{ url()->current() . '?' . http_build_query(array_merge($query, ['page' => $totalPages, 'limit' => $limit])) }}"
+                                                class="btn btn-outline-primary btn-sm" aria-label="Last Page">Last</a> --}}
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -129,7 +153,7 @@
                     url: "/purchasing/seriesSearch",
                     data: {
                         Series: selectedSeries,
-                        ObjectCode: "22"
+                        ObjectCode: "67"
                     },
                     dataType: "json"
                 }).then(function(data) {
@@ -165,7 +189,7 @@
                         }
                         return {
                             q: params.term,
-                            ObjectCode: '22'
+                            ObjectCode: '67'
                         };
                     },
                     processResults: function(data) {
@@ -179,6 +203,9 @@
                     }
                 }
             });
+
+            const prefix = {!! json_encode(Auth::user()->default_series_prefix) !!};
+            setDefaultSeries("#seriesSelect", "67", prefix);
         });
     </script>
 @endsection

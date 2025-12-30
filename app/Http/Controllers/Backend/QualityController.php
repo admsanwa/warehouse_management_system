@@ -52,7 +52,6 @@ class QualityController extends Controller
             ->values()
             ->all();
 
-        // $totalPages = ceil($getProds['total'] / $param['limit']);
         $currentCount   = $getProds['total'] ?? count($getProds['data'] ?? []);
         $totalPages     = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
         $user           = Auth::user();
