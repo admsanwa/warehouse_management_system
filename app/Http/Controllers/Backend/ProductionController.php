@@ -58,6 +58,7 @@ class ProductionController extends Controller
         }
         // dd(['series' => $series, "getSeries" => $getSeries]);
 
+        // filter param
         $param = [
             "page" => (int) $request->get('page', 1),
             "limit" => (int) $request->get('limit', 50),
@@ -70,6 +71,7 @@ class ProductionController extends Controller
             "Status" =>  $request->get('status', 'Released'),
         ];
 
+        // get data API
         $getProds = $this->sap->getProductionOrders($param);
         if (empty($getProds) || $getProds['success'] !== true) {
             return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
@@ -86,7 +88,7 @@ class ProductionController extends Controller
             $getProds['total'] = count($getProds['data']);
         }
 
-        // $totalPages = ceil($getProds['total'] / $param['limit']);
+        // set pagination
         $currentCount = $getProds['total'] ?? count($getProds['data'] ?? []);
         $totalPages = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
         $user = Auth::user();
@@ -717,9 +719,31 @@ class ProductionController extends Controller
             ->whereHas('user', function ($q) {
                 $q->where('department', 'Purchasing');
             })
-            ->first();;
+            ->first();
 
-        return view("backend.production.showbon", compact('bon', 'user', 'signApprove', 'signBuyer'));
+        // boolean check po & series
+        $fullInsertPO = ! $bon->details()
+            ->where(function ($q) {
+                $q->whereNull('no_po')
+                    ->orWhereNull('no_series');
+            })
+            ->exists();
+
+        // get series base on WMS series
+        $seriesData = null;
+        if (!empty($bon->no_series)) {
+            $getSeries = $this->sap->getSeries([
+                'page'       => 1,
+                'limit'      => 50,
+                'ObjectCode' => 22,
+                'Series'     => $bon->no_series, // 🔑 FILTER BY WMS VALUE
+            ]);
+
+            $seriesData = $getSeries['data'][0] ?? null;
+        }
+        // dd($bon->details);
+
+        return view("backend.production.showbon", compact('bon', 'user', 'signApprove', 'signBuyer', 'fullInsertPO', 'seriesData'));
     }
 
     public function approve_bon(Request $request)
@@ -774,8 +798,6 @@ class ProductionController extends Controller
         $user = Auth::user();
         $request->validate([
             'results.*.bon_id' => 'required|integer',
-            'results.*.po_no'  => 'required',
-            'results.*.series' => 'required',
             'results.*.no_bon' => 'required'
         ]);
 

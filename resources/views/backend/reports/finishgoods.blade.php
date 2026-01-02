@@ -75,21 +75,19 @@
                                                 <th>Production Order</th>
                                                 <th>Production Nomor</th>
                                                 <th>Production Description</th>
-                                                <th>Series</th>
+                                                <th>Remarks</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse ($getInvtf as $fg)
-                                                @foreach($fg["Lines"] as $line)
+                                            @forelse ($getProds as $fg)
                                                     <tr>
                                                         <td>{{ $loop->iteration }}</td>
                                                         <td>{{ $fg['U_MEB_NO_IO'] }}</td>
-                                                        <td>{{ $fg['U_MEB_No_Prod_Order'] }}</td>
-                                                        <td><a href="{{ url('admin/inventorytf/view?docEntry=' . $fg['DocEntry'] . '&docNum=' . $fg['DocNum']) }}">{{ $line['ItemCode'] }}</a>
-                                                        <td>{{ $line['ItemName'] }}</td>
+                                                        <td>{{ $fg['DocNum'] }}</td>
+                                                        <td><a href="{{ url('admin/production/view?docEntry=' . $fg['DocEntry'] . '&docNum=' . $fg['DocNum']) }}">{{ $fg['ItemCode'] }}</a>
+                                                        <td>{{ $fg['ItemName'] }}</td>
                                                         <td>{{ $fg['Comments']}}</td>
                                                     </tr>
-                                                @endforeach
                                             @empty
                                                 <tr>
                                                     <td colspan="100%">No Record Found</td>

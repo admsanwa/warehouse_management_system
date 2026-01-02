@@ -92,7 +92,7 @@ class BonModel extends Model
 
     public function details()
     {
-        return $this->hasMany(BonDetailsModel::class, 'bon_id');
+        return $this->hasMany(BonDetailsModel::class, 'bon_id', 'id');
     }
 
     public function createdBy()

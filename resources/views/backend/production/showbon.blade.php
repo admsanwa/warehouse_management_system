@@ -96,12 +96,29 @@
                             <form id="insertPoForm_{{ $bon->id }}" method="post">
                             @csrf
                                 <div>
-                                    <select name="series" class="form-control series-select" data-bon-id="{{ $detail->id }}" data-object-code="22"
-                                       data-selected-id={{ $detail->no_series }} data-selected-text={{ $detail->no_series }} required></select>
+                                    @if ($seriesData)
+    <select name="series"
+            id="series_{{ $detail->id }}"
+            class="form-control series-select"
+            data-bon-id="{{ $detail->id }}"
+            data-object-code="22">
+        <option value="{{ $seriesData['Series'] }}" selected>
+            {{ $seriesData['SeriesName'] }}
+        </option>
+    </select>
+@else
+    <select name="series"
+            id="series_{{ $detail->id }}"
+            class="form-control series-select"
+            data-bon-id="{{ $detail->id }}"
+            data-object-code="22">
+    </select>
+@endif
+
                                 </div>
                                 <div>
                                     <select name="po" data-bon-id="{{ $detail->id }}" class="form-control po-select" value="{{ $detail->no_po }}"
-                                        data-selected-id={{ $detail->no_po }} data-selected-text={{ $detail->no_po }} required>
+                                        data-selected-id={{ $detail->no_po }} data-selected-text={{ $detail->no_po }}>
                                     </select>
                                     <small class="text-muted">Memilih series akan mempermudah pencarian data PO yang
                                         sesuai.</small>
@@ -126,7 +143,7 @@
                     <div class="signature-dept text-muted small">{{ $signApprove->user->department }}</div>
                 </div>
             @endif
-            @if ($signBuyer)
+            @if ($signBuyer && $fullInsertPO)
                 <div class="col md-4 text-center col-sign"
                     style="display: {{ $signBuyer->sign === 1 ? 'block' : 'none' }}">
                     <div class="fw-bold mb-1">Bagian Pembeli,</div>
@@ -184,10 +201,17 @@
 
     <script>
         $(document).ready(function () {
+            const prefix = @json(Auth::user()->default_series_prefix);
+
             $(".series-select").each(function () {
                 const $series = $(this);
                 const bonId = $series.data("bon-id");
-                const objectCode = $series.data("object-code")
+                const objectCode = $series.data("object-code");
+                const series = $series.val(); // value WMS / SAP
+
+                if (!series) {
+                    setDefaultSeries($series, objectCode, prefix);
+                } 
         
                 $series.select2({
                     placeholder: "Choose Series",
@@ -222,11 +246,8 @@
                         }
                     }
                 });
-
-                // default series
-                const prefix = {!! json_encode(Auth::user()->default_series_prefix) !!};
-                setDefaultSeries($series, objectCode, prefix);
-
+            
+                // setdefault series
                 setSelect2Value(
                     $series,
                     $series.data("selected-id"),
@@ -234,60 +255,56 @@
                 )
             });
 
-            $(".po-select").each(function() {
-                const $po = $(this);
-                const bonId = $po.data("bon-id");
-                const $series = $(".series-select[data-bon-id='" + bonId + "']");
-                $po.select2({
-                    placeholder: "Select No Purchase Order",
-                    allowClear: true,
-                    width: "100%",
-                    minimumInputLength: 3,
-                    language: {
-                        inputTooShort: function() {
-                            return "Type min 3 character";
-                        },
-                        noResults: function() {
-                            return "Data not found";
-                        },
-                        searching: function() {
-                            return "Still searching...";
-                        }
+            $(".po-select").each(function () {
+            const $po = $(this);
+            const bonId = $po.data("bon-id");
+
+            // ambil series select yg sesuai dengan PO ini
+            const $series = $(".series-select[data-bon-id='" + bonId + "']");
+
+            $po.select2({
+                placeholder: "Select No Purchase Order",
+                allowClear: true,
+                width: "100%",
+                minimumInputLength: 3,
+                language: {
+                    inputTooShort: () => "Type min 3 character",
+                    noResults: () => "Data not found",
+                    searching: () => "Still searching..."
+                },
+                ajax: {
+                    url: "/purchaseOrderSearchAll",
+                    dataType: "json",
+                    delay: 600,
+                    data: function (params) {
+                        const series = $series.val();
+                        // console.log("series:", series, "bonId:", bonId);
+
+                        return {
+                            q: params.term,
+                            limit: 5,
+                            series: series
+                        };
                     },
-                    ajax: {
-                        url: "/purchaseOrderSearch",
-                        dataType: "json",
-                        delay: 600,
-                        data: function(params) {
-                            const seriesData = $("#seriesSelect_{{ $bon->id }}").select2('data');
-                            const series = seriesData.length > 0 ? seriesData[0].id : null;
-        
-                            return {
-                                q: params.term,
-                                limit: 5,
-                                series: series,
-                                status: "Open",
-                            };
-                        },
-                        processResults: function(data) {
-                            tempPoData = data.po || [];
-                            return {
-                                results: (data.results || []).map(item => ({
-                                    id: item.docnum,
-                                    text: item.text,
-                                }))
-                            };
-                        },
-                        cache: true
-                    }
-                });
+                    processResults: function (data) {
+                        return {
+                            results: (data.results || []).map(item => ({
+                                id: item.docnum,
+                                text: item.text
+                            }))
+                        };
+                    },
+                    cache: true
+                }
+            });
 
                 setSelect2Value(
                     $po,
                     $po.data("selected-id"),
                     $po.data("selected-text")
-                )
-            })
+                );
+            });
+
         });
 
         function showLoading() {
@@ -330,10 +347,10 @@
                 console.log("results", results);
             });
 
-            if (results.some(r => !r.series || !r.po_no)) {
-                alert("Series and PO must be selected for all rows");
-                return;
-            }
+            // if (results.some(r => !r.series || !r.po_no)) {
+            //     alert("Series and PO must be selected for all rows");
+            //     return;
+            // }
             
             if (!confirm("Are you sure approve to BON this?")) return;
                 showLoading();

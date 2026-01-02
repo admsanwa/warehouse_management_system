@@ -115,76 +115,55 @@ class ReportsController extends Controller
         if (Auth::user()->default_series_prefix === 'SBY') {
             $series = 'SBY-' . $year;
 
-            $getSeries = $this->sap->getSeries(['page' => 1, 'limit' => 1, 'ObjectCode' => 67, 'SeriesName' => $series]);
+            $getSeries = $this->sap->getSeries(['page' => 1, 'limit' => 1, 'ObjectCode' => 202, 'SeriesName' => $series]);
             if (!empty($getSeries['data'][0]['Series'])) {
                 $series = $getSeries['data'][0]['Series'];
             }
         }
+        // dd(['series' => $series, "getSeries" => $getSeries]);
 
+        // filter param
         $param = [
             "page" => (int) $request->get('page', 1),
-            "limit" => (int) $request->get('limit', 5),
-            "U_MEB_NO_IO" => $request->get('io'),
-            "U_MEB_No_Prod_Order" => $request->get('prod_order'),
-            "DocStatus" =>  $request->get('status', 'O'),
+            "limit" => (int) $request->get('limit', 50),
+            "DueDate" => formatDateSlash($request->get('date')),
+            "DocNum" => $request->get('doc_num'),
+            "U_MEB_NO_IO" => $request->get('io_no'),
+            "ItemCode" =>  $request->get('prod_no'),
+            "ItemName" =>  $request->get('prod_desc'),
             "Series" =>  $series ?? $request->get('series'),
+            "Status" =>  $request->get('status', 'Released'),
         ];
 
-        $getInvtf = $this->sap->getInventoryTransfers($param);
-        if (empty($getInvtf) || $getInvtf['success'] !== true) {
+        // get data API
+        $getProds = $this->sap->getProductionOrders($param);
+        if (empty($getProds) || $getProds['success'] !== true) {
             return back()->with('error', 'Gagal mengambil data dari SAP. Silakan coba lagi nanti.');
         }
 
-        // filter 
-        $getInvtf['data'] = collect($getInvtf['data'])
-            ->map(function ($doc) use ($request) {
+        // Filter ulang kalau ada Series
+        if (!empty($param['Series']) && !empty($getProds['data'])) {
+            $getProds['data'] = collect($getProds['data'])
+                ->where('Series', $param['Series'])
+                ->values()
+                ->all();
 
-                $lines = collect($doc['Lines'] ?? []);
+            // update total sesuai hasil filter
+            $getProds['total'] = count($getProds['data']);
+        }
 
-                // 🔍 Filter ItemCode (LIKE)
-                if ($request->filled('ItemCode')) {
-                    $keyword = strtolower($request->get('ItemCode'));
-                    $lines = $lines->filter(
-                        fn($line) =>
-                        isset($line['ItemCode']) &&
-                            str_contains(strtolower($line['ItemCode']), $keyword)
-                    );
-                }
-
-                // 🔍 Filter ItemName (LIKE)
-                if ($request->filled('ItemName')) {
-                    $keyword = strtolower($request->get('ItemName'));
-                    $lines = $lines->filter(
-                        fn($line) =>
-                        isset($line['ItemName']) &&
-                            str_contains(strtolower($line['ItemName']), $keyword)
-                    );
-                }
-
-                // 🔥 Filter SI
-                $lines = $lines->filter(
-                    fn($line) =>
-                    isset($line['ItemCode']) &&
-                        str_starts_with(strtoupper($line['ItemCode']), 'SI')
-                );
-
-                $doc['Lines'] = $lines->values()->all();
-
-                return $doc;
-            })
-            ->filter(fn($doc) => count($doc['Lines']) > 0)
-            ->values()
-            ->all();
-
-        $currentCount = $getInvtf['total'] ?? count($getInvtf['data'] ?? []);
+        // set pagination
+        $currentCount = $getProds['total'] ?? count($getProds['data'] ?? []);
         $totalPages = ($currentCount < $param['limit']) ? $param['page'] : $param['page'] + 1;
+        $user = Auth::user();
 
         return view('backend.reports.finishgoods', [
-            'getInvtf'      => $getInvtf['data'],
-            'page'        => $getInvtf['page'],
-            'limit'       => $getInvtf['limit'],
-            'total'       => $getInvtf['total'],
+            'getProds'      => $getProds['data'] ?? [],
+            'page'        => $getProds['page'],
+            'limit'       => $getProds['limit'],
+            'total'       => $getProds['total'],
             'totalPages'  => $totalPages,
+            'user'        => $user
         ]);
     }
 

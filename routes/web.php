@@ -227,6 +227,7 @@ Route::group(['middleware' => 'admin'], function () {
     // get data api
     Route::get('/purchasing/seriesSearch', [PurchasingController::class, 'series_search']);
     Route::get('/purchaseOrderSearch', [PurchasingController::class, 'po_search']);
+    Route::get('/purchaseOrderSearchAll', [PurchasingController::class, 'po_search_all']);
     Route::get('/productionOrderSearch', [ProductionController::class, 'prod_search']);
     Route::get('/warehouseSearch', [ItemsController::class, 'warehouse_search']);
     Route::get('/costCenterSearch', [ItemsController::class, 'cost_center_search']);

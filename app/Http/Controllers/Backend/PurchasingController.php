@@ -163,6 +163,47 @@ class PurchasingController extends Controller
         ]);
     }
 
+    public function po_search_all(Request $request)
+    {
+        $param = [
+            "limit" => (int) $request->get('limit', 5),
+            "DocNum" => $request->get('q'),
+            "DocEntry" => $request->get('docentry'),
+            "Series" => $request->get('series'),
+            'page'       => 1,
+        ];
+
+        $orders = $this->sap->getPurchaseOrders($param);
+
+        if (empty($orders) || $orders['success'] !== true) {
+            return response()->json([
+                'results' => []
+            ]);
+        }
+        // Jika user set filter Series, pastikan data difilter ulang
+        if (!empty($param['Series']) && !empty($orders['data'])) {
+            $orders['data'] = collect($orders['data'])
+                ->where('Series', $param['Series'])
+                ->values()
+                ->all();
+
+            // Rehitung total
+            $orders['total'] = count($orders['data']);
+        }
+        $poData = collect($orders['data'] ?? [])->map(function ($item) {
+            return [
+                'id'   => $item['DocEntry'],
+                'docnum'   => $item['DocNum'],
+                'text' => $item['DocNum'] . " - " . $item['CardName'],
+            ];
+        });
+
+        return response()->json([
+            'results' => $poData,
+            'po' => $orders['data']
+        ]);
+    }
+
     public function series_search(Request $request)
     {
         $searchQuery = $request->get('q');

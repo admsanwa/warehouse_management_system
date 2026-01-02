@@ -11,7 +11,7 @@ class BonDetailsModel extends Model
 
     protected $table = 'bon_details';
 
-    protected $fillable = ['bon_id', 'item_code', 'item_name', 'qty', 'uom', 'remark'];
+    protected $fillable = ['bon_id', 'item_code', 'item_name', 'qty', 'uom', 'remark', 'no_series'];
 
     public function scopeFilter($query)
     {
