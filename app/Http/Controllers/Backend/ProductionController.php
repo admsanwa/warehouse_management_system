@@ -795,14 +795,15 @@ class ProductionController extends Controller
 
     public function insert_po(Request $request)
     {
-        $user = Auth::user();
+        // validation
         $request->validate([
             'results.*.bon_id' => 'required|integer',
-            'results.*.no_bon' => 'required'
+            'results.*.no_bon' => 'required',
         ]);
 
+        // update bon detail
+        $user = Auth::user();
         DB::transaction(function () use ($request, $user) {
-            // update bon detail
             foreach ($request->results as $result) {
                 BonDetailsModel::where('id', $result['bon_id'])->update([
                     'no_series' => $result['series'],

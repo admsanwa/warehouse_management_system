@@ -38,6 +38,7 @@ class ReportsController extends Controller
             }
         }
 
+        // filter SAP
         $param = [
             "page" => (int) $request->get('page', 1),
             "limit" => (int) $request->get('limit', 2),
@@ -122,17 +123,16 @@ class ReportsController extends Controller
         }
         // dd(['series' => $series, "getSeries" => $getSeries]);
 
-        // filter param
+        // filter SAP
         $param = [
             "page" => (int) $request->get('page', 1),
-            "limit" => (int) $request->get('limit', 50),
-            "DueDate" => formatDateSlash($request->get('date')),
-            "DocNum" => $request->get('doc_num'),
+            "limit" => (int) $request->get('limit', 20),
+            "DocNum" => $request->get('prod_order'),
             "U_MEB_NO_IO" => $request->get('io_no'),
-            "ItemCode" =>  $request->get('prod_no'),
-            "ItemName" =>  $request->get('prod_desc'),
+            "ItemCode" =>  $request->filled('ItemCode') ? $request->get('ItemCode') : 'SI%',
+            "ItemName" =>  $request->get('ItemName'),
             "Series" =>  $series ?? $request->get('series'),
-            "Status" =>  $request->get('status', 'Released'),
+            "Status" =>  $request->get('status', 'Closed'),
         ];
 
         // get data API

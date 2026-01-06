@@ -26,8 +26,8 @@
                                     <div class="row">
                                         <div class="form-group col-md-2">
                                             <label for="">IO No</label>
-                                            <input type="text" name="io" class="form-control"
-                                                value="{{ request('io') }}" placeholder="Enter Nomor IO">
+                                            <input type="text" name="io_no" class="form-control"
+                                                value="{{ request('io_no') }}" placeholder="Enter Nomor IO">
                                         </div>
                                         <div class="form-group col-md-2">
                                             <label for="">Production Order</label>
@@ -151,7 +151,7 @@
                     url: "/purchasing/seriesSearch",
                     data: {
                         Series: selectedSeries,
-                        ObjectCode: "67"
+                        ObjectCode: "202"
                     },
                     dataType: "json"
                 }).then(function(data) {
@@ -187,7 +187,7 @@
                         }
                         return {
                             q: params.term,
-                            ObjectCode: '67'
+                            ObjectCode: '202'
                         };
                     },
                     processResults: function(data) {
@@ -203,7 +203,7 @@
             });
 
             const prefix = {!! json_encode(Auth::user()->default_series_prefix) !!};
-            setDefaultSeries("#seriesSelect", "67", prefix);
+            setDefaultSeries("#seriesSelect", "202", prefix);
         });
     </script>
 @endsection

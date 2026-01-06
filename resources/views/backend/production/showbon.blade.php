@@ -92,39 +92,39 @@
                         <td>{{ $detail->qty . ' ' . $detail->uom }}</td>
                         <td class="text-center">{{ $detail->remark }}</td>
                         @if ($user->department === 'Purchasing' || $user->department === 'IT')
-                        <td>
-                            <form id="insertPoForm_{{ $bon->id }}" method="post">
-                            @csrf
-                                <div>
+                            <td>
+                                <form id="insertPoForm_{{ $bon->id }}" method="post">
+                                @csrf
+                                    <div>
                                     @if ($seriesData)
-    <select name="series"
-            id="series_{{ $detail->id }}"
-            class="form-control series-select"
-            data-bon-id="{{ $detail->id }}"
-            data-object-code="22">
-        <option value="{{ $seriesData['Series'] }}" selected>
-            {{ $seriesData['SeriesName'] }}
-        </option>
-    </select>
-@else
-    <select name="series"
-            id="series_{{ $detail->id }}"
-            class="form-control series-select"
-            data-bon-id="{{ $detail->id }}"
-            data-object-code="22">
-    </select>
-@endif
-
-                                </div>
-                                <div>
-                                    <select name="po" data-bon-id="{{ $detail->id }}" class="form-control po-select" value="{{ $detail->no_po }}"
-                                        data-selected-id={{ $detail->no_po }} data-selected-text={{ $detail->no_po }}>
+                                    <select name="series"
+                                            id="series_{{ $detail->id }}"
+                                            class="form-control series-select"
+                                            data-bon-id="{{ $detail->id }}"
+                                            data-object-code="22">
+                                        <option value="{{ $seriesData['Series'] }}" selected>
+                                            {{ $seriesData['SeriesName'] }}
+                                        </option>
                                     </select>
-                                    <small class="text-muted">Memilih series akan mempermudah pencarian data PO yang
-                                        sesuai.</small>
-                                </div>
-                            </form>
-                        </td>
+                                    @else
+                                        <select name="series"
+                                                id="series_{{ $detail->id }}"
+                                                class="form-control series-select"
+                                                data-bon-id="{{ $detail->id }}"
+                                                data-object-code="22">
+                                        </select>
+                                    @endif
+
+                                    </div>
+                                    <div>
+                                        <select name="po" data-bon-id="{{ $detail->id }}" class="form-control po-select" value="{{ $detail->no_po }}"
+                                            data-selected-id="{{ $detail->no_po }}" data-selected-text="{{ $detail->no_po }}">
+                                        </select>
+                                        <small class="text-muted">Memilih series akan mempermudah pencarian data PO yang
+                                            sesuai.</small>
+                                    </div>
+                                </form>
+                            </td>
                         @endif
                     </tr>
                 @endforeach
@@ -256,56 +256,56 @@
             });
 
             $(".po-select").each(function () {
-            const $po = $(this);
-            const bonId = $po.data("bon-id");
+                const $po = $(this);
+                const bonId = $po.data("bon-id");
 
-            // ambil series select yg sesuai dengan PO ini
-            const $series = $(".series-select[data-bon-id='" + bonId + "']");
+                // ambil series select yg sesuai dengan PO ini
+                const $series = $(".series-select[data-bon-id='" + bonId + "']");
 
-            $po.select2({
-                placeholder: "Select No Purchase Order",
-                allowClear: true,
-                width: "100%",
-                minimumInputLength: 3,
-                language: {
-                    inputTooShort: () => "Type min 3 character",
-                    noResults: () => "Data not found",
-                    searching: () => "Still searching..."
-                },
-                ajax: {
-                    url: "/purchaseOrderSearchAll",
-                    dataType: "json",
-                    delay: 600,
-                    data: function (params) {
-                        const series = $series.val();
-                        // console.log("series:", series, "bonId:", bonId);
-
-                        return {
-                            q: params.term,
-                            limit: 5,
-                            series: series
-                        };
+                $po.select2({
+                    placeholder: "Select No Purchase Order",
+                    allowClear: true,
+                    width: "100%",
+                    minimumInputLength: 3,
+                    language: {
+                        inputTooShort: () => "Type min 3 character",
+                        noResults: () => "Data not found",
+                        searching: () => "Still searching..."
                     },
-                    processResults: function (data) {
-                        return {
-                            results: (data.results || []).map(item => ({
-                                id: item.docnum,
-                                text: item.text
-                            }))
-                        };
-                    },
-                    cache: true
-                }
-            });
+                    ajax: {
+                        url: "/purchaseOrderSearchAll",
+                        dataType: "json",
+                        delay: 600,
+                        data: function (params) {
+                            const series = $series.val();
+                            // console.log("series:", series, "bonId:", bonId);
 
-                setSelect2Value(
-                    $po,
-                    $po.data("selected-id"),
-                    $po.data("selected-text")
-                );
-            });
+                            return {
+                                q: params.term,
+                                limit: 5,
+                                series: series
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: (data.results || []).map(item => ({
+                                    id: item.docnum,
+                                    text: item.text
+                                }))
+                            };
+                        },
+                        cache: true
+                    }
+                });
 
-        });
+                    setSelect2Value(
+                        $po,
+                        $po.data("selected-id"),
+                        $po.data("selected-text")
+                    );
+                });
+
+            });
 
         function showLoading() {
             document.getElementById("loadingOverlay").style.display = "block";
