@@ -179,7 +179,7 @@
                         }
                     },
                     ajax: {
-                        url: "/warehouseSearch",
+                        url: "/warehouseSearchCustom",
                         dataType: "json",
                         delay: 250,
                         data: function(params) {

@@ -230,6 +230,7 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('/purchaseOrderSearchAll', [PurchasingController::class, 'po_search_all']);
     Route::get('/productionOrderSearch', [ProductionController::class, 'prod_search']);
     Route::get('/warehouseSearch', [ItemsController::class, 'warehouse_search']);
+    Route::get('/warehouseSearchCustom', [ItemsController::class, 'warehouse_search_custom']);
     Route::get('/costCenterSearch', [ItemsController::class, 'cost_center_search']);
     Route::get('/projectSearch', [ItemsController::class, 'project_search']);
     Route::get('/onhandSearch', [ItemsController::class, 'onhand_search']);

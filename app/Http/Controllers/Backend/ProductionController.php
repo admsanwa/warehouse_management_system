@@ -6,17 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\BarcodeProductionModel;
 use App\Models\BonDetailsModel;
 use App\Models\BonModel;
-use App\Models\DeliveryModel;
-use App\Models\ItemsModel;
 use App\Models\MemoModel;
 use App\Models\PrepareMatModel;
 use App\Models\ProductionModel;
-use App\Models\ProductionOrderDetailsModel;
 use App\Models\QualityModel;
 use App\Models\RFPModel;
 use App\Models\SignBonModel;
 use App\Models\SignModel;
-use App\Models\StockModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -479,16 +475,6 @@ class ProductionController extends Controller
         ]);
     }
 
-    public function barcode_old(Request $request)
-    {
-        $getRecord     = ProductionModel::where("status", "Released")->paginate(10);
-        $user          = Auth::user()->username;
-        $addedBarcodes = BarcodeProductionModel::where('username', $user)->latest()->take(5)->get();
-
-        // dd($getProd);
-        return view("backend.production.barcode", compact("getRecord", "addedBarcodes"));
-    }
-
     public function add_print(Request $request)
     {
         // dd($request->all()); // Check what data is being sent
@@ -603,7 +589,6 @@ class ProductionController extends Controller
             ]);
 
             foreach ($validated['item_code'] as $index => $item) {
-                // $items = ItemsModel::where('code', $item)->first();
                 BonDetailsModel::create([
                     'bon_id'    => $bon->id,
                     'item_code' => $validated['item_code'][$index],

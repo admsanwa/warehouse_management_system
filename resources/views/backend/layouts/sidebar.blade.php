@@ -97,7 +97,7 @@
                 ($authDept == 'Quality Control' && $authLevel != 'Magang') ||
                 $authDept == 'Procurement, Installation and Delivery' ||
                 $authDept == 'Sales' ||
-                ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor'))
+                ($authDept == 'Accounting and Finance' && ($authLevel == 'Supervisor' && $authEmail != 'anggi@sanwamas.co.id')))
 
                     <li class="nav-item">
                         <a href="{{ url('admin/dashboard') }}"
@@ -139,11 +139,12 @@
             $authDept == 'Production and Warehouse' ||
             $authDept == 'Production' ||
             $authDept == 'Fabrication' ||
+            $authDept == 'Quality Control' ||
             $authDept == 'PPIC' ||
             $authDept == 'Purchasing' ||
             ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager') ||
             ($authDept == 'Quality Control' && $authLevel == 'Manager') ||
-            ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor'))
+            ($authDept == 'Accounting and Finance' && ($authLevel == 'Supervisor' && $authEmail != 'anggi@sanwamas.co.id')))
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                     data-accordion="false">
@@ -168,13 +169,15 @@
                             @endif
                             @if (
                                 $authDept == 'IT' ||
-                                    $authDept == 'PPIC' ||
-                                    $authDept == 'Purchasing' ||
-                                    $authDept == 'Production and Warehouse' ||
-                                    $authDept == 'Fabrication' ||
-                                    $authDept == 'Procurement, Installation and Delivery' ||
-                                    ($authDept == 'Quality Control' && $authLevel == 'Manager') ||
-                                    ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor'))
+                                $authDept == 'PPIC' ||
+                                $authDept == 'Purchasing' ||
+                                $authDept == 'Production and Warehouse' ||
+                                $authDept == 'Quality Control' ||
+                                $authDept == 'Production' ||
+                                $authDept == 'Fabrication' ||
+                                $authDept == 'Procurement, Installation and Delivery' ||
+                                ($authDept == 'Quality Control' && $authLevel == 'Manager') ||
+                                ($authDept == 'Accounting and Finance' && ($authLevel == 'Supervisor' && $authEmail != 'anggi@sanwamas.co.id')))
                                 <li class="nav-item">
                                     <a href="{{ url('admin/items/list') }}"
                                         class="nav-link @if (Request::is('admin/items/list')) active @endif">
@@ -224,7 +227,7 @@
             $authDept == 'IT' ||
             $authDept == 'Purchasing' ||
             ($authDept == 'Production and Warehouse' && $authLevel != 'Manager' && $authEmail != 'warehouse_sby@sanwamas.co.id') ||
-            ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor'))
+            ($authDept == 'Accounting and Finance' && ($authLevel == 'Supervisor' && $authEmail != 'anggi@sanwamas.co.id')))
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                     data-accordion="false">
@@ -272,7 +275,7 @@
             ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager') ||
             $authDept == 'Production' ||
             $authDept == 'Quality Control' ||
-            ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor'))
+            ($authDept == 'Accounting and Finance' && ($authLevel == 'Supervisor' && $authEmail != 'anggi@sanwamas.co.id')))
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                     data-accordion="false">
@@ -298,7 +301,7 @@
                                 ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager') ||
                                 $authDept == 'Fabrication' ||
                                 (($authDept == 'Production and Warehouse' && $authLevel === 'Leader') || $authEmail == 'warehouse_sby@sanwamas.co.id') ||
-                                ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor'))
+                                ($authDept == 'Accounting and Finance' && ($authLevel == 'Supervisor' && $authEmail != 'anggi@sanwamas.co.id')))
                                 <li class="nav-item">
                                     <a href="{{ url('admin/production/po') }}"
                                         class="nav-link @if (Request::is('admin/production/po')) active @endif">
@@ -404,7 +407,7 @@
             $authDept == 'IT' ||
             $authDept == 'Production and Warehouse' ||
             $authDept == 'Production' ||
-            ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor'))
+            ($authDept == 'Accounting and Finance' && ($authLevel == 'Supervisor' && $authEmail != 'anggi@sanwamas.co.id')))
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                     data-accordion="false">
@@ -438,7 +441,7 @@
                                 $authDept == 'Production and Warehouse' ||
                                 ($authDept == 'Production' && $authLevel == 'Staff') ||
                                 $authDept == 'PPIC' ||
-                                ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor'))
+                                ($authDept == 'Accounting and Finance' && ($authLevel == 'Supervisor' && $authEmail != 'anggi@sanwamas.co.id')))
                                 <li class="nav-item">
                                     <a href="{{ url('admin/inventorytf/list') }}"
                                         class="nav-link @if (Request::is('admin/inventorytf/list')) active @endif">
@@ -606,7 +609,7 @@
             ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager') ||
             ($authDept == 'Production and Warehouse' && $authLevel != 'Operator' && $authLevel != 'Leader' && $authEmail != 'warehouse_sby@sanwamas.co.id') ||
             $authDept == 'Production' ||
-            ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor'))
+            ($authDept == 'Accounting and Finance' && ($authLevel == 'Supervisor' && $authEmail != 'anggi@sanwamas.co.id')))
 
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
@@ -642,7 +645,7 @@
                                 $authDept == 'Production and Warehouse' ||
                                 $authDept == 'PPIC' ||
                                 $authDept == 'Production' ||
-                                ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor'))
+                                ($authDept == 'Accounting and Finance' && ($authLevel == 'Supervisor' && $authEmail != 'anggi@sanwamas.co.id')))
                                 <li class="nav-item">
                                     <a href="{{ url('admin/quality/history') }}"
                                         class="nav-link @if (Request::is('admin/quality/history')) active @endif">
@@ -666,7 +669,7 @@
             $authDept == 'Production' ||
             $authDept == 'Purchasing' ||
             $authDept == 'Sales' ||
-            ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor'))
+            ($authDept == 'Accounting and Finance' && ($authLevel == 'Supervisor' && $authEmail != 'anggi@sanwamas.co.id')))
 
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
@@ -694,7 +697,7 @@
                                 $authDept == 'Production and Warehouse' ||
                                 $authDept == 'Production' ||
                                 $authDept == 'Sales' ||
-                                ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor'))
+                                ($authDept == 'Accounting and Finance' && ($authLevel == 'Supervisor' && $authEmail != 'anggi@sanwamas.co.id')))
                                 <li class="nav-item">
                                     <a href="{{ url('admin/reports/semifg') }}"
                                         class="nav-link @if (Request::is('admin/reports/semifg')) active @endif">
@@ -711,7 +714,7 @@
                                 $authDept == 'Production and Warehouse' ||
                                 $authDept == 'Production' ||
                                 $authDept == 'Sales' ||
-                                ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor'))
+                                ($authDept == 'Accounting and Finance' && ($authLevel == 'Supervisor' && $authEmail != 'anggi@sanwamas.co.id')))
                                 <li class="nav-item">
                                     <a href="{{ url('admin/reports/finishgoods') }}"
                                         class="nav-link @if (Request::is('admin/reports/finishgoods')) active @endif">
@@ -725,7 +728,7 @@
                                 ($authDept == 'Procurement, Installation and Delivery' && $authLevel == 'Manager') ||
                                 $authDept == 'PPIC' ||
                                 $authDept == 'Purchasing' ||
-                                ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor'))
+                                ($authDept == 'Accounting and Finance' && ($authLevel == 'Supervisor' && $authEmail != 'anggi@sanwamas.co.id')))
                                 <li class="nav-item">
                                     <a href="{{ url('/reports-bon') }}"
                                         class="nav-link @if (Request::is('admin/reports/bon')) active @endif">
@@ -740,7 +743,7 @@
                                 $authDept == 'PPIC' ||
                                 $authDept == 'Quality Control' ||
                                 $authDept == 'Purchasing' ||
-                                ($authDept == 'Accounting and Finance' && $authLevel == 'Supervisor'))
+                                ($authDept == 'Accounting and Finance' && ($authLevel == 'Supervisor' && $authEmail != 'anggi@sanwamas.co.id')))
                                 <li class="nav-item">
                                     <a href="{{ url('/reports-memo') }}"
                                         class="nav-link @if (Request::is('reports-memo')) active @endif">

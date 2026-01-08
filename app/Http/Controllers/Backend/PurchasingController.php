@@ -5,10 +5,7 @@ namespace App\Http\Controllers\Backend;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\BarcodeModel;
-use App\Models\ItemsMaklonModel;
-use App\Models\PurchaseOrderDetailsModel;
 use App\Models\PurchasingModel;
-use App\Models\StockModel;
 use App\Models\UmebApproveModel;
 use App\Models\UmebKnowingModel;
 use App\Models\BuyerModel;
@@ -19,7 +16,6 @@ use App\Services\SapService;
 use Illuminate\Support\Arr;
 use Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\Date;
 
 class PurchasingController extends Controller
 {
@@ -243,48 +239,6 @@ class PurchasingController extends Controller
         return response()->json([
             'results' => $series->values()
         ]);
-    }
-
-    public function old_index(Request $request)
-    {
-        $getRecord      = PurchasingModel::with("po_details")->get()->values();
-        $getRecordTwo   = PurchasingModel::with("maklon_details")->get()->values();
-        // $getRecord      = PurchaseOrderDetailsModel::with("stocks")->get()->unique("nopo")->values();
-        $getPagination  = PurchasingModel::getRecord($request);
-
-        $purchasingSummary = [];
-        $purchasingSummaryTwo = [];
-        foreach ($getRecord as $record) {
-            $po = $record->no_po;
-            $purchaseQty = PurchaseOrderDetailsModel::where("nopo", $po)->sum("qty");
-            $stockInQty = StockModel::where("no_po", $po)->sum("qty");
-
-            $purchasingSummary[$po] = [
-                'remain' => $purchaseQty - $stockInQty
-            ];
-        }
-        foreach ($getRecordTwo as $record) {
-            $po             = $record->no_po;
-            $purchaseQty    = PurchaseOrderDetailsModel::where("nopo", $po)->sum("qty");
-            $goodReceipt    = ItemsMaklonModel::where("po", $po)
-                ->where(function ($query) {
-                    $query->whereNotNull("gr")->where("gr", "<>", 0);
-                })->sum("qty");
-
-            $purchasingSummaryTwo[$po] = [
-                'remain' => $purchaseQty - $goodReceipt
-            ];
-        }
-
-        return view("backend.purchasing.list", compact('getRecord', 'getPagination', 'purchasingSummary', 'purchasingSummaryTwo'));
-    }
-
-    public function old_view(Request $request, $id)
-    {
-        $getRecord  = PurchasingModel::find($id);
-        $getPO      = PurchasingModel::where("id", $id)->value("no_po");
-        $getData    = PurchaseOrderDetailsModel::where("nopo", $getPO)->get();
-        return view("backend.purchasing.view", compact('getRecord', 'getData', 'getPO'));
     }
 
     public function upload_form()

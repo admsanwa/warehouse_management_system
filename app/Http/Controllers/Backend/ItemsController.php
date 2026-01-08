@@ -174,12 +174,6 @@ class ItemsController extends Controller
         ]);
     }
 
-    public function list_old(Request $request)
-    {
-        $getRecord = ItemsModel::getRecord($request);
-        return view("backend.items.list", compact('getRecord'));
-    }
-
     public function upload(Request $request)
     {
         $request->validate([
@@ -320,6 +314,63 @@ class ItemsController extends Controller
         if (Auth::user()->default_series_prefix === 'SBY') {
             $results = $results->filter(function ($val) {
                 return str_starts_with($val['WhsCode'], 'SB');
+            });
+        } else if (Auth::user()->email === 'admprod_bks@sanwamas.co.id') {
+            $results = $results->filter(function ($val) {
+                return $val['WhsCode'] === 'BK002';
+            });
+        }
+
+        $wh = $results->map(function ($val) {
+
+            return [
+                'id'   => $val['WhsCode'],
+                'text' => $val['WhsCode'] . ' ' . $val['WhsName'],
+            ];
+        });
+
+        return response()->json([
+            'results' => $wh,
+            'api_response' => $results
+        ]);
+    }
+
+    public function warehouse_search_custom(Request $request)
+    {
+        $q = $request->get('q');
+        $page = (int) $request->get('page', 1);
+        $limit = (int) $request->get('limit', 10);
+        $results = collect();
+        // 1. Cari berdasarkan WhsCode
+        $paramCode = [
+            "page" => $page,
+            "limit" => $limit,
+            "WhsCode" => $q,
+        ];
+        $getCode = $this->sap->getWarehouses($paramCode);
+
+        if (!empty($getCode) && $getCode['success'] === true) {
+            $results = $results->merge($getCode['data']);
+        }
+
+        // 2. Cari berdasarkan WhsName
+        $paramName = [
+            "page" => $page,
+            "limit" => $limit,
+            "WhsName" => $q,
+        ];
+        $getName = $this->sap->getWarehouses($paramName);
+
+        if (!empty($getName) && $getName['success'] === true) {
+            $results = $results->merge($getName['data']);
+        }
+
+        $results = $results->unique('WhsCode')->values();
+        $user = Auth::user();
+
+        if ($user->email === 'admprod_bks@sanwamas.co.id' || $user->department === 'Quality Control') {
+            $results = $results->filter(function ($val) {
+                return $val['WhsCode'] === $this->default_warehouse;
             });
         }
 

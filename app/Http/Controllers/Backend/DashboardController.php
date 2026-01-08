@@ -6,23 +6,11 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\BonModel;
 use App\Models\DeliveryModel;
-use App\Models\ItemsModel;
 use App\Models\MemoModel;
-use App\Models\ProductionModel;
-use App\Models\goodissueModel;
 use App\Models\goodreceiptModel;
-use App\Models\ProductionOrderDetailsModel;
-use App\Models\PurchaseOrderDetailsModel;
-use App\Models\PurchasingModel;
 use App\Models\QualityModel;
-use App\Models\RFPModel;
-use App\Models\IFPModel;
-use App\Models\StockModel;
 use Auth;
-use DB;
 use App\Services\SapService;
-
-use App\Models\ProgressTrackingModel;
 use App\Helpers\ProgressHelper;
 use App\Models\grpoModel;
 
@@ -271,42 +259,6 @@ class DashboardController extends Controller
     {
         session()->forget('deliveryPending');
         return redirect('admin/delivery/list');
-    }
-
-    public function min_stock(Request $request)
-    {
-        $latestStock = DB::table('stocks as s1')
-            ->select('s1.item_code', 's1.stock_in', 's1.stock_out', 's1.id as stock_id')
-            ->whereRaw('s1.id = (SELECT MAX(s2.id) FROM stocks s2 WHERE s2.item_code = s1.item_code)');
-
-        $getRecord = ItemsModel::leftJoinSub($latestStock, 'latest', function ($join) {
-            $join->on('latest.item_code', '=', 'items.code');
-        })
-            ->select('items.id', 'items.code', 'items.name', 'items.uom', 'items.stock_min', 'items.in_stock', 'items.updated_at')
-            ->selectRaw('COALESCE(latest.stock_in,0) as last_in')
-            ->selectRaw('COALESCE(latest.stock_out,0) as last_out')
-            ->selectRaw('latest.stock_id')
-            ->whereRaw('items.stock_min >= (items.in_stock + (COALESCE(latest.stock_in,0) - COALESCE(latest.stock_out,0)))')
-            ->orderByDesc('latest.stock_id')
-            ->paginate(10);
-
-        return view("backend.dashboard.minstock", compact('getRecord'));
-    }
-
-    public function after_check(Request $request)
-    {
-
-        $getRecord = ProductionModel::with('qualityTwo')
-            ->whereHas('qualityTwo', function ($q) {
-                $q->whereNotNull('result');
-            })
-            ->filter($request) // <-- using the scope
-            ->orderBy('id', 'desc')
-            ->get()
-            ->unique('io_no');
-        $user = Auth::user();
-
-        return view("backend.dashboard.aftercheck", compact('getRecord', 'user'));
     }
 
     public function deliv_status(Request $request)
