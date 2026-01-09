@@ -315,10 +315,6 @@ class ItemsController extends Controller
             $results = $results->filter(function ($val) {
                 return str_starts_with($val['WhsCode'], 'SB');
             });
-        } else if (Auth::user()->email === 'admprod_bks@sanwamas.co.id') {
-            $results = $results->filter(function ($val) {
-                return $val['WhsCode'] === 'BK002';
-            });
         }
 
         $wh = $results->map(function ($val) {

@@ -33,7 +33,7 @@
                                         <label for="" class="col-sm-3 col-form-lable">Tipe Bon :</label>
                                         <div class="col-sm-6">
                                             <select name="type" id="type" class="form-control">
-                                                <option value="">Select tipe bon Lokal/Import</option>
+                                                <option value="">Select tipe bon Lokal/Import</option required>
                                                 <option value="Lokal">Lokal</option>
                                                 <option value="Import">Import</option>
                                             </select>
@@ -49,7 +49,7 @@
                                     <div class="form-group row">
                                         <label for="" class="col-sm-3 col-form-lable">Tanggal :</label>
                                         <div class="col-sm-6">
-                                            <input type="date" name="date" id="date" class="form-control">
+                                            <input type="date" name="date" id="date" class="form-control" required>
                                         </div>
                                     </div>
                                     <div class="form-group row">
@@ -67,14 +67,14 @@
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="" class="col-sm-3 col-form-label">IO :</label>
+                                        <label for="" class="col-sm-3 col-form-label">IO<span style="color:springgreen"> (optional)</span> :</label>
                                         <div class="col-sm-6">
                                             <input type="text" name="io" id="io" class="form-control"
                                                 placeholder="Masukkan IO">
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="" class="col-sm-3 col-form-label">Project :</label>
+                                        <label for="" class="col-sm-3 col-form-label">Project<span style="color:springgreen"> (optional) </span> :</label>
                                         <div class="col-sm-6">
                                             <input type="text" name="project" id="project" class="form-control"
                                                 placeholder="Masukkan Project">
@@ -83,7 +83,7 @@
                                     <div class="form-group row">
                                         <label for="" class="col-sm-3 col-form-lable">Make to Order/Stock :</label>
                                         <div class="col-sm-6">
-                                            <select name="make_to" id="make_to" class="form-control">
+                                            <select name="make_to" id="make_to" class="form-control" required>
                                                 <option value="">Make to Order/Stock</option>
                                                 <option value="Stock">Stock</option>
                                                 <option value="Order">Order</option>

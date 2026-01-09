@@ -39,13 +39,13 @@
                                     <div class="form-group row">
                                         <label for="" class="col-sm-3 col-form-lable">Tanggal :</label>
                                         <div class="col-sm-6">
-                                            <input type="date" name="date" id="date" class="form-control">
+                                            <input type="date" name="date" id="date" class="form-control" required>
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="" class="col-sm-3 col-form-lable">Hal :</label>
                                         <div class="col-sm-6">
-                                            <select name="description" id="description" class="form-control">
+                                            <select name="description" id="description" class="form-control" required>
                                                 <option value="">Pilih hal disini</option>
                                                 <option value="Stock Produksi">Stock Produksi</option>
                                                 <option value="Kirim barang ke maklon">Kirim barang ke maklon</option>
@@ -55,7 +55,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="" class="col-sm-3 col-form-label">Proyek/Order :</label>
+                                        <label for="" class="col-sm-3 col-form-label">Proyek/Order<span style="color:springgreen"> (optional) </span>:</label>
                                         <div class="col-sm-6">
                                             <input type="text" name="project" id="project" class="form-control"
                                                 placeholder="Enter Proyek atau Order">
@@ -65,17 +65,17 @@
                                         <label for="" class="col-sm-3 col-form-label">IO :</label>
                                         <div class="col-sm-6">
                                             <input type="text" name="io" id="io" class="form-control"
-                                                placeholder="Enter IO">
+                                                placeholder="Enter IO" required>
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <label for="" class="col-sm-3 col-form-label">Due Date :</label>
                                         <div class="col-sm-6">
-                                            <input type="date" name="duedate" id="duedate" class="form-control">
+                                            <input type="date" name="duedate" id="duedate" class="form-control" required>
                                         </div>
                                     </div>
                                     <div id="unitContainer">
-                                        <div class="unit-block">
+                                        <div class="unit-block mb-3 p-3 border rounded bg-light">
                                             <div class="form-group row">
                                                 <label for="" class="col-sm-3 col-form-label">Kebutuhan :</label>
                                                 <div class="col-sm-6">

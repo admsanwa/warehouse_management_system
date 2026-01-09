@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Request;
 
 class MemoModel extends Model
@@ -41,43 +42,45 @@ class MemoModel extends Model
 
     public static function generateNumber()
     {
-        $now = Carbon::now();
-        $month = $now->month;
-        $year = $now->year;
-        $lastMemo = MemoModel::orderByDesc('id')->first();
-        $romanMonths = [
-            1 => 'I',
-            2 => 'II',
-            3 => 'III',
-            4 => 'IV',
-            5 => 'V',
-            6 => 'VI',
-            7 => 'VII',
-            8 => 'VIII',
-            9 => 'IX',
-            10 => 'X',
-            11 => 'XI',
-            12 => 'XII',
-        ];
+        return DB::transaction(function () {
 
-        $romanMonth = $romanMonths[$month];
-        $shortYears = substr($year, -2);
+            $now = Carbon::now();
+            $month = $now->month;
+            $year = substr($now->year, -2);
+            $romanMonths = [
+                1 => 'I',
+                2 => 'II',
+                3 => 'III',
+                4 => 'IV',
+                5 => 'V',
+                6 => 'VI',
+                7 => 'VII',
+                8 => 'VIII',
+                9 => 'IX',
+                10 => 'X',
+                11 => 'XI',
+                12 => 'XII',
+            ];
 
-        if ($lastMemo && !empty($lastMemo->no)) {
-            $parts = explode('/', $lastMemo->no);
-            $lastYear = intval($parts[4]);
+            $romanMonth = $romanMonths[$month];
+            // Get max number for current month & year
+            $lastNumber = MemoModel::where('no', 'LIKE', "%/P/PPIC/{$romanMonth}/{$year}%")
+                ->lockForUpdate()
+                ->selectRaw("MAX(CAST(SUBSTRING_INDEX(no, '/', 1) AS UNSIGNED)) AS max_no")
+                ->value('max_no');
 
-            if ($lastYear == $shortYears) {
-                $lastNumber = intval($parts[0]);
-                $number = $lastNumber + 1;
-            } else {
-                $number = 1;
+            $number = ($lastNumber ?? 0) + 1;
+
+            // Ensure no duplicate (safety check)
+            $noMemo = "{$number}/P/PPIC/{$romanMonth}/{$year}";
+
+            // Final safety check (should be false due to lock)
+            if (MemoModel::where('no', $noMemo)->exists()) {
+                throw new \Exception("Duplicate memo number detected");
             }
-        } else {
-            $number = 1;
-        }
 
-        return "{$number}/P/PPIC/{$romanMonth}/{$shortYears}";
+            return $noMemo;
+        });
     }
 
     public function details()

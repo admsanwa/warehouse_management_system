@@ -294,7 +294,7 @@ class ProductionController extends Controller
                 'no'            => $validated['no'],
                 'date'          => $validated['date'],
                 'description'   => $request->description,
-                'project'       => $request->project,
+                'project'       => $request->project ?? '-',
                 'io'            => $validated['io'],
                 'due_date'      => $validated['duedate'],
             ]);
