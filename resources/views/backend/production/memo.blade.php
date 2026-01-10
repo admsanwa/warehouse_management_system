@@ -62,10 +62,10 @@
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label for="" class="col-sm-3 col-form-label">IO :</label>
+                                        <label for="" class="col-sm-3 col-form-label">IO <span style="color:springgreen"> (optional) </span>:</label>
                                         <div class="col-sm-6">
                                             <input type="text" name="io" id="io" class="form-control"
-                                                placeholder="Enter IO" required>
+                                                placeholder="Enter IO">
                                         </div>
                                     </div>
                                     <div class="form-group row">
